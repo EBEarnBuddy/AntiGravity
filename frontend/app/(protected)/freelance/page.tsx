@@ -1,8 +1,7 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useRouter } from 'next/navigation';
 import {
     Search,
     Plus,
@@ -21,36 +20,21 @@ import {
     ChevronRight,
     ChevronLeft
 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
-import CreateProjectModal from '@/components/CreateProjectModal'; // Ensure this exists
-import { FirestoreService, Gig } from '@/lib/firestore';
+import CreateProjectModal from '@/components/CreateProjectModal';
+import { Gig } from '@/lib/firestore';
+import { useProjects } from '@/hooks/useFirestore';
 import { Skeleton } from '@/components/ui/skeleton';
 
 const FreelancePage: React.FC = () => {
     const { currentUser } = useAuth();
     const router = useRouter();
+    const { projects, loading } = useProjects();
     const [searchTerm, setSearchTerm] = useState('');
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [showApplicationModal, setShowApplicationModal] = useState(false);
     const [selectedProject, setSelectedProject] = useState<Gig | null>(null);
-    const [projects, setProjects] = useState<Gig[]>([]);
-    const [loading, setLoading] = useState(true);
-
-    const fetchProjects = async () => {
-        try {
-            setLoading(true);
-            const fetchedProjects = await FirestoreService.getProjects();
-            setProjects(fetchedProjects);
-        } catch (error) {
-            console.error('Error fetching projects:', error);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    useEffect(() => {
-        fetchProjects();
-    }, []);
 
     const filteredProjects = projects.filter(project => {
         const matchesSearch = project.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -238,7 +222,6 @@ const FreelancePage: React.FC = () => {
                 onClose={() => setShowCreateModal(false)}
                 onSuccess={() => {
                     setShowCreateModal(false);
-                    fetchProjects();
                 }}
             />
         </div>

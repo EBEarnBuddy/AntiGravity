@@ -2,8 +2,12 @@ import { Request, Response } from 'express';
 import Opportunity from '../models/Opportunity';
 import { AuthRequest } from '../middlewares/auth';
 import User from '../models/User';
+import Room from '../models/Room';
+import RoomMembership from '../models/RoomMembership';
 
 // Create Opportunity
+// For startup opportunities this will also auto-create a private Room
+// which acts as the "Opportunity Circle" for collaboration.
 export const createOpportunity = async (req: AuthRequest, res: Response) => {
     try {
         const { uid } = req.user!;
@@ -13,13 +17,42 @@ export const createOpportunity = async (req: AuthRequest, res: Response) => {
             return;
         }
 
+        const payload = req.body || {};
+
+        // Create an Opportunity Circle (Room) for this opportunity.
+        // We keep this generic so it also works for future freelance/project postings.
+        const roomName = payload.name || payload.title || 'Opportunity Circle';
+        const roomDescription = payload.description || 'Opportunity collaboration space';
+
+        const room = await Room.create({
+            name: roomName,
+            description: roomDescription,
+            isPrivate: true,
+            icon: payload.industry,
+            createdBy: user._id,
+            membersCount: 1,
+        });
+
+        await RoomMembership.create({
+            room: room._id,
+            user: user._id,
+            role: 'admin',
+        });
+
         const opportunity = await Opportunity.create({
-            ...req.body,
+            ...payload,
             postedBy: user._id,
+            room: room._id,
+            // For startup opportunities, default startupStatus to active if not explicitly provided
+            startupStatus: payload.startupStatus || 'active',
+            founderId: payload.founderId || uid,
+            founderName: payload.founderName || user.displayName,
+            founderAvatar: payload.founderAvatar || user.photoURL,
         });
 
         res.status(201).json(opportunity);
     } catch (error) {
+        console.error('Error creating opportunity:', error);
         res.status(500).json({ error: 'Failed to create opportunity' });
     }
 };

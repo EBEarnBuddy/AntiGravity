@@ -23,7 +23,7 @@ import {
   Award
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import axios from '../lib/axios';
+import { useProjects } from '../hooks/useFirestore';
 
 interface Role {
   title: string;
@@ -48,6 +48,7 @@ interface CreateProjectModalProps {
 
 const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose, onSuccess }) => {
   const { currentUser } = useAuth();
+  const { createProject } = useProjects();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState({
@@ -264,51 +265,63 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose
 
     setIsSubmitting(true);
     try {
-      const response = await axios.post('/api/projects', formData);
+      const projectPayload = {
+        title: formData.title,
+        description: formData.description,
+        company: formData.company,
+        industry: formData.industry,
+        projectType: formData.projectType,
+        totalBudget: `${formData.totalBudget.currency} ${formData.totalBudget.min} - ${formData.totalBudget.max}`,
+        duration: formData.duration,
+        location: formData.location,
+        remote: formData.remote,
+        equity: formData.equity,
+        tags: formData.tags,
+        urgency: formData.urgency,
+        benefits: formData.benefits,
+        roles: formData.roles,
+        requirements: formData.requirements,
+        contact: formData.contact,
+        additionalInfo: formData.additionalInfo,
+      };
 
-      if (response.data.success) {
-        onSuccess();
-        onClose();
-        // Reset form
-        setFormData({
-          title: '',
-          description: '',
-          company: '',
-          industry: '',
-          projectType: 'startup',
-          totalBudget: { min: 0, max: 0, currency: 'USD' },
-          duration: '',
-          location: '',
-          remote: false,
-          equity: '',
-          tags: [],
-          urgency: 'medium',
-          roles: [],
-          benefits: [],
-          requirements: {
-            teamSize: 1,
-            startDate: '',
-            endDate: '',
-            timezone: 'UTC'
-          },
-          contact: {
-            email: '',
-            phone: '',
-            website: ''
-          },
-          additionalInfo: ''
-        });
-        setCurrentStep(1);
-      }
+      await createProject(projectPayload);
+
+      onSuccess();
+      onClose();
+      // Reset form
+      setFormData({
+        title: '',
+        description: '',
+        company: '',
+        industry: '',
+        projectType: 'startup',
+        totalBudget: { min: 0, max: 0, currency: 'USD' },
+        duration: '',
+        location: '',
+        remote: false,
+        equity: '',
+        tags: [],
+        urgency: 'medium',
+        roles: [],
+        benefits: [],
+        requirements: {
+          teamSize: 1,
+          startDate: '',
+          endDate: '',
+          timezone: 'UTC'
+        },
+        contact: {
+          email: '',
+          phone: '',
+          website: ''
+        },
+        additionalInfo: ''
+      });
+      setCurrentStep(1);
     } catch (error: any) {
       console.error('Error creating project:', error);
-      if (error.code === 'ERR_NETWORK') {
-        alert('Cannot connect to server. Please make sure the backend server is running on http://localhost:5000');
-      } else if (error.response?.status === 404) {
-        alert('API endpoint not found. Please check if the backend server is running correctly.');
-      } else {
-        alert(error.response?.data?.message || 'Failed to create project. Please try again.');
-      }
+      alert(error.response?.data?.message || 'Failed to create project. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
