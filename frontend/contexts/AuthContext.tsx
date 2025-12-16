@@ -44,12 +44,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const createUserProfile = async (user: User, additionalData?: any) => {
     if (!user) return;
 
-    try {
-      // Sync with backend (creates or retrieves user)
-      const response = await userAPI.sync();
-      setUserProfile(response.data);
-    } catch (error) {
-      console.error('Error syncing user profile:', error);
+    let retries = 3;
+    while (retries > 0) {
+      try {
+        // Sync with backend (creates or retrieves user)
+        const response = await userAPI.sync();
+        setUserProfile(response.data);
+        return; // Success, exit
+      } catch (error) {
+        console.error(`Error syncing user profile (attempts left: ${retries - 1}):`, error);
+        retries--;
+        if (retries === 0) {
+          // Final attempt failed, maybe set a global error state or just log
+          console.error("Critical: Failed to sync user profile after multiple attempts.");
+        } else {
+          // Wait a bit before retrying (exponential backoff could be better but simple 1s delay is fine)
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        }
+      }
     }
   };
 

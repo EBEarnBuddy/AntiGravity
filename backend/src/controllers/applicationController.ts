@@ -5,6 +5,7 @@ import User from '../models/User';
 import { AuthRequest } from '../middlewares/auth';
 import Room from '../models/Room';
 import RoomMembership from '../models/RoomMembership';
+import { createNotification } from './notificationController';
 
 // Apply to an Opportunity
 // This endpoint is intentionally flexible to support the current frontend,
@@ -76,6 +77,19 @@ export const applyToOpportunity = async (req: AuthRequest, res: Response) => {
         }
 
         await opportunity.save();
+
+        // Notify Opportunity Owner
+        const owner = await User.findById(opportunity.postedBy);
+        if (owner) {
+            await createNotification(
+                owner.firebaseUid,
+                user.firebaseUid,
+                'application_received',
+                'New Application Received',
+                `${user.displayName || 'Someone'} applied to ${opportunity.title}`,
+                `/dashboard` // Or deep link to manage applications
+            );
+        }
 
         res.status(201).json(application);
     } catch (error) {
@@ -198,6 +212,19 @@ export const updateApplicationStatus = async (req: AuthRequest, res: Response) =
                     await Room.findByIdAndUpdate(roomId, { $inc: { membersCount: 1 } });
                 }
             }
+        }
+
+        // Notify Applicant
+        const applicantUser = await User.findById(application.applicant);
+        if (applicantUser) {
+            await createNotification(
+                applicantUser.firebaseUid,
+                adminUser.firebaseUid,
+                status === 'accepted' ? 'application_accepted' : 'application_rejected',
+                `Application ${status.charAt(0).toUpperCase() + status.slice(1)}`,
+                `Your application for ${opportunity.title} was ${status}.`,
+                `/applications`
+            );
         }
 
         res.json(application);

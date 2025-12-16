@@ -29,7 +29,11 @@ export const initSocket = (httpServer: HttpServer) => {
     });
 
     io.on('connection', (socket: Socket) => {
-        console.log(`User connected: ${socket.data.user.uid}`);
+        const uid = socket.data.user.uid;
+        console.log(`User connected: ${uid}`);
+
+        // Join personal room for notifications
+        socket.join(`user_${uid}`);
 
         socket.on('join_room', async (roomId: string) => {
             try {

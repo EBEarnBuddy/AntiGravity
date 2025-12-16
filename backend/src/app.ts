@@ -24,12 +24,14 @@ import applicationRoutes from './routes/applicationRoutes';
 import roomRoutes from './routes/roomRoutes';
 import collabRoutes from './routes/collabRoutes';
 import eventRoutes from './routes/eventRoutes';
+import notificationRoutes from './routes/notificationRoutes';
 
 // Routes
 app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/opportunities', opportunityRoutes);
 app.use('/api/v1/applications', applicationRoutes);
 app.use('/api/v1/rooms', roomRoutes);
+app.use('/api/v1/notifications', notificationRoutes);
 app.use('/api/v1/collab', collabRoutes);
 app.use('/api/v1/events', eventRoutes);
 

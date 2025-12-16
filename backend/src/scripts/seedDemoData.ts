@@ -223,6 +223,10 @@ async function seedCircles(posterId: mongoose.Types.ObjectId) {
     { name: 'Product Management', icon: '📅', desc: 'Roadmaps, strategy, and user talks.' },
     { name: 'Crypto & Web3', icon: '⛓️', desc: 'DeFi, NFTs, and DAOs.' },
     { name: 'Mobile Devs', icon: '📱', desc: 'iOS, Android, React Native, Flutter.' },
+    // New Demo Circles for Verification
+    { name: 'General Lounge', icon: '☕', desc: 'Chill hangout for everyone.' },
+    { name: 'Startup Ideas', icon: '💡', desc: 'Validate your crazy ideas here.' },
+    { name: 'EarnBuddy Feedback', icon: '📢', desc: 'Help us improve the platform!' },
   ];
 
   for (const cat of categories) {

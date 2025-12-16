@@ -5,6 +5,7 @@ import User from '../models/User';
 import RoomMembership from '../models/RoomMembership';
 import { AuthRequest } from '../middlewares/auth';
 import { getIO } from '../socket';
+import { createNotification } from './notificationController';
 
 // Send Message
 export const sendMessage = async (req: AuthRequest, res: Response) => {
@@ -43,8 +44,28 @@ export const sendMessage = async (req: AuthRequest, res: Response) => {
         try {
             const io = getIO();
             io.to(roomId).emit('new_message', message);
+
+            // Notify offline / inactive members
+            // For MVP, we notify all OTHER members. 
+            // In a real app, we'd check if they are currently connected to the socket room.
+            const memberships = await RoomMembership.find({ room: roomId, user: { $ne: user._id } });
+
+            for (const member of memberships) {
+                const recipient = await User.findById(member.user);
+                if (recipient) {
+                    // Provide a generic title or room name if possible
+                    await createNotification(
+                        recipient.firebaseUid,
+                        user.firebaseUid,
+                        'new_message',
+                        `New Message from ${user.displayName}`,
+                        message.content.substring(0, 50) + (message.content.length > 50 ? '...' : ''),
+                        `/rooms/${roomId}`
+                    );
+                }
+            }
         } catch (err) {
-            console.error('Socket emit failed:', err);
+            console.error('Socket/Notification failed:', err);
         }
 
         res.status(201).json(message);

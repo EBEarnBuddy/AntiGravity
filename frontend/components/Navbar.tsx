@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { Bell, Globe, User, LogOut, LayoutDashboard, Settings } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import NotificationDropdown from './NotificationDropdown';
 
 const Navbar: React.FC = () => {
     const pathname = usePathname();
@@ -54,10 +55,7 @@ const Navbar: React.FC = () => {
 
             {/* Right Icons */}
             <div className="flex items-center gap-4">
-                <button className="p-2 hover:bg-green-700 rounded-full transition relative">
-                    <Bell className="w-5 h-5 text-white" />
-                    <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border border-green-600"></span>
-                </button>
+                <NotificationDropdown />
 
                 {/* Profile Dropdown */}
                 <div className="relative" ref={dropdownRef}>
