@@ -1,0 +1,78 @@
+import { Server, Socket } from 'socket.io';
+import { Server as HttpServer } from 'http';
+import { auth } from './config/firebase';
+import RoomMembership from './models/RoomMembership';
+import User from './models/User';
+
+export const initSocket = (httpServer: HttpServer) => {
+    const io = new Server(httpServer, {
+        cors: {
+            origin: '*', // Allow all for dev, tighten for prod
+            methods: ['GET', 'POST']
+        }
+    });
+
+    // Middleware for Auth
+    io.use(async (socket, next) => {
+        const token = socket.handshake.auth.token;
+        if (!token) {
+            return next(new Error('Authentication error'));
+        }
+
+        try {
+            const decodedToken = await auth.verifyIdToken(token);
+            socket.data.user = decodedToken;
+            next();
+        } catch (err) {
+            next(new Error('Authentication error'));
+        }
+    });
+
+    io.on('connection', (socket: Socket) => {
+        console.log(`User connected: ${socket.data.user.uid}`);
+
+        socket.on('join_room', async (roomId: string) => {
+            try {
+                const user = await User.findOne({ firebaseUid: socket.data.user.uid });
+                if (!user) return;
+
+                // Verify membership before allowing join
+                const isMember = await RoomMembership.exists({ room: roomId, user: user._id });
+
+                if (isMember) {
+                    socket.join(roomId);
+                    console.log(`User ${user.displayName} joined room ${roomId}`);
+                } else {
+                    console.warn(`User ${user.displayName} tried to join room ${roomId} without membership`);
+                    socket.emit('error', 'Not a member of this room');
+                }
+            } catch (error) {
+                console.error('Error joining room:', error);
+            }
+        });
+
+        socket.on('leave_room', (roomId: string) => {
+            socket.leave(roomId);
+        });
+
+        socket.on('disconnect', () => {
+            console.log('User disconnected');
+        });
+    });
+
+    return io;
+};
+
+// Global IO instance holder to use in controllers
+let ioInstance: Server | null = null;
+
+export const setIO = (io: Server) => {
+    ioInstance = io;
+};
+
+export const getIO = () => {
+    if (!ioInstance) {
+        throw new Error('Socket.io not initialized!');
+    }
+    return ioInstance;
+};

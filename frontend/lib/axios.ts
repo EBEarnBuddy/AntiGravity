@@ -42,13 +42,13 @@ api.interceptors.response.use(
 export const userAPI = {
   sync: () => api.post('/users/sync'),
   getMe: () => api.get('/users/me'),
-  updateMe: (data: any) => api.put('/users/me', data),
+  updateMe: (data: Record<string, unknown>) => api.put('/users/me', data),
 };
 
 export const opportunityAPI = {
   getAll: (type?: string) => api.get('/opportunities', { params: { type } }),
   getById: (id: string) => api.get(`/opportunities/${id}`),
-  create: (data: any) => api.post('/opportunities', data),
+  create: (data: Record<string, unknown>) => api.post('/opportunities', data),
 };
 
 export const applicationAPI = {
@@ -59,13 +59,13 @@ export const applicationAPI = {
 export const roomAPI = {
   getAll: () => api.get('/rooms'),
   getMyRooms: () => api.get('/rooms/me'),
-  create: (data: any) => api.post('/rooms', data),
+  create: (data: Record<string, unknown>) => api.post('/rooms', data),
   join: (roomId: string) => api.post(`/rooms/${roomId}/join`),
 };
 
 export const eventAPI = {
   getAll: (limit?: number) => api.get('/events', { params: { limit } }),
-  create: (data: any) => api.post('/events', data),
+  create: (data: Record<string, unknown>) => api.post('/events', data),
 };
 
 export const messageAPI = {
@@ -75,8 +75,8 @@ export const messageAPI = {
 };
 
 export const communityPostsAPI = {
-  create: (data: any) => api.post('/community-posts', data),
-  createPost: (data: any) => api.post('/community-posts', data),
+  create: (data: Record<string, unknown>) => api.post('/community-posts', data),
+  createPost: (data: Record<string, unknown>) => api.post('/community-posts', data),
   getAll: () => api.get('/community-posts'),
   // Add other methods as needed based on usage
 };

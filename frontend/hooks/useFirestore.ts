@@ -79,10 +79,12 @@ export const useRoomMessages = (roomId: string) => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { currentUser } = useAuth(); // Need to ensure user is logged in for socket
 
   useEffect(() => {
     if (!roomId) return;
 
+    // 1. Fetch historical messages via HTTP
     const fetchMessages = async () => {
       try {
         setLoading(true);
@@ -96,20 +98,83 @@ export const useRoomMessages = (roomId: string) => {
     };
 
     fetchMessages();
-    // Polling setup could go here if no sockets
-    const interval = setInterval(fetchMessages, 5000);
-    return () => clearInterval(interval);
 
-  }, [roomId]);
+    // 2. Setup Real-time Socket Connection
+    let socketInstance: any = null;
+
+    const setupSocket = async () => {
+      try {
+        // Dynamic import to avoid SSR issues if any, though "use client" handles it.
+        // Using the lib helper we created
+        const { getSocket } = await import('../lib/socket');
+        const socket = await getSocket();
+
+        if (socket) {
+          socketInstance = socket;
+
+          // Join Room
+          socket.emit('join_room', roomId);
+
+          // Listen for messages
+          socket.on('new_message', (newMessage: ChatMessage) => {
+            setMessages((prev) => {
+              // Prevent duplicates if backend emits for sender too, but sender usually optimistic updates.
+              // Assuming backend sends a proper ID.
+              if (prev.find(m => m.id === newMessage.id || (m as any)._id === (newMessage as any)._id)) {
+                return prev;
+              }
+              return [...prev, newMessage];
+            });
+          });
+
+          // Listen for errors (e.g. not a member)
+          socket.on('error', (err: any) => {
+            console.error('Socket Error:', err);
+            if (err === 'Not a member of this room') {
+              setError('You are not authorized to view this chat.');
+            }
+          });
+        }
+      } catch (err) {
+        console.error('Failed to setup socket:', err);
+      }
+    };
+
+    if (currentUser) {
+      setupSocket();
+    }
+
+    // Cleanup
+    return () => {
+      if (socketInstance) {
+        socketInstance.emit('leave_room', roomId);
+        socketInstance.off('new_message');
+        socketInstance.off('error');
+      }
+    };
+
+  }, [roomId, currentUser]);
 
   const sendMessage = async (content: string, senderId: string, type: 'text' | 'image' = 'text') => {
     try {
-      await messageAPI.send(roomId, content, type);
-      // Refresh
-      const response = await messageAPI.getAll(roomId);
-      setMessages(response.data);
+      // Send via HTTP (Reliable storage)
+      const response = await messageAPI.send(roomId, content, type);
+      const savedMessage = response.data;
+
+      // Optimistic update is tricky with ID mismatch, but since we refetch history or get socket event, 
+      // we can rely on socket event for the "official" append, 
+      // OR append optimistically and let the socket event dedupe.
+      // Backend controller emits 'new_message', so our listener above will catch it.
+      // We rely on the socket listener to display it to self as well for consistency, 
+      // OR we can deduplicate.
+
+      // For now, let's rely on the socket event coming back from the server (latency is low). 
+      // But for better UX, we might want to append immediately.
+      // If we append immediately, we need a temp ID.
+
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to send message');
+      throw err; // Re-throw so UI can handle error state (e.g. clear input or not)
     }
   };
 

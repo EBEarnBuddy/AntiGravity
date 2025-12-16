@@ -1,5 +1,7 @@
 import mongoose from 'mongoose';
 import app from './app';
+import http from 'http';
+import { initSocket, setIO } from './socket';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -16,7 +18,14 @@ const startServer = async () => {
             console.log('✅ MongoDB connected successfully');
         }
 
-        app.listen(PORT, () => {
+        // Create HTTP server from Express app
+        const server = http.createServer(app);
+
+        // Initialize Socket.io
+        const io = initSocket(server);
+        setIO(io);
+
+        server.listen(PORT, () => {
             console.log(`✅ Server running on http://localhost:${PORT}`);
         });
     } catch (error) {
