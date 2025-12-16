@@ -15,12 +15,14 @@ import {
 import { useAuth } from '@/contexts/AuthContext';
 import { useRooms } from '@/hooks/useFirestore';
 import { Skeleton } from '@/components/ui/skeleton';
+import CreateCircleModal from '@/components/CreateCircleModal';
 
 const CirclesPage: React.FC = () => {
     const { currentUser } = useAuth();
     const router = useRouter();
     const { rooms, loading, joinRoom, requestJoin } = useRooms();
     const [searchTerm, setSearchTerm] = useState('');
+    const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
     const filteredRooms = rooms.filter(room =>
         room.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -68,6 +70,7 @@ const CirclesPage: React.FC = () => {
                             Browse Circles
                         </button>
                         <button
+                            onClick={() => setIsCreateModalOpen(true)}
                             className="px-8 py-3 bg-green-600 text-white font-bold rounded-xl hover:bg-green-700 transition shadow-lg shadow-green-200 transform hover:-translate-y-1"
                         >
                             Create a Circle
@@ -75,8 +78,14 @@ const CirclesPage: React.FC = () => {
                     </div>
                 </div>
 
+                <CreateCircleModal
+                    isOpen={isCreateModalOpen}
+                    onClose={() => setIsCreateModalOpen(false)}
+                    onSuccess={() => setIsCreateModalOpen(false)}
+                />
+
                 {/* Search Bar */}
-                <div className="max-w-3xl mx-auto mb-20 relative z-10">
+                < div className="max-w-3xl mx-auto mb-20 relative z-10" >
                     <div className="relative group">
                         <div className="absolute inset-0 bg-green-200 rounded-2xl blur opacity-25 group-hover:opacity-40 transition duration-500"></div>
                         <div className="relative bg-white rounded-2xl shadow-xl flex items-center p-2 border border-slate-100">
@@ -90,10 +99,10 @@ const CirclesPage: React.FC = () => {
                             />
                         </div>
                     </div>
-                </div>
+                </div >
 
                 {/* Active Circles Grid */}
-                <div className="mb-24">
+                < div className="mb-24" >
                     <div className="flex items-center justify-between mb-8">
                         <h2 className="text-3xl font-black text-slate-800 tracking-tight">Active Communities</h2>
                         <button className="text-green-600 font-bold text-sm flex items-center hover:underline">View All <ChevronRight className="w-4 h-4" /></button>
@@ -171,7 +180,7 @@ const CirclesPage: React.FC = () => {
                             })
                         )}
                     </div>
-                </div>
+                </div >
 
 
                 {/* Featured Events (Wireframe "Upcoming Events" style) */}
@@ -221,8 +230,8 @@ const CirclesPage: React.FC = () => {
                     Earnbuddy Pvt. Ltd. all rights reserved
                 </footer>
 
-            </div>
-        </div>
+            </div >
+        </div >
     );
 };
 

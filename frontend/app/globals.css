@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=BBH+Hegarty&family=Science+Gothic:wght@200..900&display=swap');
 @import "tailwindcss";
 
 
@@ -64,6 +65,28 @@
   --ring: 222.2 84% 4.9%;
 
   --radius: 0.5rem;
+
+  --font-heading: 'BBH Hegarty', system-ui, sans-serif;
+  --font-body: 'Science Gothic', system-ui, sans-serif;
+}
+
+@layer base {
+  body {
+    font-family: var(--font-body);
+    font-weight: 200;
+    /* Extralight as requested */
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  button,
+  .btn {
+    font-family: var(--font-heading);
+  }
 }
 
 /* Animations from SignIn Component */

@@ -6,7 +6,7 @@ import { AuthRequest } from '../middlewares/auth';
 export const syncUser = async (req: AuthRequest, res: Response) => {
     try {
         const { uid, email } = req.user!;
-        const { displayName, photoURL } = req.body;
+        const { displayName, photoURL } = req.body || {};
 
         const user = await User.findOneAndUpdate(
             { firebaseUid: uid },
