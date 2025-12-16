@@ -1,4 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=BBH+Hegarty&family=Science+Gothic:wght@200..900&display=swap');
 @import "tailwindcss";
 
 
@@ -65,9 +64,6 @@
   --ring: 222.2 84% 4.9%;
 
   --radius: 0.5rem;
-
-  --font-heading: 'BBH Hegarty', system-ui, sans-serif;
-  --font-body: 'Science Gothic', system-ui, sans-serif;
 }
 
 @layer base {

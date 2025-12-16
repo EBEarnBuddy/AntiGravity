@@ -37,8 +37,15 @@ app.use('/api/v1/events', eventRoutes);
 
 // Basic Health Check
 app.get('/', (req: Request, res: Response) => {
-    console.log('Health check hit');
-    res.send('EarnBuddy Backend is running 🚀');
+    // console.log('Health check hit'); // Too noisy for basic check
+    res.status(200).json({
+        status: 'UP',
+        timestamp: new Date().toISOString(),
+        service: 'earnbuddy-backend'
+    });
+});
+app.get('/health', (req: Request, res: Response) => {
+    res.status(200).send('OK');
 });
 
 // Global Error Handler

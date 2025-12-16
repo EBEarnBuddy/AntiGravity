@@ -1,6 +1,13 @@
 import type { Metadata } from "next";
+import { Inter } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
+import BackendHealthCheck from "@/components/BackendHealthCheck";
+
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-inter",
+});
 
 export const metadata: Metadata = {
   title: "EarnBuddy | Connect, Collaborate, Create",
@@ -17,8 +24,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="antialiased">
+      <body className={`${inter.variable} antialiased font-sans`}>
         <Providers>
+          <BackendHealthCheck />
           {children}
         </Providers>
       </body>

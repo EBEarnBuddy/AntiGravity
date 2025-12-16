@@ -2,6 +2,7 @@ import axios from 'axios';
 import { auth } from './firebase';
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1';
+console.log(`ℹ️  [API Config] Base URL: ${BASE_URL}`);
 
 const api = axios.create({
   baseURL: BASE_URL,
@@ -20,19 +21,38 @@ api.interceptors.request.use(
         console.error('Error getting Firebase token:', error);
       }
     }
+    console.log(`➡️ [API Request] ${config.method?.toUpperCase()} ${config.url}`);
     return config;
   },
   (error) => {
+    console.error('❌ [API Request Error]:', error);
     return Promise.reject(error);
   }
 );
 
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    console.log(`✅ [API Success] ${response.config.method?.toUpperCase()} ${response.config.url}`, response.status);
+    return response;
+  },
   (error) => {
-    console.error('API Error Status:', error.response?.status);
-    console.error('API Error Data:', error.response?.data);
-    console.error('API Error Message:', error.message);
+    if (error.response) {
+      // The request was made and the server responded with a status code
+      // that falls out of the range of 2xx
+      console.error(`❌ [API Error] ${error.response.status} ${error.config.url}:`, error.response.data);
+
+      if (error.response.status === 401) {
+        console.warn('⚠️ [Auth] Unauthorized - Token may be invalid or expired.');
+      } else if (error.response.status === 403) {
+        console.warn('⚠️ [Auth] Forbidden - Insufficient permissions.');
+      }
+    } else if (error.request) {
+      // The request was made but no response was received
+      console.error('❌ [Network Error] No response received from backend. Is the server running?');
+    } else {
+      // Something happened in setting up the request that triggered an Error
+      console.error('❌ [Request Error]', error.message);
+    }
     return Promise.reject(error);
   }
 );
