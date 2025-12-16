@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Pod, PodPost, ChatRoom as Room, Startup, Gig, Notification, ChatMessage, UserAnalytics } from '../lib/firestore'; // Keep types for now
 import { useAuth } from '../contexts/AuthContext';
-import { roomAPI, opportunityAPI, messageAPI, applicationAPI, userAPI } from '../lib/axios';
+import { roomAPI, opportunityAPI, messageAPI, applicationAPI, userAPI, eventAPI } from '../lib/axios';
 
 // Custom hooks for Firestore operations
 export const usePods = () => {
@@ -128,7 +128,8 @@ export const useStartups = () => {
       try {
         setLoading(true);
         const response = await opportunityAPI.getAll('startup');
-        setStartups(response.data);
+        const data = response.data.map((item: any) => ({ ...item, id: item._id }));
+        setStartups(data);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to fetch startups');
       } finally {
@@ -151,7 +152,7 @@ export const useStartups = () => {
 
   const applyToStartup = async (startupId: string, roleId: string, userId: string, applicationData: any) => {
     try {
-      await applicationAPI.apply(startupId, JSON.stringify(applicationData));
+      await applicationAPI.apply(startupId, { message: JSON.stringify(applicationData), roleId });
       // Refresh?
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to apply to startup');
@@ -175,7 +176,8 @@ export const useProjects = () => {
         setLoading(true);
         // Assuming 'freelance' or 'project' type. Let's use 'project' as per model comment for Colancing
         const response = await opportunityAPI.getAll('project');
-        setProjects(response.data);
+        const data = response.data.map((item: any) => ({ ...item, id: item._id }));
+        setProjects(data);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to fetch projects');
       } finally {
@@ -198,7 +200,7 @@ export const useProjects = () => {
 
   const applyToRole = async (projectId: string, roleId: string, userId: string, applicationData: any) => {
     try {
-      await applicationAPI.apply(projectId, JSON.stringify(applicationData));
+      await applicationAPI.apply(projectId, { message: JSON.stringify(applicationData), roleId });
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to apply to role');
     }
@@ -254,6 +256,64 @@ export const useEnhancedPodPosts = (podId: string) => {
 
 export const useNotifications = () => {
   return { notifications: [], loading: false, error: null, markAsRead: async () => { }, unreadCount: 0 };
+};
+
+export const useEvents = (limit?: number) => {
+  const [events, setEvents] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        setLoading(true);
+        const response = await eventAPI.getAll(limit);
+        const data = response.data.map((item: any) => ({ ...item, id: item._id }));
+        setEvents(data);
+      } catch (err: any) {
+        setError(err.message || 'Failed to fetch events');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchEvents();
+  }, [limit]);
+
+  return { events, loading, error };
+};
+
+export const useBookmarks = () => {
+  const { userProfile, updateProfile } = useAuth();
+  const [loading, setLoading] = useState(false);
+
+  const toggleBookmark = async (opportunityId: string) => {
+    if (!userProfile) return;
+    setLoading(true);
+    try {
+      const currentBookmarks = userProfile.bookmarks || [];
+      const isBookmarked = currentBookmarks.includes(opportunityId);
+
+      let newBookmarks: string[];
+      if (isBookmarked) {
+        newBookmarks = currentBookmarks.filter(id => id !== opportunityId);
+      } else {
+        newBookmarks = [...currentBookmarks, opportunityId];
+      }
+
+      await updateProfile({ bookmarks: newBookmarks });
+    } catch (error) {
+      console.error('Failed to toggle bookmark:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const isBookmarked = (opportunityId: string) => {
+    return userProfile?.bookmarks?.includes(opportunityId) || false;
+  };
+
+  return { toggleBookmark, isBookmarked, loading };
 };
 
 export const useOnboarding = () => {

@@ -77,12 +77,47 @@ export const joinRoom = async (req: AuthRequest, res: Response) => {
     }
 };
 
-// Get All Rooms
-export const getRooms = async (req: Request, res: Response) => {
+// Get All Rooms (Protected, injects membership info)
+export const getRooms = async (req: AuthRequest, res: Response) => {
     try {
-        const rooms = await Room.find().sort({ lastMessageAt: -1, createdAt: -1 });
-        res.json(rooms);
+        const { uid } = req.user!;
+        const user = await User.findOne({ firebaseUid: uid });
+
+        // Fetch all rooms
+        // We use .lean() if possible for performance, but basic find is okay.
+        // We need to return a plain object to attach 'members' property if it's not in schema.
+        const roomsDocs = await Room.find().sort({ lastMessageAt: -1, createdAt: -1 });
+
+        if (!user) {
+            // If for some reason user not found, just return rooms without membership info
+            res.json(roomsDocs);
+            return;
+        }
+
+        // Fetch all memberships for this user
+        const memberships = await RoomMembership.find({ user: user._id });
+        const memberRoomIds = new Set(memberships.map(m => m.room.toString()));
+
+        // Transform response to include a 'members' array mock if the user is a member
+        // This satisfies the frontend check: room.members.includes(currentUser.uid)
+        const roomsWithMembership = roomsDocs.map(room => {
+            const roomObj = room.toObject();
+            const isMember = memberRoomIds.has(room._id.toString());
+
+            // We inject the CURRENT user's firebaseUid into the members array if they are a member.
+            // This is a minimal implementation to satisfy the frontend requirement.
+            // Realistically, the frontend should probably check a 'membershipStatus' field,
+            // but we are adhering to the existing frontend logic.
+            return {
+                ...roomObj,
+                members: isMember ? [uid] : [], // Inject UID if member
+                // pendingMembers can be handled similarly if we had a request model
+            };
+        });
+
+        res.json(roomsWithMembership);
     } catch (error) {
+        console.error("Error fetching rooms:", error);
         res.status(500).json({ error: 'Fetch failed' });
     }
 };

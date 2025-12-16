@@ -107,228 +107,233 @@ const StartupApplicationModal: React.FC<StartupApplicationModalProps> = ({
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+          className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           onClick={onClose}
         >
           <motion.div
-            className="bg-white dark:bg-gray-900 rounded-2xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+            className="flex flex-col bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] shadow-xl overflow-hidden"
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.9, opacity: 0 }}
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Header */}
-            <div className="flex items-center justify-between mb-6">
-              <div>
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Apply to {startup.name}</h2>
-                <p className="text-gray-600 dark:text-gray-400">Join this exciting startup team</p>
-              </div>
-              <button
-                onClick={onClose}
-                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            {/* Startup Info */}
-            <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-6 mb-6">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{startup.name}</h3>
-              <p className="text-gray-600 dark:text-gray-400 mb-4">{startup.description}</p>
-              <div className="flex flex-wrap gap-2">
-                <span className="px-3 py-1 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 rounded-full text-sm">
-                  {startup.industry}
-                </span>
-                <span className="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-full text-sm">
-                  {startup.stage}
-                </span>
-                <span className="px-3 py-1 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 rounded-full text-sm">
-                  {startup.equity} equity
-                </span>
-              </div>
-            </div>
-
-            {/* Role Selection */}
-            <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Select Role *
-              </label>
-              <select
-                value={selectedRoleId}
-                onChange={(e) => setSelectedRoleId(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-200 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-300"
-              >
-                <option value="">Choose a role...</option>
-                {startup.roles?.map((role) => (
-                  <option key={role.id} value={role.id}>
-                    {role.title} - {role.type} ({role.location})
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* Selected Role Details */}
-            {selectedRoleId && (
-              <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4 mb-6">
-                {(() => {
-                  const role = startup.roles?.find(r => r.id === selectedRoleId);
-                  if (!role) return null;
-
-                  return (
-                    <div>
-                      <h4 className="font-semibold text-gray-900 dark:text-white mb-2">{role.title}</h4>
-                      <p className="text-gray-600 dark:text-gray-400 mb-3">{role.description}</p>
-                      <div className="flex flex-wrap gap-2 mb-3">
-                        <span className="px-2 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-full text-xs">
-                          {role.type}
-                        </span>
-                        <span className="px-2 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 rounded-full text-xs">
-                          {role.location}
-                        </span>
-                        {role.salary && (
-                          <span className="px-2 py-1 bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300 rounded-full text-xs">
-                            {role.salary}
-                          </span>
-                        )}
-                        {role.equity && (
-                          <span className="px-2 py-1 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 rounded-full text-xs">
-                            {role.equity} equity
-                          </span>
-                        )}
-                      </div>
-                      <div>
-                        <h5 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Requirements:</h5>
-                        <ul className="text-sm text-gray-600 dark:text-gray-400">
-                          {role.requirements?.map((req, index) => (
-                            <li key={index} className="flex items-start gap-2">
-                              <span className="text-emerald-500 mt-1">•</span>
-                              {req}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    </div>
-                  );
-                })()}
-              </div>
-            )}
-
-            {/* Application Form */}
-            <div className="space-y-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Cover Letter *
-                </label>
-                <textarea
-                  value={formData.coverLetter}
-                  onChange={(e) => handleInputChange('coverLetter', e.target.value)}
-                  rows={4}
-                  className="w-full px-4 py-3 border border-gray-200 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-300"
-                  placeholder="Tell us why you're interested in joining this startup and what you can bring to the team..."
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Portfolio/Website
-                </label>
-                <div className="relative">
-                  <Globe className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                  <input
-                    type="url"
-                    value={formData.portfolio}
-                    onChange={(e) => handleInputChange('portfolio', e.target.value)}
-                    className="w-full pl-10 pr-4 py-3 border border-gray-200 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-300"
-                    placeholder="https://yourportfolio.com"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Header - Fixed */}
+            <div className="flex-none px-8 py-6 border-b border-slate-100 bg-white">
+              <div className="flex items-center justify-between">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    LinkedIn Profile
-                  </label>
-                  <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                    <input
-                      type="url"
-                      value={formData.linkedin}
-                      onChange={(e) => handleInputChange('linkedin', e.target.value)}
-                      className="w-full pl-10 pr-4 py-3 border border-gray-200 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-300"
-                      placeholder="https://linkedin.com/in/yourprofile"
-                    />
-                  </div>
+                  <h2 className="text-2xl font-black text-slate-900 tracking-tight">Apply to {startup.name}</h2>
+                  <p className="text-slate-500 font-medium mt-1">Join this exciting startup team</p>
                 </div>
+                <button
+                  onClick={onClose}
+                  className="p-2 hover:bg-slate-100 rounded-lg transition-colors text-slate-400 hover:text-slate-600"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+            </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    GitHub Profile
-                  </label>
-                  <div className="relative">
-                    <FileText className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                    <input
-                      type="url"
-                      value={formData.github}
-                      onChange={(e) => handleInputChange('github', e.target.value)}
-                      className="w-full pl-10 pr-4 py-3 border border-gray-200 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-300"
-                      placeholder="https://github.com/yourusername"
-                    />
-                  </div>
+            {/* Scrollable Content */}
+            <div className="flex-1 overflow-y-auto px-8 py-6 custom-scrollbar">
+              {/* Startup Info */}
+              <div className="bg-slate-50 rounded-xl p-6 mb-8 border border-slate-100">
+                <h3 className="text-lg font-bold text-slate-900 mb-2">{startup.name}</h3>
+                <p className="text-slate-600 mb-4 leading-relaxed">{startup.description}</p>
+                <div className="flex flex-wrap gap-2">
+                  <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium border border-green-200">
+                    {startup.industry}
+                  </span>
+                  <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-medium border border-blue-200">
+                    {startup.stage}
+                  </span>
+                  <span className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm font-medium border border-purple-200">
+                    {startup.equity} equity
+                  </span>
                 </div>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Relevant Experience *
-                </label>
-                <textarea
-                  value={formData.experience}
-                  onChange={(e) => handleInputChange('experience', e.target.value)}
-                  rows={3}
-                  className="w-full px-4 py-3 border border-gray-200 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-300"
-                  placeholder="Describe your relevant experience, skills, and achievements..."
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Why are you interested in this startup? *
-                </label>
-                <textarea
-                  value={formData.whyInterested}
-                  onChange={(e) => handleInputChange('whyInterested', e.target.value)}
-                  rows={3}
-                  className="w-full px-4 py-3 border border-gray-200 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-300"
-                  placeholder="What excites you about this startup and its mission?"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Availability
+              {/* Role Selection */}
+              <div className="mb-8">
+                <label className="block text-sm font-bold text-slate-700 mb-2">
+                  Select Role *
                 </label>
                 <select
-                  value={formData.availability}
-                  onChange={(e) => handleInputChange('availability', e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-200 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-300"
+                  value={selectedRoleId}
+                  onChange={(e) => setSelectedRoleId(e.target.value)}
+                  className="w-full px-4 py-3 border border-slate-200 rounded-xl bg-white text-slate-900 focus:ring-2 focus:ring-green-600 focus:border-transparent transition-all duration-300 font-medium outline-none"
                 >
-                  <option value="full-time">Full-time</option>
-                  <option value="part-time">Part-time</option>
-                  <option value="contract">Contract</option>
-                  <option value="consulting">Consulting</option>
+                  <option value="">Choose a role...</option>
+                  {startup.roles?.map((role) => (
+                    <option key={role.id} value={role.id}>
+                      {role.title} - {role.type} ({role.location})
+                    </option>
+                  ))}
                 </select>
+              </div>
+
+              {/* Selected Role Details */}
+              {selectedRoleId && (
+                <div className="bg-blue-50/50 rounded-xl p-6 mb-8 border border-blue-100">
+                  {(() => {
+                    const role = startup.roles?.find(r => r.id === selectedRoleId);
+                    if (!role) return null;
+
+                    return (
+                      <div>
+                        <h4 className="text-lg font-bold text-slate-900 mb-2">{role.title}</h4>
+                        <p className="text-slate-600 mb-4">{role.description}</p>
+                        <div className="flex flex-wrap gap-2 mb-4">
+                          <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-semibold uppercase tracking-wide">
+                            {role.type}
+                          </span>
+                          <span className="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-semibold uppercase tracking-wide">
+                            {role.location}
+                          </span>
+                          {role.salary && (
+                            <span className="px-2 py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs font-semibold uppercase tracking-wide">
+                              {role.salary}
+                            </span>
+                          )}
+                          {role.equity && (
+                            <span className="px-2 py-1 bg-purple-100 text-purple-700 rounded-full text-xs font-semibold uppercase tracking-wide">
+                              {role.equity} equity
+                            </span>
+                          )}
+                        </div>
+                        <div>
+                          <h5 className="text-sm font-bold text-slate-700 mb-2">Requirements:</h5>
+                          <ul className="space-y-2">
+                            {role.requirements?.map((req, index) => (
+                              <li key={index} className="flex items-start gap-2 text-sm text-slate-600">
+                                <span className="text-green-500 mt-1.5">•</span>
+                                {req}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      </div>
+                    );
+                  })()}
+                </div>
+              )}
+
+              {/* Application Form */}
+              <div className="space-y-6">
+                <div>
+                  <label className="block text-sm font-bold text-slate-700 mb-2">
+                    Cover Letter *
+                  </label>
+                  <textarea
+                    value={formData.coverLetter}
+                    onChange={(e) => handleInputChange('coverLetter', e.target.value)}
+                    rows={4}
+                    className="w-full px-4 py-3 border border-slate-200 rounded-xl bg-white text-slate-900 focus:ring-2 focus:ring-green-600 focus:border-transparent transition-all duration-300 font-medium outline-none placeholder:text-slate-400"
+                    placeholder="Tell us why you're interested in joining this startup and what you can bring to the team..."
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-bold text-slate-700 mb-2">
+                    Portfolio/Website
+                  </label>
+                  <div className="relative">
+                    <Globe className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-5 h-5" />
+                    <input
+                      type="url"
+                      value={formData.portfolio}
+                      onChange={(e) => handleInputChange('portfolio', e.target.value)}
+                      className="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-xl bg-white text-slate-900 focus:ring-2 focus:ring-green-600 focus:border-transparent transition-all duration-300 font-medium outline-none placeholder:text-slate-400"
+                      placeholder="https://yourportfolio.com"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-bold text-slate-700 mb-2">
+                      LinkedIn Profile
+                    </label>
+                    <div className="relative">
+                      <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-5 h-5" />
+                      <input
+                        type="url"
+                        value={formData.linkedin}
+                        onChange={(e) => handleInputChange('linkedin', e.target.value)}
+                        className="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-xl bg-white text-slate-900 focus:ring-2 focus:ring-green-600 focus:border-transparent transition-all duration-300 font-medium outline-none placeholder:text-slate-400"
+                        placeholder="https://linkedin.com/in/yourprofile"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-bold text-slate-700 mb-2">
+                      GitHub Profile
+                    </label>
+                    <div className="relative">
+                      <FileText className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-5 h-5" />
+                      <input
+                        type="url"
+                        value={formData.github}
+                        onChange={(e) => handleInputChange('github', e.target.value)}
+                        className="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-xl bg-white text-slate-900 focus:ring-2 focus:ring-green-600 focus:border-transparent transition-all duration-300 font-medium outline-none placeholder:text-slate-400"
+                        placeholder="https://github.com/yourusername"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-bold text-slate-700 mb-2">
+                    Relevant Experience *
+                  </label>
+                  <textarea
+                    value={formData.experience}
+                    onChange={(e) => handleInputChange('experience', e.target.value)}
+                    rows={3}
+                    className="w-full px-4 py-3 border border-slate-200 rounded-xl bg-white text-slate-900 focus:ring-2 focus:ring-green-600 focus:border-transparent transition-all duration-300 font-medium outline-none placeholder:text-slate-400"
+                    placeholder="Describe your relevant experience, skills, and achievements..."
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-bold text-slate-700 mb-2">
+                    Why are you interested in this startup? *
+                  </label>
+                  <textarea
+                    value={formData.whyInterested}
+                    onChange={(e) => handleInputChange('whyInterested', e.target.value)}
+                    rows={3}
+                    className="w-full px-4 py-3 border border-slate-200 rounded-xl bg-white text-slate-900 focus:ring-2 focus:ring-green-600 focus:border-transparent transition-all duration-300 font-medium outline-none placeholder:text-slate-400"
+                    placeholder="What excites you about this startup and its mission?"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-bold text-slate-700 mb-2">
+                    Availability
+                  </label>
+                  <select
+                    value={formData.availability}
+                    onChange={(e) => handleInputChange('availability', e.target.value)}
+                    className="w-full px-4 py-3 border border-slate-200 rounded-xl bg-white text-slate-900 focus:ring-2 focus:ring-green-600 focus:border-transparent transition-all duration-300 font-medium outline-none"
+                  >
+                    <option value="full-time">Full-time</option>
+                    <option value="part-time">Part-time</option>
+                    <option value="contract">Contract</option>
+                    <option value="consulting">Consulting</option>
+                  </select>
+                </div>
               </div>
             </div>
 
-            {/* Submit Button */}
-            <div className="flex justify-end gap-4 mt-8">
+            {/* Footer - Fixed */}
+            <div className="flex-none px-8 py-6 border-t border-slate-100 bg-slate-50 flex justify-end gap-4 rounded-b-2xl">
               <motion.button
                 onClick={onClose}
-                className="px-6 py-3 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-all duration-300"
+                className="px-6 py-3 border-2 border-slate-200 text-slate-600 font-bold rounded-xl hover:bg-slate-100 hover:border-slate-300 transition-all duration-300"
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
               >
@@ -337,11 +342,10 @@ const StartupApplicationModal: React.FC<StartupApplicationModalProps> = ({
               <motion.button
                 onClick={handleSubmit}
                 disabled={isSubmitting || !selectedRoleId || !formData.coverLetter || !formData.experience || !formData.whyInterested}
-                className={`px-6 py-3 rounded-xl font-semibold transition-all duration-300 flex items-center gap-2 ${
-                  isSubmitting || !selectedRoleId || !formData.coverLetter || !formData.experience || !formData.whyInterested
-                    ? 'bg-gray-100 dark:bg-gray-800 text-gray-400 cursor-not-allowed'
-                    : 'bg-gradient-to-r from-emerald-600 to-emerald-500 text-white hover:shadow-lg'
-                }`}
+                className={`px-6 py-3 rounded-xl font-bold uppercase tracking-wide transition-all duration-300 flex items-center gap-2 ${isSubmitting || !selectedRoleId || !formData.coverLetter || !formData.experience || !formData.whyInterested
+                    ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
+                    : 'bg-green-600 text-white hover:bg-green-700 hover:shadow-lg'
+                  }`}
                 whileHover={{ scale: isSubmitting || !selectedRoleId || !formData.coverLetter || !formData.experience || !formData.whyInterested ? 1 : 1.02 }}
                 whileTap={{ scale: isSubmitting || !selectedRoleId || !formData.coverLetter || !formData.experience || !formData.whyInterested ? 1 : 0.98 }}
               >

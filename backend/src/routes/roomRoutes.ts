@@ -7,10 +7,10 @@ import messageRoutes from './messageRoutes';
 const router = Router();
 
 // Public
-router.get('/', getRooms);
-
 // Protected
 router.use(verifyToken);
+router.get('/', getRooms); // Now protected to allow membership check
+// Nested message routes
 // Nested message routes
 router.use('/:roomId/messages', messageRoutes);
 

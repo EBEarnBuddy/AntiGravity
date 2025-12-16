@@ -10,327 +10,364 @@ import {
     MessageCircle,
     Search,
     TrendingUp,
-    ArrowRight,
-    Hash,
-    Eye,
     Filter,
-    Award
+    Calendar,
+    Bookmark,
+    Clock,
+    CheckCircle,
+    ChevronRight,
+    Sparkles
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { usePods, useProjects, useStartups, useAnalytics, useRecommendations, useOnboarding, useRooms } from '@/hooks/useFirestore';
-import { TrendingPods } from '@/components/ui/trending-pods';
-import { BuilderFeed } from '@/components/ui/builder-feed';
+import { usePods, useProjects, useStartups, useEvents, useBookmarks, useRooms } from '@/hooks/useFirestore';
 import { FloatingCard } from '@/components/ui/floating-card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AdvancedSearch } from '@/components/ui/advanced-search';
-// import { NotificationCenter } from '@/components/ui/notification-center'; // Temporarily commented out until verified
-import { OnboardingFlow } from '@/components/ui/onboarding-flow';
+import { applicationAPI } from '@/lib/axios';
+
+const formatDate = (dateString: any) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+};
 
 export default function DiscoverPage() {
-    const { currentUser, userProfile, logout } = useAuth();
+    const { currentUser, userProfile } = useAuth();
+    const router = useRouter();
+
+    // Hooks
     const { pods, loading: podsLoading } = usePods();
     const { projects, loading: projectsLoading } = useProjects();
     const { startups, loading: startupsLoading } = useStartups();
-    const { rooms, loading: roomsLoading } = useRooms();
-    const { analytics, loading: analyticsLoading } = useAnalytics();
-    const { recommendations, loading: recommendationsLoading } = useRecommendations();
-    const { saveOnboardingResponse } = useOnboarding();
-    const router = useRouter();
+    const { events, loading: eventsLoading } = useEvents(5);
+    const { isBookmarked } = useBookmarks();
 
+    // Local State
+    const [myApplications, setMyApplications] = useState<any[]>([]);
+    const [loadingApplications, setLoadingApplications] = useState(true);
     const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
-    const [showOnboarding, setShowOnboarding] = useState(false);
 
+    // Fetch My Applications
     useEffect(() => {
-        if (userProfile && !userProfile.onboardingCompleted) {
-            setShowOnboarding(true);
-        }
-    }, [userProfile]);
-
-
-    const handleSearch = (filters: any) => {
-        console.log('Search filters:', filters);
-        // Implement search logic
-    };
-
-    const handleOnboardingComplete = (data: any) => {
-        console.log('Onboarding data:', data);
-
-        // Save onboarding data to database
-        saveOnboardingResponse(data).then(() => {
-            setShowOnboarding(false);
-            // Refresh the page
-            window.location.reload();
-        }).catch(error => {
-            console.error('Error saving onboarding data:', error);
-        });
-    };
-
-    // Personalized quick actions based on user's onboarding
-    const getPersonalizedQuickActions = () => {
-        const baseActions = [
-            {
-                title: 'Community Pods',
-                description: 'Join builder communities',
-                icon: Hash,
-                path: '/community',
-                color: 'from-blue-500 to-purple-600',
-                count: pods?.length || 0
-            },
-            {
-                title: 'Team Projects',
-                description: 'Join project teams',
-                icon: Briefcase,
-                path: '/freelance',
-                color: 'from-green-500 to-emerald-600',
-                count: projects?.length || 0
-            },
-            {
-                title: 'Startups',
-                description: 'Discover startup opportunities',
-                icon: Rocket,
-                path: '/startups',
-                color: 'from-purple-500 to-pink-600',
-                count: startups?.length || 0
-            },
-            {
-                title: 'Chat Rooms',
-                description: 'Connect in real-time',
-                icon: MessageCircle,
-                path: '/rooms',
-                color: 'from-orange-500 to-red-600',
-                count: rooms?.length || 0
+        const fetchApplications = async () => {
+            if (!currentUser) return;
+            try {
+                // Assuming this endpoint returns applications with populated opportunity details
+                const res = await applicationAPI.getMyApplications();
+                setMyApplications(res.data || []);
+            } catch (err) {
+                console.error("Failed to fetch applications", err);
+            } finally {
+                setLoadingApplications(false);
             }
-        ];
+        };
+        fetchApplications();
+    }, [currentUser]);
 
-        return baseActions;
-    };
+    // Derived Data
+    // Ensure ids are present or filter items without id
+    const validStartups = startups || [];
+    const validProjects = projects || [];
 
-    const quickActions = getPersonalizedQuickActions();
+    const bookmarkedOpportunities = [...validStartups, ...validProjects]
+        .filter(item => item.id && isBookmarked(item.id));
 
-    // Personalized stats (Using mock data logic from original file)
-    const getPersonalizedStats = () => {
-        const joinedPods = currentUser ? pods.filter(p => p.members?.includes(currentUser.uid)) : [];
-        const profileViews = analytics?.profileViews ?? 0;
-        const postsCreated = analytics?.postsCreated ?? 0;
-        const projectsCompleted = (userProfile?.completedProjects as number) ?? analytics?.completedProjects ?? 0;
-        const podsJoined = joinedPods.length;
+    // Feed: Combined Startups and Projects, sorted by creation (assuming default sort for now or random mix)
+    // We'll take top 10 items for the feed
+    const feedItems = [...validStartups, ...validProjects]
+        // .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()) // Assuming createdAt exists and is string/date
+        .slice(0, 10);
 
-        return [
-            { label: 'Profile Views', value: profileViews.toString(), icon: Eye, change: "+0%" },
-            { label: 'Posts Created', value: postsCreated.toString(), icon: MessageCircle, change: "+0%" },
-            { label: 'Pods Joined', value: podsJoined.toString(), icon: Users, change: "+0%" },
-            { label: 'Projects Completed', value: projectsCompleted.toString(), icon: Award, change: "+0%" }
-        ];
-    };
-
-    const stats = getPersonalizedStats();
-
-    const recentActivity = [
-        { type: 'Welcome', title: 'Complete your profile to get personalized recommendations', time: 'Now', urgent: true }
+    const quickActions = [
+        { title: 'Find Work', icon: Briefcase, path: '/freelance', color: 'bg-emerald-500' },
+        { title: 'Join a Circle', icon: Users, path: '/circles', color: 'bg-blue-500' },
+        { title: 'Browse Startups', icon: Rocket, path: '/startups', color: 'bg-purple-500' },
+        { title: 'Events', icon: Calendar, path: '#events', color: 'bg-orange-500' },
     ];
 
     return (
-        <div className="min-h-screen bg-slate-50">
-            <div className="container mx-auto">
-                {/* Welcome Section */}
-                <motion.div
-                    className="mb-8"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6 }}
-                >
-                    <h2 className="text-3xl font-bold text-slate-900 mb-2">
-                        Welcome back, {userProfile?.displayName?.split(' ')[0] || 'Builder'}!
-                        👋
-                    </h2>
-                    <p className="text-slate-600">
-                        Here's what's happening in your builder network today.
-                    </p>
-                </motion.div>
+        <div className="min-h-screen bg-slate-50 pb-20">
+            {/* Header Section */}
+            <div className="bg-white border-b border-slate-100 sticky top-0 z-30">
+                <div className="container mx-auto px-4 py-6">
+                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                        <div>
+                            <h1 className="text-2xl font-black text-slate-900 tracking-tight">
+                                Welcome back, {userProfile?.displayName?.split(' ')[0] || 'Builder'}! 👋
+                            </h1>
+                            <p className="text-slate-500 font-medium">Here's what's happening in your network.</p>
+                        </div>
 
-                {/* Stats Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                    {stats.map((stat, index) => (
-                        <motion.div
-                            key={index}
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.6, delay: index * 0.1 }}
-                        >
-                            <FloatingCard className="p-6">
-                                <div className="flex items-center justify-between">
-                                    <div>
-                                        <p className="text-sm text-slate-600 mb-1">{stat.label}</p>
-                                        <p className="text-2xl font-bold text-slate-900">{stat.value}</p>
-                                        <p className="text-sm text-green-600 flex items-center gap-1">
-                                            <TrendingUp className="w-3 h-3" />
-                                            {stat.change}
-                                        </p>
-                                    </div>
-                                    <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                                        <stat.icon className="w-6 h-6 text-green-600" />
-                                    </div>
-                                </div>
-                            </FloatingCard>
-                        </motion.div>
-                    ))}
-                </div>
-
-                {/* Quick Actions */}
-                <motion.section
-                    className="mb-8"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6, delay: 0.2 }}
-                >
-                    <div className="flex items-center justify-between mb-6">
-                        <h3 className="text-2xl font-bold text-slate-900">Quick Actions</h3>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                        {quickActions.map((action, index) => (
-                            <motion.div
-                                key={index}
-                                className="group cursor-pointer"
-                                whileHover={{ scale: 1.05, y: -5 }}
-                                whileTap={{ scale: 0.95 }}
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ duration: 0.5, delay: 0.3 + index * 0.1 }}
-                                onClick={() => router.push(action.path)}
-                            >
-                                <div className={`bg-gradient-to-r ${action.color} rounded-2xl p-6 text-white shadow-lg group-hover:shadow-xl transition-all duration-300 relative overflow-hidden`}>
-                                    <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                                    <div className="flex items-center justify-between mb-4 relative z-10">
-                                        <action.icon className="w-8 h-8" />
-                                        <span className="text-2xl font-bold">{action.count}</span>
-                                    </div>
-                                    <div className="relative z-10">
-                                        <h3 className="font-bold text-lg mb-1">{action.title}</h3>
-                                        <p className="text-sm opacity-90">{action.description}</p>
-                                    </div>
-                                </div>
-                            </motion.div>
-                        ))}
-                    </div>
-                </motion.section>
-
-                {/* Search Section */}
-                <motion.section
-                    className="mb-8"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6, delay: 0.3 }}
-                >
-                    <div className="max-w-4xl mx-auto">
-                        <div className="relative">
-                            <Search className="absolute left-6 top-1/2 transform -translate-y-1/2 text-slate-400 w-6 h-6" />
+                        {/* Search Bar */}
+                        <div className="relative w-full md:w-96">
+                            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-5 h-5" />
                             <input
                                 type="text"
-                                placeholder="Search opportunities, pods, startups, and more..."
-                                className="w-full pl-14 pr-14 py-5 text-xl border border-slate-200 rounded-2xl bg-white text-slate-900 focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-300 shadow-lg"
+                                placeholder="Search opportunities, circles..."
+                                className="w-full pl-10 pr-10 py-2.5 bg-slate-50 border-none rounded-xl text-slate-900 font-medium focus:ring-2 focus:ring-green-500/20 outline-none transition-all"
                             />
-                            <motion.button
+                            <button
                                 onClick={() => setShowAdvancedSearch(true)}
-                                className="absolute right-4 top-1/2 transform -translate-y-1/2 p-3 hover:bg-slate-100 rounded-lg transition-colors"
-                                whileHover={{ scale: 1.1 }}
+                                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-green-600 transition-colors"
                             >
-                                <Filter className="w-6 h-6 text-slate-500" />
-                            </motion.button>
+                                <Filter className="w-4 h-4" />
+                            </button>
                         </div>
                     </div>
-                </motion.section>
+                </div>
+            </div>
 
-                {/* Main Content Grid */}
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    {/* Left Column */}
-                    <div className="lg:col-span-2 space-y-8">
-                        {/* Builder Feed */}
-                        <motion.section
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.6, delay: 0.6 }}
-                        >
-                            <BuilderFeed />
-                        </motion.section>
-                    </div>
+            <div className="container mx-auto px-4 py-8">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
 
-                    {/* Right Column */}
-                    <div className="space-y-8">
-                        {/* Trending Pods */}
-                        <motion.section
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.6, delay: 0.5 }}
-                        >
-                            {podsLoading ? (
-                                <FloatingCard className="p-6">
-                                    <Skeleton className="h-6 w-32 mb-4" />
-                                    <div className="space-y-4">
-                                        Loading pods...
+                    {/* Main Content - Left Column (8 cols) */}
+                    <div className="lg:col-span-8 space-y-10">
+
+                        {/* Quick Actions */}
+                        <section className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            {quickActions.map((action, idx) => (
+                                <motion.div
+                                    key={idx}
+                                    whileHover={{ y: -4 }}
+                                    className="bg-white p-4 rounded-xl border border-slate-100 shadow-sm hover:shadow-md transition-all cursor-pointer group"
+                                    onClick={() => action.path.startsWith('#') ? {} : router.push(action.path)}
+                                >
+                                    <div className={`${action.color} w-10 h-10 rounded-lg flex items-center justify-center mb-3 text-white shadow-sm group-hover:scale-110 transition-transform`}>
+                                        <action.icon className="w-5 h-5" />
                                     </div>
-                                </FloatingCard>
-                            ) : (
-                                <TrendingPods pods={pods} />
-                            )}
-                        </motion.section>
+                                    <h3 className="font-bold text-slate-900">{action.title}</h3>
+                                </motion.div>
+                            ))}
+                        </section>
 
-                        {/* Quick Stats */}
-                        <motion.section
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.6, delay: 0.7 }}
-                        >
-                            <FloatingCard className="p-6">
-                                <h3 className="text-xl font-semibold text-slate-900 mb-6">Your Progress</h3>
+                        {/* My Workbench */}
+                        <section>
+                            <div className="flex items-center gap-2 mb-6">
+                                <Sparkles className="w-5 h-5 text-green-600" />
+                                <h2 className="text-xl font-black text-slate-900">My Workbench</h2>
+                            </div>
 
-                                <div className="space-y-4">
-                                    <div>
-                                        <div className="flex justify-between items-center mb-2">
-                                            <span className="text-sm text-slate-600">Profile Completion</span>
-                                            <span className="text-sm font-medium text-slate-900">
-                                                {userProfile?.onboardingCompleted ? '100%' : '85%'}
-                                            </span>
-                                        </div>
-                                        <div className="w-full bg-slate-200 rounded-full h-2">
-                                            <motion.div
-                                                className="bg-gradient-to-r from-green-500 to-green-400 h-2 rounded-full"
-                                                initial={{ width: 0 }}
-                                                animate={{ width: userProfile?.onboardingCompleted ? "100%" : "85%" }}
-                                                transition={{ duration: 1, delay: 0.8 }}
-                                            />
-                                        </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                {/* My Applications Card */}
+                                <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm h-full">
+                                    <div className="flex items-center justify-between mb-4">
+                                        <h3 className="font-bold text-slate-900 flex items-center gap-2">
+                                            <Briefcase className="w-4 h-4 text-blue-500" />
+                                            Active Applications
+                                        </h3>
+                                        <span className="bg-blue-50 text-blue-600 px-2.5 py-1 rounded-full text-xs font-bold">
+                                            {myApplications.length}
+                                        </span>
+                                    </div>
+
+                                    <div className="space-y-4 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar md:h-[calc(100%-3rem)]">
+                                        {loadingApplications ? (
+                                            [1, 2].map(i => <Skeleton key={i} className="h-16 w-full rounded-xl" />)
+                                        ) : myApplications.length > 0 ? (
+                                            myApplications.map((app: any) => (
+                                                <div key={app._id} className="group flex items-start gap-4 p-3 rounded-xl hover:bg-slate-50 transition-colors border border-transparent hover:border-slate-100">
+                                                    <div className="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center flex-shrink-0">
+                                                        <Briefcase className="w-5 h-5 text-slate-400" />
+                                                    </div>
+                                                    <div className="flex-1 min-w-0">
+                                                        <h4 className="font-bold text-slate-900 text-sm truncate">{app.opportunityId?.title || app.opportunityId?.name || 'Unknown Opportunity'}</h4>
+                                                        <p className="text-xs text-slate-500 truncate">{app.status}</p>
+                                                    </div>
+                                                    {app.status === 'accepted' ? (
+                                                        <CheckCircle className="w-5 h-5 text-green-500" />
+                                                    ) : (
+                                                        <Clock className="w-5 h-5 text-slate-300" />
+                                                    )}
+                                                </div>
+                                            ))
+                                        ) : (
+                                            <div className="text-center py-8 text-slate-400 text-sm">
+                                                No active applications yet.
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
 
-                                <motion.button
-                                    className="w-full mt-6 py-3 bg-gradient-to-r from-green-600 to-green-500 text-white font-semibold rounded-lg hover:shadow-lg transition-all duration-300"
-                                    whileHover={{ scale: 1.02 }}
-                                    whileTap={{ scale: 0.98 }}
-                                    onClick={() => router.push('/profile')}
-                                >
-                                    {userProfile?.onboardingCompleted ? 'View Profile' : 'Complete Profile'}
-                                </motion.button>
-                            </FloatingCard>
-                        </motion.section>
+                                {/* Bookmarks Card */}
+                                <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm h-full">
+                                    <div className="flex items-center justify-between mb-4">
+                                        <h3 className="font-bold text-slate-900 flex items-center gap-2">
+                                            <Bookmark className="w-4 h-4 text-purple-500" />
+                                            Saved Opportunities
+                                        </h3>
+                                        <span className="bg-purple-50 text-purple-600 px-2.5 py-1 rounded-full text-xs font-bold">
+                                            {bookmarkedOpportunities.length}
+                                        </span>
+                                    </div>
+
+                                    <div className="space-y-4 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar md:h-[calc(100%-3rem)]">
+                                        {bookmarkedOpportunities.length > 0 ? (
+                                            bookmarkedOpportunities.map((item: any) => (
+                                                <div key={item.id} className="group flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 transition-colors border border-transparent hover:border-slate-100 cursor-pointer"
+                                                    onClick={() => router.push(item.type === 'startup' ? `/startups` : `/freelance`)}>
+                                                    <div className="flex items-center gap-3 overflow-hidden">
+                                                        <div className="w-8 h-8 rounded bg-slate-100 flex-shrink-0"
+                                                            style={{ backgroundImage: `url(${item.logo || item.companyLogo})`, backgroundSize: 'cover' }} />
+                                                        <div className="min-w-0">
+                                                            <h4 className="font-bold text-slate-900 text-sm truncate">{item.name || item.title}</h4>
+                                                            <p className="text-xs text-slate-500 truncate capitalize">{item.type}</p>
+                                                        </div>
+                                                    </div>
+                                                    <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-slate-500" />
+                                                </div>
+                                            ))
+                                        ) : (
+                                            <div className="text-center py-8 text-slate-400 text-sm">
+                                                No bookmarks yet.
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        {/* Recent Activity Feed */}
+                        <section>
+                            <div className="flex items-center justify-between mb-6">
+                                <div className="flex items-center gap-2">
+                                    <TrendingUp className="w-5 h-5 text-green-600" />
+                                    <h2 className="text-xl font-black text-slate-900">Recommended for You</h2>
+                                </div>
+                            </div>
+
+                            <div className="space-y-4">
+                                {(projectsLoading || startupsLoading) ? (
+                                    [1, 2, 3].map(i => <Skeleton key={i} className="h-32 w-full rounded-xl" />)
+                                ) : (
+                                    feedItems.map((item: any) => (
+                                        <motion.div
+                                            key={item.id}
+                                            initial={{ opacity: 0, y: 10 }}
+                                            whileInView={{ opacity: 1, y: 0 }}
+                                            viewport={{ once: true }}
+                                            className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all cursor-pointer group"
+                                            onClick={() => router.push(item.type === 'startup' ? `/startups` : `/freelance`)}
+                                        >
+                                            <div className="flex justify-between items-start gap-4">
+                                                <div className="flex gap-4">
+                                                    <div className="w-12 h-12 rounded-xl bg-slate-100 border border-slate-200 overflow-hidden flex-shrink-0">
+                                                        {item.logo || item.companyLogo ? (
+                                                            <img src={item.logo || item.companyLogo} alt="" className="w-full h-full object-cover" />
+                                                        ) : (
+                                                            <div className="w-full h-full flex items-center justify-center text-2xl">⚡</div>
+                                                        )}
+                                                    </div>
+                                                    <div>
+                                                        <h3 className="text-lg font-bold text-slate-900 group-hover:text-green-600 transition-colors">
+                                                            {item.name || item.title}
+                                                        </h3>
+                                                        <p className="text-slate-600 text-sm line-clamp-1 mb-2">{item.description}</p>
+                                                        <div className="flex flex-wrap gap-2 text-xs font-semibold">
+                                                            <span className="px-2 py-1 bg-slate-100 text-slate-600 rounded-md">
+                                                                {item.industry || item.category || 'Tech'}
+                                                            </span>
+                                                            {item.location && (
+                                                                <span className="px-2 py-1 bg-slate-100 text-slate-600 rounded-md">
+                                                                    {item.location}
+                                                                </span>
+                                                            )}
+                                                            <span className="px-2 py-1 bg-green-50 text-green-700 rounded-md">
+                                                                {item.salary || item.funding || 'Funded'}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div className="text-xs font-medium text-slate-400 whitespace-nowrap">
+                                                    {item.createdAt ? formatDate(item.createdAt) : 'Recently'}
+                                                </div>
+                                            </div>
+                                        </motion.div>
+                                    ))
+                                )}
+                            </div>
+                        </section>
+                    </div>
+
+                    {/* Right Sidebar (4 cols) */}
+                    <div className="lg:col-span-4 space-y-8">
+
+                        {/* Upcoming Events */}
+                        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 sticky top-24">
+                            <h3 className="font-bold text-slate-900 text-lg mb-6 flex items-center gap-2">
+                                <Calendar className="w-5 h-5 text-green-600" />
+                                Upcoming Events
+                            </h3>
+
+                            <div className="space-y-6 relative">
+                                {/* Vertical Line */}
+                                <div className="absolute left-2.5 top-2 bottom-2 w-0.5 bg-slate-100 rounded-full"></div>
+
+                                {eventsLoading ? (
+                                    [1, 2].map(i => <div key={i} className="pl-8"><Skeleton className="h-16 w-full" /></div>)
+                                ) : events.length > 0 ? (
+                                    events.map((event, i) => (
+                                        <div key={i} className="relative pl-8 group cursor-pointer">
+                                            {/* Dot */}
+                                            <div className="absolute left-0 top-1.5 w-5 h-5 rounded-full border-4 border-white bg-green-500 shadow-sm z-10 group-hover:scale-110 transition-transform"></div>
+
+                                            <h4 className="font-bold text-slate-900 group-hover:text-green-600 transition-colors">
+                                                {event.name}
+                                            </h4>
+                                            <p className="text-xs text-slate-500 mb-1">{formatDate(event.date)} • {event.location || 'Online'}</p>
+                                            <p className="text-sm text-slate-600 line-clamp-2">{event.description}</p>
+
+                                            {/* Host Circle */}
+                                            {event.hostCircles && event.hostCircles[0] && (
+                                                <div className="flex items-center gap-1.5 mt-2">
+                                                    <span className="text-[10px] uppercase font-bold text-slate-400">Host:</span>
+                                                    <span className="text-xs font-semibold text-slate-700 bg-slate-100 px-1.5 py-0.5 rounded">
+                                                        {event.hostCircles[0].name}
+                                                    </span>
+                                                </div>
+                                            )}
+                                        </div>
+                                    ))
+                                ) : (
+                                    <div className="pl-8 text-sm text-slate-400">No upcoming events.</div>
+                                )}
+                            </div>
+
+                            <button className="w-full mt-6 py-2.5 text-sm font-bold text-slate-600 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors">
+                                View Calendar
+                            </button>
+                        </div>
+
+                        {/* Trending Circles (Simple List) */}
+                        <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-2xl shadow-xl p-6 text-white relative overflow-hidden">
+                            <div className="absolute top-0 right-0 w-32 h-32 bg-green-500 opacity-20 blur-3xl rounded-full transform translate-x-10 -translate-y-10"></div>
+
+                            <h3 className="font-bold text-lg mb-4 relative z-10">Trendsetters</h3>
+                            <p className="text-slate-300 text-sm mb-6 relative z-10">Top circles making waves this week.</p>
+
+                            <div className="space-y-4 relative z-10">
+                                {pods.slice(0, 3).map((pod, i) => (
+                                    <div key={i} className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/10 transition-colors cursor-pointer" onClick={() => router.push(`/circles`)}>
+                                        <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-xl">
+                                            {pod.icon || '🔥'}
+                                        </div>
+                                        <div>
+                                            <h4 className="font-bold">{pod.name}</h4>
+                                            <p className="text-xs text-slate-400">{pod.memberCount || 0} members</p>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
 
                     </div>
                 </div>
             </div>
 
-            {/* Advanced Search Modal */}
             <AdvancedSearch
                 isOpen={showAdvancedSearch}
                 onClose={() => setShowAdvancedSearch(false)}
-                onSearch={handleSearch}
-            />
-
-            {/* Onboarding Flow */}
-            <OnboardingFlow
-                isOpen={showOnboarding}
-                onComplete={handleOnboardingComplete}
-                onSkip={() => setShowOnboarding(false)}
+                onSearch={() => { }}
             />
         </div>
     );
-};
+}

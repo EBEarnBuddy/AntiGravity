@@ -18,6 +18,7 @@ export const createOpportunity = async (req: AuthRequest, res: Response) => {
         }
 
         const payload = req.body || {};
+        console.log('[createOpportunity] Payload:', JSON.stringify(payload, null, 2));
 
         // Create an Opportunity Circle (Room) for this opportunity.
         // We keep this generic so it also works for future freelance/project postings.
@@ -53,6 +54,7 @@ export const createOpportunity = async (req: AuthRequest, res: Response) => {
         res.status(201).json(opportunity);
     } catch (error) {
         console.error('Error creating opportunity:', error);
+        if (error instanceof Error) console.error(error.stack);
         res.status(500).json({ error: 'Failed to create opportunity' });
     }
 };
@@ -61,6 +63,8 @@ export const createOpportunity = async (req: AuthRequest, res: Response) => {
 export const getOpportunities = async (req: Request, res: Response) => {
     try {
         const { type } = req.query;
+        console.log(`[GET /opportunities] Fetching type: ${type}`);
+
         const filter: any = { status: 'open' };
         if (type) filter.type = type;
 
@@ -68,8 +72,10 @@ export const getOpportunities = async (req: Request, res: Response) => {
             .populate('postedBy', 'displayName photoURL role') // Populate poster info
             .sort({ createdAt: -1 });
 
+        console.log(`[GET /opportunities] Found ${opportunities.length} items`);
         res.json(opportunities);
     } catch (error) {
+        console.error('[GET /opportunities] Error:', error);
         res.status(500).json({ error: 'Fetch failed' });
     }
 };

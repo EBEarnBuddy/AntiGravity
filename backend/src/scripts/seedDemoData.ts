@@ -4,6 +4,7 @@ import User from '../models/User';
 import Opportunity, { IStartupRole } from '../models/Opportunity';
 import Room from '../models/Room';
 import RoomMembership from '../models/RoomMembership';
+import Event from '../models/Event';
 
 dotenv.config();
 
@@ -15,6 +16,52 @@ async function connect() {
   }
   await mongoose.connect(MONGO_URI);
 }
+
+// --- Helper Data ---
+
+const industries = [
+  'FinTech', 'HealthTech', 'EdTech', 'Climate Tech', 'AI/ML', 'E-commerce', 'SaaS', 'Web3', 'Consumer Social', 'Gaming'
+];
+
+const stages = ['Pre-seed', 'Seed', 'Series A', 'Bootstrapped'];
+
+const locations = ['Remote', 'San Francisco', 'New York', 'London', 'Berlin', 'Bengaluru', 'Singapore', 'Toronto'];
+
+const roles = [
+  'Frontend Engineer', 'Backend Engineer', 'Fullstack Engineer', 'Product Designer', 'Product Manager', 'Growth Marketer', 'Content Creator', 'Data Scientist'
+];
+
+const projectTitles = [
+  'Landing page design & build', 'Mobile app MVP', 'SaaS dashboard redesign', 'Content writing for blog', 'Logo & Brand Identity', 'Smart contract audit', 'Data visualization dashboard', 'SEO optimization'
+];
+
+// --- Generators ---
+
+function getRandom(arr: any[]) {
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
+function generateStartupRoles(): IStartupRole[] {
+  const numRoles = Math.floor(Math.random() * 3) + 1;
+  const startupRoles: IStartupRole[] = [];
+  for (let i = 0; i < numRoles; i++) {
+    const roleTitle = getRandom(roles);
+    startupRoles.push({
+      id: `role-${Math.random().toString(36).substr(2, 9)}`,
+      title: `${Math.random() > 0.7 ? 'Founding ' : ''}${roleTitle}`,
+      description: `We are looking for a talented ${roleTitle} to join our early team and help us build the future of our industry.`,
+      requirements: ['Experience with modern tech stack', 'Passion for building', 'Ownership mindset'],
+      salary: `₹${15 + Math.floor(Math.random() * 20)}L – ₹${35 + Math.floor(Math.random() * 20)}L`,
+      equity: `${0.1 + Math.random()}% – ${0.5 + Math.random()}%`,
+      type: Math.random() > 0.8 ? 'part-time' : 'full-time',
+      location: getRandom(['remote', 'hybrid', 'onsite']),
+      applicants: [],
+    });
+  }
+  return startupRoles;
+}
+
+// --- Seeding Functions ---
 
 async function ensureDemoUser() {
   let user = await User.findOne({ email: 'founder@example.com' });
@@ -31,124 +78,58 @@ async function ensureDemoUser() {
   return user;
 }
 
-function createStartupRoles(): IStartupRole[] {
-  return [
-    {
-      id: 'founding-fe',
-      title: 'Founding Frontend Engineer',
-      description:
-        'Own the EarnBuddy user experience end-to-end, from dashboards to opportunity flows, in close collaboration with design.',
-      requirements: ['3+ years React / Next.js', 'Strong product sense', 'Obsessed with UX details'],
-      salary: '₹15–25L + meaningful equity',
-      equity: '0.5 – 1.5%',
-      type: 'full-time',
-      location: 'remote',
-      applicants: [],
-    },
-    {
-      id: 'community-lead',
-      title: 'Community & Circles Lead',
-      description:
-        'Design and run our circles, events, and community playbook; turn EarnBuddy into the default home for student builders.',
-      requirements: ['You love communities', 'Great writing', 'Comfortable hosting events'],
-      salary: 'Stipend + performance-based upside',
-      equity: '0.1 – 0.3%',
-      type: 'part-time',
-      location: 'remote',
-      applicants: [],
-    },
-  ];
-}
+async function seedStartups(posterId: mongoose.Types.ObjectId, founderUid: string) {
+  const count = await Opportunity.countDocuments({ type: 'startup' });
+  if (count >= 15) return;
 
-async function seedStartupOpportunities(posterId: mongoose.Types.ObjectId, founderUid: string) {
-  const existing = await Opportunity.countDocuments({ type: 'startup' });
-  if (existing > 0) return;
-
-  const baseStartup = {
-    type: 'startup' as const,
-    description:
-      'EarnBuddy is building a collaboration-first platform for startups, student builders, and freelancers to ship together.',
-    requirements: ['Founder mindset', 'Comfort with ambiguity'],
-    location: 'Remote',
-    salary: 'Equity / stipend depending on role',
-    postedBy: posterId,
-    status: 'open' as const,
-    applicants: [],
-    name: 'EarnBuddy Core Team',
-    industry: 'Future of Work',
-    stage: 'pre-seed',
-    funding: 'Bootstrapped / early',
-    equity: 'Variable by role',
-    founderId: founderUid,
-    founderName: 'Demo Founder',
-    founderAvatar:
-      'https://images.unsplash.com/photo-1544723795-3fb6469f5b39?w=80&h=80&fit=crop&crop=face',
-    startupStatus: 'active' as const,
-    roles: createStartupRoles(),
-    totalApplicants: 0,
-    contact: {
-      email: 'hello@earnbuddy.test',
-      website: 'https://earnbuddy.test',
-      linkedin: 'https://www.linkedin.com/company/earnbuddy',
-    },
-    additionalInfo:
-      'These roles are purely for demo and testing. Feel free to apply with any profile to see the flow.',
-    website: 'https://earnbuddy.test',
-    logo: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=120&h=120&fit=crop&crop=faces',
-    teamSize: 4,
-    matchScore: 92,
-    verified: true,
-    foundedDate: '2024',
-  };
-
-  // Also create an associated Opportunity Circle (Room)
-  const room = await Room.create({
-    name: 'EarnBuddy Core Team – Opportunity Circle',
-    description: 'Private room for accepted collaborators on the EarnBuddy demo startup.',
-    createdBy: posterId,
-    isPrivate: true,
-    membersCount: 1,
-  });
-
-  await RoomMembership.create({
-    room: room._id,
-    user: posterId,
-    role: 'admin',
-  });
-
-  await Opportunity.create({
-    ...baseStartup,
-    room: room._id,
-  });
-}
-
-async function seedProjectOpportunities(posterId: mongoose.Types.ObjectId, founderUid: string) {
-  const existing = await Opportunity.countDocuments({ type: 'project' });
-  if (existing > 0) return;
-
-  const sampleProjects = [
-    {
-      title: 'Landing page for climate-tech collective',
-      description:
-        'Design + build a fast, beautiful landing page for a climate-tech student collective. Focus on storytelling and visuals.',
-      requirements: ['Next.js', 'Tailwind', 'Basic SEO'],
-      location: 'Remote',
-      salary: '$600 – $900 fixed',
-    },
-    {
-      title: 'Pitch deck polish for early-stage fintech',
-      description:
-        'Help a small fintech startup turn a rough pitch narrative into a crisp, fundable deck. Visual + copy help both welcome.',
-      requirements: ['Pitch decks', 'Storytelling', 'Basic design'],
-      location: 'Remote',
-      salary: '$300 – $500 fixed',
-    },
+  const startupNames = [
+    'Nebula AI', 'GreenLeaf', 'FinFlow', 'EduVerse', 'BlockChainX', 'MediCare+', 'UrbanSpace', 'FoodieTech', 'StreamLine', 'CyberGuard', 'RocketLaunch', 'CodeWhiz'
   ];
 
-  for (const project of sampleProjects) {
+  for (const name of startupNames) {
+    // Check if already exists to avoid dupes on re-run
+    const exists = await Opportunity.findOne({ name, type: 'startup' });
+    if (exists) continue;
+
+    const industry = getRandom(industries);
+
+    const startup = {
+      type: 'startup' as const,
+      description: `${name} is revolutionizing ${industry} by leveraging cutting-edge technology to solve real-world problems.`,
+      requirements: ['Passion', 'Grit', 'Innovation'],
+      location: getRandom(locations),
+      salary: 'Competitive + Equity',
+      postedBy: posterId,
+      status: 'open' as const,
+      applicants: [],
+      name: name,
+      industry: industry,
+      stage: getRandom(stages),
+      funding: getRandom(['Bootstrapped', '$500k Pre-seed', '$2M Seed', '$5M Series A']),
+      equity: '1.0% - 5.0%',
+      founderId: founderUid,
+      founderName: 'Demo Founder',
+      founderAvatar: 'https://images.unsplash.com/photo-1544723795-3fb6469f5b39?w=80&h=80&fit=crop&crop=face',
+      startupStatus: 'active' as const,
+      roles: generateStartupRoles(),
+      totalApplicants: Math.floor(Math.random() * 50),
+      contact: {
+        email: `hello@${name.toLowerCase().replace(/\s/g, '')}.test`,
+        website: `https://${name.toLowerCase().replace(/\s/g, '')}.test`,
+      },
+      additionalInfo: 'Exciting times ahead!',
+      website: `https://${name.toLowerCase().replace(/\s/g, '')}.test`,
+      logo: `https://ui-avatars.com/api/?name=${name.replace(' ', '+')}&background=random&color=fff&size=128`,
+      teamSize: Math.floor(Math.random() * 20) + 2,
+      matchScore: Math.floor(Math.random() * 20) + 80, // High match for demo
+      verified: Math.random() > 0.3,
+      foundedDate: '2023',
+    };
+
+    // Associated Circle
     const room = await Room.create({
-      name: `${project.title} – Opportunity Circle`,
-      description: project.description,
+      name: `${name} – Team Circle`,
+      description: `Private circle for ${name} team members.`,
       createdBy: posterId,
       isPrivate: true,
       membersCount: 1,
@@ -161,77 +142,100 @@ async function seedProjectOpportunities(posterId: mongoose.Types.ObjectId, found
     });
 
     await Opportunity.create({
-      type: 'project',
-      title: project.title,
-      description: project.description,
-      requirements: project.requirements,
-      location: project.location,
-      salary: project.salary,
-      postedBy: posterId,
-      status: 'open',
-      applicants: [],
-      name: project.title,
-      industry: 'Freelance / Colancing',
-      stage: 'seed',
-      funding: 'Client-funded project',
-      equity: '0%',
-      founderId: founderUid,
-      founderName: 'Demo Founder',
-      founderAvatar:
-        'https://images.unsplash.com/photo-1544723795-3fb6469f5b39?w=80&h=80&fit=crop&crop=face',
-      startupStatus: 'active',
-      roles: [
-        {
-          id: 'primary-role',
-          title: 'Primary contributor',
-          description: project.description,
-          requirements: project.requirements,
-          salary: project.salary,
-          equity: '0%',
-          type: 'contract',
-          location: 'remote',
-          applicants: [],
-        },
-      ],
-      totalApplicants: 0,
-      contact: {
-        email: 'demo-client@earnbuddy.test',
-      },
+      ...startup,
       room: room._id,
     });
   }
 }
 
-async function seedCommunityCircles(posterId: mongoose.Types.ObjectId) {
-  const existingPublicRooms = await Room.countDocuments({ isPrivate: false });
-  if (existingPublicRooms > 0) return;
+async function seedProjects(posterId: mongoose.Types.ObjectId, founderUid: string) {
+  const count = await Opportunity.countDocuments({ type: 'project' });
+  if (count >= 15) return;
 
-  const circles = [
-    {
-      name: 'Web Dev – Launch Circles',
-      description: 'Builders who ship web projects together every month.',
-      icon: '💻',
-    },
-    {
-      name: 'Design Pods',
-      description: 'Designers helping early-stage founders with brand and product.',
-      icon: '🎨',
-    },
-    {
-      name: 'Campus Builders',
-      description: 'Student founders and hackers across campuses.',
-      icon: '🏫',
-    },
+  for (const title of projectTitles) {
+    const exists = await Opportunity.findOne({ title, type: 'project' });
+    if (exists) continue;
+
+    const budget = `$${Math.floor(Math.random() * 5) + 1}k`;
+
+    const project = {
+      type: 'project' as const,
+      title: title,
+      description: `Looking for an expert to help with ${title}. Must have proven experience and a portfolio.`,
+      requirements: ['Portfolio', 'Communication', 'Speed'],
+      location: 'Remote',
+      salary: `${budget} Fixed`,
+      postedBy: posterId,
+      status: 'open' as const,
+      applicants: [],
+      name: title, // Backend requires 'name'
+      industry: getRandom(industries),
+      stage: 'Project',
+      funding: 'Funded',
+      equity: '0%',
+      founderId: founderUid,
+      founderName: 'Demo Founder',
+      founderAvatar: 'https://images.unsplash.com/photo-1544723795-3fb6469f5b39?w=80&h=80&fit=crop&crop=face',
+      startupStatus: 'active' as const,
+      roles: [{
+        id: 'primary',
+        title: 'Freelancer',
+        description: 'Complete the project deliverables.',
+        requirements: ['Skill 1', 'Skill 2'],
+        salary: budget,
+        type: 'contract' as const,
+        location: 'remote' as const
+      }],
+      totalApplicants: Math.floor(Math.random() * 10),
+      contact: {
+        email: 'client@example.com',
+      },
+    };
+
+    const room = await Room.create({
+      name: `${title.substring(0, 20)}... – Project`,
+      description: `Collaboration room for ${title}`,
+      createdBy: posterId,
+      isPrivate: true,
+      membersCount: 1,
+    });
+
+    await RoomMembership.create({
+      room: room._id,
+      user: posterId,
+      role: 'admin',
+    });
+
+    await Opportunity.create({
+      ...project,
+      room: room._id,
+    });
+  }
+}
+
+async function seedCircles(posterId: mongoose.Types.ObjectId) {
+  const categories = [
+    { name: 'Web Dev Wizards', icon: '💻', desc: 'Discuss latest frameworks and tools.' },
+    { name: 'UI/UX Designers', icon: '🎨', desc: 'Feedback, critiques, and design talk.' },
+    { name: 'Indie Hackers', icon: '🚀', desc: 'Building profitable side projects.' },
+    { name: 'AI Researchers', icon: '🤖', desc: 'Discussing LLMs, agents, and more.' },
+    { name: 'Content Creators', icon: '✍️', desc: 'Writing, video, and audience building.' },
+    { name: 'Product Management', icon: '📅', desc: 'Roadmaps, strategy, and user talks.' },
+    { name: 'Crypto & Web3', icon: '⛓️', desc: 'DeFi, NFTs, and DAOs.' },
+    { name: 'Mobile Devs', icon: '📱', desc: 'iOS, Android, React Native, Flutter.' },
   ];
 
-  for (const circle of circles) {
+  for (const cat of categories) {
+    const exists = await Room.findOne({ name: cat.name });
+    if (exists) continue;
+
     const room = await Room.create({
-      name: circle.name,
-      description: circle.description,
+      name: cat.name,
+      description: cat.desc,
       createdBy: posterId,
-      icon: circle.icon,
+      icon: cat.icon,
       isPrivate: false,
-      membersCount: 1,
+      membersCount: Math.floor(Math.random() * 50) + 5,
     });
 
     await RoomMembership.create({
@@ -242,19 +246,74 @@ async function seedCommunityCircles(posterId: mongoose.Types.ObjectId) {
   }
 }
 
+async function seedEvents(posterId: mongoose.Types.ObjectId) {
+  const existingEvents = await Event.countDocuments();
+  if (existingEvents > 5) return;
+
+  // Get some circles to host events
+  const circles = await Room.find({ isPrivate: false }).limit(3);
+  if (circles.length === 0) return;
+
+  const eventData = [
+    { name: 'Next.js 15 Launch Party', type: 'online' },
+    { name: 'Design Systems Workshop', type: 'online' },
+    { name: 'Indie Hacker Meetup - SF', type: 'offline', loc: 'San Francisco' },
+    { name: 'AI Hackathon Kickoff', type: 'online' },
+    { name: 'Weekly Co-working Session', type: 'online' }
+  ];
+
+  for (const evt of eventData) {
+    const hostCircle = getRandom(circles);
+    const eventDate = new Date();
+    eventDate.setDate(eventDate.getDate() + Math.floor(Math.random() * 14) + 1); // Future date
+
+    // Create temporary event circle
+    const eventRoom = await Room.create({
+      name: evt.name,
+      description: `Event room for ${evt.name}`,
+      createdBy: posterId,
+      isPrivate: false,
+      isTemporary: true,
+      membersCount: 1,
+      icon: '📅'
+    });
+
+    // Add creator to temporary room
+    await RoomMembership.create({ room: eventRoom._id, user: posterId, role: 'admin' });
+
+    await Event.create({
+      name: evt.name,
+      description: `Join us for ${evt.name}! It's going to be great.`,
+      date: eventDate,
+      hostCircles: [hostCircle._id],
+      eventCircle: eventRoom._id,
+      type: evt.type,
+      location: evt.type === 'offline' ? evt.loc : 'Zoom / Google Meet',
+      status: 'upcoming',
+      createdBy: posterId
+    });
+  }
+}
+
 async function main() {
   try {
     await connect();
     const demoUser = await ensureDemoUser();
 
-    await seedStartupOpportunities(demoUser._id, demoUser.firebaseUid);
-    await seedProjectOpportunities(demoUser._id, demoUser.firebaseUid);
-    await seedCommunityCircles(demoUser._id);
+    console.log('🌱 Seeding Startups...');
+    await seedStartups(demoUser._id, demoUser.firebaseUid);
 
-    // eslint-disable-next-line no-console
-    console.log('✅ Demo data seeding complete');
+    console.log('🌱 Seeding Projects...');
+    await seedProjects(demoUser._id, demoUser.firebaseUid);
+
+    console.log('🌱 Seeding Circles...');
+    await seedCircles(demoUser._id);
+
+    console.log('🌱 Seeding Events...');
+    await seedEvents(demoUser._id);
+
+    console.log('✅ Demo data seeding complete!');
   } catch (err) {
-    // eslint-disable-next-line no-console
     console.error('❌ Failed to seed demo data:', err);
   } finally {
     await mongoose.disconnect();
@@ -262,5 +321,3 @@ async function main() {
 }
 
 void main();
-
-

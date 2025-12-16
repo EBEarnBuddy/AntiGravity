@@ -13,6 +13,7 @@ export const applyToOpportunity = async (req: AuthRequest, res: Response) => {
     try {
         const { uid } = req.user!;
         const { opportunityId, message, roleId } = req.body;
+        console.log('[applyToOpportunity] Request Body:', JSON.stringify(req.body, null, 2));
 
         const user = await User.findOne({ firebaseUid: uid });
         if (!user) {

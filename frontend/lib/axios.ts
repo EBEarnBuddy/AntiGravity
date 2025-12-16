@@ -30,7 +30,9 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    console.error('API Error:', error.response?.data || error.message);
+    console.error('API Error Status:', error.response?.status);
+    console.error('API Error Data:', error.response?.data);
+    console.error('API Error Message:', error.message);
     return Promise.reject(error);
   }
 );
@@ -50,7 +52,7 @@ export const opportunityAPI = {
 };
 
 export const applicationAPI = {
-  apply: (opportunityId: string, message?: string) => api.post('/applications', { opportunityId, message }),
+  apply: (opportunityId: string, data: { message: string; roleId?: string }) => api.post('/applications', { opportunityId, ...data }),
   getMyApplications: () => api.get('/applications/me'),
 };
 
@@ -59,6 +61,11 @@ export const roomAPI = {
   getMyRooms: () => api.get('/rooms/me'),
   create: (data: any) => api.post('/rooms', data),
   join: (roomId: string) => api.post(`/rooms/${roomId}/join`),
+};
+
+export const eventAPI = {
+  getAll: (limit?: number) => api.get('/events', { params: { limit } }),
+  create: (data: any) => api.post('/events', data),
 };
 
 export const messageAPI = {

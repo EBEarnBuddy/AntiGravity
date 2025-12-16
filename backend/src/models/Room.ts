@@ -6,6 +6,7 @@ export interface IRoom extends Document {
     createdBy: mongoose.Types.ObjectId;
     icon?: string;
     isPrivate: boolean;
+    isTemporary?: boolean;
     membersCount: number;
     lastMessageAt?: Date;
     createdAt: Date;
@@ -18,6 +19,7 @@ const RoomSchema: Schema = new Schema({
     createdBy: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     icon: { type: String }, // URL or icon name
     isPrivate: { type: Boolean, default: false },
+    isTemporary: { type: Boolean, default: false }, // For Event Circles
     membersCount: { type: Number, default: 0 },
     lastMessageAt: { type: Date },
 }, { timestamps: true });
