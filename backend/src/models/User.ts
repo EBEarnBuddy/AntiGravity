@@ -17,6 +17,7 @@ export interface IUser extends Document {
     bookmarks?: string[]; // IDs of bookmarked opportunities
     createdAt: Date;
     updatedAt: Date;
+    lastLogin?: Date;
 }
 
 const UserSchema: Schema = new Schema({
@@ -34,6 +35,7 @@ const UserSchema: Schema = new Schema({
         portfolio: String
     },
     bookmarks: [{ type: Schema.Types.ObjectId, ref: 'Opportunity' }],
+    lastLogin: { type: Date },
 }, { timestamps: true });
 
 export default mongoose.model<IUser>('User', UserSchema);

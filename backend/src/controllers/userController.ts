@@ -8,18 +8,28 @@ export const syncUser = async (req: AuthRequest, res: Response) => {
         const { uid, email } = req.user!;
         const { displayName, photoURL } = req.body;
 
-        let user = await User.findOne({ firebaseUid: uid });
+        const user = await User.findOneAndUpdate(
+            { firebaseUid: uid },
+            {
+                $set: {
+                    email, // Ensure email is fresh from token
+                    displayName: displayName || 'New User',
+                    photoURL: photoURL || '',
+                    lastLogin: new Date()
+                },
+                $setOnInsert: {
+                    role: 'user', // Default role for new users
+                    skills: []
+                }
+            },
+            {
+                new: true, // Return the updated document
+                upsert: true, // Create if not exists
+                setDefaultsOnInsert: true
+            }
+        );
 
-        if (!user) {
-            user = await User.create({
-                firebaseUid: uid,
-                email: email || '',
-                displayName: displayName || 'New User',
-                photoURL: photoURL || '',
-            });
-            console.log(`Created new user: ${uid}`);
-        }
-
+        console.log(`Synced user: ${uid} (${user.email})`);
         res.status(200).json(user);
     } catch (error) {
         console.error('Error syncing user:', error);
