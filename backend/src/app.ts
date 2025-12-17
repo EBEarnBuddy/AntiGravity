@@ -69,6 +69,13 @@ app.get('/', (req: Request, res: Response) => {
     });
 });
 app.get('/health', (req: Request, res: Response) => {
+    const origin = req.get('origin');
+    if (origin && allowedOrigins.includes(origin)) {
+        console.log(`✅ [Frontend Connection] Access from known origin: ${origin}`);
+    } else if (origin) {
+        console.warn(`⚠️ [Unknown Connection] Access from unknown origin: ${origin}`);
+    }
+
     res.status(200).send('OK');
 });
 

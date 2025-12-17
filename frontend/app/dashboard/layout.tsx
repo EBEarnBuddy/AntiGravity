@@ -23,7 +23,7 @@ export default function DashboardLayout({
             {/* Sidebar */}
             <aside className="w-64 bg-white border-r border-slate-200 flex flex-col fixed inset-y-0 z-20">
                 <div className="h-16 flex items-center px-6 border-b border-slate-50">
-                    <Link href="/lander" className="flex items-center gap-2 font-bold text-xl tracking-tight text-slate-900">
+                    <Link href="/discover" className="flex items-center gap-2 font-bold text-xl tracking-tight text-slate-900">
                         <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center text-white">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
                                 <path d="M12 2L2 7l10 5 10-5-10-5zm0 9l2.5-1.25L12 8.5l-2.5 1.25L12 11zm0 2.5l-5-2.5-5 2.5L12 22l10-8.5-5-2.5-5 2.5z" />

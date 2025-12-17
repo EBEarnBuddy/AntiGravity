@@ -1,10 +1,19 @@
-import { redirect } from 'next/navigation';
+"use client";
+
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/contexts/AuthContext';
 import LanderPage from './lander/page';
 
 export default function Home() {
-  // Option 1: Redirect to /lander
-  // redirect('/lander');
+  const { currentUser, loading } = useAuth();
+  const router = useRouter();
 
-  // Option 2: Render Lander directly (better for SEO/UX as root)
+  useEffect(() => {
+    if (!loading && currentUser) {
+      router.push('/discover');
+    }
+  }, [currentUser, loading, router]);
+
   return <LanderPage />;
 }
