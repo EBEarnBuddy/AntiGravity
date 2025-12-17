@@ -180,6 +180,12 @@ export interface Startup {
   matchScore?: number;
   verified?: boolean;
   foundedDate?: string;
+  postedBy?: string | {
+    _id: string;
+    firebaseUid: string;
+    displayName: string;
+    photoURL?: string;
+  };
 }
 
 export interface StartupRole {
@@ -208,6 +214,23 @@ export interface StartupApplication {
   availability: string;
   appliedAt: Timestamp;
   status: 'pending' | 'accepted' | 'rejected' | 'interviewing';
+}
+
+export interface Application {
+  _id: string;
+  opportunityId: string | { _id: string; name: string; description: string; type: string; postedBy: string };
+  applicantId: string | {
+    _id: string;
+    displayName: string;
+    email: string;
+    photoURL?: string;
+  };
+  roleId?: string;
+  status: 'pending' | 'accepted' | 'rejected' | 'interviewing';
+  message: string;
+  details?: any;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface ChatRoom {

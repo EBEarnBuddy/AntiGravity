@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Pod, PodPost, ChatRoom as Room, Startup, Gig, Notification, ChatMessage, UserAnalytics } from '../lib/firestore'; // Keep types for now
+import { Pod, PodPost, ChatRoom as Room, Startup, Gig, Notification, ChatMessage, UserAnalytics, Application } from '../lib/firestore'; // Keep types for now
 import { useAuth } from '../contexts/AuthContext';
 import { roomAPI, opportunityAPI, messageAPI, applicationAPI, userAPI, eventAPI } from '../lib/axios';
 
@@ -237,10 +237,52 @@ export const useStartups = () => {
     }
   };
 
+  const getApplicants = async (startupId: string) => {
+    try {
+      const response = await applicationAPI.getForOpportunity(startupId);
+      return response.data;
+    } catch (err) {
+      console.error('Failed to get applicants:', err);
+      throw err;
+    }
+  };
+
+  const updateApplicationStatus = async (applicationId: string, status: 'accepted' | 'rejected') => {
+    try {
+      await applicationAPI.updateStatus(applicationId, status);
+    } catch (err) {
+      console.error('Failed to update status:', err);
+      throw err;
+    }
+  };
+
   const bookmarkStartup = async (startupId: string, userId: string) => { }; // TODO
   const unbookmarkStartup = async (startupId: string, userId: string) => { }; // TODO
 
-  return { startups, loading, error, createStartup, applyToStartup, bookmarkStartup, unbookmarkStartup };
+  return { startups, loading, error, createStartup, applyToStartup, bookmarkStartup, unbookmarkStartup, getApplicants, updateApplicationStatus };
+};
+
+export const useMyApplications = () => {
+  const [applications, setApplications] = useState<Application[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchApplications = async () => {
+      try {
+        setLoading(true);
+        const response = await applicationAPI.getMyApplications();
+        setApplications(response.data);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to fetch applications');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchApplications();
+  }, []);
+
+  return { applications, loading, error };
 };
 
 export const useProjects = () => {

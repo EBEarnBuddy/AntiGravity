@@ -83,6 +83,8 @@ export const opportunityAPI = {
 export const applicationAPI = {
   apply: (opportunityId: string, data: { message: string; roleId?: string }) => api.post('/applications', { opportunityId, ...data }),
   getMyApplications: () => api.get('/applications/me'),
+  getForOpportunity: (opportunityId: string) => api.get(`/applications/opportunity/${opportunityId}`),
+  updateStatus: (id: string, status: string) => api.patch(`/applications/${id}/status`, { status }),
 };
 
 export const roomAPI = {
