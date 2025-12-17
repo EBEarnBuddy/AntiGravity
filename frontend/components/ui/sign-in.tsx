@@ -32,6 +32,7 @@ interface SignInPageProps {
     onResetPassword?: () => void;
     onCreateAccount?: () => void;
     mode?: 'signin' | 'signup';
+    isLoading?: boolean;
 }
 
 // --- SUB-COMPONENTS ---
@@ -65,6 +66,7 @@ export const SignInPage: React.FC<SignInPageProps> = ({
     onResetPassword,
     onCreateAccount,
     mode = 'signin',
+    isLoading = false,
 }) => {
     const [showPassword, setShowPassword] = useState(false);
 
@@ -91,7 +93,7 @@ export const SignInPage: React.FC<SignInPageProps> = ({
                             <div className="animate-element animate-delay-300">
                                 <label className="text-sm font-medium text-slate-600 ml-1 mb-1 block">Email Address</label>
                                 <GlassInputWrapper>
-                                    <input name="email" type="email" placeholder="Enter your email address" className="w-full bg-transparent text-sm p-4 rounded-2xl focus:outline-none placeholder:text-slate-400" />
+                                    <input name="email" type="email" placeholder="Enter your email address" className="w-full bg-transparent text-sm p-4 rounded-2xl focus:outline-none placeholder:text-slate-400" disabled={isLoading} />
                                 </GlassInputWrapper>
                             </div>
 
@@ -99,8 +101,8 @@ export const SignInPage: React.FC<SignInPageProps> = ({
                                 <label className="text-sm font-medium text-slate-600 ml-1 mb-1 block">Password</label>
                                 <GlassInputWrapper>
                                     <div className="relative">
-                                        <input name="password" type={showPassword ? 'text' : 'password'} placeholder="Enter your password" className="w-full bg-transparent text-sm p-4 pr-12 rounded-2xl focus:outline-none placeholder:text-slate-400" />
-                                        <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute inset-y-0 right-3 flex items-center">
+                                        <input name="password" type={showPassword ? 'text' : 'password'} placeholder="Enter your password" className="w-full bg-transparent text-sm p-4 pr-12 rounded-2xl focus:outline-none placeholder:text-slate-400" disabled={isLoading} />
+                                        <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute inset-y-0 right-3 flex items-center" disabled={isLoading}>
                                             {showPassword ? <EyeOff className="w-5 h-5 text-slate-400 hover:text-slate-600 transition-colors" /> : <Eye className="w-5 h-5 text-slate-400 hover:text-slate-600 transition-colors" />}
                                         </button>
                                     </div>
@@ -109,14 +111,14 @@ export const SignInPage: React.FC<SignInPageProps> = ({
 
                             <div className="animate-element animate-delay-500 flex items-center justify-between text-sm">
                                 <label className="flex items-center gap-3 cursor-pointer">
-                                    <input type="checkbox" name="rememberMe" className="w-4 h-4 rounded border-slate-300 text-primary focus:ring-primary" />
+                                    <input type="checkbox" name="rememberMe" className="w-4 h-4 rounded border-slate-300 text-primary focus:ring-primary" disabled={isLoading} />
                                     <span className="text-slate-600">Keep me signed in</span>
                                 </label>
-                                <a href="#" onClick={(e) => { e.preventDefault(); onResetPassword?.(); }} className="hover:underline text-primary transition-colors font-medium">Reset password</a>
+                                <a href="#" onClick={(e) => { e.preventDefault(); if (!isLoading) onResetPassword?.(); }} className={`hover:underline text-primary transition-colors font-medium ${isLoading ? 'pointer-events-none opacity-50' : ''}`}>Reset password</a>
                             </div>
 
-                            <button type="submit" className="animate-element animate-delay-600 w-full rounded-2xl bg-primary py-4 font-bold text-white hover:bg-green-700 transition-transform hover:-translate-y-0.5 shadow-lg shadow-green-200">
-                                {mode === 'signin' ? 'Sign In' : 'Create Account'}
+                            <button type="submit" disabled={isLoading} className={`animate-element animate-delay-600 w-full rounded-2xl bg-primary py-4 font-bold text-white hover:bg-green-700 transition-transform hover:-translate-y-0.5 shadow-lg shadow-green-200 ${isLoading ? 'opacity-70 cursor-not-allowed' : ''}`}>
+                                {isLoading ? 'Please wait...' : (mode === 'signin' ? 'Sign In' : 'Create Account')}
                             </button>
                         </form>
 
@@ -125,7 +127,7 @@ export const SignInPage: React.FC<SignInPageProps> = ({
                             <span className="px-4 text-sm text-slate-400 bg-white absolute">Or continue with</span>
                         </div>
 
-                        <button onClick={onGoogleSignIn} className="animate-element animate-delay-800 w-full flex items-center justify-center gap-3 border border-slate-200 rounded-2xl py-4 hover:bg-slate-50 transition-colors font-medium text-slate-600 bg-white">
+                        <button onClick={onGoogleSignIn} disabled={isLoading} className={`animate-element animate-delay-800 w-full flex items-center justify-center gap-3 border border-slate-200 rounded-2xl py-4 hover:bg-slate-50 transition-colors font-medium text-slate-600 bg-white ${isLoading ? 'opacity-70 cursor-not-allowed' : ''}`}>
                             <GoogleIcon />
                             Continue with Google
                         </button>

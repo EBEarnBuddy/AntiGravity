@@ -24,6 +24,7 @@ export default function AuthPage() {
     const router = useRouter();
     const { signInWithEmail, signUpWithEmail, signInWithGoogle, currentUser } = useAuth();
     const [mode, setMode] = useState<'signin' | 'signup'>('signin');
+    const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
@@ -46,6 +47,7 @@ export default function AuthPage() {
         }
 
         try {
+            setLoading(true);
             if (mode === 'signin') {
                 await signInWithEmail(email, password);
                 router.push('/discover');
@@ -57,18 +59,24 @@ export default function AuthPage() {
         } catch (err: any) {
             console.error(err);
             setError(err.message || "Authentication failed");
+        } finally {
+            setLoading(false);
         }
     };
 
     const handleGoogleSignIn = async () => {
         setError(null);
+        if (loading) return; // Prevention
         try {
+            setLoading(true);
             await signInWithGoogle();
             router.push('/discover');
         } catch (err: any) {
             console.error(err);
             setError(err.message || "Google Sign In failed");
+            setLoading(false); // Only set false on error, success redirects
         }
+        // Note: We don't finally set loading false on success to prevent button re-enable during redirect
     };
 
     const toggleMode = () => {
@@ -90,6 +98,7 @@ export default function AuthPage() {
                 onGoogleSignIn={handleGoogleSignIn}
                 onCreateAccount={toggleMode}
                 mode={mode}
+                isLoading={loading}
                 title={<span className="text-slate-900">{mode === 'signin' ? 'Welcome Back' : 'Get Started'}</span>}
                 description={mode === 'signin' ? "Access your account and continue your journey" : "Join thousands of students and founders building the future."}
             />

@@ -50,14 +50,24 @@ import collabRoutes from './routes/collabRoutes';
 import eventRoutes from './routes/eventRoutes';
 import notificationRoutes from './routes/notificationRoutes';
 
-// Routes
-app.use('/api/v1/users', userRoutes);
-app.use('/api/v1/opportunities', opportunityRoutes);
-app.use('/api/v1/applications', applicationRoutes);
-app.use('/api/v1/rooms', roomRoutes);
-app.use('/api/v1/notifications', notificationRoutes);
-app.use('/api/v1/collab', collabRoutes);
-app.use('/api/v1/events', eventRoutes);
+// Routes Configuration
+// Routes Configuration
+const apiRoutes = [
+    { path: '/users', router: userRoutes },
+    { path: '/opportunities', router: opportunityRoutes },
+    { path: '/applications', router: applicationRoutes },
+    { path: '/rooms', router: roomRoutes },
+    { path: '/notifications', router: notificationRoutes },
+    { path: '/collab', router: collabRoutes },
+    { path: '/events', router: eventRoutes }
+];
+
+// Mount all routes at both /api/v1/ and root level /
+// This ensures compatibility whether NEXT_PUBLIC_API_URL includes /api/v1 or not
+apiRoutes.forEach(route => {
+    app.use(`/api/v1${route.path}`, route.router);
+    app.use(route.path, route.router);
+});
 
 // Basic Health Check
 app.get('/', (req: Request, res: Response) => {

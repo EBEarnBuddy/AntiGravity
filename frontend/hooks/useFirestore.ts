@@ -37,7 +37,11 @@ export const useRooms = () => {
       try {
         setLoading(true);
         const response = await roomAPI.getAll();
-        setRooms(response.data);
+        const data = response.data.map((room: any) => ({
+          ...room,
+          id: room._id || room.id // Ensure id exists
+        }));
+        setRooms(data);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to fetch rooms');
       } finally {
@@ -53,7 +57,11 @@ export const useRooms = () => {
       await roomAPI.create(roomData);
       // Refresh
       const response = await roomAPI.getAll();
-      setRooms(response.data);
+      const data = response.data.map((room: any) => ({
+        ...room,
+        id: room._id || room.id
+      }));
+      setRooms(data);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to create room');
     }
@@ -64,7 +72,11 @@ export const useRooms = () => {
       await roomAPI.join(roomId);
       // Refresh
       const response = await roomAPI.getAll();
-      setRooms(response.data);
+      const data = response.data.map((room: any) => ({
+        ...room,
+        id: room._id || room.id
+      }));
+      setRooms(data);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to join room');
     }
@@ -209,7 +221,8 @@ export const useStartups = () => {
     try {
       await opportunityAPI.create({ ...startupData, type: 'startup' });
       const response = await opportunityAPI.getAll('startup');
-      setStartups(response.data);
+      const data = response.data.map((item: any) => ({ ...item, id: item._id }));
+      setStartups(data);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to create startup');
     }
@@ -257,7 +270,8 @@ export const useProjects = () => {
     try {
       await opportunityAPI.create({ ...projectData, type: 'project' });
       const response = await opportunityAPI.getAll('project');
-      setProjects(response.data);
+      const data = response.data.map((item: any) => ({ ...item, id: item._id }));
+      setProjects(data);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to create project');
     }
