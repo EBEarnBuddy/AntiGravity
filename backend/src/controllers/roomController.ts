@@ -81,6 +81,7 @@ export const joinRoom = async (req: AuthRequest, res: Response) => {
 export const getRooms = async (req: AuthRequest, res: Response) => {
     try {
         const { uid } = req.user!;
+        console.log(`🔥 API HIT: GET /rooms (All) for UID: ${uid}`);
         const user = await User.findOne({ firebaseUid: uid });
 
         // Fetch all rooms

@@ -240,7 +240,7 @@ export const useProjects = () => {
       try {
         setLoading(true);
         // Assuming 'freelance' or 'project' type. Let's use 'project' as per model comment for Colancing
-        const response = await opportunityAPI.getAll('project');
+        const response = await opportunityAPI.getAll('freelance');
         const data = response.data.map((item: any) => ({ ...item, id: item._id }));
         setProjects(data);
       } catch (err) {

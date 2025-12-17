@@ -63,18 +63,33 @@ export const createOpportunity = async (req: AuthRequest, res: Response) => {
 export const getOpportunities = async (req: Request, res: Response) => {
     try {
         const { type } = req.query;
-        console.log(`🔥 API HIT: GET /opportunities Type: ${type || 'ALL'}`);
-        console.log(`[GET /opportunities] Fetching type: ${type}`);
+        console.log(`🔥 API HIT: GET /opportunities Type: ${type}`);
 
-        const filter: any = { status: 'open' };
-        if (type) filter.type = type;
+        if (!type) {
+            console.warn('[Get Opportunities] 400 Bad Request: Missing type');
+            res.status(400).json({ error: 'Type parameter is required (startup | freelance)' });
+            return;
+        }
+
+        let filter: any = { status: 'open' };
+
+        if (type === 'startup') {
+            filter.type = 'startup';
+        } else if (type === 'freelance') {
+            // "freelance" query returns both freelance (Gig) and project (Colancing) types
+            filter.type = { $in: ['freelance', 'project'] };
+        } else {
+            console.warn(`[Get Opportunities] 400 Bad Request: Invalid type '${type}'`);
+            res.status(400).json({ error: 'Invalid type parameter' });
+            return;
+        }
 
         const opportunities = await Opportunity.find(filter)
             .populate('postedBy', 'displayName photoURL role') // Populate poster info
             .sort({ createdAt: -1 });
 
-        console.log(`[GET /opportunities] Found ${opportunities.length} items`);
-        res.json(opportunities);
+        console.log(`[GET /opportunities] Found ${opportunities.length} items for type: ${type}`);
+        res.status(200).json(opportunities);
     } catch (error) {
         console.error('[GET /opportunities] Error:', error);
         res.status(500).json({ error: 'Fetch failed' });
