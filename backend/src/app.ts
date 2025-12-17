@@ -14,12 +14,16 @@ app.use((req, res, next) => {
 });
 
 app.use(express.json());
+const clientUrls = process.env.CLIENT_URL ? process.env.CLIENT_URL.split(',') : [];
 const allowedOrigins = [
-    process.env.CLIENT_URL || 'http://localhost:3000',
+    ...clientUrls,
+    'http://localhost:3000',
     'http://localhost:3001', // Local dev fallback
-    'https://earnbuddy.vercel.app', // Example production domain
+    'https://earnbuddy.vercel.app', // Original domain
+    'https://earnbuddy-frontend.vercel.app', // Production domain reported in logs
     'https://earnbuddy.onrender.com'
-];
+].filter(Boolean); // Remove empty strings if any
+console.log('ℹ️  [CORS] Allowed Origins:', allowedOrigins);
 
 app.use(cors({
     origin: function (origin, callback) {
