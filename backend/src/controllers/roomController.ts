@@ -84,10 +84,11 @@ export const getRooms = async (req: AuthRequest, res: Response) => {
         console.log(`🔥 API HIT: GET /rooms (All) for UID: ${uid}`);
         const user = await User.findOne({ firebaseUid: uid });
 
-        // Fetch all rooms
-        // We use .lean() if possible for performance, but basic find is okay.
-        // We need to return a plain object to attach 'members' property if it's not in schema.
-        const roomsDocs = await Room.find().sort({ lastMessageAt: -1, createdAt: -1 });
+        // Fetch all rooms (excluding private and opportunity circles)
+        const roomsDocs = await Room.find({
+            isPrivate: false,
+            type: { $ne: 'opportunity' }
+        }).sort({ lastMessageAt: -1, createdAt: -1 });
 
         if (!user) {
             // If for some reason user not found, just return rooms without membership info

@@ -20,13 +20,16 @@ import CreateCircleModal from '@/components/CreateCircleModal';
 const CirclesPage: React.FC = () => {
     const { currentUser } = useAuth();
     const router = useRouter();
-    const { rooms, loading, joinRoom, requestJoin } = useRooms();
+    const { rooms, myRooms, loading, joinRoom, requestJoin } = useRooms();
     const [searchTerm, setSearchTerm] = useState('');
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+    const [activeTab, setActiveTab] = useState<'explore' | 'my-circles'>('explore');
 
-    const filteredRooms = rooms.filter(room =>
+    const sourceRooms = activeTab === 'explore' ? rooms : myRooms;
+
+    const filteredRooms = sourceRooms.filter(room =>
         room.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        room.description.toLowerCase().includes(searchTerm.toLowerCase())
+        room.description?.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     const handleRoomAction = (room: any) => {
@@ -36,7 +39,6 @@ const CirclesPage: React.FC = () => {
         const isPending = room.pendingMembers?.includes(currentUser.uid);
 
         if (isMember) {
-            // Directly go to dynamic room page which SHOULD have chat
             router.push(`/circles/${room.id}`);
         } else if (isPending) {
             // Already requested
@@ -51,12 +53,13 @@ const CirclesPage: React.FC = () => {
 
     return (
         <div className="min-h-screen bg-slate-50 font-sans text-slate-900 pb-20">
-            {/* Header placeholder - assumed handled by Layout */}
+            {/* Header Spacing */}
+            <div className="h-12"></div>
 
-            <div className="container mx-auto px-4 py-12 max-w-7xl">
+            <div className="container mx-auto px-4 py-8 max-w-7xl">
 
                 {/* Hero */}
-                <div className="text-center space-y-4 mb-16">
+                <div className="text-center space-y-4 mb-12">
                     <h1 className="text-5xl md:text-6xl font-black text-green-600 tracking-tighter">
                         EB Circles
                     </h1>
@@ -66,14 +69,25 @@ const CirclesPage: React.FC = () => {
                     </p>
 
                     <div className="flex items-center justify-center gap-4 pt-6">
-                        <button className="px-8 py-3 bg-white border-2 border-slate-900 text-slate-900 font-bold rounded-xl hover:bg-slate-50 transition transform hover:-translate-y-1">
-                            Browse Circles
-                        </button>
+                        <div className="flex bg-slate-200 p-1 rounded-xl">
+                            <button
+                                onClick={() => setActiveTab('explore')}
+                                className={`px-6 py-2 rounded-lg text-sm font-bold transition ${activeTab === 'explore' ? 'bg-white text-green-600 shadow-sm' : 'text-slate-500 hover:text-slate-900'}`}
+                            >
+                                Explore
+                            </button>
+                            <button
+                                onClick={() => setActiveTab('my-circles')}
+                                className={`px-6 py-2 rounded-lg text-sm font-bold transition ${activeTab === 'my-circles' ? 'bg-white text-green-600 shadow-sm' : 'text-slate-500 hover:text-slate-900'}`}
+                            >
+                                My Circles
+                            </button>
+                        </div>
                         <button
                             onClick={() => setIsCreateModalOpen(true)}
-                            className="px-8 py-3 bg-green-600 text-white font-bold rounded-xl hover:bg-green-700 transition shadow-lg shadow-green-200 transform hover:-translate-y-1"
+                            className="px-6 py-2.5 bg-green-600 text-white font-bold rounded-xl hover:bg-green-700 transition shadow-lg shadow-green-200"
                         >
-                            Create a Circle
+                            Create Circle
                         </button>
                     </div>
                 </div>
@@ -85,14 +99,14 @@ const CirclesPage: React.FC = () => {
                 />
 
                 {/* Search Bar */}
-                < div className="max-w-3xl mx-auto mb-20 relative z-10" >
+                < div className="max-w-3xl mx-auto mb-16 relative z-10" >
                     <div className="relative group">
                         <div className="absolute inset-0 bg-green-200 rounded-2xl blur opacity-25 group-hover:opacity-40 transition duration-500"></div>
                         <div className="relative bg-white rounded-2xl shadow-xl flex items-center p-2 border border-slate-100">
                             <Search className="ml-4 text-slate-400 w-6 h-6" />
                             <input
                                 type="text"
-                                placeholder="Search for circles, interests, or communities..."
+                                placeholder={activeTab === 'explore' ? "Search for communities..." : "Search your circles..."}
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                                 className="w-full h-12 pl-4 pr-4 text-lg outline-none text-slate-700 placeholder:text-slate-400 font-medium bg-transparent"
@@ -104,13 +118,18 @@ const CirclesPage: React.FC = () => {
                 {/* Active Circles Grid */}
                 < div className="mb-24" >
                     <div className="flex items-center justify-between mb-8">
-                        <h2 className="text-3xl font-black text-slate-800 tracking-tight">Active Communities</h2>
-                        <button className="text-green-600 font-bold text-sm flex items-center hover:underline">View All <ChevronRight className="w-4 h-4" /></button>
+                        <h2 className="text-3xl font-black text-slate-800 tracking-tight">
+                            {activeTab === 'explore' ? 'Active Communities' : 'My Circles'}
+                        </h2>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                         {loading ? (
                             [1, 2, 3, 4].map(i => <Skeleton key={i} className="h-80 w-full rounded-2xl" />)
+                        ) : filteredRooms.length === 0 ? (
+                            <div className="col-span-4 text-center py-20 text-slate-500">
+                                {activeTab === 'explore' ? "No communities found." : "You haven't joined any circles yet."}
+                            </div>
                         ) : (
                             filteredRooms.map((room, index) => {
                                 const isMember = currentUser && room.members.includes(currentUser.uid);

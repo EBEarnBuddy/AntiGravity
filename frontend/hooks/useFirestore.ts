@@ -28,6 +28,7 @@ export const usePodPosts = (podId: string) => {
 
 export const useRooms = () => {
   const [rooms, setRooms] = useState<Room[]>([]);
+  const [myRooms, setMyRooms] = useState<Room[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { currentUser } = useAuth();
@@ -36,12 +37,23 @@ export const useRooms = () => {
     const fetchRooms = async () => {
       try {
         setLoading(true);
-        const response = await roomAPI.getAll();
-        const data = response.data.map((room: any) => ({
+        const [allResponse, myResponse] = await Promise.all([
+          roomAPI.getAll(),
+          currentUser ? roomAPI.getMyRooms() : Promise.resolve({ data: [] })
+        ]);
+
+        const allData = allResponse.data.map((room: any) => ({
           ...room,
-          id: room._id || room.id // Ensure id exists
+          id: room._id || room.id
         }));
-        setRooms(data);
+
+        const myData = myResponse.data.map((room: any) => ({
+          ...room,
+          id: room._id || room.id
+        }));
+
+        setRooms(allData);
+        setMyRooms(myData);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to fetch rooms');
       } finally {
@@ -55,13 +67,13 @@ export const useRooms = () => {
   const createRoom = async (roomData: any) => {
     try {
       await roomAPI.create(roomData);
-      // Refresh
-      const response = await roomAPI.getAll();
-      const data = response.data.map((room: any) => ({
-        ...room,
-        id: room._id || room.id
-      }));
-      setRooms(data);
+      // Refresh both
+      const [allResponse, myResponse] = await Promise.all([
+        roomAPI.getAll(),
+        roomAPI.getMyRooms()
+      ]);
+      setRooms(allResponse.data.map((r: any) => ({ ...r, id: r._id || r.id })));
+      setMyRooms(myResponse.data.map((r: any) => ({ ...r, id: r._id || r.id })));
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to create room');
     }
@@ -70,13 +82,13 @@ export const useRooms = () => {
   const joinRoom = async (roomId: string) => {
     try {
       await roomAPI.join(roomId);
-      // Refresh
-      const response = await roomAPI.getAll();
-      const data = response.data.map((room: any) => ({
-        ...room,
-        id: room._id || room.id
-      }));
-      setRooms(data);
+      // Refresh both
+      const [allResponse, myResponse] = await Promise.all([
+        roomAPI.getAll(),
+        roomAPI.getMyRooms()
+      ]);
+      setRooms(allResponse.data.map((r: any) => ({ ...r, id: r._id || r.id })));
+      setMyRooms(myResponse.data.map((r: any) => ({ ...r, id: r._id || r.id })));
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to join room');
     }
@@ -84,7 +96,7 @@ export const useRooms = () => {
 
   const requestJoin = joinRoom; // Map to same for now
 
-  return { rooms, loading, error, createRoom, joinRoom, requestJoin };
+  return { rooms, myRooms, loading, error, createRoom, joinRoom, requestJoin };
 };
 
 export const useRoomMessages = (roomId: string) => {

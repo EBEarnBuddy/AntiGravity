@@ -29,6 +29,7 @@ export const createOpportunity = async (req: AuthRequest, res: Response) => {
             name: roomName,
             description: roomDescription,
             isPrivate: true,
+            type: 'opportunity',
             icon: payload.industry,
             createdBy: user._id,
             membersCount: 1,
