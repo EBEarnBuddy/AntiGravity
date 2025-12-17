@@ -19,9 +19,10 @@ const allowedOrigins = [
     ...clientUrls,
     'http://localhost:3000',
     'http://localhost:3001', // Local dev fallback
-    'https://earnbuddy.vercel.app', // Original domain
+    'https://www.earnbuddy.io', // Original domain
     'https://earnbuddy-frontend.vercel.app', // Production domain reported in logs
     'https://earnbuddy.onrender.com'
+
 ].filter(Boolean); // Remove empty strings if any
 console.log('ℹ️  [CORS] Allowed Origins:', allowedOrigins);
 
