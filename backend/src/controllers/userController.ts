@@ -2,23 +2,28 @@ import { Request, Response } from 'express';
 import User from '../models/User';
 import { AuthRequest } from '../middlewares/auth';
 
-// Sync User (Create if not exists, otherwise return)
+// Sync User (Create if not exists, return updated)
 export const syncUser = async (req: AuthRequest, res: Response) => {
     try {
-        const { uid, email } = req.user!;
-        const { displayName, photoURL } = req.body || {};
+        const { uid, email, name, picture } = req.user!;
+        // Use body if provided, otherwise fall back to token, then defaults
+        const body = req.body || {};
+        const displayName = body.displayName || name || 'New User';
+        const photoURL = body.photoURL || picture || '';
+
+        console.log(`🔄 [Sync] Attempting sync for UID: ${uid} | Email: ${email}`);
 
         const user = await User.findOneAndUpdate(
             { firebaseUid: uid },
             {
                 $set: {
-                    email, // Ensure email is fresh from token
-                    displayName: displayName || 'New User',
-                    photoURL: photoURL || '',
+                    email, // Always keep email in sync with Auth
+                    displayName,
+                    photoURL,
                     lastLogin: new Date()
                 },
                 $setOnInsert: {
-                    role: 'user', // Default role for new users
+                    role: 'user',
                     skills: []
                 }
             },
@@ -29,10 +34,10 @@ export const syncUser = async (req: AuthRequest, res: Response) => {
             }
         );
 
-        console.log(`Synced user: ${uid} (${user.email})`);
+        console.log(`✅ [Sync] Success for UID: ${uid} | ID: ${user._id}`);
         res.status(200).json(user);
     } catch (error) {
-        console.error('Error syncing user:', error);
+        console.error('❌ [Sync] Failed for UID:', req.user?.uid, error);
         res.status(500).json({ error: 'Failed to sync user' });
     }
 };

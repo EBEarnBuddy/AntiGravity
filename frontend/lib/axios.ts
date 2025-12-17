@@ -37,21 +37,30 @@ api.interceptors.response.use(
   },
   (error) => {
     if (error.response) {
-      // The request was made and the server responded with a status code
-      // that falls out of the range of 2xx
-      console.error(`❌ [API Error] ${error.response.status} ${error.config.url}:`, error.response.data);
+      // Server responded with a status code outside 2xx range
+      const status = error.response.status;
+      const url = error.config.url;
+      const method = error.config.method?.toUpperCase();
+      const data = error.response.data;
 
-      if (error.response.status === 401) {
-        console.warn('⚠️ [Auth] Unauthorized - Token may be invalid or expired.');
-      } else if (error.response.status === 403) {
-        console.warn('⚠️ [Auth] Forbidden - Insufficient permissions.');
+      console.error(`❌ [API FAILURE] ${status} ${method} ${url}`, data);
+
+      if (status === 401) {
+        console.warn('⚠️ [Auth] Unauthorized: Token invalid/expired. Check Firebase Auth.');
+      } else if (status === 403) {
+        console.warn('⚠️ [Auth] Forbidden: Insufficient permissions.');
+      } else if (status === 404) {
+        console.warn('⚠️ [API] Not Found: Endpoint does not exist. Check URL.');
+      } else if (status >= 500) {
+        console.error('🔥 [API] Server Error: Internal Backend Issue.');
       }
     } else if (error.request) {
-      // The request was made but no response was received
-      console.error('❌ [Network Error] No response received from backend. Is the server running?');
+      // Request made but no response received
+      console.error('🌐 [NETWORK FAILURE] No response received. Possible causes: Backend down, CORS issue, or wrong URL.');
+      console.error('Request Details:', error.config);
     } else {
-      // Something happened in setting up the request that triggered an Error
-      console.error('❌ [Request Error]', error.message);
+      // Something happened in setting up the request
+      console.error('❌ [REQUEST ERROR] Client-side error:', error.message);
     }
     return Promise.reject(error);
   }
