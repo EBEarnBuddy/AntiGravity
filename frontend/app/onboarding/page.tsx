@@ -49,8 +49,8 @@ export default function OnboardingPage() {
                 userId: currentUser.uid,
                 ...formData
             });
-            // Force reload or redirect to dashboard
-            window.location.href = '/dashboard';
+            // Force reload or redirect to discover
+            window.location.href = '/discover';
         } catch (error) {
             console.error("Onboarding error:", error);
         } finally {

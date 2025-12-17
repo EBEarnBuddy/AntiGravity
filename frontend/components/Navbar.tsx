@@ -41,7 +41,7 @@ const Navbar: React.FC = () => {
     return (
         <nav className="h-16 bg-green-600 text-white flex items-center justify-between px-6 shadow-md sticky top-0 z-50">
             {/* Logo */}
-            <Link href="/dashboard" className="flex items-center gap-2">
+            <Link href="/discover" className="flex items-center gap-2">
                 <img src="/logo-white.png" alt="EarnBuddy" className="h-8 w-auto object-contain" />
             </Link>
 
@@ -77,7 +77,6 @@ const Navbar: React.FC = () => {
                                 <p className="text-xs text-slate-500 truncate">{currentUser?.email}</p>
                             </div>
                             <Link href="/profile" className="flex items-center gap-2 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-green-600 font-medium" onClick={() => setIsProfileOpen(false)}><User className="w-4 h-4" /> Profile</Link>
-                            <Link href="/dashboard" className="flex items-center gap-2 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-green-600 font-medium" onClick={() => setIsProfileOpen(false)}><LayoutDashboard className="w-4 h-4" /> Dashboard</Link>
                             <Link href="/settings" className="flex items-center gap-2 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-green-600 font-medium" onClick={() => setIsProfileOpen(false)}><Settings className="w-4 h-4" /> Settings</Link>
                             <div className="border-t border-slate-50 mt-1">
                                 <button onClick={handleLogout} className="w-full text-left flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 font-medium"><LogOut className="w-4 h-4" /> Logout</button>
