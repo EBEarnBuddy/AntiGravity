@@ -46,6 +46,9 @@ export const syncUser = async (req: AuthRequest, res: Response) => {
 export const getMe = async (req: AuthRequest, res: Response) => {
     try {
         const { uid } = req.user!;
+        const { type } = req.query;
+        console.log(`🔥 API HIT: GET /opportunities Type: ${type}`);
+        console.log(`[GET /opportunities] Fetching type: ${type}`);
         const user = await User.findOne({ firebaseUid: uid });
         if (!user) {
             res.status(404).json({ error: 'User not found' });

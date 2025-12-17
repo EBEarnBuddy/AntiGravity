@@ -63,6 +63,7 @@ export const createOpportunity = async (req: AuthRequest, res: Response) => {
 export const getOpportunities = async (req: Request, res: Response) => {
     try {
         const { type } = req.query;
+        console.log(`🔥 API HIT: GET /opportunities Type: ${type || 'ALL'}`);
         console.log(`[GET /opportunities] Fetching type: ${type}`);
 
         const filter: any = { status: 'open' };
