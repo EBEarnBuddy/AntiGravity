@@ -1,8 +1,6 @@
-"use client";
-
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import {
     Search,
     Bookmark,
@@ -23,10 +21,30 @@ import ApplicantsModal from '@/components/ApplicantsModal';
 
 const StartupsPage: React.FC = () => {
     const { currentUser } = useAuth();
+    const router = useRouter();
+    const searchParams = useSearchParams();
+
+    // Initialize tab from URL or default to 'discover'
+    const initialTab = (searchParams.get('tab') as 'discover' | 'posted' | 'applied') || 'discover';
+
     const { startups, loading: startupsLoading, bookmarkStartup } = useStartups();
     const { applications, loading: appsLoading } = useMyApplications();
     const [searchTerm, setSearchTerm] = useState('');
-    const [activeTab, setActiveTab] = useState<'discover' | 'posted' | 'applied'>('discover');
+    const [activeTab, setActiveTabState] = useState<'discover' | 'posted' | 'applied'>(initialTab);
+
+    // Sync state if URL changes (optional, but good for back button)
+    React.useEffect(() => {
+        const tab = searchParams.get('tab') as 'discover' | 'posted' | 'applied';
+        if (tab) setActiveTabState(tab);
+    }, [searchParams]);
+
+    // Update URL when tab changes
+    const setActiveTab = (tab: 'discover' | 'posted' | 'applied') => {
+        setActiveTabState(tab);
+        const params = new URLSearchParams(window.location.search);
+        params.set('tab', tab);
+        router.push(`${window.location.pathname}?${params.toString()}`);
+    };
 
     // Modals
     const [showCreateModal, setShowCreateModal] = useState(false);

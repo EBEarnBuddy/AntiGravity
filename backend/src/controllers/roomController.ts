@@ -135,8 +135,10 @@ export const getMyRooms = async (req: AuthRequest, res: Response) => {
         }
 
         const memberships = await RoomMembership.find({ user: user._id }).populate('room');
-        // Extract room objects
-        const rooms = memberships.map(m => m.room);
+        // Extract room objects and filter out any nulls (orphaned memberships)
+        const rooms = memberships
+            .map(m => m.room)
+            .filter(r => r !== null && r !== undefined);
 
         res.json(rooms);
     } catch (error) {

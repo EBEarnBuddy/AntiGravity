@@ -87,7 +87,7 @@ export const applyToOpportunity = async (req: AuthRequest, res: Response) => {
                 'application_received',
                 'New Application Received',
                 `${user.displayName || 'Someone'} applied to ${opportunity.title}`,
-                `/dashboard` // Or deep link to manage applications
+                `/startups?tab=posted&id=${opportunity._id}` // Deep link to manage applications
             );
         }
 
@@ -223,7 +223,7 @@ export const updateApplicationStatus = async (req: AuthRequest, res: Response) =
                 status === 'accepted' ? 'application_accepted' : 'application_rejected',
                 `Application ${status.charAt(0).toUpperCase() + status.slice(1)}`,
                 `Your application for ${opportunity.title} was ${status}.`,
-                `/applications`
+                `/startups?tab=applied`
             );
         }
 
