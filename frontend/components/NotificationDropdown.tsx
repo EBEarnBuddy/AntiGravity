@@ -94,9 +94,9 @@ const NotificationDropdown = () => {
                         {notifications.length === 0 ? (
                             <div className="p-4 text-center text-gray-500 text-sm">No notifications</div>
                         ) : (
-                            notifications.map(notif => (
+                            notifications.map((notif, index) => (
                                 <div
-                                    key={notif._id}
+                                    key={`${notif._id}-${index}`}
                                     className={`p-3 border-b border-gray-100 hover:bg-gray-50 transition-colors ${!notif.isRead ? 'bg-blue-50/50' : ''}`}
                                     onClick={() => markAsRead(notif._id, notif.isRead)}
                                 >

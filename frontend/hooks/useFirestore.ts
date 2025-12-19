@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, useEffect } from 'react';
 import { Pod, PodPost, ChatRoom as Room, Startup, Gig, Notification, ChatMessage, UserAnalytics, Application } from '../lib/firestore'; // Keep types for now
 import { useAuth } from '../contexts/AuthContext';
@@ -38,7 +40,7 @@ export const useRooms = () => {
       try {
         setLoading(true);
         const [allResponse, myResponse] = await Promise.all([
-          roomAPI.getAll(),
+          roomAPI.getRooms(), // Get community circles by default
           currentUser ? roomAPI.getMyRooms() : Promise.resolve({ data: [] })
         ]);
 
@@ -66,10 +68,10 @@ export const useRooms = () => {
 
   const createRoom = async (roomData: any) => {
     try {
-      await roomAPI.create(roomData);
+      await roomAPI.createRoom(roomData);
       // Refresh both
       const [allResponse, myResponse] = await Promise.all([
-        roomAPI.getAll(),
+        roomAPI.getRooms(),
         roomAPI.getMyRooms()
       ]);
       setRooms(allResponse.data.map((r: any) => ({ ...r, id: r._id || r.id })));
@@ -81,10 +83,10 @@ export const useRooms = () => {
 
   const joinRoom = async (roomId: string) => {
     try {
-      await roomAPI.join(roomId);
+      await roomAPI.joinRoom(roomId);
       // Refresh both
       const [allResponse, myResponse] = await Promise.all([
-        roomAPI.getAll(),
+        roomAPI.getRooms(),
         roomAPI.getMyRooms()
       ]);
       setRooms(allResponse.data.map((r: any) => ({ ...r, id: r._id || r.id })));
@@ -96,7 +98,33 @@ export const useRooms = () => {
 
   const requestJoin = joinRoom; // Map to same for now
 
-  return { rooms, myRooms, loading, error, createRoom, joinRoom, requestJoin };
+  const getPendingRequests = async (roomId: string) => {
+    try {
+      const response = await roomAPI.getPendingRequests(roomId);
+      return response.data;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to fetch pending requests');
+      return [];
+    }
+  };
+
+  const approveMembership = async (roomId: string, userId: string, status: 'accepted' | 'rejected') => {
+    try {
+      await roomAPI.approveMembership(roomId, userId, status);
+      // Refresh rooms to update counts and membership status
+      const [allResponse, myResponse] = await Promise.all([
+        roomAPI.getRooms(), // Get community circles by default
+        roomAPI.getMyRooms()
+      ]);
+      setRooms(allResponse.data);
+      setMyRooms(myResponse.data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to approve membership');
+      throw err;
+    }
+  };
+
+  return { rooms, myRooms, loading, error, createRoom, joinRoom, requestJoin, getPendingRequests, approveMembership };
 };
 
 export const useRoomMessages = (roomId: string) => {

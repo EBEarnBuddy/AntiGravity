@@ -49,8 +49,8 @@ import roomRoutes from './routes/roomRoutes';
 import collabRoutes from './routes/collabRoutes';
 import eventRoutes from './routes/eventRoutes';
 import notificationRoutes from './routes/notificationRoutes';
+import collaborationRoutes from './routes/collaborationRoutes';
 
-// Routes Configuration
 // Routes Configuration
 const apiRoutes = [
     { path: '/users', router: userRoutes },
@@ -58,6 +58,7 @@ const apiRoutes = [
     { path: '/applications', router: applicationRoutes },
     { path: '/rooms', router: roomRoutes },
     { path: '/notifications', router: notificationRoutes },
+    { path: '/collaborations', router: collaborationRoutes },
     { path: '/collab', router: collabRoutes },
     { path: '/events', router: eventRoutes }
 ];

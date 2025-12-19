@@ -257,11 +257,10 @@ export interface ChatRoom {
 
 export interface ChatMessage {
   id?: string;
-  roomId: string;
-  senderId: string;
-  senderName: string;
-  senderAvatar?: string;
   content: string;
+  senderId: string;
+  senderName?: string;
+  senderPhotoURL?: string;
   type: 'text' | 'image' | 'video' | 'file';
   attachment?: {
     url: string;
@@ -269,10 +268,11 @@ export interface ChatMessage {
     type: string;
     size: string;
   };
-  reactions: { [emoji: string]: string[] };
+  reactions?: { [emoji: string]: string[] };
   timestamp: Timestamp;
   edited?: boolean;
   editedAt?: Timestamp;
+  roomId?: string;
 }
 
 export interface Notification {

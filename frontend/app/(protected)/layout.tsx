@@ -10,6 +10,7 @@ import Navbar from '@/components/Navbar';
 function ProtectedShell({ children }: { children: React.ReactNode }) {
     const { currentUser, loading } = useAuth();
     const router = useRouter();
+    const pathname = usePathname();
 
     useEffect(() => {
         if (!loading && !currentUser) {
@@ -27,13 +28,16 @@ function ProtectedShell({ children }: { children: React.ReactNode }) {
 
     if (!currentUser) return null;
 
+    // Check if we're on the circles page
+    const isCirclesPage = pathname === '/circles';
+
     return (
         <div className="flex flex-col min-h-screen bg-slate-50 font-sans text-slate-600">
             {/* Top Navigation */}
             <Navbar />
 
             {/* Main Content Area */}
-            <main className="flex-1 w-full max-w-7xl mx-auto p-8 pt-8">
+            <main className={isCirclesPage ? "flex-1 w-full" : "flex-1 w-full max-w-7xl mx-auto p-8 pt-8"}>
                 {children}
             </main>
         </div>

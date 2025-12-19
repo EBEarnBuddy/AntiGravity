@@ -8,8 +8,11 @@ export interface IRoom extends Document {
     type: 'community' | 'opportunity';
     isPrivate: boolean;
     isTemporary?: boolean;
+    hasWhiteboard?: boolean;
+    hasVideoCall?: boolean;
     membersCount: number;
     lastMessageAt?: Date;
+    collaborators?: mongoose.Types.ObjectId[];
     createdAt: Date;
     updatedAt: Date;
 }
@@ -17,13 +20,22 @@ export interface IRoom extends Document {
 const RoomSchema: Schema = new Schema({
     name: { type: String, required: true },
     description: { type: String },
+    category: { type: String },
     createdBy: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-    icon: { type: String }, // URL or icon name
-    type: { type: String, enum: ['community', 'opportunity'], default: 'community' },
     isPrivate: { type: Boolean, default: false },
-    isTemporary: { type: Boolean, default: false }, // For Event Circles
+    avatar: { type: String },
+    hasWhiteboard: { type: Boolean, default: false },
+    hasVideoCall: { type: Boolean, default: false },
     membersCount: { type: Number, default: 0 },
     lastMessageAt: { type: Date },
-}, { timestamps: true });
+    type: {
+        type: String,
+        enum: ['community', 'collab', 'opportunity'],
+        default: 'community'
+    },
+    collaborators: [{ type: Schema.Types.ObjectId, ref: 'User' }], // For collab circles
+}, {
+    timestamps: true
+});
 
 export default mongoose.model<IRoom>('Room', RoomSchema);

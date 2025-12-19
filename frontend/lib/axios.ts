@@ -88,10 +88,21 @@ export const applicationAPI = {
 };
 
 export const roomAPI = {
-  getAll: () => api.get('/rooms'),
+  getRooms: (type?: string) => api.get(`/rooms${type ? `?type=${type}` : ''}`),
   getMyRooms: () => api.get('/rooms/me'),
-  create: (data: Record<string, unknown>) => api.post('/rooms', data),
-  join: (roomId: string) => api.post(`/rooms/${roomId}/join`),
+  createRoom: (data: any) => api.post('/rooms', data),
+  joinRoom: (roomId: string) => api.post(`/rooms/${roomId}/join`),
+  getPendingRequests: (roomId: string) => api.get(`/rooms/${roomId}/pending`),
+  approveMembership: (roomId: string, userId: string, status: 'accepted' | 'rejected') =>
+    api.post(`/rooms/${roomId}/approve/${userId}`, { status }),
+};
+
+export const collaborationAPI = {
+  sendRequest: (fromCircleId: string, toCircleId: string, message?: string) =>
+    api.post('/collaborations/request', { fromCircleId, toCircleId, message }),
+  getPendingRequests: () => api.get('/collaborations/pending'),
+  acceptRequest: (requestId: string) => api.post(`/collaborations/${requestId}/accept`),
+  rejectRequest: (requestId: string) => api.post(`/collaborations/${requestId}/reject`),
 };
 
 export const eventAPI = {
