@@ -324,7 +324,7 @@ const CirclesPage: React.FC = () => {
                                                         : 'bg-white border-2 border-slate-900 text-slate-900 hover:bg-slate-900 hover:text-white'
                                                     }`}
                                             >
-                                                {activeCircleType === 'collab' || activeCircleType === 'opportunity' ? (
+                                                {(activeCircleType as string) === 'collab' || (activeCircleType as string) === 'opportunity' ? (
                                                     'Enter Circle'
                                                 ) : activeTab === 'my-circles' ? (
                                                     <>Enter Circle <ArrowRight className="w-4 h-4 inline" /></>
