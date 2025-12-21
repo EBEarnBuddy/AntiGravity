@@ -21,8 +21,8 @@ const RoomChatPage: React.FC = () => {
     const roomId = params?.roomId as string;
     const { currentUser } = useAuth();
 
-    const { rooms } = useRooms();
-    const room = rooms.find(r => r.id === roomId);
+    const { rooms, myRooms } = useRooms();
+    const room = rooms.find(r => r.id === roomId) || myRooms.find(r => r.id === roomId);
 
     const { messages, loading, sendMessage } = useRoomMessages(roomId);
     const [newMessage, setNewMessage] = useState('');
@@ -49,6 +49,16 @@ const RoomChatPage: React.FC = () => {
             handleSend();
         }
     };
+
+    const messagesEndRef = React.useRef<HTMLDivElement>(null);
+
+    const scrollToBottom = () => {
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    };
+
+    useEffect(() => {
+        scrollToBottom();
+    }, [messages]);
 
     // Access control
     if (isPending) {
@@ -193,7 +203,13 @@ const RoomChatPage: React.FC = () => {
                     )}
 
                     {messages.map((msg, index) => {
-                        const isMe = msg.senderId === currentUser?.uid;
+                        // Handle both old schema (senderId string) and new schema (sender object)
+                        const sender = (msg as any).sender;
+                        const senderId = sender?.firebaseUid || msg.senderId;
+                        const senderName = sender?.displayName || msg.senderName;
+                        const senderPhoto = sender?.photoURL || msg.senderPhotoURL;
+
+                        const isMe = senderId === currentUser?.uid;
 
                         return (
                             <div
@@ -205,15 +221,15 @@ const RoomChatPage: React.FC = () => {
                                     <div className="h-8 w-8 border-2 border-slate-900 overflow-hidden bg-gradient-to-br from-green-400 to-green-600 relative">
                                         {/* Pattern */}
                                         <div className="absolute inset-0 opacity-20 bg-[linear-gradient(45deg,#000_25%,transparent_25%,transparent_75%,#000_75%,#000),linear-gradient(45deg,#000_25%,transparent_25%,transparent_75%,#000_75%,#000)] [background-size:8px_8px] [background-position:0_0,4px_4px]"></div>
-                                        {msg.senderPhotoURL ? (
+                                        {senderPhoto ? (
                                             <img
-                                                src={msg.senderPhotoURL}
-                                                alt={msg.senderName || 'User'}
+                                                src={senderPhoto}
+                                                alt={senderName || 'User'}
                                                 className="w-full h-full object-cover relative z-10"
                                             />
                                         ) : (
                                             <div className="w-full h-full flex items-center justify-center text-white font-black text-xs relative z-10">
-                                                {msg.senderName?.charAt(0).toUpperCase() || 'U'}
+                                                {senderName?.charAt(0).toUpperCase() || 'U'}
                                             </div>
                                         )}
                                     </div>
@@ -236,6 +252,7 @@ const RoomChatPage: React.FC = () => {
                             </div>
                         );
                     })}
+                    <div ref={messagesEndRef} />
                 </div>
             </div>
 

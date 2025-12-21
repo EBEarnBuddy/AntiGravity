@@ -38,7 +38,7 @@ export const sendMessage = async (req: AuthRequest, res: Response) => {
         await Room.findByIdAndUpdate(roomId, { lastMessageAt: new Date() });
 
         // Populate sender for immediate frontend display
-        await message.populate('sender', 'displayName photoURL');
+        await message.populate('sender', 'displayName photoURL firebaseUid');
 
         // Emit to room
         try {
@@ -99,7 +99,7 @@ export const getMessages = async (req: AuthRequest, res: Response) => {
         const messages = await Message.find({ room: roomId })
             .sort({ createdAt: 1 }) // Check client needs. Usually ascending for chat log
             .limit(limit)
-            .populate('sender', 'displayName photoURL');
+            .populate('sender', 'displayName photoURL firebaseUid');
 
         res.json(messages);
     } catch (error) {
