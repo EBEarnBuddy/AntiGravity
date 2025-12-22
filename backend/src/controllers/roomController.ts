@@ -83,6 +83,17 @@ export const joinRoom = async (req: AuthRequest, res: Response) => {
             // If rejected, allow re-requesting by updating status
             membership.status = 'pending';
             await membership.save();
+
+            // Emit socket event for re-request
+            try {
+                const io = getIO();
+                io.emit('membership_created', {
+                    roomId,
+                    userId: uid, // Use firebaseUid for easier frontend handling
+                    status: 'pending'
+                });
+            } catch (e) { console.error(e) }
+
             res.status(200).json({ message: 'Request sent', status: 'pending' });
             return;
         }
@@ -94,6 +105,16 @@ export const joinRoom = async (req: AuthRequest, res: Response) => {
             role: 'member',
             status: 'pending',
         });
+
+        // Emit socket event for new request
+        try {
+            const io = getIO();
+            io.emit('membership_created', {
+                roomId,
+                userId: uid,
+                status: 'pending'
+            });
+        } catch (e) { console.error(e) }
 
         res.status(200).json({ message: 'Request sent', status: 'pending' });
     } catch (error) {
@@ -311,6 +332,19 @@ export const updateMembershipStatus = async (req: AuthRequest, res: Response) =>
         // If accepted, increment member count
         if (status === 'accepted') {
             await Room.findByIdAndUpdate(roomId, { $inc: { membersCount: 1 } });
+        }
+
+        // Emit socket event
+        try {
+            const io = getIO();
+            io.emit('membership_updated', {
+                roomId,
+                userId: userId, // target user's firebaseUid
+                status,
+                adminUid: uid
+            });
+        } catch (e) {
+            console.error('Socket emit failed:', e);
         }
 
         res.json({ message: `Request ${status}`, membership });

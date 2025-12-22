@@ -6,6 +6,7 @@ import { AuthRequest } from '../middlewares/auth';
 import Room from '../models/Room';
 import RoomMembership from '../models/RoomMembership';
 import { createNotification } from './notificationController';
+import { getIO } from '../socket';
 
 // Apply to an Opportunity
 // This endpoint is intentionally flexible to support the current frontend,
@@ -89,6 +90,21 @@ export const applyToOpportunity = async (req: AuthRequest, res: Response) => {
                 `${user.displayName || 'Someone'} applied to ${opportunity.title}`,
                 `/startups?tab=posted&id=${opportunity._id}` // Deep link to manage applications
             );
+        }
+
+        // Socket Event
+        try {
+            const io = getIO();
+            // Emit to opportunity-specific room if we had one for events, but global or owner-specific is safer
+            // Using a specific event structure that frontend can filter
+            const eventPayload = {
+                opportunityId: opportunity._id,
+                application: application,
+                applicantUid: user.firebaseUid
+            };
+            io.emit('application_created', eventPayload);
+        } catch (e) {
+            console.error('Socket emit error:', e);
         }
 
         res.status(201).json(application);
@@ -210,6 +226,15 @@ export const updateApplicationStatus = async (req: AuthRequest, res: Response) =
                     });
 
                     await Room.findByIdAndUpdate(roomId, { $inc: { membersCount: 1 } });
+
+                    // Emit membership update event
+                    try {
+                        const io = getIO();
+                        io.emit('membership_created', {
+                            roomId,
+                            userId: applicant.firebaseUid
+                        });
+                    } catch (e) { console.error(e) }
                 }
             }
         }
@@ -225,6 +250,20 @@ export const updateApplicationStatus = async (req: AuthRequest, res: Response) =
                 `Your application for ${opportunity.title} was ${status}.`,
                 `/startups?tab=applied`
             );
+        }
+
+        // Socket Event
+        try {
+            const io = getIO();
+            const eventPayload = {
+                applicationId: application._id,
+                status: status,
+                opportunityId: opportunity._id,
+                applicantUid: applicantUser?.firebaseUid
+            };
+            io.emit('application_status_updated', eventPayload);
+        } catch (e) {
+            console.error('Socket emit error:', e);
         }
 
         res.json(application);

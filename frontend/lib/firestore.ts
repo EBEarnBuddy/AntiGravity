@@ -281,7 +281,7 @@ export interface Notification {
   type: 'message' | 'project' | 'payment' | 'system' | 'social';
   title: string;
   message: string;
-  read: boolean;
+  isRead: boolean;
   seen: boolean;
   priority: 'low' | 'medium' | 'high';
   actionUrl?: string;

@@ -124,6 +124,12 @@ export const communityPostsAPI = {
   // Add other methods as needed based on usage
 };
 
+
+export const notificationAPI = {
+  getMyNotifications: () => api.get('/notifications'),
+  markAsRead: (id: string) => api.patch(`/notifications/${id}/read`),
+};
+
 export const uploadAPI = {
   uploadFile: async (file: File) => {
     const form = new FormData();

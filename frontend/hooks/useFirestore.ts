@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Pod, PodPost, ChatRoom as Room, Startup, Gig, Notification, ChatMessage, UserAnalytics, Application } from '../lib/firestore'; // Keep types for now
 import { useAuth } from '../contexts/AuthContext';
-import { roomAPI, opportunityAPI, messageAPI, applicationAPI, userAPI, eventAPI } from '../lib/axios';
+import { roomAPI, opportunityAPI, messageAPI, applicationAPI, userAPI, eventAPI, notificationAPI } from '../lib/axios';
 
 // Custom hooks for Firestore operations
 export const usePods = () => {
@@ -65,7 +65,7 @@ export const useRooms = () => {
 
     fetchRooms();
 
-    // Realtime Listener
+    // Realtime Listener for Auto-Reload
     let socketInstance: any = null;
     const setupSocket = async () => {
       try {
@@ -73,21 +73,14 @@ export const useRooms = () => {
         const socket = await getSocket();
         if (socket) {
           socketInstance = socket;
-          socket.on('room_created', (newRoom: any) => {
-            // Optimistically add to lists
-            // Ideally we verify if it matches user's list or global list
-            // For simplicity, add to global, check createdBy for myRooms
-            const formattedRoom = { ...newRoom, id: newRoom._id || newRoom.id };
-            setRooms((prev: any[]) => [formattedRoom, ...prev]);
 
-            if (currentUser && newRoom.createdBy === currentUser.uid) { // Check ID format in backend (it's ObjectId usually, need mapping)
-              // Actually createdBy is ObjectId in room, currentUser.uid is Firebase UID.
-              // We might not be able to easily check 'myRooms' without extra data or assumed knowledge.
-              // But since we are the creator (if we are the one triggering it?), usually we just refetch.
-              // But for *other* users, they just see it in community list.
-              // Let's just add to 'rooms' (Explore).
-            }
-          });
+          const handleReload = () => {
+            fetchRooms();
+          };
+
+          socket.on('room_created', handleReload);
+          socket.on('membership_updated', handleReload);
+          socket.on('membership_created', handleReload); // Pending requests or new joins
         }
       } catch (e) {
         console.error('Socket setup failed in useRooms', e);
@@ -98,6 +91,8 @@ export const useRooms = () => {
     return () => {
       if (socketInstance) {
         socketInstance.off('room_created');
+        socketInstance.off('membership_updated');
+        socketInstance.off('membership_created');
       }
     };
   }, [currentUser]);
@@ -300,11 +295,16 @@ export const useStartups = () => {
         const socket = await getSocket();
         if (socket) {
           socketInstance = socket;
-          socket.on('opportunity_created', (newOpp: any) => {
-            if (newOpp.type === 'startup') {
-              setStartups((prev: any[]) => [newOpp, ...prev]);
-            }
-          });
+
+          // Re-fetch on any opportunity creation or status change
+          const handleReload = (data?: any) => {
+            // Optional: Filter by type if available in data to avoid unnecessary refetches
+            if (data && data.type && data.type !== 'startup') return;
+            fetchStartups();
+          };
+
+          socket.on('opportunity_created', handleReload);
+          // Assuming we might add 'opportunity_updated' later
         }
       } catch (e) {
         console.error('Socket setup failed in useStartups', e);
@@ -382,6 +382,36 @@ export const useMyApplications = () => {
       }
     };
     fetchApplications();
+
+    // Realtime Listener
+    let socketInstance: any = null;
+    const setupSocket = async () => {
+      try {
+        const { getSocket } = await import('../lib/socket');
+        const socket = await getSocket();
+        if (socket) {
+          socketInstance = socket;
+
+          const handleReload = () => {
+            fetchApplications();
+          };
+
+          // Re-fetch when application status changes or (less likely) a new one is created by user elsewhere
+          socket.on('application_status_updated', handleReload);
+          socket.on('application_created', handleReload);
+        }
+      } catch (e) {
+        console.error('Socket setup failed in useMyApplications', e);
+      }
+    };
+    setupSocket();
+
+    return () => {
+      if (socketInstance) {
+        socketInstance.off('application_status_updated');
+        socketInstance.off('application_created');
+      }
+    };
   }, []);
 
   return { applications, loading, error };
@@ -417,11 +447,13 @@ export const useProjects = () => {
         const socket = await getSocket();
         if (socket) {
           socketInstance = socket;
-          socket.on('opportunity_created', (newOpp: any) => {
-            if (newOpp.type === 'project' || newOpp.type === 'freelance') {
-              setProjects((prev: any[]) => [newOpp, ...prev]);
-            }
-          });
+
+          const handleReload = (data?: any) => {
+            if (data && data.type && data.type !== 'project' && data.type !== 'freelance') return;
+            fetchProjects();
+          };
+
+          socket.on('opportunity_created', handleReload);
         }
       } catch (e) {
         console.error('Socket setup failed in useProjects', e);
@@ -504,7 +536,65 @@ export const useEnhancedPodPosts = (podId: string) => {
 // ... (existing exports)
 
 export const useNotifications = () => {
-  return { notifications: [], loading: false, error: null, markAsRead: async () => { }, unreadCount: 0 };
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const { currentUser } = useAuth();
+
+  const fetchNotifications = async () => {
+    if (!currentUser) return;
+    try {
+      const { notificationAPI } = await import('../lib/axios'); // Lazy import to avoid circ dep if any
+      const response = await notificationAPI.getMyNotifications();
+      setNotifications(response.data);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchNotifications();
+
+    let socketInstance: any = null;
+    const setupSocket = async () => {
+      try {
+        const { getSocket } = await import('../lib/socket');
+        const socket = await getSocket();
+        if (socket) {
+          socketInstance = socket;
+          socket.on('notification', (notif: Notification) => {
+            fetchNotifications(); // Reload list to get latest state
+          });
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    };
+    setupSocket();
+
+    return () => {
+      if (socketInstance) {
+        socketInstance.off('notification');
+      }
+    };
+  }, [currentUser]);
+
+  const markAsRead = async (id: string) => {
+    try {
+      const { notificationAPI } = await import('../lib/axios');
+      await notificationAPI.markAsRead(id);
+      // Refetch
+      fetchNotifications();
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const unreadCount = notifications.filter(n => !n.isRead).length;
+
+  return { notifications, loading, error, markAsRead, unreadCount };
 };
 
 export const useEvents = (limit?: number) => {
