@@ -36,6 +36,7 @@ const CreateStartupModal: React.FC<CreateStartupModalProps> = ({ isOpen, onClose
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState({
     name: '',
+    image: '',
     description: '',
     industry: '',
     stage: 'pre-seed',
@@ -84,7 +85,7 @@ const CreateStartupModal: React.FC<CreateStartupModalProps> = ({ isOpen, onClose
   ];
 
   const handleInputChange = (field: string, value: any) => {
-    setFormData(prev => ({
+    setFormData((prev: any) => ({
       ...prev,
       [field]: value
     }));
@@ -92,7 +93,7 @@ const CreateStartupModal: React.FC<CreateStartupModalProps> = ({ isOpen, onClose
 
   const handleNestedChange = (parent: string, field: string, value: any) => {
     if (parent === 'contact') {
-      setFormData(prev => ({
+      setFormData((prev: any) => ({
         ...prev,
         contact: {
           ...prev.contact,
@@ -102,9 +103,23 @@ const CreateStartupModal: React.FC<CreateStartupModalProps> = ({ isOpen, onClose
     }
   };
 
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFormData((prev: any) => ({
+          ...prev,
+          image: reader.result as string
+        }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const addRequirement = () => {
     if (newRequirement.trim() && !formData.requirements.includes(newRequirement.trim())) {
-      setFormData(prev => ({
+      setFormData((prev: any) => ({
         ...prev,
         requirements: [...prev.requirements, newRequirement.trim()]
       }));
@@ -113,15 +128,15 @@ const CreateStartupModal: React.FC<CreateStartupModalProps> = ({ isOpen, onClose
   };
 
   const removeRequirement = (requirementToRemove: string) => {
-    setFormData(prev => ({
+    setFormData((prev: any) => ({
       ...prev,
-      requirements: prev.requirements.filter(req => req !== requirementToRemove)
+      requirements: prev.requirements.filter((req: any) => req !== requirementToRemove)
     }));
   };
 
   const addRoleRequirement = () => {
     if (newRoleRequirement.trim() && !newRole.requirements.includes(newRoleRequirement.trim())) {
-      setNewRole(prev => ({
+      setNewRole((prev: any) => ({
         ...prev,
         requirements: [...prev.requirements, newRoleRequirement.trim()]
       }));
@@ -130,9 +145,9 @@ const CreateStartupModal: React.FC<CreateStartupModalProps> = ({ isOpen, onClose
   };
 
   const removeRoleRequirement = (requirementToRemove: string) => {
-    setNewRole(prev => ({
+    setNewRole((prev: any) => ({
       ...prev,
-      requirements: prev.requirements.filter(req => req !== requirementToRemove)
+      requirements: prev.requirements.filter((req: any) => req !== requirementToRemove)
     }));
   };
 
@@ -144,7 +159,7 @@ const CreateStartupModal: React.FC<CreateStartupModalProps> = ({ isOpen, onClose
         applicants: []
       };
 
-      setFormData(prev => ({
+      setFormData((prev: any) => ({
         ...prev,
         roles: [...prev.roles, roleData]
       }));
@@ -163,9 +178,9 @@ const CreateStartupModal: React.FC<CreateStartupModalProps> = ({ isOpen, onClose
   };
 
   const removeRole = (roleId: string) => {
-    setFormData(prev => ({
+    setFormData((prev: any) => ({
       ...prev,
-      roles: prev.roles.filter(role => role.id !== roleId)
+      roles: prev.roles.filter((role: any) => role.id !== roleId)
     }));
   };
 
@@ -190,6 +205,8 @@ const CreateStartupModal: React.FC<CreateStartupModalProps> = ({ isOpen, onClose
 
       const startupData = {
         name: formData.name,
+        logo: formData.image, // Map image to logo/image
+        image: formData.image,
         description: formData.description,
         industry: formData.industry,
         stage: formData.stage,
@@ -216,6 +233,7 @@ const CreateStartupModal: React.FC<CreateStartupModalProps> = ({ isOpen, onClose
       // Reset form
       setFormData({
         name: '',
+        image: '',
         description: '',
         industry: '',
         stage: 'pre-seed',
@@ -241,12 +259,12 @@ const CreateStartupModal: React.FC<CreateStartupModalProps> = ({ isOpen, onClose
 
   const nextStep = () => {
     if (validateStep(currentStep)) {
-      setCurrentStep(prev => Math.min(prev + 1, 3));
+      setCurrentStep((prev: any) => Math.min(prev + 1, 3));
     }
   };
 
   const prevStep = () => {
-    setCurrentStep(prev => Math.max(prev - 1, 1));
+    setCurrentStep((prev: any) => Math.max(prev - 1, 1));
   };
 
   return (
@@ -306,6 +324,24 @@ const CreateStartupModal: React.FC<CreateStartupModalProps> = ({ isOpen, onClose
                   <h3 className="text-xl font-bold text-slate-800 mb-6">Basic Information</h3>
 
                   <div className="space-y-6">
+                    <div>
+                      <label className="block text-sm font-bold text-slate-700 mb-2">
+                        Startup Logo / Image
+                      </label>
+                      <div className="flex items-center gap-4">
+                        <div className="w-16 h-16 rounded-xl bg-slate-100 border border-slate-200 overflow-hidden flex items-center justify-center">
+                          {formData.image ? (
+                            <img src={formData.image} alt="Preview" className="w-full h-full object-cover" />
+                          ) : (
+                            <Rocket className="w-8 h-8 text-slate-400" />
+                          )}
+                        </div>
+                        <label className="cursor-pointer bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold px-4 py-2 rounded-xl transition-colors">
+                          Upload Image
+                          <input type="file" className="hidden" accept="image/*" onChange={handleImageUpload} />
+                        </label>
+                      </div>
+                    </div>
                     <div>
                       <label className="block text-sm font-bold text-slate-700 mb-2">
                         Startup Name *
@@ -457,7 +493,7 @@ const CreateStartupModal: React.FC<CreateStartupModalProps> = ({ isOpen, onClose
                           <input
                             type="text"
                             value={newRole.title}
-                            onChange={(e) => setNewRole(prev => ({ ...prev, title: e.target.value }))}
+                            onChange={(e) => setNewRole((prev: any) => ({ ...prev, title: e.target.value }))}
                             className="w-full px-4 py-3 border border-slate-200 rounded-xl bg-white text-slate-900 focus:ring-2 focus:ring-green-600 focus:border-transparent transition-all outline-none font-medium"
                             placeholder="e.g., Senior Frontend Developer"
                           />
@@ -469,7 +505,7 @@ const CreateStartupModal: React.FC<CreateStartupModalProps> = ({ isOpen, onClose
                           </label>
                           <select
                             value={newRole.type}
-                            onChange={(e) => setNewRole(prev => ({ ...prev, type: e.target.value as any }))}
+                            onChange={(e) => setNewRole((prev: any) => ({ ...prev, type: e.target.value as any }))}
                             className="w-full px-4 py-3 border border-slate-200 rounded-xl bg-white text-slate-900 focus:ring-2 focus:ring-green-600 focus:border-transparent transition-all outline-none font-medium"
                           >
                             <option value="full-time">Full-time</option>
@@ -487,7 +523,7 @@ const CreateStartupModal: React.FC<CreateStartupModalProps> = ({ isOpen, onClose
                           </label>
                           <select
                             value={newRole.location}
-                            onChange={(e) => setNewRole(prev => ({ ...prev, location: e.target.value as any }))}
+                            onChange={(e) => setNewRole((prev: any) => ({ ...prev, location: e.target.value as any }))}
                             className="w-full px-4 py-3 border border-slate-200 rounded-xl bg-white text-slate-900 focus:ring-2 focus:ring-green-600 focus:border-transparent transition-all outline-none font-medium"
                           >
                             <option value="remote">Remote</option>
@@ -503,7 +539,7 @@ const CreateStartupModal: React.FC<CreateStartupModalProps> = ({ isOpen, onClose
                           <input
                             type="text"
                             value={newRole.salary}
-                            onChange={(e) => setNewRole(prev => ({ ...prev, salary: e.target.value }))}
+                            onChange={(e) => setNewRole((prev: any) => ({ ...prev, salary: e.target.value }))}
                             className="w-full px-4 py-3 border border-slate-200 rounded-xl bg-white text-slate-900 focus:ring-2 focus:ring-green-600 focus:border-transparent transition-all outline-none font-medium"
                             placeholder="e.g., $80K-120K"
                           />
@@ -516,7 +552,7 @@ const CreateStartupModal: React.FC<CreateStartupModalProps> = ({ isOpen, onClose
                         </label>
                         <textarea
                           value={newRole.description}
-                          onChange={(e) => setNewRole(prev => ({ ...prev, description: e.target.value }))}
+                          onChange={(e) => setNewRole((prev: any) => ({ ...prev, description: e.target.value }))}
                           rows={3}
                           className="w-full px-4 py-3 border border-slate-200 rounded-xl bg-white text-slate-900 focus:ring-2 focus:ring-green-600 focus:border-transparent transition-all outline-none font-medium resize-none"
                           placeholder="Describe the role responsibilities..."
@@ -574,7 +610,7 @@ const CreateStartupModal: React.FC<CreateStartupModalProps> = ({ isOpen, onClose
                         <input
                           type="text"
                           value={newRole.equity}
-                          onChange={(e) => setNewRole(prev => ({ ...prev, equity: e.target.value }))}
+                          onChange={(e) => setNewRole((prev: any) => ({ ...prev, equity: e.target.value }))}
                           className="w-full px-4 py-3 border border-slate-200 rounded-xl bg-white text-slate-900 focus:ring-2 focus:ring-green-600 focus:border-transparent transition-all outline-none font-medium"
                           placeholder="e.g., 0.5-1%"
                         />

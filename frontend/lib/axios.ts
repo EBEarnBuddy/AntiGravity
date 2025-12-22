@@ -72,6 +72,7 @@ export const userAPI = {
   sync: () => api.post('/users/sync'),
   getMe: () => api.get('/users/me'),
   updateMe: (data: Record<string, unknown>) => api.put('/users/me', data),
+  toggleBookmark: (opportunityId: string) => api.post('/users/bookmarks/toggle', { opportunityId }),
 };
 
 export const opportunityAPI = {

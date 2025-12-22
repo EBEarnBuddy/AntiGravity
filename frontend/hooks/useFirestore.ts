@@ -64,6 +64,42 @@ export const useRooms = () => {
     };
 
     fetchRooms();
+
+    // Realtime Listener
+    let socketInstance: any = null;
+    const setupSocket = async () => {
+      try {
+        const { getSocket } = await import('../lib/socket');
+        const socket = await getSocket();
+        if (socket) {
+          socketInstance = socket;
+          socket.on('room_created', (newRoom: any) => {
+            // Optimistically add to lists
+            // Ideally we verify if it matches user's list or global list
+            // For simplicity, add to global, check createdBy for myRooms
+            const formattedRoom = { ...newRoom, id: newRoom._id || newRoom.id };
+            setRooms((prev: any[]) => [formattedRoom, ...prev]);
+
+            if (currentUser && newRoom.createdBy === currentUser.uid) { // Check ID format in backend (it's ObjectId usually, need mapping)
+              // Actually createdBy is ObjectId in room, currentUser.uid is Firebase UID.
+              // We might not be able to easily check 'myRooms' without extra data or assumed knowledge.
+              // But since we are the creator (if we are the one triggering it?), usually we just refetch.
+              // But for *other* users, they just see it in community list.
+              // Let's just add to 'rooms' (Explore).
+            }
+          });
+        }
+      } catch (e) {
+        console.error('Socket setup failed in useRooms', e);
+      }
+    };
+    setupSocket();
+
+    return () => {
+      if (socketInstance) {
+        socketInstance.off('room_created');
+      }
+    };
   }, [currentUser]);
 
   const createRoom = async (roomData: any) => {
@@ -255,6 +291,32 @@ export const useStartups = () => {
     };
 
     fetchStartups();
+
+    // Realtime Listener
+    let socketInstance: any = null;
+    const setupSocket = async () => {
+      try {
+        const { getSocket } = await import('../lib/socket');
+        const socket = await getSocket();
+        if (socket) {
+          socketInstance = socket;
+          socket.on('opportunity_created', (newOpp: any) => {
+            if (newOpp.type === 'startup') {
+              setStartups((prev: any[]) => [newOpp, ...prev]);
+            }
+          });
+        }
+      } catch (e) {
+        console.error('Socket setup failed in useStartups', e);
+      }
+    };
+    setupSocket();
+
+    return () => {
+      if (socketInstance) {
+        socketInstance.off('opportunity_created');
+      }
+    };
   }, []);
 
   const createStartup = async (startupData: any) => {
@@ -346,6 +408,32 @@ export const useProjects = () => {
     };
 
     fetchProjects();
+
+    // Realtime Listener
+    let socketInstance: any = null;
+    const setupSocket = async () => {
+      try {
+        const { getSocket } = await import('../lib/socket');
+        const socket = await getSocket();
+        if (socket) {
+          socketInstance = socket;
+          socket.on('opportunity_created', (newOpp: any) => {
+            if (newOpp.type === 'project' || newOpp.type === 'freelance') {
+              setProjects((prev: any[]) => [newOpp, ...prev]);
+            }
+          });
+        }
+      } catch (e) {
+        console.error('Socket setup failed in useProjects', e);
+      }
+    };
+    setupSocket();
+
+    return () => {
+      if (socketInstance) {
+        socketInstance.off('opportunity_created');
+      }
+    };
   }, []);
 
   const createProject = async (projectData: any) => {
@@ -452,10 +540,11 @@ export const useBookmarks = () => {
     if (!userProfile) return;
     setLoading(true);
     try {
+      await userAPI.toggleBookmark(opportunityId);
+      // Optimistically update or refetch
       const currentBookmarks = userProfile.bookmarks || [];
       const isBookmarked = currentBookmarks.includes(opportunityId);
-
-      let newBookmarks: string[];
+      let newBookmarks;
       if (isBookmarked) {
         newBookmarks = currentBookmarks.filter(id => id !== opportunityId);
       } else {

@@ -13,6 +13,7 @@ export interface IRoom extends Document {
     membersCount: number;
     lastMessageAt?: Date;
     collaborators?: mongoose.Types.ObjectId[];
+    avatar?: string;
     createdAt: Date;
     updatedAt: Date;
 }

@@ -352,8 +352,10 @@ const CirclesPage: React.FC = () => {
             <Sidebar open={sidebarOpen} setOpen={setSidebarOpen}>
                 <SidebarBody className="justify-between gap-10">
                     <div className="flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
-                        <div className="mb-8">
-                            <h2 className="text-lg font-black text-slate-900">Circle Types</h2>
+                        <div className="mb-8 overflow-hidden">
+                            <motion.div animate={{ opacity: sidebarOpen ? 1 : 0, height: sidebarOpen ? 'auto' : 0 }}>
+                                <h2 className="text-lg font-black text-slate-900 whitespace-nowrap">Circle Types</h2>
+                            </motion.div>
                         </div>
                         <div className="flex flex-col gap-2">
                             {sidebarLinks.map((link, idx) => (

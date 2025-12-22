@@ -4,6 +4,7 @@ import { AuthRequest } from '../middlewares/auth';
 import User from '../models/User';
 import Room from '../models/Room';
 import RoomMembership from '../models/RoomMembership';
+import { getIO } from '../socket';
 
 // Create Opportunity
 // For startup opportunities this will also auto-create a private Room
@@ -41,16 +42,28 @@ export const createOpportunity = async (req: AuthRequest, res: Response) => {
             role: 'admin',
         });
 
-        const opportunity = await Opportunity.create({
+        const opportunity = new Opportunity({
             ...payload,
             postedBy: user._id,
             room: room._id,
             // For startup opportunities, default startupStatus to active if not explicitly provided
             startupStatus: payload.startupStatus || 'active',
-            founderId: payload.founderId || uid,
             founderName: payload.founderName || user.displayName,
             founderAvatar: payload.founderAvatar || user.photoURL,
+            image: payload.image || payload.logo, // Support image field
         });
+        await opportunity.save();
+
+        // Populate for immediate frontend use if needed
+        await opportunity.populate('postedBy', 'displayName photoURL role');
+
+        // Realtime: Emit event
+        try {
+            const io = getIO();
+            io.emit('opportunity_created', opportunity);
+        } catch (err) {
+            console.error('Socket emission failed:', err);
+        }
 
         res.status(201).json(opportunity);
     } catch (error) {

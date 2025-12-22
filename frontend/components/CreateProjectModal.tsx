@@ -49,6 +49,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState({
     title: '',
+    image: '',
     description: '',
     company: '',
     industry: '',
@@ -121,14 +122,14 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose
   ];
 
   const handleInputChange = (field: string, value: any) => {
-    setFormData(prev => ({
+    setFormData((prev: any) => ({
       ...prev,
       [field]: value
     }));
   };
 
   const handleNestedChange = (parent: string, field: string, value: any) => {
-    setFormData(prev => ({
+    setFormData((prev: any) => ({
       ...prev,
       [parent]: {
         ...(prev[parent as keyof typeof prev] as any),
@@ -137,9 +138,23 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose
     }));
   };
 
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFormData((prev: any) => ({
+          ...prev,
+          image: reader.result as string
+        }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const addTag = () => {
     if (newTag.trim() && !formData.tags.includes(newTag.trim())) {
-      setFormData(prev => ({
+      setFormData((prev: any) => ({
         ...prev,
         tags: [...prev.tags, newTag.trim()]
       }));
@@ -148,15 +163,15 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose
   };
 
   const removeTag = (tagToRemove: string) => {
-    setFormData(prev => ({
+    setFormData((prev: any) => ({
       ...prev,
-      tags: prev.tags.filter(tag => tag !== tagToRemove)
+      tags: prev.tags.filter((tag: any) => tag !== tagToRemove)
     }));
   };
 
   const addBenefit = () => {
     if (newBenefit.trim() && !formData.benefits.includes(newBenefit.trim())) {
-      setFormData(prev => ({
+      setFormData((prev: any) => ({
         ...prev,
         benefits: [...prev.benefits, newBenefit.trim()]
       }));
@@ -165,9 +180,9 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose
   };
 
   const removeBenefit = (benefitToRemove: string) => {
-    setFormData(prev => ({
+    setFormData((prev: any) => ({
       ...prev,
-      benefits: prev.benefits.filter(benefit => benefit !== benefitToRemove)
+      benefits: prev.benefits.filter((benefit: any) => benefit !== benefitToRemove)
     }));
   };
 
@@ -181,25 +196,25 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose
       benefits: [],
       priority: 'medium'
     };
-    setFormData(prev => ({
+    setFormData((prev: any) => ({
       ...prev,
       roles: [...prev.roles, newRole]
     }));
   };
 
   const updateRole = (index: number, field: string, value: any) => {
-    setFormData(prev => ({
+    setFormData((prev: any) => ({
       ...prev,
-      roles: prev.roles.map((role, i) =>
+      roles: prev.roles.map((role: any, i: any) =>
         i === index ? { ...role, [field]: value } : role
       )
     }));
   };
 
   const updateRoleNested = (index: number, parent: string, field: string, value: any) => {
-    setFormData(prev => ({
+    setFormData((prev: any) => ({
       ...prev,
-      roles: prev.roles.map((role, i) =>
+      roles: prev.roles.map((role: any, i: any) =>
         i === index ? {
           ...role,
           [parent]: { ...(role[parent as keyof Role] as any), [field]: value }
@@ -209,9 +224,9 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose
   };
 
   const removeRole = (index: number) => {
-    setFormData(prev => ({
+    setFormData((prev: any) => ({
       ...prev,
-      roles: prev.roles.filter((_, i) => i !== index)
+      roles: prev.roles.filter((_: any, i: any) => i !== index)
     }));
   };
 
@@ -263,6 +278,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose
     try {
       const projectPayload = {
         title: formData.title,
+        image: formData.image,
         description: formData.description,
         company: formData.company,
         industry: formData.industry,
@@ -288,6 +304,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose
       // Reset form
       setFormData({
         title: '',
+        image: '',
         description: '',
         company: '',
         industry: '',
@@ -344,7 +361,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.9, opacity: 0 }}
-            onClick={(e) => e.stopPropagation()}
+            onClick={(e: any) => e.stopPropagation()}
           >
             {/* Header - Fixed */}
             <div className="flex-none px-8 py-6 border-b border-slate-100 bg-white">
@@ -423,7 +440,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose
                       <input
                         type="text"
                         value={formData.title}
-                        onChange={(e) => handleInputChange('title', e.target.value)}
+                        onChange={(e: any) => handleInputChange('title', e.target.value)}
                         className="w-full px-4 py-3 border border-slate-200 rounded-xl bg-white text-slate-900 focus:ring-2 focus:ring-green-600 focus:border-transparent transition-all outline-none font-medium placeholder:text-slate-400"
                         placeholder="e.g., AI-Powered E-commerce Platform"
                         required
@@ -437,7 +454,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose
                       </label>
                       <textarea
                         value={formData.description}
-                        onChange={(e) => handleInputChange('description', e.target.value)}
+                        onChange={(e: any) => handleInputChange('description', e.target.value)}
                         className="w-full px-4 py-3 border border-slate-200 rounded-xl bg-white text-slate-900 focus:ring-2 focus:ring-green-600 focus:border-transparent transition-all outline-none font-medium placeholder:text-slate-400 resize-none"
                         rows={4}
                         placeholder="Describe your project, goals, and what you're building..."
@@ -453,7 +470,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose
                       <input
                         type="text"
                         value={formData.company}
-                        onChange={(e) => handleInputChange('company', e.target.value)}
+                        onChange={(e: any) => handleInputChange('company', e.target.value)}
                         className="w-full px-4 py-3 border border-slate-200 rounded-xl bg-white text-slate-900 focus:ring-2 focus:ring-green-600 focus:border-transparent transition-all outline-none font-medium placeholder:text-slate-400"
                         placeholder="Your company name"
                         required
@@ -534,8 +551,8 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose
                         <input
                           type="text"
                           value={newTag}
-                          onChange={(e) => setNewTag(e.target.value)}
-                          onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addTag())}
+                          onChange={(e: any) => setNewTag(e.target.value)}
+                          onKeyPress={(e: any) => e.key === 'Enter' && (e.preventDefault(), addTag())}
                           className="flex-1 px-4 py-2 border border-slate-200 rounded-lg bg-white text-slate-900 focus:ring-2 focus:ring-green-600 focus:border-transparent transition-all outline-none font-medium"
                           placeholder="Add a tag..."
                         />
@@ -571,7 +588,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose
                           <input
                             type="number"
                             value={formData.totalBudget.min}
-                            onChange={(e) => handleNestedChange('totalBudget', 'min', parseInt(e.target.value) || 0)}
+                            onChange={(e: any) => handleNestedChange('totalBudget', 'min', parseInt(e.target.value) || 0)}
                             className="w-full px-4 py-3 border border-slate-200 rounded-xl bg-white text-slate-900 focus:ring-2 focus:ring-green-600 focus:border-transparent transition-all outline-none font-medium"
                             placeholder="0"
                             min="0"
@@ -583,7 +600,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose
                           <input
                             type="number"
                             value={formData.totalBudget.max}
-                            onChange={(e) => handleNestedChange('totalBudget', 'max', parseInt(e.target.value) || 0)}
+                            onChange={(e: any) => handleNestedChange('totalBudget', 'max', parseInt(e.target.value) || 0)}
                             className="w-full px-4 py-3 border border-slate-200 rounded-xl bg-white text-slate-900 focus:ring-2 focus:ring-green-600 focus:border-transparent transition-all outline-none font-medium"
                             placeholder="0"
                             min="0"
@@ -594,7 +611,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose
                           <label className="block text-xs text-slate-500 mb-1 font-medium">Currency</label>
                           <select
                             value={formData.totalBudget.currency}
-                            onChange={(e) => handleNestedChange('totalBudget', 'currency', e.target.value)}
+                            onChange={(e: any) => handleNestedChange('totalBudget', 'currency', e.target.value)}
                             className="w-full px-4 py-3 border border-slate-200 rounded-xl bg-white text-slate-900 focus:ring-2 focus:ring-green-600 focus:border-transparent transition-all outline-none font-medium"
                           >
                             <option value="USD">USD</option>
@@ -614,7 +631,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose
                       <input
                         type="text"
                         value={formData.duration}
-                        onChange={(e) => handleInputChange('duration', e.target.value)}
+                        onChange={(e: any) => handleInputChange('duration', e.target.value)}
                         className="w-full px-4 py-3 border border-slate-200 rounded-xl bg-white text-slate-900 focus:ring-2 focus:ring-green-600 focus:border-transparent transition-all outline-none font-medium"
                         placeholder="e.g., 2-3 months, 6 weeks, Ongoing"
                         required
@@ -630,7 +647,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose
                         <input
                           type="text"
                           value={formData.location}
-                          onChange={(e) => handleInputChange('location', e.target.value)}
+                          onChange={(e: any) => handleInputChange('location', e.target.value)}
                           className="w-full px-4 py-3 border border-slate-200 rounded-xl bg-white text-slate-900 focus:ring-2 focus:ring-green-600 focus:border-transparent transition-all outline-none font-medium"
                           placeholder="e.g., San Francisco, CA or Remote"
                           required
@@ -639,7 +656,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose
                           <input
                             type="checkbox"
                             checked={formData.remote}
-                            onChange={(e) => handleInputChange('remote', e.target.checked)}
+                            onChange={(e: any) => handleInputChange('remote', e.target.checked)}
                             className="w-5 h-5 text-green-600 border-slate-300 rounded focus:ring-green-500"
                           />
                           <span className="text-sm text-slate-700 font-medium">
@@ -657,7 +674,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose
                       <input
                         type="text"
                         value={formData.equity}
-                        onChange={(e) => handleInputChange('equity', e.target.value)}
+                        onChange={(e: any) => handleInputChange('equity', e.target.value)}
                         className="w-full px-4 py-3 border border-slate-200 rounded-xl bg-white text-slate-900 focus:ring-2 focus:ring-green-600 focus:border-transparent transition-all outline-none font-medium"
                         placeholder="e.g., 0.5% - 2% equity"
                       />
@@ -715,8 +732,8 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose
                         <input
                           type="text"
                           value={newBenefit}
-                          onChange={(e) => setNewBenefit(e.target.value)}
-                          onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addBenefit())}
+                          onChange={(e: any) => setNewBenefit(e.target.value)}
+                          onKeyPress={(e: any) => e.key === 'Enter' && (e.preventDefault(), addBenefit())}
                           className="flex-1 px-4 py-2 border border-slate-200 rounded-lg bg-white text-slate-900 focus:ring-2 focus:ring-green-600 focus:border-transparent transition-all outline-none font-medium"
                           placeholder="Add a benefit..."
                         />
@@ -778,7 +795,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose
                       </div>
                     )}
 
-                    {formData.roles.map((role, roleIndex) => (
+                    {formData.roles.map((role: Role, roleIndex: number) => (
                       <div
                         key={roleIndex}
                         className="border border-slate-200 rounded-xl p-6 bg-slate-50/50"
@@ -899,7 +916,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose
                             Required Skills
                           </label>
                           <div className="flex flex-wrap gap-2 mb-3">
-                            {role.skills.map((skill, skillIndex) => (
+                            {role.skills.map((skill: string, skillIndex: number) => (
                               <span
                                 key={skillIndex}
                                 className="px-3 py-1 bg-green-50 text-green-700 border border-green-200 rounded-full text-sm font-medium flex items-center gap-2"
@@ -955,7 +972,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose
                             Role-Specific Benefits
                           </label>
                           <div className="flex flex-wrap gap-2 mb-3">
-                            {role.benefits.map((benefit, benefitIndex) => (
+                            {role.benefits.map((benefit: string, benefitIndex: number) => (
                               <span
                                 key={benefitIndex}
                                 className="px-3 py-1 bg-blue-50 text-blue-700 border border-blue-200 rounded-full text-sm font-medium flex items-center gap-2"

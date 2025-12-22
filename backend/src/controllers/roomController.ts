@@ -3,6 +3,7 @@ import Room from '../models/Room';
 import RoomMembership from '../models/RoomMembership';
 import User from '../models/User';
 import { AuthRequest } from '../middlewares/auth';
+import { getIO } from '../socket';
 
 // Create a Room
 export const createRoom = async (req: AuthRequest, res: Response) => {
@@ -14,16 +15,20 @@ export const createRoom = async (req: AuthRequest, res: Response) => {
             return;
         }
 
-        const { name, description, isPrivate, icon } = req.body;
+        const { name, description, isPrivate, icon, avatar } = req.body;
 
         const room = await Room.create({
             name,
             description,
             isPrivate: !!isPrivate,
-            icon,
+            avatar: avatar || icon, // Map to schema's avatar field
             createdBy: user._id,
             membersCount: 1, // Creator is first member
         });
+
+        if (!room) {
+            throw new Error('Failed to create room doc');
+        }
 
         // Add creator as admin member with accepted status
         await RoomMembership.create({
@@ -32,6 +37,14 @@ export const createRoom = async (req: AuthRequest, res: Response) => {
             role: 'admin',
             status: 'accepted',
         });
+
+        // Realtime: Emit event
+        try {
+            const io = getIO();
+            io.emit('room_created', room);
+        } catch (err) {
+            console.error('Socket emission failed:', err);
+        }
 
         res.status(201).json(room);
     } catch (error) {

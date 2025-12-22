@@ -15,13 +15,14 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import CreateProjectModal from '@/components/CreateProjectModal';
 import { Gig } from '@/lib/firestore';
-import { useProjects } from '@/hooks/useFirestore';
+import { useProjects, useBookmarks } from '@/hooks/useFirestore';
 import { Skeleton } from '@/components/ui/skeleton';
 
 const FreelancePage: React.FC = () => {
     const { currentUser } = useAuth();
     const router = useRouter();
     const { projects, loading } = useProjects();
+    const { toggleBookmark, isBookmarked } = useBookmarks();
     const [searchTerm, setSearchTerm] = useState('');
     const [showCreateModal, setShowCreateModal] = useState(false);
 
@@ -76,7 +77,7 @@ const FreelancePage: React.FC = () => {
                             type="text"
                             placeholder="Web Dev, Range: $5500"
                             value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
+                            onChange={(e: any) => setSearchTerm(e.target.value)}
                             className="w-full h-14 pl-6 pr-14 border-2 border-slate-900 rounded-xl text-lg focus:outline-none transition shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] focus:shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] focus:translate-x-[2px] focus:translate-y-[2px] placeholder:text-slate-400 font-bold"
                         />
                         <Search className="absolute right-5 top-1/2 transform -translate-y-1/2 text-slate-900 w-6 h-6" />
@@ -103,12 +104,31 @@ const FreelancePage: React.FC = () => {
                                 >
                                     {/* Wireframe Header Structure */}
                                     <div className="flex justify-between items-start mb-2">
-                                        <h3 className="text-xl font-black text-slate-900 group-hover:text-green-600 transition-colors">
-                                            {project.title}
-                                        </h3>
+                                        <div className="flex-1">
+                                            <h3 className="text-xl font-black text-slate-900 group-hover:text-green-600 transition-colors">
+                                                {project.title}
+                                            </h3>
+                                        </div>
                                         <div className="flex gap-2">
-                                            <button className="p-1 hover:text-green-600 transition text-slate-400"><Bookmark className="w-5 h-5" /></button>
-                                            <button className="p-1 hover:text-green-600 transition text-slate-400"><Share2 className="w-5 h-5" /></button>
+                                            <button
+                                                onClick={(e: any) => {
+                                                    e.stopPropagation();
+                                                    if (project.id) toggleBookmark(project.id);
+                                                }}
+                                                className={`p-1 hover:text-green-600 transition ${project.id && isBookmarked(project.id) ? 'text-green-600' : 'text-slate-400'}`}
+                                            >
+                                                <Bookmark className={`w-5 h-5 ${project.id && isBookmarked(project.id) ? 'fill-current' : ''}`} />
+                                            </button>
+                                            <button
+                                                onClick={(e: any) => {
+                                                    e.stopPropagation();
+                                                    navigator.clipboard.writeText(`${window.location.origin}/freelance/${project.id}`);
+                                                    alert('Link copied to clipboard!');
+                                                }}
+                                                className="p-1 hover:text-green-600 transition text-slate-400"
+                                            >
+                                                <Share2 className="w-5 h-5" />
+                                            </button>
                                         </div>
                                     </div>
 
@@ -133,7 +153,11 @@ const FreelancePage: React.FC = () => {
                                         <div className="flex flex-col items-center">
                                             <div className="w-12 h-12 rounded-full border-2 border-slate-900 bg-slate-100 overflow-hidden mb-1">
                                                 {/* Pattern or Image */}
-                                                <div className="w-full h-full bg-[radial-gradient(#0f172a_1px,transparent_1px)] [background-size:4px_4px] opacity-20"></div>
+                                                {(project as any).image ? (
+                                                    <img src={(project as any).image} alt="Project" className="w-full h-full object-cover" />
+                                                ) : (
+                                                    <div className="w-full h-full bg-[radial-gradient(#0f172a_1px,transparent_1px)] [background-size:4px_4px] opacity-20"></div>
+                                                )}
                                             </div>
                                             <div className="bg-green-500 text-white text-[9px] font-bold px-2 py-0.5 rounded uppercase">
                                                 Posted by

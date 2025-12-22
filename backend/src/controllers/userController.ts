@@ -81,3 +81,51 @@ export const updateMe = async (req: AuthRequest, res: Response) => {
         res.status(500).json({ error: 'Update failed' });
     }
 };
+
+// Toggle Bookmark
+export const toggleBookmark = async (req: AuthRequest, res: Response) => {
+    try {
+        const { uid } = req.user!;
+        const { opportunityId } = req.body;
+
+        if (!opportunityId) {
+            res.status(400).json({ error: 'Opportunity ID is required' });
+            return;
+        }
+
+        const user = await User.findOne({ firebaseUid: uid });
+        if (!user) {
+            res.status(404).json({ error: 'User not found' });
+            return;
+        }
+
+        // Initialize bookmarks array if it doesn't exist
+        if (!user.bookmarks) {
+            user.bookmarks = [];
+        }
+
+        const index = user.bookmarks.findIndex((id: any) => id.toString() === opportunityId);
+        let action = '';
+
+        if (index > -1) {
+            // Remove bookmark
+            user.bookmarks.splice(index, 1);
+            action = 'removed';
+        } else {
+            // Add bookmark
+            user.bookmarks.push(opportunityId);
+            action = 'added';
+        }
+
+        await user.save();
+
+        res.json({
+            message: `Bookmark ${action}`,
+            bookmarks: user.bookmarks,
+            action
+        });
+    } catch (error) {
+        console.error('Error toggling bookmark:', error);
+        res.status(500).json({ error: 'Failed to toggle bookmark' });
+    }
+};

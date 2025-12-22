@@ -75,6 +75,7 @@ export interface IOpportunity extends Document {
     urgency?: 'low' | 'medium' | 'high';
     featured?: boolean;
     tags?: string[];
+    image?: string;
 
     // Link to the underlying collaboration circle / room (Opportunity Circle)
     room?: mongoose.Types.ObjectId;

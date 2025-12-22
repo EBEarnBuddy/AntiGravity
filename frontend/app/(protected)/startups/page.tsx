@@ -15,7 +15,7 @@ import {
     UserCircle
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { useStartups, useMyApplications } from '@/hooks/useFirestore';
+import { useStartups, useMyApplications, useBookmarks } from '@/hooks/useFirestore';
 import { Skeleton } from '@/components/ui/skeleton';
 import CreateStartupModal from '@/components/CreateStartupModal';
 import StartupApplicationModal from '@/components/StartupApplicationModal';
@@ -29,8 +29,9 @@ const StartupsPage: React.FC = () => {
     // Initialize tab from URL or default to 'discover'
     const initialTab = (searchParams.get('tab') as 'discover' | 'posted' | 'applied') || 'discover';
 
-    const { startups, loading: startupsLoading, bookmarkStartup } = useStartups();
+    const { startups, loading: startupsLoading } = useStartups(); // removed bookmarkStartup
     const { applications, loading: appsLoading } = useMyApplications();
+    const { toggleBookmark, isBookmarked } = useBookmarks();
     const [searchTerm, setSearchTerm] = useState('');
     const [activeTab, setActiveTabState] = useState<'discover' | 'posted' | 'applied'>(initialTab);
 
@@ -181,7 +182,15 @@ const StartupsPage: React.FC = () => {
                                     >
                                         {/* Image / Header */}
                                         <div className="aspect-[4/3] bg-slate-50 relative border-2 border-slate-200 mb-4 overflow-hidden">
-                                            <div className="absolute inset-0 opacity-10 bg-[linear-gradient(45deg,#000_25%,transparent_25%,transparent_75%,#000_75%,#000),linear-gradient(45deg,#000_25%,transparent_25%,transparent_75%,#000_75%,#000)] [background-size:20px_20px] [background-position:0_0,10px_10px]"></div>
+                                            {startup.logo || startup.image ? (
+                                                <img
+                                                    src={startup.logo || startup.image}
+                                                    alt={startup.name}
+                                                    className="w-full h-full object-cover"
+                                                />
+                                            ) : (
+                                                <div className="absolute inset-0 opacity-10 bg-[linear-gradient(45deg,#000_25%,transparent_25%,transparent_75%,#000_75%,#000),linear-gradient(45deg,#000_25%,transparent_25%,transparent_75%,#000_75%,#000)] [background-size:20px_20px] [background-position:0_0,10px_10px]"></div>
+                                            )}
 
                                             {/* Status Badge for Applications */}
                                             {status && (
@@ -209,7 +218,25 @@ const StartupsPage: React.FC = () => {
                                                 </p>
                                             </div>
                                             <div className="flex gap-1">
-                                                <Share2 className="w-4 h-4 text-green-600" />
+                                                <button
+                                                    onClick={(e: any) => {
+                                                        e.stopPropagation();
+                                                        navigator.clipboard.writeText(`${window.location.origin}/startups/${startup.id || startup._id}`);
+                                                        alert('Link copied to clipboard!');
+                                                    }}
+                                                    className="p-1 hover:bg-slate-100 rounded-lg transition-colors"
+                                                >
+                                                    <Share2 className="w-4 h-4 text-green-600" />
+                                                </button>
+                                                <button
+                                                    onClick={(e: any) => {
+                                                        e.stopPropagation();
+                                                        if (startup.id || startup._id) toggleBookmark(startup.id || startup._id);
+                                                    }}
+                                                    className="p-1 hover:bg-slate-100 rounded-lg transition-colors"
+                                                >
+                                                    <Bookmark className={`w-4 h-4 ${isBookmarked(startup.id || startup._id) ? 'fill-current text-green-600' : 'text-slate-400 hover:text-green-600'}`} />
+                                                </button>
                                             </div>
                                         </div>
 
