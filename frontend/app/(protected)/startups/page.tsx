@@ -247,12 +247,22 @@ const StartupsPage: React.FC = () => {
                                         {/* Actions */}
                                         <div className="mt-auto pt-4 border-t border-slate-100 flex gap-2">
                                             {isOwner ? (
-                                                <button
-                                                    onClick={() => handleManage(startup)}
-                                                    className="flex-1 py-2 bg-slate-900 text-white text-xs font-bold uppercase hover:bg-slate-800 transition-all rounded-md flex items-center justify-center gap-2"
-                                                >
-                                                    <Users className="w-3 h-3" /> Manage ({startup.totalApplicants || 0})
-                                                </button>
+                                                <>
+                                                    <button
+                                                        onClick={() => handleManage(startup)}
+                                                        className="flex-1 py-2 bg-slate-900 text-white text-xs font-bold uppercase hover:bg-slate-800 transition-all rounded-md flex items-center justify-center gap-2"
+                                                    >
+                                                        <Users className="w-3 h-3" /> Manage ({startup.totalApplicants || 0})
+                                                    </button>
+                                                    {startup.room && (
+                                                        <button
+                                                            onClick={() => router.push(`/circles/${startup.room._id || startup.room}`)}
+                                                            className="flex-1 py-2 bg-green-600 text-white text-xs font-bold uppercase hover:bg-green-700 transition-all rounded-md flex items-center justify-center gap-2"
+                                                        >
+                                                            <Users className="w-3 h-3" /> Circle
+                                                        </button>
+                                                    )}
+                                                </>
                                             ) : status ? (
                                                 <div className="flex-1 py-2 bg-slate-100 text-slate-500 text-xs font-bold uppercase rounded-md flex items-center justify-center gap-2 cursor-default">
                                                     {status === 'accepted' ? <CheckCircle className="w-3 h-3" /> : <UserCircle className="w-3 h-3" />} Applied

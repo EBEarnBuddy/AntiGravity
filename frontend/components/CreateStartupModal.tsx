@@ -22,6 +22,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useStartups } from '../hooks/useFirestore';
+import { FirestoreService } from '../lib/firestore';
 
 interface CreateStartupModalProps {
   isOpen: boolean;
@@ -36,7 +37,8 @@ const CreateStartupModal: React.FC<CreateStartupModalProps> = ({ isOpen, onClose
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState({
     name: '',
-    image: '',
+    previewImage: '',
+    file: null as File | null,
     description: '',
     industry: '',
     stage: 'pre-seed',
@@ -110,7 +112,8 @@ const CreateStartupModal: React.FC<CreateStartupModalProps> = ({ isOpen, onClose
       reader.onloadend = () => {
         setFormData((prev: any) => ({
           ...prev,
-          image: reader.result as string
+          previewImage: reader.result as string,
+          file: file
         }));
       };
       reader.readAsDataURL(file);
@@ -203,10 +206,19 @@ const CreateStartupModal: React.FC<CreateStartupModalProps> = ({ isOpen, onClose
     try {
       setIsSubmitting(true);
 
+      let imageUrl = '';
+      if (formData.file) {
+        try {
+          imageUrl = await FirestoreService.uploadStartupLogo(formData.file);
+        } catch (uploadError) {
+          console.error("Failed to upload image, proceeding without it", uploadError);
+        }
+      }
+
       const startupData = {
         name: formData.name,
-        logo: formData.image, // Map image to logo/image
-        image: formData.image,
+        logo: imageUrl, // Use uploaded URL
+        image: imageUrl,
         description: formData.description,
         industry: formData.industry,
         stage: formData.stage,
@@ -233,7 +245,8 @@ const CreateStartupModal: React.FC<CreateStartupModalProps> = ({ isOpen, onClose
       // Reset form
       setFormData({
         name: '',
-        image: '',
+        previewImage: '',
+        file: null,
         description: '',
         industry: '',
         stage: 'pre-seed',
@@ -330,8 +343,8 @@ const CreateStartupModal: React.FC<CreateStartupModalProps> = ({ isOpen, onClose
                       </label>
                       <div className="flex items-center gap-4">
                         <div className="w-16 h-16 rounded-xl bg-slate-100 border border-slate-200 overflow-hidden flex items-center justify-center">
-                          {formData.image ? (
-                            <img src={formData.image} alt="Preview" className="w-full h-full object-cover" />
+                          {formData.previewImage ? (
+                            <img src={formData.previewImage} alt="Preview" className="w-full h-full object-cover" />
                           ) : (
                             <Rocket className="w-8 h-8 text-slate-400" />
                           )}

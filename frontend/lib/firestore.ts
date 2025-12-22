@@ -384,6 +384,14 @@ export class FirestoreService {
       size: this.formatBytes(file.size)
     };
   }
+
+  static async uploadStartupLogo(file: File): Promise<string> {
+    if (!storage) throw new Error('Firebase storage is not initialized');
+    const safeName = `${Date.now()}_${file.name}`.replace(/\s+/g, '_');
+    const objectRef = ref(storage, `startups/logos/${safeName}`);
+    await uploadBytes(objectRef, file);
+    return await getDownloadURL(objectRef);
+  }
   // User Profiles
   static async createUserProfile(profileData: Omit<UserProfile, 'id' | 'joinDate'>): Promise<void> {
     await setDoc(doc(db, 'users', profileData.uid), {

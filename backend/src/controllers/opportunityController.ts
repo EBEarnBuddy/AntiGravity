@@ -32,6 +32,7 @@ export const createOpportunity = async (req: AuthRequest, res: Response) => {
             isPrivate: true,
             type: 'opportunity',
             icon: payload.industry,
+            avatar: payload.image || payload.logo, // Set avatar to startup logo
             createdBy: user._id,
             membersCount: 1,
         });
