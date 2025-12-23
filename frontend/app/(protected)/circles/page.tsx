@@ -141,12 +141,14 @@ const CirclesPage: React.FC = () => {
                 <div className="flex items-center justify-between mb-8">
                     <div>
                         <h1 className="text-3xl font-black text-slate-900 mb-2">
-                            {activeCircleType === 'community' ? 'Community Circles' : 'Collab Circles'}
+                            {activeCircleType === 'community' ? 'Community Circles' : activeCircleType === 'opportunity' ? 'Opportunity Circles' : 'Collab Circles'}
                         </h1>
                         <p className="text-slate-500 font-medium">
                             {activeCircleType === 'community'
                                 ? 'Connect with verified builders and creators'
-                                : 'Your collaboration circles'}
+                                : activeCircleType === 'opportunity'
+                                    ? 'Your startup opportunity circles'
+                                    : 'Your collaboration circles'}
                         </p>
                     </div>
                     <button

@@ -125,7 +125,7 @@ export const getMyApplications = async (req: AuthRequest, res: Response) => {
         }
 
         const applications = await Application.find({ applicant: user._id })
-            .populate('opportunity', 'title type status');
+            .populate('opportunity'); // Populate all opportunity fields
 
         res.json(applications);
     } catch (error) {

@@ -213,24 +213,62 @@ export const getMyRooms = async (req: AuthRequest, res: Response) => {
             status: 'accepted'
         }).populate('room');
 
-        // Extract room objects and add createdByUid
-        const rooms = await Promise.all(memberships
-            .filter(m => m.room !== null && m.room !== undefined)
-            .map(async (m) => {
-                const room = (m.room as any).toObject();
+        const validMemberships = memberships.filter(m => m.room !== null && m.room !== undefined);
 
-                // Get creator's Firebase UID
-                const creator = await User.findById(room.createdBy);
+        if (validMemberships.length === 0) {
+            res.json([]);
+            return;
+        }
 
-                return {
-                    ...room,
-                    createdByUid: creator?.firebaseUid || null,
-                    id: room._id
-                };
-            }));
+        // Extract room IDs and creator IDs
+        const roomIds = validMemberships.map(m => (m.room as any)._id);
+        const creatorIds = validMemberships.map(m => (m.room as any).createdBy);
+
+        // Batch query: Get all creators at once
+        const creators = await User.find({ _id: { $in: creatorIds } });
+        const creatorMap = new Map(creators.map(c => [c._id.toString(), c.firebaseUid]));
+
+        // Batch query: Get all room memberships at once
+        const allRoomMemberships = await RoomMembership.find({
+            room: { $in: roomIds },
+            status: 'accepted'
+        }).populate('user');
+
+        // Group memberships by room
+        const membershipsByRoom = new Map<string, any[]>();
+        allRoomMemberships.forEach(membership => {
+            const roomId = membership.room.toString();
+            if (!membershipsByRoom.has(roomId)) {
+                membershipsByRoom.set(roomId, []);
+            }
+            membershipsByRoom.get(roomId)!.push(membership);
+        });
+
+        // Build room objects with members
+        const rooms = validMemberships.map(m => {
+            const room = (m.room as any).toObject();
+            const roomId = room._id.toString();
+
+            // Get creator UID from map
+            const createdByUid = creatorMap.get(room.createdBy.toString()) || null;
+
+            // Get member UIDs from grouped memberships
+            const roomMemberships = membershipsByRoom.get(roomId) || [];
+            const memberUids = roomMemberships
+                .map(membership => (membership.user as any)?.firebaseUid)
+                .filter(Boolean);
+
+            return {
+                ...room,
+                createdByUid,
+                members: memberUids,
+                id: room._id
+            };
+        });
 
         res.json(rooms);
     } catch (error) {
+        console.error('Error in getMyRooms:', error);
         res.status(500).json({ error: 'Fetch failed' });
     }
 };

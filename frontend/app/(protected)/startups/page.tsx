@@ -26,6 +26,7 @@ import { formatTimeAgo } from '@/lib/utils';
 import CreateStartupModal from '@/components/CreateStartupModal';
 import StartupApplicationModal from '@/components/StartupApplicationModal';
 import ApplicantsModal from '@/components/ApplicantsModal';
+import CollaborationRequestModal from '@/components/CollaborationRequestModal';
 
 const StartupsPage: React.FC = () => {
     const { currentUser } = useAuth();
@@ -63,7 +64,9 @@ const StartupsPage: React.FC = () => {
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [showApplicationModal, setShowApplicationModal] = useState(false);
     const [showApplicantsModal, setShowApplicantsModal] = useState(false);
+    const [showCollabModal, setShowCollabModal] = useState(false);
     const [selectedStartup, setSelectedStartup] = useState<any>(null);
+    const [selectedTargetStartup, setSelectedTargetStartup] = useState<any>(null);
     const [actionMenuOpen, setActionMenuOpen] = useState<string | null>(null);
 
     // Derived Data
@@ -285,6 +288,8 @@ const StartupsPage: React.FC = () => {
                                                 >
                                                     <Bookmark className={`w-4 h-4 ${isBookmarked(startup.id || startup._id) ? 'fill-current text-green-600' : 'text-slate-400 hover:text-green-600'}`} />
                                                 </button>
+
+                                                {/* Ellipsis Menu for Owners */}
                                                 {isOwner && (
                                                     <div className="relative">
                                                         <button
@@ -329,6 +334,44 @@ const StartupsPage: React.FC = () => {
                                                                         className="w-full text-left px-4 py-3 text-sm font-bold text-red-600 hover:bg-red-50 flex items-center gap-2"
                                                                     >
                                                                         <Trash2 className="w-4 h-4" /> Delete
+                                                                    </button>
+                                                                </motion.div>
+                                                            )}
+                                                        </AnimatePresence>
+                                                    </div>
+                                                )}
+
+                                                {/* Ellipsis Menu for Non-Owners in Discover Tab */}
+                                                {!isOwner && activeTab === 'discover' && (
+                                                    <div className="relative">
+                                                        <button
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                setActionMenuOpen(actionMenuOpen === `collab-${startup.id || startup._id}` ? null : `collab-${startup.id || startup._id}`);
+                                                            }}
+                                                            className="p-1 hover:bg-slate-100 rounded-lg transition-colors"
+                                                        >
+                                                            <MoreVertical className="w-4 h-4 text-slate-500" />
+                                                        </button>
+
+                                                        <AnimatePresence>
+                                                            {actionMenuOpen === `collab-${startup.id || startup._id}` && (
+                                                                <motion.div
+                                                                    initial={{ opacity: 0, scale: 0.95, y: 5 }}
+                                                                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                                                                    exit={{ opacity: 0, scale: 0.95, y: 5 }}
+                                                                    className="absolute right-0 top-full mt-1 w-56 bg-white rounded-xl shadow-xl border border-slate-100 z-10 overflow-hidden"
+                                                                >
+                                                                    <button
+                                                                        onClick={(e) => {
+                                                                            e.stopPropagation();
+                                                                            setSelectedTargetStartup(startup);
+                                                                            setShowCollabModal(true);
+                                                                            setActionMenuOpen(null);
+                                                                        }}
+                                                                        className="w-full text-left px-4 py-3 text-sm font-bold text-slate-700 hover:bg-green-50 hover:text-green-700 transition flex items-center gap-2"
+                                                                    >
+                                                                        <Users className="w-4 h-4" /> Request Collaboration
                                                                     </button>
                                                                 </motion.div>
                                                             )}
@@ -426,6 +469,23 @@ const StartupsPage: React.FC = () => {
                 onClose={() => setShowApplicantsModal(false)}
                 startupId={selectedStartup?._id || selectedStartup?.id}
                 startupName={selectedStartup?.name || selectedStartup?.title}
+            />
+
+            <CollaborationRequestModal
+                isOpen={showCollabModal}
+                onClose={() => {
+                    setShowCollabModal(false);
+                    setSelectedTargetStartup(null);
+                }}
+                targetCircle={selectedTargetStartup ? {
+                    id: selectedTargetStartup.room?._id || selectedTargetStartup.room,
+                    name: selectedTargetStartup.name || selectedTargetStartup.title,
+                    description: selectedTargetStartup.description
+                } : null}
+                onSuccess={() => {
+                    setShowCollabModal(false);
+                    setSelectedTargetStartup(null);
+                }}
             />
 
         </div >

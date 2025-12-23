@@ -13,7 +13,7 @@ interface CollaborationRequestModalProps {
         id: string;
         name: string;
         description?: string;
-    };
+    } | null;
     onSuccess?: () => void;
 }
 
@@ -36,7 +36,7 @@ const CollaborationRequestModal: React.FC<CollaborationRequestModalProps> = ({
     const ownedCircles = myRooms.filter(room => {
         // Use createdByUid if available, fallback to createdBy
         const creatorUid = (room as any).createdByUid || room.createdBy;
-        return creatorUid === currentUser?.uid && room.id !== targetCircle.id;
+        return creatorUid === currentUser?.uid && room.id !== targetCircle?.id;
     });
     console.log('✅ ownedCircles:', ownedCircles);
 
@@ -49,6 +49,11 @@ const CollaborationRequestModal: React.FC<CollaborationRequestModalProps> = ({
     const handleSend = async () => {
         if (!selectedCircleId) {
             setError('Please select a circle');
+            return;
+        }
+
+        if (!targetCircle?.id) {
+            setError('Target circle not found');
             return;
         }
 
