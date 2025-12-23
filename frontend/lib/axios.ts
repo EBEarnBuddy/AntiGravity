@@ -96,6 +96,8 @@ export const roomAPI = {
   getPendingRequests: (roomId: string) => api.get(`/rooms/${roomId}/pending`),
   approveMembership: (roomId: string, userId: string, status: 'accepted' | 'rejected') =>
     api.post(`/rooms/${roomId}/approve/${userId}`, { status }),
+  updateRoom: (roomId: string, data: any) => api.put(`/rooms/${roomId}`, data),
+  deleteRoom: (roomId: string) => api.delete(`/rooms/${roomId}`),
 };
 
 export const collaborationAPI = {

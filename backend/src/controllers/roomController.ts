@@ -353,3 +353,81 @@ export const updateMembershipStatus = async (req: AuthRequest, res: Response) =>
         res.status(500).json({ error: 'Failed to update membership status' });
     }
 };
+
+// Update Room Settings (Owner/Admin only)
+export const updateRoom = async (req: AuthRequest, res: Response) => {
+    try {
+        const { uid } = req.user!;
+        const { roomId } = req.params;
+        const { name, description, avatar } = req.body;
+
+        const user = await User.findOne({ firebaseUid: uid });
+        if (!user) {
+            res.status(404).json({ error: 'User not found' });
+            return;
+        }
+
+        const room = await Room.findById(roomId);
+        if (!room) {
+            res.status(404).json({ error: 'Room not found' });
+            return;
+        }
+
+        // Check if user is creator or admin
+        const isCreator = room.createdBy.toString() === user._id.toString();
+        const adminMembership = await RoomMembership.findOne({
+            room: roomId,
+            user: user._id,
+            role: 'admin',
+            status: 'accepted'
+        });
+
+        if (!isCreator && !adminMembership) {
+            res.status(403).json({ error: 'Not authorized' });
+            return;
+        }
+
+        if (name) room.name = name;
+        if (description) room.description = description;
+        if (avatar) room.avatar = avatar;
+
+        await room.save();
+
+        res.json(room);
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to update room' });
+    }
+};
+
+// Delete Room (Creator only)
+export const deleteRoom = async (req: AuthRequest, res: Response) => {
+    try {
+        const { uid } = req.user!;
+        const { roomId } = req.params;
+
+        const user = await User.findOne({ firebaseUid: uid });
+        if (!user) {
+            res.status(404).json({ error: 'User not found' });
+            return;
+        }
+
+        const room = await Room.findById(roomId);
+        if (!room) {
+            res.status(404).json({ error: 'Room not found' });
+            return;
+        }
+
+        // Only creator can delete
+        if (room.createdBy.toString() !== user._id.toString()) {
+            res.status(403).json({ error: 'Only the circle creator can delete it' });
+            return;
+        }
+
+        await Room.deleteOne({ _id: roomId });
+        await RoomMembership.deleteMany({ room: roomId });
+
+        res.json({ message: 'Room deleted' });
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to delete room' });
+    }
+};

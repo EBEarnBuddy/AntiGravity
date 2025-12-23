@@ -10,10 +10,12 @@ import {
     MoreVertical,
     ChevronLeft,
     Users,
-    UserCheck
+    UserCheck,
+    Settings
 } from 'lucide-react';
 import PendingRequestsModal from '@/components/PendingRequestsModal';
 import CollaborationRequestsModal from '@/components/CollaborationRequestsModal';
+import ChatSettingsModal from '@/components/ChatSettingsModal';
 import { getSocket } from '@/lib/socket';
 import { messageAPI } from '@/lib/axios';
 import { formatTimeAgo } from '@/lib/utils';
@@ -31,6 +33,7 @@ const RoomChatPage: React.FC = () => {
     const [newMessage, setNewMessage] = useState('');
     const [showPendingModal, setShowPendingModal] = useState(false);
     const [showCollabModal, setShowCollabModal] = useState(false);
+    const [showSettingsModal, setShowSettingsModal] = useState(false);
 
     const [showMenu, setShowMenu] = useState(false);
     const [typingUsers, setTypingUsers] = useState<string[]>([]);
@@ -244,10 +247,22 @@ const RoomChatPage: React.FC = () => {
                                         setShowCollabModal(true);
                                         setShowMenu(false);
                                     }}
-                                    className="w-full px-4 py-3 text-left text-sm font-bold text-slate-900 hover:bg-purple-50 hover:text-purple-700 transition flex items-center gap-2 rounded-b-xl"
+                                    className="w-full px-4 py-3 text-left text-sm font-bold text-slate-900 hover:bg-purple-50 hover:text-purple-700 transition flex items-center gap-2"
                                 >
                                     <Users className="w-4 h-4" />
                                     Collaboration Requests
+                                </button>
+                            )}
+                            {isAdmin && (
+                                <button
+                                    onClick={() => {
+                                        setShowSettingsModal(true);
+                                        setShowMenu(false);
+                                    }}
+                                    className="w-full px-4 py-3 text-left text-sm font-bold text-slate-900 hover:bg-slate-50 transition flex items-center gap-2 rounded-b-xl border-t border-slate-200"
+                                >
+                                    <Settings className="w-4 h-4" />
+                                    Chat Settings
                                 </button>
                             )}
                         </div>
@@ -279,43 +294,48 @@ const RoomChatPage: React.FC = () => {
                         return (
                             <div
                                 key={msg.id || index}
-                                className={`flex items-start gap-3 w-full ${isMe ? 'justify-end flex-row-reverse' : 'justify-start flex-row'}`}
+                                className={`flex items-end gap-2 w-full mb-4 ${isMe ? 'justify-end' : 'justify-start'}`}
                             >
-                                {/* Avatar - Comic Style */}
-                                <div className="flex-shrink-0">
-                                    <div className="h-8 w-8 border-2 border-slate-900 overflow-hidden bg-gradient-to-br from-green-400 to-green-600 relative">
-                                        {/* Pattern */}
-                                        <div className="absolute inset-0 opacity-20 bg-[linear-gradient(45deg,#000_25%,transparent_25%,transparent_75%,#000_75%,#000),linear-gradient(45deg,#000_25%,transparent_25%,transparent_75%,#000_75%,#000)] [background-size:8px_8px] [background-position:0_0,4px_4px]"></div>
-                                        {senderPhoto ? (
-                                            <img
-                                                src={senderPhoto}
-                                                alt={senderName || 'User'}
-                                                className="w-full h-full object-cover relative z-10"
-                                            />
-                                        ) : (
-                                            <div className="w-full h-full flex items-center justify-center text-white font-black text-xs relative z-10">
-                                                {senderName?.charAt(0).toUpperCase() || 'U'}
-                                            </div>
-                                        )}
+                                {/* Avatar (Receiver Only) */}
+                                {!isMe && (
+                                    <div className="flex-shrink-0 order-1">
+                                        <div className="h-8 w-8 rounded-full border border-slate-200 overflow-hidden bg-white">
+                                            {senderPhoto ? (
+                                                <img src={senderPhoto} alt={senderName} className="w-full h-full object-cover" />
+                                            ) : (
+                                                <div className="w-full h-full flex items-center justify-center bg-slate-100 text-xs font-bold text-slate-500">
+                                                    {senderName?.charAt(0).toUpperCase()}
+                                                </div>
+                                            )}
+                                        </div>
                                     </div>
-                                </div>
+                                )}
 
-                                {/* Message bubble - Comic Style */}
-                                <div className="flex flex-col gap-1 max-w-[70%]">
-                                    <div
-                                        className={`border-2 border-slate-900 px-4 py-2 ${isMe
-                                            ? 'bg-green-600 text-white'
-                                            : 'bg-white text-slate-900'
+                                {/* Message Bubble */}
+                                <div className={`flex flex-col max-w-[70%] order-2 ${isMe ? 'items-end' : 'items-start'}`}>
+                                    {/* Name (Top) */}
+                                    <span
+                                        className={`text-[10px] font-bold mb-1 px-1 ${isMe ? 'hidden' : 'text-purple-600'
                                             }`}
                                     >
-                                        <div className="text-sm font-medium leading-relaxed">{msg.content}</div>
+                                        {senderName}
+                                    </span>
+
+                                    {/* Bubble */}
+                                    <div
+                                        className={`px-4 py-2 rounded-2xl text-sm font-medium leading-relaxed shadow-sm relative group ${isMe
+                                            ? 'bg-green-600 text-white rounded-br-none'
+                                            : 'bg-white text-slate-900 border border-slate-200 rounded-bl-none'
+                                            }`}
+                                    >
+                                        {msg.content}
                                     </div>
-                                    <span className={`text-[10px] font-black px-1 uppercase tracking-wider ${isMe ? 'text-slate-400 text-right' : 'text-slate-400'}`}>
+
+                                    {/* Timestamp (Bottom) */}
+                                    <span className={`text-[10px] font-medium text-slate-400 mt-1 px-1 flex items-center gap-1`}>
                                         {formatTimeAgo(msg.timestamp?.seconds ? new Date(msg.timestamp.seconds * 1000) : (msg as any).createdAt)}
-                                        {isMe && (msg as any).readBy && (msg as any).readBy.length > 0 && (
-                                            <span className="ml-2 text-green-600">
-                                                Read by {(msg as any).readBy.length}
-                                            </span>
+                                        {isMe && (msg as any).readBy?.length > 0 && (
+                                            <span className="text-green-600 ml-1">Read</span>
                                         )}
                                     </span>
                                 </div>
@@ -378,9 +398,16 @@ const RoomChatPage: React.FC = () => {
             />
 
             {/* Collaboration Requests Modal */}
-            <CollaborationRequestsModal
-                isOpen={showCollabModal}
-                onClose={() => setShowCollabModal(false)}
+            onClose={() => setShowCollabModal(false)}
+            />
+
+            {/* Settings Modal */}
+            <ChatSettingsModal
+                isOpen={showSettingsModal}
+                onClose={() => setShowSettingsModal(false)}
+                room={room}
+                onUpdate={(updated) => {/* Room hook handles live updates via socket usually, but strict update here is fine too */ }}
+                onDelete={() => router.push('/circles')}
             />
         </div>
     );
