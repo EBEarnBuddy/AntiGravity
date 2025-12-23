@@ -67,12 +67,34 @@
 }
 
 @layer base {
+
+  /* Apply Geo font to all body text elements */
   body {
-    font-family: var(--font-body);
-    font-weight: 200;
-    /* Extralight as requested */
+    font-family: 'Geo', sans-serif;
+    font-weight: 400;
+    font-style: normal;
+    font-size: 1.5rem;
+    /* 20px - increased for better readability */
   }
 
+  /* Apply Geo to all common text elements */
+  p,
+  span,
+  div,
+  a,
+  li,
+  ul,
+  ol,
+  td,
+  th,
+  label,
+  input,
+  textarea,
+  select {
+    font-family: 'Geo', sans-serif;
+  }
+
+  /* Apply Zen Dots to headings and buttons */
   h1,
   h2,
   h3,
@@ -81,7 +103,24 @@
   h6,
   button,
   .btn {
-    font-family: var(--font-heading);
+    font-family: 'Zen Dots', sans-serif;
+    font-weight: 400;
+    font-style: normal;
+  }
+
+  /* Ensure italic variant uses Geo */
+  em,
+  i {
+    font-family: 'Geo', sans-serif;
+    font-style: italic;
+  }
+
+  /* Specific paragraph styling for better readability */
+  p {
+    font-size: 1.25rem;
+    /* 20px */
+    line-height: 1.7;
+    /* Better line spacing */
   }
 }
 

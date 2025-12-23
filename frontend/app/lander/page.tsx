@@ -3,6 +3,11 @@ import { Check, ChevronDown, ChevronRight, Layout, Menu, Play, Star, Users, Brie
 import Link from "next/link";
 import Image from "next/image";
 import { Faq5 } from "@/components/ui/faq-5";
+import EcosystemExplainer from "@/components/ui/ecosystem-explainer";
+import { StaggerTestimonials } from "@/components/ui/stagger-testimonials";
+import { CreativePricing, type PricingTier } from "@/components/ui/creative-pricing";
+import { SquishyOffers, BGComponent1, BGComponent2, BGComponent3 } from "@/components/ui/squishy-offers";
+import { CircularGallery, type GalleryItem } from "@/components/ui/circular-gallery";
 
 export default function Lander() {
     const testimonials = [
@@ -145,276 +150,233 @@ export default function Lander() {
                     </div>
                 </div>
 
-                {/* Wave separator - Filled with Slate 900 to transition to Dark Section */}
+                {/* Wave separator - Filled with Black to transition to What EarnBuddy Offers Section */}
                 <div className="absolute bottom-0 left-0 w-full overflow-hidden leading-none rotate-180">
                     <svg className="relative block w-[calc(100%+1.3px)] h-[60px]" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none">
-                        {/* Changed fill to #0f172a (Slate 900) */}
-                        <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z" fill="#0f172a"></path>
+                        {/* Changed fill to #000000 (Pure Black) */}
+                        <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z" fill="#000000"></path>
                     </svg>
                 </div>
             </header>
 
 
-            {/* Your Journey (Student Journey) - Dark Theme - Connected via Wave */}
-            <section className="py-24 bg-slate-900 text-white relative overflow-hidden">
+            {/* What EarnBuddy Offers - Black Background with Squishy Cards */}
+            <section className="py-24 bg-black text-white relative overflow-hidden">
                 <div className="container mx-auto px-6 relative z-10 pt-10">
-                    <div className="text-center max-w-3xl mx-auto mb-20">
-                        <h2 className="text-3xl md:text-5xl font-bold mb-6">
-                            <span className="bg-clip-text text-transparent bg-gradient-to-r from-green-400 to-emerald-600">
-                                Your journey
-                            </span> from builder to founder
+                    <div className="text-center max-w-3xl mx-auto mb-12">
+                        <h2 className="text-4xl md:text-6xl font-bold mb-6">
+                            <span className="bg-clip-text text-transparent bg-gradient-to-r from-green-400 via-emerald-500 to-teal-500">
+                                What EarnBuddy Offers
+                            </span>
                         </h2>
-                        <p className="text-slate-400 text-lg">Four simple steps to transform your skills into meaningful opportunities and partnerships.</p>
+                        <p className="text-lg text-gray-300">
+                            Three powerful ways to connect, collaborate, and grow
+                        </p>
                     </div>
 
-                    <div className="grid md:grid-cols-2 gap-12">
-                        {/* Step 01 */}
-                        <div className="bg-slate-800/50 p-8 rounded-2xl border border-slate-700 hover:border-green-500/50 transition duration-500 group">
-                            <div className="text-6xl font-black text-slate-800 mb-6 group-hover:text-green-500/20 transition-colors">01</div>
-                            <h3 className="text-2xl font-bold mb-4 text-white group-hover:text-green-400 transition-colors">Create Your Profile</h3>
-                            <p className="text-slate-400 mb-8 leading-relaxed">
-                                Less profile setup, more time building connections. Showcase your skills, experience, and project portfolio.
-                            </p>
-                            {/* Mini Mockup */}
-                            <div className="bg-slate-900 rounded-lg p-4 border border-slate-700 opacity-80 group-hover:opacity-100 transition">
-                                <div className="flex items-center gap-3 mb-3 border-b border-slate-800 pb-3">
-                                    <div className="w-8 h-8 rounded-full bg-slate-700"></div>
-                                    <div className="h-2 w-20 bg-slate-700 rounded"></div>
-                                </div>
-                                <div className="space-y-2">
-                                    <div className="h-2 w-full bg-slate-800 rounded"></div>
-                                    <div className="h-2 w-2/3 bg-slate-800 rounded"></div>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Step 02 */}
-                        <div className="bg-slate-800/50 p-8 rounded-2xl border border-slate-700 hover:border-green-500/50 transition duration-500 group">
-                            <div className="text-6xl font-black text-slate-800 mb-6 group-hover:text-green-500/20 transition-colors">02</div>
-                            <h3 className="text-2xl font-bold mb-4 text-white group-hover:text-green-400 transition-colors">Discover Opportunities</h3>
-                            <p className="text-slate-400 mb-8 leading-relaxed">
-                                Find your perfect match in the builder ecosystem. Startup listings, gigs, and community pods.
-                            </p>
-                            {/* Mini Mockup */}
-                            <div className="bg-slate-900 rounded-lg p-4 border border-slate-700 opacity-80 group-hover:opacity-100 transition">
-                                <div className="space-y-3">
-                                    <div className="flex justify-between items-center bg-slate-800 p-2 rounded">
-                                        <div className="h-2 w-16 bg-slate-700 rounded"></div>
-                                        <div className="h-2 w-2 bg-green-500 rounded-full"></div>
-                                    </div>
-                                    <div className="flex justify-between items-center bg-slate-800 p-2 rounded">
-                                        <div className="h-2 w-20 bg-slate-700 rounded"></div>
-                                        <div className="h-2 w-2 bg-green-500 rounded-full"></div>
-                                    </div>
-                                    <div className="flex justify-between items-center bg-slate-800 p-2 rounded">
-                                        <div className="h-2 w-12 bg-slate-700 rounded"></div>
-                                        <div className="h-2 w-2 bg-green-500 rounded-full"></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    {/* Squishy Offer Cards */}
+                    <SquishyOffers
+                        offers={[
+                            {
+                                label: "For Founders",
+                                title: "Startups",
+                                description: "Post roles, find co-founders, and build your team",
+                                features: [
+                                    "Post unlimited startup roles",
+                                    "Find technical & non-technical co-founders",
+                                    "Create private Opportunity Circles",
+                                    "Real-time collaboration tools",
+                                    "Applicant matching & insights"
+                                ],
+                                cta: "Explore Startups",
+                                BGComponent: BGComponent1
+                            },
+                            {
+                                label: "For Freelancers",
+                                title: "Colancing",
+                                description: "Offer services, find projects, get paid",
+                                features: [
+                                    "Post freelance projects",
+                                    "Browse skilled professionals",
+                                    "Secure payment processing",
+                                    "Project-based Circles",
+                                    "Portfolio & reputation system"
+                                ],
+                                cta: "Start Colancing",
+                                BGComponent: BGComponent2
+                            },
+                            {
+                                label: "For Communities",
+                                title: "Circles",
+                                description: "Build communities, host events, collaborate",
+                                features: [
+                                    "Create public/private communities",
+                                    "Host virtual & in-person events",
+                                    "Cross-community collaborations",
+                                    "Discussion forums & chat",
+                                    "Community analytics"
+                                ],
+                                cta: "Join Circles",
+                                BGComponent: BGComponent3
+                            }
+                        ]}
+                    />
                 </div>
             </section>
 
-            {/* Values Section */}
-            <section className="py-24 bg-white relative">
-                <div className="container mx-auto px-6">
-                    <div className="text-center max-w-3xl mx-auto mb-16">
-                        <h2 className="text-3xl md:text-5xl font-bold mb-6">Whatever is <span className="text-primary">holding you back</span></h2>
-                        <p className="text-lg text-slate-500">We provide the ecosystem you need to break through barriers.</p>
-                    </div>
-
-                    <div className="grid md:grid-cols-3 gap-8">
-                        {[
-                            { title: "No Real Experience", icon: Briefcase, desc: "Stop building to-do apps. Build real products used by real people." },
-                            { title: "Imposter Syndrome", icon: Zap, desc: "Gain confidence by shipping code and solving hard problems alongside peers." },
-                            { title: "Hard to Get Hired", icon: Users, desc: "Build a portfolio that speaks for itself and get warm intros to founders." }
-                        ].map((item, i) => (
-                            <div key={i} className="bg-slate-50 rounded-2xl p-8 border border-slate-100 hover:border-green-200 hover:bg-white hover:shadow-xl hover:shadow-green-50 transition duration-300 group">
-                                <div className="w-12 h-12 bg-white rounded-xl shadow-sm flex items-center justify-center text-primary mb-6 group-hover:scale-110 transition border border-slate-100">
-                                    <item.icon className="w-6 h-6" />
-                                </div>
-                                <h3 className="text-xl font-bold mb-3 text-slate-900">{item.title}</h3>
-                                <p className="text-slate-600 leading-relaxed">{item.desc}</p>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            </section>
-
-            {/* Partners Section */}
-            <section className="py-24 bg-green-50/50 relative overflow-hidden">
-                <div className="absolute inset-0 z-0 opacity-30"
-                    style={{ backgroundImage: 'radial-gradient(#2f9e44 1px, transparent 1px)', backgroundSize: '24px 24px' }}>
+            {/* Verified Partners Section */}
+            <section className="py-24 bg-white relative overflow-hidden">
+                {/* Subtle background pattern */}
+                <div className="absolute inset-0 z-0 opacity-20"
+                    style={{ backgroundImage: 'radial-gradient(#10b981 1px, transparent 1px)', backgroundSize: '24px 24px' }}>
                 </div>
 
-                <div className="container mx-auto px-6 max-w-5xl relative z-10">
-                    <div className="text-center mb-16">
+                <div className="container mx-auto px-6 relative z-10">
+                    <div className="text-center mb-12">
                         <div className="uppercase tracking-widest text-primary font-bold text-xs mb-2">Verified Partners</div>
-                        <h2 className="text-3xl md:text-5xl font-bold text-slate-900">
+                        <h2 className="text-3xl md:text-5xl font-bold text-slate-900 mb-4">
                             Partnering with <span className="text-primary">India's Top Institutions</span>
                         </h2>
+                        <p className="text-lg text-slate-500 max-w-2xl mx-auto">
+                            Trusted by leading entrepreneurship cells across India's premier institutions
+                        </p>
                     </div>
 
-                    <div className="grid md:grid-cols-2 gap-8">
-                        <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-10 text-center shadow-xl shadow-green-100/50 border border-white hover:border-green-200 transition duration-500 hover:scale-[1.02] group">
-                            <div className="w-24 h-24 bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl mx-auto mb-6 flex items-center justify-center text-primary font-bold text-3xl group-hover:rotate-6 transition duration-500 shadow-inner">
-                                <span className="text-xs font-black tracking-tighter">E-CELL</span>
-                            </div>
-                            <h3 className="text-2xl font-bold mb-3 text-slate-900">E-Cell IIT-BHU</h3>
-                            <p className="text-slate-500 mb-8">Official partnership for student opportunities and innovation.</p>
-                            <div className="inline-flex items-center gap-2 bg-green-100/50 text-primary px-4 py-2 rounded-full text-xs font-bold uppercase tracking-widest border border-green-200">
-                                <Check className="w-3 h-3" /> Verified Partner
-                            </div>
-                        </div>
-                        <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-10 text-center shadow-xl shadow-green-100/50 border border-white hover:border-green-200 transition duration-500 hover:scale-[1.02] group">
-                            <div className="w-24 h-24 bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl mx-auto mb-6 flex items-center justify-center text-primary font-bold text-3xl group-hover:-rotate-6 transition duration-500 shadow-inner">
-                                <span className="text-xs font-black tracking-tighter">E-CELL</span>
-                            </div>
-                            <h3 className="text-2xl font-bold mb-3 text-slate-900">E-Cell IIT-Mandi</h3>
-                            <p className="text-slate-500 mb-8">Official partnership for student opportunities and innovation.</p>
-                            <div className="inline-flex items-center gap-2 bg-green-100/50 text-primary px-4 py-2 rounded-full text-xs font-bold uppercase tracking-widest border border-green-200">
-                                <Check className="w-3 h-3" /> Verified Partner
-                            </div>
-                        </div>
+                    {/* Circular Gallery with IIT Logos */}
+                    <div className="h-[600px] w-full">
+                        <CircularGallery
+                            items={[
+                                { image: "/partners/iit-bhu.png", text: "IIT BHU" },
+                                { image: "/partners/iit-mandi.png", text: "IIT Mandi" },
+                                { image: "/partners/iit-bhilai.png", text: "IIT Bhilai" },
+                                { image: "/partners/iit-bhubaneshwar.png", text: "IIT Bhubaneshwar" }
+                            ]}
+                            bend={3}
+                            borderRadius={0.5}
+                            scrollEase={0.05}
+                            scrollSpeed={2}
+                        />
                     </div>
                 </div>
             </section>
 
-            {/* Ecosystem Section */}
-            <section className="py-24 overflow-hidden relative">
-                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-96 h-96 bg-green-100 rounded-full blur-[120px] -z-10"></div>
-                <div className="container mx-auto px-6 flex flex-col md:flex-row items-center gap-16">
-                    <div className="flex-1 space-y-8">
-                        <div className="uppercase tracking-widest text-primary font-bold text-xs">Ecosystem</div>
-                        <h2 className="text-3xl md:text-5xl font-bold text-slate-900">
-                            Build your startup with <span className="text-primary">world-class talent.</span>
+            {/* Explaining Our Ecosystem Section */}
+            <EcosystemExplainer />
+
+            {/* Plans & Pricing Section */}
+            <section className="py-24 bg-black relative overflow-hidden">
+                <div className="container mx-auto px-6 max-w-6xl mb-16">
+                    <div className="text-center">
+                        <h2 className="text-3xl md:text-5xl font-bold text-white mb-4">
+                            Plans & <span className="text-primary">Pricing</span>
                         </h2>
-                        <div className="space-y-6">
-                            {[
-                                { label: "Technical Founders", desc: "CTOs and Lead Devs ready to build." },
-                                { label: "Growth Marketers", desc: "Experts in acquisition and retention." },
-                                { label: "Product Designers", desc: "UI/UX pros who understand users." }
-                            ].map((item, i) => (
-                                <div key={i} className="flex gap-4 p-4 rounded-xl hover:bg-white hover:shadow-lg hover:shadow-green-50 transition border border-transparent hover:border-green-50 cursor-default">
-                                    <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-primary shrink-0">
-                                        <Check className="w-5 h-5" />
-                                    </div>
-                                    <div>
-                                        <h4 className="font-bold text-slate-900">{item.label}</h4>
-                                        <p className="text-sm text-slate-500">{item.desc}</p>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
                     </div>
-                    <div className="flex-1 relative">
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="space-y-4 mt-8">
-                                <div className="bg-white p-6 rounded-2xl shadow-lg border border-slate-100">
-                                    <div className="w-10 h-10 rounded-full bg-blue-100 mb-4"></div>
-                                    <div className="font-bold text-sm">Full-Stack Dev</div>
-                                    <div className="text-xs text-slate-400">React, Node, Postgres</div>
-                                </div>
-                            </div>
-                            <div className="space-y-4">
-                                <div className="bg-white p-6 rounded-2xl shadow-lg border border-slate-100">
-                                    <div className="w-10 h-10 rounded-full bg-purple-100 mb-4"></div>
-                                    <div className="font-bold text-sm">UX Designer</div>
-                                    <div className="text-xs text-slate-400">Figma, Prototyping</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                </div>
+                <CreativePricing
+                    tag=""
+                    title=""
+                    description=""
+                    tiers={[
+                        {
+                            name: "Free",
+                            icon: <Zap className="w-6 h-6 text-primary" />,
+                            price: "Free",
+                            description: "For exploring and getting started",
+                            color: "green",
+                            features: [
+                                "Unlimited applications to Startups, Colancing projects, and Circles",
+                                "View all public opportunities",
+                                "Join Community Circles (approval required)",
+                                "Participate in Opportunity Circles if accepted",
+                                "Real-time chat and collaboration inside circles"
+                            ],
+                            limits: [
+                                "1 Startup post",
+                                "3 Colancing posts (lifetime)",
+                                "Cannot create Circles"
+                            ],
+                            bestFor: "Individuals exploring EarnBuddy and joining collaborations."
+                        },
+                        {
+                            name: "Creator",
+                            icon: <Star className="w-6 h-6 text-amber-500" />,
+                            price: 29,
+                            description: "For founders & freelancers who want to create",
+                            color: "amber",
+                            popular: true,
+                            features: [
+                                "Everything in Free, plus:",
+                                "Up to 5 active Startup posts",
+                                "Up to 10 active Colancing projects",
+                                "Create 1 Community Circle",
+                                "Request collaborations with other Circles",
+                                "Host small events (up to 50 participants)",
+                                "1 featured opportunity per week",
+                                "Basic applicant insights (skill match score)"
+                            ],
+                            bestFor: "Solo founders, freelancers, and early creators."
+                        },
+                        {
+                            name: "Builder",
+                            icon: <Briefcase className="w-6 h-6 text-blue-500" />,
+                            price: 79,
+                            description: "For serious builders, teams, and agencies",
+                            color: "blue",
+                            features: [
+                                "Everything in Creator, plus:",
+                                "Unlimited Startup & Colancing posts",
+                                "Priority applicant recommendations",
+                                "Advanced applicant insights (portfolio, history, match %, badges)",
+                                "Create up to 5 Community Circles",
+                                "Initiate Circle collaborations",
+                                "Host large community events",
+                                "Custom roles inside Opportunity Circles",
+                                "Team analytics dashboard"
+                            ],
+                            bestFor: "Growing startups, agencies, and active community leaders."
+                        },
+                        {
+                            name: "Organization",
+                            icon: <Globe className="w-6 h-6 text-purple-500" />,
+                            price: 199,
+                            description: "For large teams, incubators, and institutions",
+                            color: "purple",
+                            features: [
+                                "Everything in Builder, plus:",
+                                "Unlimited posts and Circles",
+                                "Branded opportunities and events",
+                                "Recruiter & admin access for teams",
+                                "Multi-circle events (500+ participants)",
+                                "Workflow automation (auto‑shortlisting)",
+                                "Organization-wide analytics",
+                                "Internal/private Circles",
+                                "Talent pools",
+                                "Dedicated support & early feature access"
+                            ],
+                            bestFor: "Accelerators, incubators, enterprises, universities."
+                        }
+                    ]}
+                />
+            </section>
+
+            {/* Stories from our Community - Stagger Testimonials */}
+            <section className="py-24 bg-black">
+                <div className="container mx-auto px-6 max-w-6xl">
+                    <h2 className="text-3xl md:text-5xl font-bold mb-16 text-center text-white">
+                        Stories from our <span className="text-primary">community</span>
+                    </h2>
+                    <StaggerTestimonials />
                 </div>
             </section>
 
             {/* FAQ Section */}
             <Faq5 />
 
-            {/* Institutional Testimonials */}
-            <section className="py-24 bg-white border-t border-slate-100">
-                <div className="container mx-auto px-6 max-w-6xl">
-                    <h2 className="text-3xl font-bold mb-16 text-center">What our <span className="text-primary">institutional partners</span> say</h2>
-
-                    <div className="grid md:grid-cols-2 gap-8">
-                        <div className="bg-slate-50 p-10 rounded-3xl relative">
-                            <div className="absolute top-8 right-8 text-green-200">
-                                <Star className="w-8 h-8 fill-current" />
-                            </div>
-                            <p className="text-slate-700 italic leading-relaxed mb-8 relative z-10">
-                                "EarnBuddy is the kind of platform every startup ecosystem needs today. It connects ambitious campus talent with budding startups..."
-                            </p>
-                            <div className="flex items-center gap-4">
-                                <div className="w-12 h-12 bg-slate-200 rounded-full bg-[url('https://i.pravatar.cc/100?img=11')] bg-cover"></div>
-                                <div>
-                                    <div className="font-bold text-slate-900">Gourav Pandey</div>
-                                    <div className="text-xs text-primary font-bold uppercase">Startup Assistance Head, E-Cell IIT BHU</div>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="bg-slate-50 p-10 rounded-3xl relative">
-                            <div className="absolute top-8 right-8 text-green-200">
-                                <Star className="w-8 h-8 fill-current" />
-                            </div>
-                            <p className="text-slate-700 italic leading-relaxed mb-8 relative z-10">
-                                "EarnBuddy has been instrumental in strengthening the founder-developer ecosystem. By connecting builders, founders, and innovators..."
-                            </p>
-                            <div className="flex items-center gap-4">
-                                <div className="w-12 h-12 bg-slate-200 rounded-full bg-[url('https://i.pravatar.cc/100?img=33')] bg-cover"></div>
-                                <div>
-                                    <div className="font-bold text-slate-900">Oppilan Iniyan</div>
-                                    <div className="text-xs text-primary font-bold uppercase">Startup Assistance Head, E-Cell IIT BHU</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            {/* Community Testimonials Section */}
-            <section className="py-24 bg-slate-50">
-                <div className="container mx-auto px-6 max-w-6xl">
-                    <h2 className="text-3xl font-bold mb-16 text-center">Stories from our <span className="text-primary">community</span></h2>
-
-                    <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-                        {testimonials.map((t) => (
-                            <div key={t.id} className="bg-white p-6 rounded-2xl shadow-sm hover:shadow-md transition border border-slate-100 flex flex-col h-full">
-                                <div className="flex items-center gap-3 mb-4">
-                                    <div className="w-12 h-12 rounded-full overflow-hidden shrink-0 border border-slate-100">
-                                        <Image
-                                            src={t.avatar}
-                                            alt={t.name}
-                                            width={48}
-                                            height={48}
-                                            className="object-cover w-full h-full"
-                                        />
-                                    </div>
-                                    <div>
-                                        <h4 className="font-bold text-slate-900 text-sm">{t.name}</h4>
-                                        <span className="text-xs text-primary font-semibold block">{t.company}</span>
-                                    </div>
-                                </div>
-                                <div className="mb-4 flex">
-                                    {[...Array(t.rating)].map((_, i) => (
-                                        <Star key={i} className="w-3 h-3 text-yellow-400 fill-current" />
-                                    ))}
-                                </div>
-                                <p className="text-slate-600 text-sm leading-relaxed mb-4 flex-grow italic">
-                                    "{t.content}"
-                                </p>
-                                <div className="text-xs text-slate-400 uppercase font-bold tracking-wider mt-auto pt-4 border-t border-slate-50">
-                                    {t.role}
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            </section>
+            {/* White Separator */}
+            <div className="border-t-4 border-white"></div>
 
             {/* Footer - Green Background, White Text, Increased Spacing */}
-            <footer className="bg-primary text-white py-24 border-t border-green-600">
+            <footer className="bg-primary text-white py-24">
                 <div className="container mx-auto px-6 max-w-6xl">
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-20 mb-20">
                         <div>
