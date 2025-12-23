@@ -132,16 +132,7 @@ export const notificationAPI = {
 };
 
 export const uploadAPI = {
-  uploadFile: async (file: File) => {
-    const form = new FormData();
-    form.append('file', file);
-    // Ensure backend has /upload route if needed, or implement separately
-    // For now, removing or keeping as is if backend supported it. 
-    // The current backend plan didn't include general upload, but we can add it later.
-    // returning generic error for now to avoid confusion or mocking it.
-    console.warn("Upload API not fully implemented in backend yet");
-    return { url: "https://via.placeholder.com/150" };
-  }
+  getSignature: (folder: string) => api.post('/upload/signature', { folder }),
 };
 
 export default api;

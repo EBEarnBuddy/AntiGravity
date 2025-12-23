@@ -50,6 +50,7 @@ import collabRoutes from './routes/collabRoutes';
 import eventRoutes from './routes/eventRoutes';
 import notificationRoutes from './routes/notificationRoutes';
 import collaborationRoutes from './routes/collaborationRoutes';
+import uploadRoutes from './routes/uploadRoutes';
 
 // Routes Configuration
 const apiRoutes = [
@@ -60,7 +61,8 @@ const apiRoutes = [
     { path: '/notifications', router: notificationRoutes },
     { path: '/collaborations', router: collaborationRoutes },
     { path: '/collab', router: collabRoutes },
-    { path: '/events', router: eventRoutes }
+    { path: '/events', router: eventRoutes },
+    { path: '/upload', router: uploadRoutes }
 ];
 
 // Mount all routes at both /api/v1/ and root level /

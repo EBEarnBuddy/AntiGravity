@@ -23,6 +23,7 @@ import {
 import { useAuth } from '../contexts/AuthContext';
 import { useStartups } from '../hooks/useFirestore';
 import { FirestoreService } from '../lib/firestore';
+import { uploadImage } from '../lib/cloudinary';
 
 interface CreateStartupModalProps {
   isOpen: boolean;
@@ -209,7 +210,7 @@ const CreateStartupModal: React.FC<CreateStartupModalProps> = ({ isOpen, onClose
       let imageUrl = '';
       if (formData.file) {
         try {
-          imageUrl = await FirestoreService.uploadStartupLogo(formData.file);
+          imageUrl = await uploadImage(formData.file, 'earnbuddy/startups');
         } catch (uploadError) {
           console.error("Failed to upload image, proceeding without it", uploadError);
         }

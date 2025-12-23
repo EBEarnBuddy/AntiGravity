@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Users, Lock, Globe, Hash, Zap, Heart, Code, Briefcase, Palette } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useRooms } from '../hooks/useFirestore';
+import { uploadImage } from '../lib/cloudinary';
 
 interface CreateCircleModalProps {
     isOpen: boolean;
@@ -18,6 +19,7 @@ const CreateCircleModal: React.FC<CreateCircleModalProps> = ({ isOpen, onClose, 
         name: '',
         description: '',
         avatar: '',
+        file: null as File | null,
         isPrivate: false,
         icon: 'users'
     });
@@ -38,7 +40,8 @@ const CreateCircleModal: React.FC<CreateCircleModalProps> = ({ isOpen, onClose, 
             reader.onloadend = () => {
                 setFormData((prev: any) => ({
                     ...prev,
-                    avatar: reader.result as string
+                    avatar: reader.result as string,
+                    file: file
                 }));
             };
             reader.readAsDataURL(file);
@@ -51,16 +54,26 @@ const CreateCircleModal: React.FC<CreateCircleModalProps> = ({ isOpen, onClose, 
 
         try {
             setIsSubmitting(true);
+
+            let avatarUrl = formData.avatar;
+            if (formData.file) {
+                try {
+                    avatarUrl = await uploadImage(formData.file, 'earnbuddy/circles');
+                } catch (error) {
+                    console.error('Failed to upload avatar:', error);
+                }
+            }
+
             await createRoom({
                 name: formData.name,
                 description: formData.description,
                 isPrivate: formData.isPrivate,
                 icon: formData.icon,
-                avatar: formData.avatar
+                avatar: avatarUrl
             });
             onSuccess();
             onClose();
-            setFormData({ name: '', description: '', isPrivate: false, icon: 'users', avatar: '' });
+            setFormData({ name: '', description: '', isPrivate: false, icon: 'users', avatar: '', file: null });
         } catch (error) {
             console.error('Failed to create circle:', error);
         } finally {

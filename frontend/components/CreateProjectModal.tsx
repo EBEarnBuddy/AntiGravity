@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useProjects } from '../hooks/useFirestore';
+import { uploadImage } from '../lib/cloudinary';
 
 interface Role {
   title: string;
@@ -50,6 +51,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose
   const [formData, setFormData] = useState({
     title: '',
     image: '',
+    file: null as File | null,
     description: '',
     company: '',
     industry: '',
@@ -145,7 +147,8 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose
       reader.onloadend = () => {
         setFormData((prev: any) => ({
           ...prev,
-          image: reader.result as string
+          image: reader.result as string,
+          file: file
         }));
       };
       reader.readAsDataURL(file);
@@ -276,9 +279,18 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose
 
     setIsSubmitting(true);
     try {
+      let imageUrl = formData.image;
+      if (formData.file) {
+        try {
+          imageUrl = await uploadImage(formData.file, 'earnbuddy/colancing');
+        } catch (error) {
+          console.error('Failed to upload image:', error);
+        }
+      }
+
       const projectPayload = {
         title: formData.title,
-        image: formData.image,
+        image: imageUrl,
         description: formData.description,
         company: formData.company,
         industry: formData.industry,
@@ -305,6 +317,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose
       setFormData({
         title: '',
         image: '',
+        file: null,
         description: '',
         company: '',
         industry: '',
