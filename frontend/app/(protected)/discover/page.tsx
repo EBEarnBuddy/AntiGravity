@@ -104,7 +104,8 @@ export default function DiscoverPage() {
                             <input
                                 type="text"
                                 placeholder="Search opportunities, circles..."
-                                className="w-full pl-10 pr-10 py-2.5 bg-slate-50 border-none rounded-xl text-slate-900 font-medium focus:ring-2 focus:ring-green-500/20 outline-none transition-all"
+                                placeholder="Search opportunities, circles..."
+                                className="w-full pl-10 pr-10 py-2.5 bg-white border-2 border-slate-900 text-slate-900 font-bold placeholder:text-slate-500 focus:outline-none shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] focus:translate-x-[2px] focus:translate-y-[2px] focus:shadow-none transition-all"
                             />
                             <button
                                 onClick={() => setShowAdvancedSearch(true)}
@@ -128,14 +129,14 @@ export default function DiscoverPage() {
                             {quickActions.map((action, idx) => (
                                 <motion.div
                                     key={idx}
-                                    whileHover={{ y: -4 }}
-                                    className="bg-white p-4 rounded-xl border border-slate-100 shadow-sm hover:shadow-md transition-all cursor-pointer group"
+                                    whileHover={{ y: -2, x: -2 }}
+                                    className="bg-white p-4 border-2 border-slate-900 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] hover:shadow-[6px_6px_0px_0px_rgba(15,23,42,1)] transition-all cursor-pointer group"
                                     onClick={() => action.path.startsWith('#') ? {} : router.push(action.path)}
                                 >
-                                    <div className={`${action.color} w-10 h-10 rounded-lg flex items-center justify-center mb-3 text-white shadow-sm group-hover:scale-110 transition-transform`}>
+                                    <div className={`${action.color} w-10 h-10 border-2 border-slate-900 flex items-center justify-center mb-3 text-white shadow-sm group-hover:scale-110 transition-transform`}>
                                         <action.icon className="w-5 h-5" />
                                     </div>
-                                    <h3 className="font-bold text-slate-900">{action.title}</h3>
+                                    <h3 className="font-black text-slate-900 uppercase tracking-tight text-sm">{action.title}</h3>
                                 </motion.div>
                             ))}
                         </section>
@@ -149,7 +150,7 @@ export default function DiscoverPage() {
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 {/* My Applications Card */}
-                                <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm h-full">
+                                <div className="bg-white p-6 border-2 border-slate-900 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] h-full">
                                     <div className="flex items-center justify-between mb-4">
                                         <h3 className="font-bold text-slate-900 flex items-center gap-2">
                                             <Briefcase className="w-4 h-4 text-blue-500" />
@@ -165,8 +166,8 @@ export default function DiscoverPage() {
                                             [1, 2].map(i => <Skeleton key={i} className="h-16 w-full rounded-xl" />)
                                         ) : myApplications.length > 0 ? (
                                             myApplications.map((app: any) => (
-                                                <div key={app._id} className="group flex items-start gap-4 p-3 rounded-xl hover:bg-slate-50 transition-colors border border-transparent hover:border-slate-100">
-                                                    <div className="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center flex-shrink-0">
+                                                <div key={app._id} className="group flex items-start gap-4 p-3 hover:bg-slate-50 transition-colors border-2 border-transparent hover:border-slate-900">
+                                                    <div className="w-10 h-10 bg-white border-2 border-slate-900 flex items-center justify-center flex-shrink-0 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)]">
                                                         <Briefcase className="w-5 h-5 text-slate-400" />
                                                     </div>
                                                     <div className="flex-1 min-w-0">
@@ -189,7 +190,7 @@ export default function DiscoverPage() {
                                 </div>
 
                                 {/* Bookmarks Card */}
-                                <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm h-full">
+                                <div className="bg-white p-6 border-2 border-slate-900 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] h-full">
                                     <div className="flex items-center justify-between mb-4">
                                         <h3 className="font-bold text-slate-900 flex items-center gap-2">
                                             <Bookmark className="w-4 h-4 text-purple-500" />
@@ -203,10 +204,10 @@ export default function DiscoverPage() {
                                     <div className="space-y-4 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar md:h-[calc(100%-3rem)]">
                                         {bookmarkedOpportunities.length > 0 ? (
                                             bookmarkedOpportunities.map((item: any) => (
-                                                <div key={item.id} className="group flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 transition-colors border border-transparent hover:border-slate-100 cursor-pointer"
+                                                <div key={item.id} className="group flex items-center justify-between p-3 hover:bg-slate-50 transition-colors border-2 border-transparent hover:border-slate-900 cursor-pointer"
                                                     onClick={() => router.push(item.type === 'startup' ? `/startups` : `/freelance`)}>
                                                     <div className="flex items-center gap-3 overflow-hidden">
-                                                        <div className="w-8 h-8 rounded bg-slate-100 flex-shrink-0"
+                                                        <div className="w-8 h-8 bg-slate-100 flex-shrink-0 border-2 border-slate-900"
                                                             style={{ backgroundImage: `url(${item.logo || item.companyLogo})`, backgroundSize: 'cover' }} />
                                                         <div className="min-w-0">
                                                             <h4 className="font-bold text-slate-900 text-sm truncate">{item.name || item.title}</h4>
@@ -245,12 +246,12 @@ export default function DiscoverPage() {
                                             initial={{ opacity: 0, y: 10 }}
                                             whileInView={{ opacity: 1, y: 0 }}
                                             viewport={{ once: true }}
-                                            className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all cursor-pointer group"
+                                            className="bg-white p-6 border-2 border-slate-900 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] hover:shadow-[6px_6px_0px_0px_rgba(15,23,42,1)] hover:-translate-y-1 transition-all cursor-pointer group"
                                             onClick={() => router.push(item.type === 'startup' ? `/startups` : `/freelance`)}
                                         >
                                             <div className="flex justify-between items-start gap-4">
                                                 <div className="flex gap-4">
-                                                    <div className="w-12 h-12 rounded-xl bg-slate-100 border border-slate-200 overflow-hidden flex-shrink-0">
+                                                    <div className="w-12 h-12 bg-white border-2 border-slate-900 shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] overflow-hidden flex-shrink-0">
                                                         {item.logo || item.companyLogo ? (
                                                             <img src={item.logo || item.companyLogo} alt="" className="w-full h-full object-cover" />
                                                         ) : (
@@ -262,16 +263,16 @@ export default function DiscoverPage() {
                                                             {item.name || item.title}
                                                         </h3>
                                                         <p className="text-slate-600 text-sm line-clamp-1 mb-2">{item.description}</p>
-                                                        <div className="flex flex-wrap gap-2 text-xs font-semibold">
-                                                            <span className="px-2 py-1 bg-slate-100 text-slate-600 rounded-md">
+                                                        <div className="flex flex-wrap gap-2 text-xs font-bold uppercase tracking-wide">
+                                                            <span className="px-2 py-1 bg-white border border-slate-900 text-slate-900">
                                                                 {item.industry || item.category || 'Tech'}
                                                             </span>
                                                             {item.location && (
-                                                                <span className="px-2 py-1 bg-slate-100 text-slate-600 rounded-md">
+                                                                <span className="px-2 py-1 bg-white border border-slate-900 text-slate-900">
                                                                     {item.location}
                                                                 </span>
                                                             )}
-                                                            <span className="px-2 py-1 bg-green-50 text-green-700 rounded-md">
+                                                            <span className="px-2 py-1 bg-green-600 text-white border border-slate-900">
                                                                 {item.salary || item.funding || 'Funded'}
                                                             </span>
                                                         </div>
@@ -292,7 +293,7 @@ export default function DiscoverPage() {
                     <div className="lg:col-span-4 space-y-8">
 
                         {/* Upcoming Events */}
-                        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 sticky top-24">
+                        <div className="bg-white border-2 border-slate-900 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] p-6 sticky top-24">
                             <h3 className="font-bold text-slate-900 text-lg mb-6 flex items-center gap-2">
                                 <Calendar className="w-5 h-5 text-green-600" />
                                 Upcoming Events
@@ -300,7 +301,7 @@ export default function DiscoverPage() {
 
                             <div className="space-y-6 relative">
                                 {/* Vertical Line */}
-                                <div className="absolute left-2.5 top-2 bottom-2 w-0.5 bg-slate-100 rounded-full"></div>
+                                <div className="absolute left-2.5 top-2 bottom-2 w-0.5 bg-slate-200"></div>
 
                                 {eventsLoading ? (
                                     [1, 2].map(i => <div key={i} className="pl-8"><Skeleton className="h-16 w-full" /></div>)
@@ -308,7 +309,7 @@ export default function DiscoverPage() {
                                     events.map((event, i) => (
                                         <div key={i} className="relative pl-8 group cursor-pointer">
                                             {/* Dot */}
-                                            <div className="absolute left-0 top-1.5 w-5 h-5 rounded-full border-4 border-white bg-green-500 shadow-sm z-10 group-hover:scale-110 transition-transform"></div>
+                                            <div className="absolute left-0 top-1.5 w-5 h-5 border-2 border-slate-900 bg-green-500 shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] z-10 group-hover:scale-110 transition-transform"></div>
 
                                             <h4 className="font-bold text-slate-900 group-hover:text-green-600 transition-colors">
                                                 {event.name}
@@ -332,13 +333,13 @@ export default function DiscoverPage() {
                                 )}
                             </div>
 
-                            <button className="w-full mt-6 py-2.5 text-sm font-bold text-slate-600 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors">
+                            <button className="w-full mt-6 py-2.5 text-sm font-bold uppercase tracking-wide text-slate-900 bg-white border-2 border-slate-900 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all">
                                 View Calendar
                             </button>
                         </div>
 
                         {/* Trending Circles (Simple List) */}
-                        <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-2xl shadow-xl p-6 text-white relative overflow-hidden">
+                        <div className="bg-slate-900 border-2 border-slate-900 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] p-6 text-white relative overflow-hidden">
                             <div className="absolute top-0 right-0 w-32 h-32 bg-green-500 opacity-20 blur-3xl rounded-full transform translate-x-10 -translate-y-10"></div>
 
                             <h3 className="font-bold text-lg mb-4 relative z-10">Trendsetters</h3>

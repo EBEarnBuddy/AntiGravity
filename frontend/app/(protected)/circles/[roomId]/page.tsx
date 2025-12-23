@@ -353,7 +353,7 @@ const RoomChatPage: React.FC = () => {
                                 {/* Avatar (Receiver Only) */}
                                 {!isMe && (
                                     <div className="flex-shrink-0 order-1">
-                                        <div className="h-8 w-8 rounded-full border border-slate-200 overflow-hidden bg-white">
+                                        <div className="h-8 w-8 rounded-full border-2 border-slate-900 overflow-hidden bg-white shadow-[2px_2px_0px_0px_rgba(15,23,42,1)]">
                                             {senderPhoto ? (
                                                 <img src={senderPhoto} alt={senderName} className="w-full h-full object-cover" />
                                             ) : (
@@ -377,9 +377,9 @@ const RoomChatPage: React.FC = () => {
 
                                     {/* Bubble */}
                                     <div
-                                        className={`px-4 py-2 rounded-2xl text-sm font-medium leading-relaxed shadow-sm relative group ${isMe
-                                            ? 'bg-green-600 text-white rounded-br-none'
-                                            : 'bg-white text-slate-900 border border-slate-200 rounded-bl-none'
+                                        className={`px-4 py-2 font-bold leading-relaxed shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] border-2 border-slate-900 relative group ${isMe
+                                            ? 'bg-green-600 text-white'
+                                            : 'bg-white text-slate-900'
                                             }`}
                                     >
                                         {msg.content}
