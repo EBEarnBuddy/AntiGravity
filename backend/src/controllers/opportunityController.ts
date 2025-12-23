@@ -41,6 +41,7 @@ export const createOpportunity = async (req: AuthRequest, res: Response) => {
             room: room._id,
             user: user._id,
             role: 'admin',
+            status: 'accepted',
         });
 
         const opportunity = new Opportunity({

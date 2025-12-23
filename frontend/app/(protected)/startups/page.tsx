@@ -12,9 +12,14 @@ import {
     ChevronLeft,
     Users,
     CheckCircle,
-    UserCircle
+    CheckCircle,
+    UserCircle,
+    MoreVertical,
+    Edit2,
+    Trash2,
+    XCircle as CloseIcon,
+    Link as LinkIcon
 } from 'lucide-react';
-import { useAuth } from '@/contexts/AuthContext';
 import { useStartups, useMyApplications, useBookmarks } from '@/hooks/useFirestore';
 import { Skeleton } from '@/components/ui/skeleton';
 import { formatTimeAgo } from '@/lib/utils';
@@ -30,7 +35,10 @@ const StartupsPage: React.FC = () => {
     // Initialize tab from URL or default to 'discover'
     const initialTab = (searchParams.get('tab') as 'discover' | 'posted' | 'applied') || 'discover';
 
-    const { startups, loading: startupsLoading } = useStartups(); // removed bookmarkStartup
+    const initialTab = (searchParams.get('tab') as 'discover' | 'posted' | 'applied') || 'discover';
+
+    // Add delete/update hooks
+    const { startups, loading: startupsLoading, deleteStartup, updateStartupStatus } = useStartups();
     const { applications, loading: appsLoading } = useMyApplications();
     const { toggleBookmark, isBookmarked } = useBookmarks();
     const [searchTerm, setSearchTerm] = useState('');
@@ -55,6 +63,7 @@ const StartupsPage: React.FC = () => {
     const [showApplicationModal, setShowApplicationModal] = useState(false);
     const [showApplicantsModal, setShowApplicantsModal] = useState(false);
     const [selectedStartup, setSelectedStartup] = useState<any>(null);
+    const [actionMenuOpen, setActionMenuOpen] = useState<string | null>(null);
 
     // Derived Data
     const myPostedStartups = startups.filter(s => (typeof s.postedBy === 'object' && s.postedBy !== null && s.postedBy.firebaseUid === currentUser?.uid) || (s as any).founderId === currentUser?.uid);
@@ -92,6 +101,26 @@ const StartupsPage: React.FC = () => {
             return oppId === startupId;
         });
         return app?.status;
+    };
+
+    const handleCopyLink = (id: string) => {
+        navigator.clipboard.writeText(`${window.location.origin}/startups/${id}`);
+        alert('Link copied to clipboard!');
+        setActionMenuOpen(null);
+    };
+
+    const handleDelete = async (id: string) => {
+        if (confirm('Are you sure you want to delete this opportunity? This cannot be undone.')) {
+            await deleteStartup(id);
+            setActionMenuOpen(null);
+        }
+    };
+
+    const handleCloseOpportunity = async (id: string) => {
+        if (confirm('Stop accepting new applications?')) {
+            await updateStartupStatus(id, 'closed');
+            setActionMenuOpen(null);
+        }
     };
 
     return (
@@ -244,6 +273,56 @@ const StartupsPage: React.FC = () => {
                                                 >
                                                     <Bookmark className={`w-4 h-4 ${isBookmarked(startup.id || startup._id) ? 'fill-current text-green-600' : 'text-slate-400 hover:text-green-600'}`} />
                                                 </button>
+                                                {isOwner && (
+                                                    <div className="relative">
+                                                        <button
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                setActionMenuOpen(actionMenuOpen === (startup.id || startup._id) ? null : (startup.id || startup._id));
+                                                            }}
+                                                            className="p-1 hover:bg-slate-100 rounded-lg transition-colors"
+                                                        >
+                                                            <MoreVertical className="w-4 h-4 text-slate-500" />
+                                                        </button>
+
+                                                        <AnimatePresence>
+                                                            {actionMenuOpen === (startup.id || startup._id) && (
+                                                                <motion.div
+                                                                    initial={{ opacity: 0, scale: 0.95, y: 5 }}
+                                                                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                                                                    exit={{ opacity: 0, scale: 0.95, y: 5 }}
+                                                                    className="absolute right-0 top-full mt-1 w-48 bg-white rounded-xl shadow-xl border border-slate-100 z-10 overflow-hidden"
+                                                                >
+                                                                    <button
+                                                                        onClick={(e) => { e.stopPropagation(); /* TODO: Open Edit Modal */ setActionMenuOpen(null); alert('Edit flow to be implemented'); }}
+                                                                        className="w-full text-left px-4 py-3 text-sm font-bold text-slate-700 hover:bg-slate-50 flex items-center gap-2"
+                                                                    >
+                                                                        <Edit2 className="w-4 h-4" /> Edit Opportunity
+                                                                    </button>
+                                                                    <button
+                                                                        onClick={(e) => { e.stopPropagation(); handleCloseOpportunity(startup.id || startup._id); }}
+                                                                        className="w-full text-left px-4 py-3 text-sm font-bold text-slate-700 hover:bg-slate-50 flex items-center gap-2"
+                                                                    >
+                                                                        <CloseIcon className="w-4 h-4" /> Close Applications
+                                                                    </button>
+                                                                    <button
+                                                                        onClick={(e) => { e.stopPropagation(); handleCopyLink(startup.id || startup._id); }}
+                                                                        className="w-full text-left px-4 py-3 text-sm font-bold text-slate-700 hover:bg-slate-50 flex items-center gap-2"
+                                                                    >
+                                                                        <LinkIcon className="w-4 h-4" /> Share Link
+                                                                    </button>
+                                                                    <div className="h-px bg-slate-100 my-1" />
+                                                                    <button
+                                                                        onClick={(e) => { e.stopPropagation(); handleDelete(startup.id || startup._id); }}
+                                                                        className="w-full text-left px-4 py-3 text-sm font-bold text-red-600 hover:bg-red-50 flex items-center gap-2"
+                                                                    >
+                                                                        <Trash2 className="w-4 h-4" /> Delete
+                                                                    </button>
+                                                                </motion.div>
+                                                            )}
+                                                        </AnimatePresence>
+                                                    </div>
+                                                )}
                                             </div>
                                         </div>
 

@@ -107,12 +107,12 @@ const ApplicantsModal: React.FC<ApplicantsModalProps> = ({ isOpen, onClose, star
                                         <div className="flex-1">
                                             <div className="flex items-center gap-3 mb-2">
                                                 <img
-                                                    src={app.applicantId?.photoURL || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&q=80"}
+                                                    src={(app.applicant as any)?.photoURL || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&q=80"}
                                                     alt="Applicant"
                                                     className="w-10 h-10 rounded-full object-cover border border-slate-200"
                                                 />
                                                 <div>
-                                                    <h3 className="font-bold text-slate-900 leading-tight">{app.applicantId?.displayName || 'Anonymous User'}</h3>
+                                                    <h3 className="font-bold text-slate-900 leading-tight">{(app.applicant as any)?.displayName || 'Anonymous User'}</h3>
                                                     <p className="text-xs text-slate-500 font-bold uppercase tracking-wide">Applied {new Date(app.createdAt).toLocaleDateString()}</p>
                                                 </div>
                                             </div>
@@ -134,22 +134,35 @@ const ApplicantsModal: React.FC<ApplicantsModalProps> = ({ isOpen, onClose, star
                                         </div>
 
                                         {/* Actions */}
-                                        {app.status === 'pending' && (
-                                            <div className="flex sm:flex-col gap-2 justify-center border-t sm:border-t-0 sm:border-l border-slate-100 pt-4 sm:pt-0 sm:pl-4 mt-2 sm:mt-0">
-                                                <button
-                                                    onClick={() => handleAction(app._id || app.id, 'accepted')}
-                                                    className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-green-600 text-white text-sm font-bold rounded-lg hover:bg-green-700 transition"
-                                                >
-                                                    <Check className="w-4 h-4" /> Accept
-                                                </button>
-                                                <button
-                                                    onClick={() => handleAction(app._id || app.id, 'rejected')}
-                                                    className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-white border-2 border-slate-200 text-slate-600 text-sm font-bold rounded-lg hover:bg-slate-50 hover:text-red-500 hover:border-red-200 transition"
-                                                >
-                                                    <XCircle className="w-4 h-4" /> Reject
-                                                </button>
-                                            </div>
-                                        )}
+                                        <div className="flex sm:flex-col gap-2 justify-center border-t sm:border-t-0 sm:border-l border-slate-100 pt-4 sm:pt-0 sm:pl-4 mt-2 sm:mt-0 min-w-[120px]">
+                                            {app.status === 'pending' ? (
+                                                <>
+                                                    <button
+                                                        onClick={() => handleAction(app._id || app.id, 'accepted')}
+                                                        className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-green-600 text-white text-sm font-bold rounded-lg hover:bg-green-700 transition"
+                                                    >
+                                                        <Check className="w-4 h-4" /> Accept
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleAction(app._id || app.id, 'rejected')}
+                                                        className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-white border-2 border-slate-200 text-slate-600 text-sm font-bold rounded-lg hover:bg-slate-50 hover:text-red-500 hover:border-red-200 transition"
+                                                    >
+                                                        <XCircle className="w-4 h-4" /> Reject
+                                                    </button>
+                                                </>
+                                            ) : (
+                                                <div className="w-full py-2 text-center text-xs font-bold text-slate-400 uppercase">
+                                                    Processing Complete
+                                                </div>
+                                            )}
+
+                                            <button
+                                                onClick={() => alert('User reported to admins.')}
+                                                className="w-full flex items-center justify-center gap-2 px-4 py-2 text-xs font-bold text-slate-400 hover:text-red-500 transition mt-auto"
+                                            >
+                                                Report User
+                                            </button>
+                                        </div>
                                     </div>
                                 ))}
                             </div>

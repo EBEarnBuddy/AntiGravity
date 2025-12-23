@@ -223,6 +223,7 @@ export const updateApplicationStatus = async (req: AuthRequest, res: Response) =
                         room: roomId,
                         user: applicant._id,
                         role: 'member',
+                        status: 'accepted',
                     });
 
                     await Room.findByIdAndUpdate(roomId, { $inc: { membersCount: 1 } });
