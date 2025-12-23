@@ -115,6 +115,7 @@ export const messageAPI = {
   send: (roomId: string, content: string, type: 'text' | 'image' = 'text') =>
     api.post(`/rooms/${roomId}/messages`, { content, type }),
   getAll: (roomId: string) => api.get(`/rooms/${roomId}/messages`),
+  markAsRead: (roomId: string) => api.post(`/rooms/${roomId}/messages/read`),
 };
 
 export const communityPostsAPI = {

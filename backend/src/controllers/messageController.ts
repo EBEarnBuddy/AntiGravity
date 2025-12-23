@@ -21,8 +21,16 @@ export const sendMessage = async (req: AuthRequest, res: Response) => {
         }
 
         // Check membership
+        const roomDoc = await Room.findById(roomId);
+        if (!roomDoc) {
+            res.status(404).json({ error: 'Room not found' });
+            return;
+        }
+
+        const isCreator = roomDoc.createdBy.equals(user._id);
         const isMember = await RoomMembership.exists({ room: roomId, user: user._id });
-        if (!isMember) {
+
+        if (!isMember && !isCreator) {
             res.status(403).json({ error: 'Not a member of this room' });
             return;
         }
@@ -90,8 +98,16 @@ export const getMessages = async (req: AuthRequest, res: Response) => {
             return;
         }
 
+        const roomDoc = await Room.findById(roomId);
+        if (!roomDoc) {
+            res.status(404).json({ error: 'Room not found' });
+            return;
+        }
+
+        const isCreator = roomDoc.createdBy.equals(user._id);
         const isMember = await RoomMembership.exists({ room: roomId, user: user._id });
-        if (!isMember) {
+
+        if (!isMember && !isCreator) {
             res.status(403).json({ error: 'Not authorized to view messages in this room' });
             return;
         }
@@ -104,5 +120,61 @@ export const getMessages = async (req: AuthRequest, res: Response) => {
         res.json(messages);
     } catch (error) {
         res.status(500).json({ error: 'Fetch failed' });
+    }
+};
+
+// Mark all messages in a room as read
+export const markRoomAsRead = async (req: AuthRequest, res: Response) => {
+    try {
+        const { uid } = req.user!;
+        const { roomId } = req.params;
+
+        const user = await User.findOne({ firebaseUid: uid });
+        if (!user) {
+            res.status(404).json({ error: 'User not found' });
+            return;
+        }
+
+        // Validate membership or ownership
+        const roomDoc = await Room.findById(roomId);
+        if (!roomDoc) {
+            res.status(404).json({ error: 'Room not found' });
+            return;
+        }
+        const isCreator = roomDoc.createdBy.equals(user._id);
+        const isMember = await RoomMembership.exists({ room: roomId, user: user._id });
+        if (!isMember && !isCreator) {
+            res.status(403).json({ error: 'Not authorized' });
+            return;
+        }
+
+        const now = new Date();
+
+        // Update messages where user is NOT in readBy
+        await Message.updateMany(
+            { room: roomId, 'readBy.user': { $ne: user._id } },
+            {
+                $addToSet: {
+                    readBy: { user: user._id, readAt: now }
+                }
+            }
+        );
+
+        // Emit event
+        try {
+            const io = getIO();
+            io.to(roomId).emit('messages_read', {
+                roomId,
+                userId: uid,
+                readAt: now
+            });
+        } catch (e) {
+            console.error('Socket emit failed:', e);
+        }
+
+        res.status(200).json({ success: true });
+    } catch (error) {
+        console.error("markRoomAsRead error:", error);
+        res.status(500).json({ error: 'Failed to mark as read' });
     }
 };

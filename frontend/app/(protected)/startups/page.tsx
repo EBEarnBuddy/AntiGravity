@@ -17,6 +17,7 @@ import {
 import { useAuth } from '@/contexts/AuthContext';
 import { useStartups, useMyApplications, useBookmarks } from '@/hooks/useFirestore';
 import { Skeleton } from '@/components/ui/skeleton';
+import { formatTimeAgo } from '@/lib/utils';
 import CreateStartupModal from '@/components/CreateStartupModal';
 import StartupApplicationModal from '@/components/StartupApplicationModal';
 import ApplicantsModal from '@/components/ApplicantsModal';
@@ -213,9 +214,15 @@ const StartupsPage: React.FC = () => {
                                                 <h3 className="text-lg font-black text-slate-900 leading-tight group-hover:text-green-600 transition-colors line-clamp-1">
                                                     {startup.name || startup.title}
                                                 </h3>
-                                                <p className="text-[10px] text-slate-500 font-bold">
-                                                    {startup.location || 'Remote'}
-                                                </p>
+                                                <div className="flex items-center gap-2 mt-1">
+                                                    <p className="text-[10px] text-slate-500 font-bold">
+                                                        {startup.location || 'Remote'}
+                                                    </p>
+                                                    <span className="text-[10px] text-slate-300">•</span>
+                                                    <p className="text-[10px] text-slate-400 font-medium">
+                                                        {isAppTab ? `Applied ${formatTimeAgo((item as any).createdAt)}` : `Posted ${formatTimeAgo(startup.createdAt)}`}
+                                                    </p>
+                                                </div>
                                             </div>
                                             <div className="flex gap-1">
                                                 <button

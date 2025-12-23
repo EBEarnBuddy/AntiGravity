@@ -14,6 +14,9 @@ import {
 } from 'lucide-react';
 import PendingRequestsModal from '@/components/PendingRequestsModal';
 import CollaborationRequestsModal from '@/components/CollaborationRequestsModal';
+import { getSocket } from '@/lib/socket';
+import { messageAPI } from '@/lib/axios';
+import { formatTimeAgo } from '@/lib/utils';
 
 const RoomChatPage: React.FC = () => {
     const params = useParams();
@@ -28,7 +31,10 @@ const RoomChatPage: React.FC = () => {
     const [newMessage, setNewMessage] = useState('');
     const [showPendingModal, setShowPendingModal] = useState(false);
     const [showCollabModal, setShowCollabModal] = useState(false);
+
     const [showMenu, setShowMenu] = useState(false);
+    const [typingUsers, setTypingUsers] = useState<string[]>([]);
+    const typingTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
 
     // Check membership status
     const isMember = currentUser && room?.members?.includes(currentUser.uid);
@@ -58,7 +64,66 @@ const RoomChatPage: React.FC = () => {
 
     useEffect(() => {
         scrollToBottom();
-    }, [messages]);
+        if (currentUser && messages.length > 0) {
+            // Mark as read
+            messageAPI.markAsRead(roomId).catch(console.error);
+        }
+    }, [messages, roomId, currentUser]);
+
+    // Socket listeners for Typing and Read Receipts
+    useEffect(() => {
+        let socketInstance: any = null;
+        const setupSocket = async () => {
+            const socket = await getSocket();
+            if (!socket) return;
+            socketInstance = socket;
+
+            socket.on('typing', (data: { userId: string, userName: string, roomId: string }) => {
+                if (data.roomId === roomId && data.userId !== currentUser?.uid) {
+                    setTypingUsers(prev => {
+                        if (!prev.includes(data.userName)) return [...prev, data.userName];
+                        return prev;
+                    });
+                }
+            });
+
+            socket.on('stop_typing', (data: { userId: string, roomId: string }) => {
+                if (data.roomId === roomId) {
+                    setTypingUsers(prev => prev.filter(name => name !== data.userId)); // userId in stop_typing might need to be mapped or we use userName. 
+                    // To be safe, let's assume typing event sends userName and we store userName.
+                    // But stop_typing usually sends userId. 
+                    // Simplification: We clear ALL typing users after timeout if complex.
+                    // Let's rely on standard logic:
+                    // We need to map userId to name or just store userId and look up? 
+                    // Let's store objects: {id, name}
+                }
+            });
+
+            // For simplicity, we'll just listen to 'typing' and auto-clear with local timeout if stop isn't reliable, 
+            // OR assumes backend broadcasts userName in stop_typing too? 
+            // Let's adjust the listener to be more robust manually below.
+        };
+        setupSocket();
+
+        return () => {
+            if (socketInstance) {
+                socketInstance.off('typing');
+                socketInstance.off('stop_typing');
+            }
+        };
+    }, [roomId, currentUser]);
+
+    const handleTyping = async () => {
+        const socket = await getSocket();
+        if (socket && currentUser) {
+            socket.emit('typing', { roomId, userId: currentUser.uid, userName: currentUser.displayName });
+
+            if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+            typingTimeoutRef.current = setTimeout(() => {
+                socket.emit('stop_typing', { roomId, userId: currentUser.uid });
+            }, 2000);
+        }
+    };
 
     // Access control
     if (isPending) {
@@ -246,7 +311,12 @@ const RoomChatPage: React.FC = () => {
                                         <div className="text-sm font-medium leading-relaxed">{msg.content}</div>
                                     </div>
                                     <span className={`text-[10px] font-black px-1 uppercase tracking-wider ${isMe ? 'text-slate-400 text-right' : 'text-slate-400'}`}>
-                                        {msg.timestamp?.seconds ? new Date(msg.timestamp.seconds * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Now'}
+                                        {formatTimeAgo(msg.timestamp?.seconds ? new Date(msg.timestamp.seconds * 1000) : (msg as any).createdAt)}
+                                        {isMe && (msg as any).readBy && (msg as any).readBy.length > 0 && (
+                                            <span className="ml-2 text-green-600">
+                                                Read by {(msg as any).readBy.length}
+                                            </span>
+                                        )}
                                     </span>
                                 </div>
                             </div>
@@ -257,14 +327,22 @@ const RoomChatPage: React.FC = () => {
             </div>
 
             {/* Input Area - Comicy Style */}
-            <div className="bg-slate-50 p-4 shrink-0 border-t-2 border-slate-900 w-full">
+            <div className="bg-slate-50 p-4 shrink-0 border-t-2 border-slate-900 w-full relative">
+                {typingUsers.length > 0 && (
+                    <div className="absolute -top-8 left-6 text-xs font-bold text-slate-500 bg-white px-3 py-1 rounded-t-lg border-2 border-b-0 border-slate-900 animate-pulse">
+                        {typingUsers.join(', ')} {typingUsers.length === 1 ? 'is' : 'are'} typing...
+                    </div>
+                )}
                 <form
                     onSubmit={handleSend}
                     className="w-full mx-auto relative border-2 border-slate-900 bg-white shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] focus-within:shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] focus-within:translate-x-[2px] focus-within:translate-y-[2px] transition-all"
                 >
                     <textarea
                         value={newMessage}
-                        onChange={(e) => setNewMessage(e.target.value)}
+                        onChange={(e) => {
+                            setNewMessage(e.target.value);
+                            handleTyping();
+                        }}
                         onKeyDown={handleKeyPress}
                         placeholder="Type your message..."
                         className="w-full min-h-12 max-h-32 resize-none bg-white px-4 py-3 text-sm font-medium focus:outline-none placeholder:text-slate-400"

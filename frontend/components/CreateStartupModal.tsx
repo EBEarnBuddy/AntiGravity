@@ -503,13 +503,26 @@ const CreateStartupModal: React.FC<CreateStartupModalProps> = ({ isOpen, onClose
                           <label className="block text-sm font-bold text-slate-700 mb-2">
                             Position Title *
                           </label>
-                          <input
-                            type="text"
-                            value={newRole.title}
-                            onChange={(e) => setNewRole((prev: any) => ({ ...prev, title: e.target.value }))}
-                            className="w-full px-4 py-3 border border-slate-200 rounded-xl bg-white text-slate-900 focus:ring-2 focus:ring-green-600 focus:border-transparent transition-all outline-none font-medium"
-                            placeholder="e.g., Senior Frontend Developer"
-                          />
+                          <div className="relative">
+                            <input
+                              type="text"
+                              value={newRole.title}
+                              onChange={(e) => setNewRole((prev: any) => ({ ...prev, title: e.target.value }))}
+                              className="w-full px-4 py-3 border border-slate-200 rounded-xl bg-white text-slate-900 focus:ring-2 focus:ring-green-600 focus:border-transparent transition-all outline-none font-medium"
+                              placeholder="e.g., Senior Frontend Developer"
+                              list="role-suggestions"
+                            />
+                            <datalist id="role-suggestions">
+                              <option value="Frontend Developer" />
+                              <option value="Backend Developer" />
+                              <option value="Full Stack Engineer" />
+                              <option value="Product Manager" />
+                              <option value="UI/UX Designer" />
+                              <option value="Growth Marketer" />
+                              <option value="Data Scientist" />
+                              <option value="DevOps Engineer" />
+                            </datalist>
+                          </div>
                         </div>
 
                         <div>

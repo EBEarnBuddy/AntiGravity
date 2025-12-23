@@ -161,9 +161,10 @@ export const getRooms = async (req: AuthRequest, res: Response) => {
         // Map rooms with membership info (without expensive per-room queries)
         const roomsWithMembership = roomsDocs.map((room) => {
             const roomObj = room.toObject();
-            const isMember = memberRoomIds.has(room._id.toString());
+            const isCreator = roomObj.createdBy.toString() === user._id.toString();
+            // User is a member if they have an accepted membership OR they created the room
+            const isMember = memberRoomIds.has(room._id.toString()) || isCreator;
             const isPending = pendingRoomIds.has(room._id.toString());
-
 
             return {
                 ...roomObj,
