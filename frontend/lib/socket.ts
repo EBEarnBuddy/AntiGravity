@@ -4,7 +4,12 @@ import { auth } from './firebase';
 let socket: Socket | null = null;
 
 export const getSocket = async () => {
-    if (socket?.connected) return socket;
+    if (socket) {
+        if (!socket.connected) {
+            socket.connect();
+        }
+        return socket;
+    }
 
     if (!auth) return null;
     const user = auth.currentUser;

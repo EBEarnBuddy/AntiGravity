@@ -123,6 +123,20 @@ const ApplicantsModal: React.FC<ApplicantsModalProps> = ({ isOpen, onClose, star
                                                 </div>
                                             )}
 
+                                            {app.details && (
+                                                <div className="bg-white p-3 rounded-lg text-sm border border-slate-100 mb-3 shadow-sm">
+                                                    <h4 className="font-bold text-slate-800 text-xs uppercase mb-2">Application Responses</h4>
+                                                    <div className="space-y-2">
+                                                        {Object.entries(app.details).map(([key, value]) => (
+                                                            <div key={key}>
+                                                                <span className="font-semibold text-slate-700 block text-xs bg-slate-50 px-1 py-0.5 rounded w-fit mb-0.5">{key}:</span>
+                                                                <span className="text-slate-600 block pl-1">{String(value)}</span>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            )}
+
                                             <div className="flex items-center gap-2">
                                                 <span className={`px-2 py-1 rounded-md text-xs font-bold uppercase tracking-wide
                                                     ${app.status === 'accepted' ? 'bg-green-100 text-green-700' :

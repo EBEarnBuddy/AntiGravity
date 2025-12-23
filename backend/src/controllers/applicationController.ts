@@ -249,7 +249,7 @@ export const updateApplicationStatus = async (req: AuthRequest, res: Response) =
                 status === 'accepted' ? 'application_accepted' : 'application_rejected',
                 `Application ${status.charAt(0).toUpperCase() + status.slice(1)}`,
                 `Your application for ${opportunity.title} was ${status}.`,
-                `/startups?tab=applied`
+                `/startups?tab=applied&id=${opportunity._id}`
             );
         }
 

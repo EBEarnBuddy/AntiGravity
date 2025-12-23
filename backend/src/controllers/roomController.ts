@@ -448,6 +448,7 @@ export const deleteRoom = async (req: AuthRequest, res: Response) => {
 
         await Room.deleteOne({ _id: roomId });
         await RoomMembership.deleteMany({ room: roomId });
+        await Message.deleteMany({ room: roomId });
 
         res.json({ message: 'Room deleted' });
     } catch (error) {

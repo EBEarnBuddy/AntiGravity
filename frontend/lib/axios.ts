@@ -79,6 +79,8 @@ export const opportunityAPI = {
   getAll: (type?: string) => api.get('/opportunities', { params: { type } }),
   getById: (id: string) => api.get(`/opportunities/${id}`),
   create: (data: Record<string, unknown>) => api.post('/opportunities', data),
+  delete: (id: string) => api.delete(`/opportunities/${id}`),
+  updateStatus: (id: string, status: string) => api.patch(`/opportunities/${id}/status`, { status }),
 };
 
 export const applicationAPI = {

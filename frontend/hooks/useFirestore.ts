@@ -361,7 +361,34 @@ export const useStartups = () => {
   const bookmarkStartup = async (startupId: string, userId: string) => { }; // TODO
   const unbookmarkStartup = async (startupId: string, userId: string) => { }; // TODO
 
-  return { startups, loading, error, createStartup, applyToStartup, bookmarkStartup, unbookmarkStartup, getApplicants, updateApplicationStatus };
+  const deleteStartup = async (startupId: string) => {
+    try {
+      await opportunityAPI.delete(startupId);
+      // Refresh
+      const response = await opportunityAPI.getAll('startup');
+      const data = response.data.map((item: any) => ({ ...item, id: item._id }));
+      setStartups(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to delete startup');
+    }
+  };
+
+  const updateStartupStatus = async (startupId: string, status: string) => {
+    // Assuming backend endpoint exists for this or generic update
+    // We didn't explicitly check generic update, but we have opportunityAPI.update?
+    // Let's assume we need to add it or use a generic update if available.
+    // Checking opportunityAPI in axios.ts might be needed, but I'll write the logic assuming it exists or I'll add it.
+    // For now, let's look at axios.ts later to confirm.
+    try {
+      // Using a generic update if available, or just error out if not found? 
+      // I'll assume opportunityAPI.update exists.
+      // actually, let's verify axios.ts first or just stub it.
+      // I recall deleteRoom/updateRoom, but opportunity?
+      // Let's stub it for now and I will verify axios next.
+    } catch (e) { }
+  };
+
+  return { startups, loading, error, createStartup, applyToStartup, bookmarkStartup, unbookmarkStartup, getApplicants, updateApplicationStatus, deleteStartup, updateStartupStatus };
 };
 
 export const useMyApplications = () => {

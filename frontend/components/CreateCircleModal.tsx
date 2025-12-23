@@ -92,7 +92,7 @@ const CreateCircleModal: React.FC<CreateCircleModalProps> = ({ isOpen, onClose, 
                     onClick={onClose}
                 >
                     <motion.div
-                        className="flex flex-col bg-white rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden"
+                        className="flex flex-col bg-white rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden max-h-[85vh]"
                         initial={{ scale: 0.9, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
                         exit={{ scale: 0.9, opacity: 0 }}
@@ -110,7 +110,7 @@ const CreateCircleModal: React.FC<CreateCircleModalProps> = ({ isOpen, onClose, 
                         </div>
 
                         {/* Content */}
-                        <div className="p-6 space-y-6">
+                        <div className="p-6 space-y-6 overflow-y-auto custom-scrollbar">
                             {/* Name */}
                             <div>
                                 <label className="block text-sm font-bold text-slate-700 mb-2">Circle Name</label>

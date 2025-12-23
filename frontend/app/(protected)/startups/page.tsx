@@ -12,7 +12,6 @@ import {
     ChevronLeft,
     Users,
     CheckCircle,
-    CheckCircle,
     UserCircle,
     MoreVertical,
     Edit2,
@@ -21,6 +20,7 @@ import {
     Link as LinkIcon
 } from 'lucide-react';
 import { useStartups, useMyApplications, useBookmarks } from '@/hooks/useFirestore';
+import { useAuth } from '@/contexts/AuthContext';
 import { Skeleton } from '@/components/ui/skeleton';
 import { formatTimeAgo } from '@/lib/utils';
 import CreateStartupModal from '@/components/CreateStartupModal';
@@ -35,7 +35,7 @@ const StartupsPage: React.FC = () => {
     // Initialize tab from URL or default to 'discover'
     const initialTab = (searchParams.get('tab') as 'discover' | 'posted' | 'applied') || 'discover';
 
-    const initialTab = (searchParams.get('tab') as 'discover' | 'posted' | 'applied') || 'discover';
+
 
     // Add delete/update hooks
     const { startups, loading: startupsLoading, deleteStartup, updateStartupStatus } = useStartups();
@@ -55,6 +55,7 @@ const StartupsPage: React.FC = () => {
         setActiveTabState(tab);
         const params = new URLSearchParams(window.location.search);
         params.set('tab', tab);
+        params.delete('id'); // Clear specific ID when switching tabs manually
         router.push(`${window.location.pathname}?${params.toString()}`);
     };
 
@@ -71,15 +72,26 @@ const StartupsPage: React.FC = () => {
 
     // Filter Logic
     const getDisplayStartups = () => {
+        const idParam = searchParams.get('id');
         let sourceData: any[] = [];
+
+        // If ID is present, we might want to search across all/relevant data, but typically it depends on the tab context
+        // OR we can override the tab context if an ID is present to ensure we find it?
+        // For simplicity, let's filter within the active tab, but if the user follows a link, they land on 'discover' by default.
         if (activeTab === 'discover') sourceData = startups;
         else if (activeTab === 'posted') sourceData = myPostedStartups;
 
-        return sourceData.filter(startup => {
+        let filtered = sourceData.filter(startup => {
             const matchesSearch = (startup.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
                 (startup.description || '').toLowerCase().includes(searchTerm.toLowerCase());
             return matchesSearch;
         });
+
+        if (idParam) {
+            filtered = filtered.filter(s => (s.id || s._id) === idParam);
+        }
+
+        return filtered;
     };
 
     const displayItems = getDisplayStartups();
