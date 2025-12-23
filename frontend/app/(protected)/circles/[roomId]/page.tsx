@@ -11,8 +11,10 @@ import {
     ChevronLeft,
     Users,
     UserCheck,
-    Settings
+    Settings,
+    LogOut
 } from 'lucide-react';
+import { roomAPI } from '@/lib/axios'; // Import API for leaving
 import PendingRequestsModal from '@/components/PendingRequestsModal';
 import CollaborationRequestsModal from '@/components/CollaborationRequestsModal';
 import ChatSettingsModal from '@/components/ChatSettingsModal';
@@ -265,6 +267,26 @@ const RoomChatPage: React.FC = () => {
                                     Chat Settings
                                 </button>
                             )}
+                            {!isAdmin && (
+                                <button
+                                    onClick={async () => {
+                                        if (confirm('Are you sure you want to leave this circle?')) {
+                                            try {
+                                                await roomAPI.leaveRoom(roomId);
+                                                router.push('/circles');
+                                            } catch (e) {
+                                                console.error('Failed to leave:', e);
+                                                alert('Failed to leave circle');
+                                            }
+                                        }
+                                        setShowMenu(false);
+                                    }}
+                                    className="w-full px-4 py-3 text-left text-sm font-bold text-red-600 hover:bg-red-50 transition flex items-center gap-2 rounded-b-xl border-t border-slate-200"
+                                >
+                                    <LogOut className="w-4 h-4" />
+                                    Leave Circle
+                                </button>
+                            )}
                         </div>
                     )}
                 </div>
@@ -290,6 +312,38 @@ const RoomChatPage: React.FC = () => {
                         const senderPhoto = sender?.photoURL || msg.senderPhotoURL;
 
                         const isMe = senderId === currentUser?.uid;
+
+                        if ((msg as any).type === 'system') {
+                            const content = msg.content;
+                            // Basic link detection
+                            const urlRegex = /(https?:\/\/[^\s]+)/g;
+                            const parts = content.split(urlRegex);
+
+                            return (
+                                <div key={msg.id || index} className="flex justify-center w-full mb-4 px-8">
+                                    <div className="bg-slate-100 border border-slate-200 text-slate-500 text-xs font-bold px-4 py-2 rounded-full text-center shadow-sm">
+                                        {parts.map((part: string, i: number) =>
+                                            urlRegex.test(part) ? (
+                                                <a
+                                                    key={i}
+                                                    href={part}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="text-blue-600 hover:underline mx-1"
+                                                >
+                                                    {part}
+                                                </a>
+                                            ) : (
+                                                <span key={i}>{part}</span>
+                                            )
+                                        )}
+                                        <div className="text-[9px] text-slate-400 mt-1 font-normal opacity-70">
+                                            {formatTimeAgo(msg.timestamp?.seconds ? new Date(msg.timestamp.seconds * 1000) : (msg as any).createdAt)}
+                                        </div>
+                                    </div>
+                                </div>
+                            );
+                        }
 
                         return (
                             <div
@@ -334,8 +388,17 @@ const RoomChatPage: React.FC = () => {
                                     {/* Timestamp (Bottom) */}
                                     <span className={`text-[10px] font-medium text-slate-400 mt-1 px-1 flex items-center gap-1`}>
                                         {formatTimeAgo(msg.timestamp?.seconds ? new Date(msg.timestamp.seconds * 1000) : (msg as any).createdAt)}
-                                        {isMe && (msg as any).readBy?.length > 0 && (
-                                            <span className="text-green-600 ml-1">Read</span>
+                                        {isMe && msg.readBy && msg.readBy.length > 0 && (
+                                            <span className="text-green-600 ml-1">
+                                                Read {(() => {
+                                                    // Find the latest read time
+                                                    const latestRead = msg.readBy.reduce((latest: any, current: any) => {
+                                                        const currentDate = new Date(current.readAt || Date.now());
+                                                        return !latest || currentDate > new Date(latest) ? current.readAt : latest;
+                                                    }, null);
+                                                    return latestRead ? formatTimeAgo(latestRead) : '';
+                                                })()}
+                                            </span>
                                         )}
                                     </span>
                                 </div>
@@ -398,7 +461,9 @@ const RoomChatPage: React.FC = () => {
             />
 
             {/* Collaboration Requests Modal */}
-            onClose={() => setShowCollabModal(false)}
+            <CollaborationRequestsModal
+                isOpen={showCollabModal}
+                onClose={() => setShowCollabModal(false)}
             />
 
             {/* Settings Modal */}

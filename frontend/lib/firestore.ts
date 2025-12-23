@@ -257,18 +257,13 @@ export interface ChatRoom {
 
 export interface ChatMessage {
   id?: string;
-  content: string;
   senderId: string;
-  senderName?: string;
+  senderName: string;
   senderPhotoURL?: string;
-  type: 'text' | 'image' | 'video' | 'file';
-  attachment?: {
-    url: string;
-    name: string;
-    type: string;
-    size: string;
-  };
+  content: string;
+  type?: 'text' | 'image' | 'system';
   reactions?: { [emoji: string]: string[] };
+  readBy?: { user: string; readAt: string | Date }[];
   timestamp: Timestamp;
   edited?: boolean;
   editedAt?: Timestamp;

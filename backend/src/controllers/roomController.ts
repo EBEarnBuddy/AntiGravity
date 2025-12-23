@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import Room from '../models/Room';
 import RoomMembership from '../models/RoomMembership';
 import User from '../models/User';
+import Message from '../models/Message';
 import { AuthRequest } from '../middlewares/auth';
 import { getIO } from '../socket';
 
@@ -330,9 +331,31 @@ export const updateMembershipStatus = async (req: AuthRequest, res: Response) =>
         membership.status = status as 'accepted' | 'rejected';
         await membership.save();
 
-        // If accepted, increment member count
+        // If accepted, increment member count and send system message
         if (status === 'accepted') {
             await Room.findByIdAndUpdate(roomId, { $inc: { membersCount: 1 } });
+
+            // Create system message
+            try {
+                const io = getIO();
+                const content = `${targetUser.displayName} has joined the circle.`;
+                const message = await Message.create({
+                    room: roomId,
+                    sender: targetUser._id,
+                    content: content,
+                    type: 'system'
+                });
+
+                io.to(roomId).emit('new_message', {
+                    ...message.toObject(),
+                    sender: {
+                        _id: targetUser._id,
+                        displayName: targetUser.displayName,
+                        photoURL: targetUser.photoURL,
+                        firebaseUid: targetUser.firebaseUid
+                    }
+                });
+            } catch (e) { console.error('System message failed:', e); }
         }
 
         // Emit socket event
@@ -429,5 +452,79 @@ export const deleteRoom = async (req: AuthRequest, res: Response) => {
         res.json({ message: 'Room deleted' });
     } catch (error) {
         res.status(500).json({ error: 'Failed to delete room' });
+    }
+};
+
+// Leave Room
+export const leaveRoom = async (req: AuthRequest, res: Response) => {
+    try {
+        const { uid } = req.user!;
+        const { roomId } = req.params;
+
+        const user = await User.findOne({ firebaseUid: uid });
+        if (!user) {
+            res.status(404).json({ error: 'User not found' });
+            return;
+        }
+
+        const room = await Room.findById(roomId);
+        if (!room) {
+            res.status(404).json({ error: 'Room not found' });
+            return;
+        }
+
+        // Prevent creator from leaving (must delete instead)
+        if (room.createdBy.toString() === user._id.toString()) {
+            res.status(400).json({ error: 'Creators cannot leave their own circle. Delete it instead.' });
+            return;
+        }
+
+        const deletion = await RoomMembership.findOneAndDelete({
+            room: roomId,
+            user: user._id,
+            status: 'accepted' // Can only leave if accepted member
+        });
+
+        if (!deletion) {
+            res.status(400).json({ error: 'Not a member' });
+            return;
+        }
+
+        await Room.findByIdAndUpdate(roomId, { $inc: { membersCount: -1 } });
+
+        // System message
+        try {
+            const io = getIO();
+            const content = `${user.displayName} has left the circle.`;
+            const message = await Message.create({
+                room: roomId,
+                sender: user._id,
+                content: content,
+                type: 'system'
+            });
+
+            // Emit new message
+            io.to(roomId).emit('new_message', {
+                ...message.toObject(),
+                sender: {
+                    _id: user._id,
+                    displayName: user.displayName,
+                    photoURL: user.photoURL,
+                    firebaseUid: user.firebaseUid
+                }
+            });
+
+            // Emit membership update
+            io.emit('membership_updated', {
+                roomId,
+                userId: uid,
+                status: 'left'
+            });
+
+        } catch (e) { console.error('System message failed:', e); }
+
+        res.json({ message: 'Left room' });
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to leave room' });
     }
 };

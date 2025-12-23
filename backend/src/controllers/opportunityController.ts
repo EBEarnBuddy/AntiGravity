@@ -4,6 +4,7 @@ import { AuthRequest } from '../middlewares/auth';
 import User from '../models/User';
 import Room from '../models/Room';
 import RoomMembership from '../models/RoomMembership';
+import Message from '../models/Message';
 import { getIO } from '../socket';
 
 // Create Opportunity
@@ -58,6 +59,44 @@ export const createOpportunity = async (req: AuthRequest, res: Response) => {
 
         // Populate for immediate frontend use if needed
         await opportunity.populate('postedBy', 'displayName photoURL role');
+
+        // Broadcast System Message to all circles the user is a member of
+        try {
+            const memberships = await RoomMembership.find({ user: user._id, status: 'accepted' });
+            const io = getIO();
+
+            // We can process this asynchronously without blocking the response
+            Promise.all(memberships.map(async (membership) => {
+                // Skip the circle just created for this opportunity (optional, but maybe redundant to announce there)
+                if (membership.room.toString() === room._id.toString()) return;
+
+                const content = `${user.displayName} has posted a new opportunity "${opportunity.title}" — click here to apply: ${process.env.FRONTEND_URL || 'http://localhost:3000'}/startups?id=${opportunity._id}`;
+
+                const message = await Message.create({
+                    room: membership.room,
+                    sender: user._id,
+                    content: content,
+                    type: 'system'
+                });
+
+                // Update room last activity
+                await Room.findByIdAndUpdate(membership.room, { lastMessageAt: new Date() });
+
+                // Emit to room
+                io.to(membership.room.toString()).emit('new_message', {
+                    ...message.toObject(),
+                    sender: {
+                        _id: user._id,
+                        displayName: user.displayName,
+                        photoURL: user.photoURL,
+                        firebaseUid: user.firebaseUid
+                    }
+                });
+            })).catch(err => console.error('Error broadcasting system messages:', err));
+
+        } catch (err) {
+            console.error('Failed to broadcast opportunity system messages:', err);
+        }
 
         // Realtime: Emit event
         try {

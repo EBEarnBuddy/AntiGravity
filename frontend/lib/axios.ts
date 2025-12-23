@@ -98,6 +98,7 @@ export const roomAPI = {
     api.post(`/rooms/${roomId}/approve/${userId}`, { status }),
   updateRoom: (roomId: string, data: any) => api.put(`/rooms/${roomId}`, data),
   deleteRoom: (roomId: string) => api.delete(`/rooms/${roomId}`),
+  leaveRoom: (roomId: string) => api.post(`/rooms/${roomId}/leave`),
 };
 
 export const collaborationAPI = {

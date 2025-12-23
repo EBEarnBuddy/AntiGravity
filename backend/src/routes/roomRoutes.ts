@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { createRoom, getRooms, joinRoom, getMyRooms, getPendingRequests, updateMembershipStatus, updateRoom, deleteRoom } from '../controllers/roomController';
+import { createRoom, getRooms, joinRoom, getMyRooms, getPendingRequests, updateMembershipStatus, updateRoom, deleteRoom, leaveRoom } from '../controllers/roomController';
 import { verifyToken } from '../middlewares/auth';
 
 import messageRoutes from './messageRoutes';
@@ -21,5 +21,6 @@ router.get('/:roomId/pending', getPendingRequests);
 router.post('/:roomId/approve/:userId', updateMembershipStatus);
 router.put('/:roomId', updateRoom);
 router.delete('/:roomId', deleteRoom);
+router.post('/:roomId/leave', leaveRoom);
 
 export default router;
