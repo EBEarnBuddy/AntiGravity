@@ -104,7 +104,6 @@ export default function DiscoverPage() {
                             <input
                                 type="text"
                                 placeholder="Search opportunities, circles..."
-                                placeholder="Search opportunities, circles..."
                                 className="w-full pl-10 pr-10 py-2.5 bg-white border-2 border-slate-900 text-slate-900 font-bold placeholder:text-slate-500 focus:outline-none shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] focus:translate-x-[2px] focus:translate-y-[2px] focus:shadow-none transition-all"
                             />
                             <button
