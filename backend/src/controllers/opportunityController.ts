@@ -165,91 +165,91 @@ export const getOpportunityById = async (req: Request, res: Response) => {
     } catch (error) {
         res.status(500).json({ error: 'Fetch failed' });
     }
+};
+// Update Opportunity Status
+export const updateOpportunityStatus = async (req: AuthRequest, res: Response) => {
+    try {
+        const { uid } = req.user!;
+        const { id } = req.params;
+        // Accept either structure depending on what frontend sends
+        const { status } = req.body;
 
-    // Update Opportunity Status
-    export const updateOpportunityStatus = async (req: AuthRequest, res: Response) => {
-        try {
-            const { uid } = req.user!;
-            const { id } = req.params;
-            // Accept either structure depending on what frontend sends
-            const { status } = req.body;
-
-            const user = await User.findOne({ firebaseUid: uid });
-            if (!user) {
-                res.status(404).json({ error: 'User not found' });
-                return;
-            }
-
-            const opportunity = await Opportunity.findById(id);
-            if (!opportunity) {
-                res.status(404).json({ error: 'Opportunity not found' });
-                return;
-            }
-
-            if (!opportunity.postedBy.equals(user._id)) {
-                res.status(403).json({ error: 'Not authorized' });
-                return;
-            }
-
-            // Map frontend "status" -> "startupStatus" if applicable
-            if (status === 'closed') {
-                opportunity.startupStatus = 'closed';
-                opportunity.status = 'closed';
-            } else if (status === 'active' || status === 'open') {
-                opportunity.startupStatus = 'active';
-                opportunity.status = 'open';
-            } else {
-                // Fallback
-                opportunity.startupStatus = status;
-            }
-
-            await opportunity.save();
-            res.json(opportunity);
-        } catch (error) {
-            console.error('Error updating status:', error);
-            res.status(500).json({ error: 'Update failed' });
+        const user = await User.findOne({ firebaseUid: uid });
+        if (!user) {
+            res.status(404).json({ error: 'User not found' });
+            return;
         }
-    };
 
-    // Delete Opportunity
-    export const deleteOpportunity = async (req: AuthRequest, res: Response) => {
-        try {
-            const { uid } = req.user!;
-            const { id } = req.params;
-
-            const user = await User.findOne({ firebaseUid: uid });
-            if (!user) {
-                res.status(404).json({ error: 'User not found' });
-                return;
-            }
-
-            const opportunity = await Opportunity.findById(id);
-            if (!opportunity) {
-                res.status(404).json({ error: 'Opportunity not found' });
-                return;
-            }
-
-            if (!opportunity.postedBy.equals(user._id)) {
-                res.status(403).json({ error: 'Not authorized' });
-                return;
-            }
-
-            // Cascade delete related resources
-            if (opportunity.room) {
-                const roomId = opportunity.room;
-                await Room.findByIdAndDelete(roomId);
-                await RoomMembership.deleteMany({ room: roomId });
-                await Message.deleteMany({ room: roomId });
-                // Emitting room_deleted event could be useful but frontend handles list refresh via opp methods
-            }
-
-            // Delete the opportunity itself
-            await Opportunity.findByIdAndDelete(id);
-
-            res.json({ success: true, message: 'Opportunity deleted' });
-        } catch (error) {
-            console.error('Error deleting opportunity:', error);
-            res.status(500).json({ error: 'Delete failed' });
+        const opportunity = await Opportunity.findById(id);
+        if (!opportunity) {
+            res.status(404).json({ error: 'Opportunity not found' });
+            return;
         }
-    };
+
+        if (!opportunity.postedBy.equals(user._id)) {
+            res.status(403).json({ error: 'Not authorized' });
+            return;
+        }
+
+        // Map frontend "status" -> "startupStatus" if applicable
+        if (status === 'closed') {
+            opportunity.startupStatus = 'closed';
+            opportunity.status = 'closed';
+        } else if (status === 'active' || status === 'open') {
+            opportunity.startupStatus = 'active';
+            opportunity.status = 'open';
+        } else {
+            // Fallback
+            opportunity.startupStatus = status;
+        }
+
+        await opportunity.save();
+        res.json(opportunity);
+    } catch (error) {
+        console.error('Error updating status:', error);
+        res.status(500).json({ error: 'Update failed' });
+    }
+};
+
+// Delete Opportunity
+export const deleteOpportunity = async (req: AuthRequest, res: Response) => {
+    try {
+        const { uid } = req.user!;
+        const { id } = req.params;
+
+        const user = await User.findOne({ firebaseUid: uid });
+        if (!user) {
+            res.status(404).json({ error: 'User not found' });
+            return;
+        }
+
+        const opportunity = await Opportunity.findById(id);
+        if (!opportunity) {
+            res.status(404).json({ error: 'Opportunity not found' });
+            return;
+        }
+
+        if (!opportunity.postedBy.equals(user._id)) {
+            res.status(403).json({ error: 'Not authorized' });
+            return;
+        }
+
+        // Cascade delete related resources
+        if (opportunity.room) {
+            const roomId = opportunity.room;
+            await Room.findByIdAndDelete(roomId);
+            await RoomMembership.deleteMany({ room: roomId });
+            await Message.deleteMany({ room: roomId });
+            // Emitting room_deleted event could be useful but frontend handles list refresh via opp methods
+        }
+
+        // Delete the opportunity itself
+        await Opportunity.findByIdAndDelete(id);
+
+        res.json({ success: true, message: 'Opportunity deleted' });
+    } catch (error) {
+        console.error('Error deleting opportunity:', error);
+        res.status(500).json({ error: 'Delete failed' });
+    }
+};
 
