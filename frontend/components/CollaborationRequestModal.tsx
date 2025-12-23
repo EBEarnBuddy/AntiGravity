@@ -90,7 +90,7 @@ const CollaborationRequestModal: React.FC<CollaborationRequestModalProps> = ({
                 {/* Header */}
                 <h2 className="text-2xl font-black text-slate-900 mb-2">Request Collaboration</h2>
                 <p className="text-sm text-slate-500 mb-6">
-                    Send a collaboration request to <span className="font-bold text-slate-900">{targetCircle.name}</span>
+                    Send a collaboration request to <span className="font-bold text-slate-900">{targetCircle?.name || 'Unknown'}</span>
                 </p>
 
                 {/* Error Message */}
