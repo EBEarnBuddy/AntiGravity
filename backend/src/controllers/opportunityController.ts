@@ -141,6 +141,7 @@ export const getOpportunities = async (req: Request, res: Response) => {
 
         const opportunities = await Opportunity.find(filter)
             .populate('postedBy', 'displayName photoURL role') // Populate poster info
+            .populate('room', 'name isPrivate') // Populate room specific fields for redirection
             .sort({ createdAt: -1 });
 
         console.log(`[GET /opportunities] Found ${opportunities.length} items for type: ${type}`);

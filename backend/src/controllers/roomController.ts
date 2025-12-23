@@ -115,6 +115,21 @@ export const joinRoom = async (req: AuthRequest, res: Response) => {
                 userId: uid,
                 status: 'pending'
             });
+
+            // Notify Room Owner/Admins
+            const roomOwner = await RoomMembership.findOne({ room: roomId, role: 'admin' }).populate('user');
+            if (roomOwner && roomOwner.user) {
+                const { createNotification } = await import('./notificationController');
+                await createNotification(
+                    (roomOwner.user as any).firebaseUid,
+                    user.firebaseUid,
+                    'join_request',
+                    'New Join Request',
+                    `${user.displayName} wants to join ${room.name}`,
+                    `/circles/${roomId}`
+                );
+            }
+
         } catch (e) { console.error(e) }
 
         res.status(200).json({ message: 'Request sent', status: 'pending' });

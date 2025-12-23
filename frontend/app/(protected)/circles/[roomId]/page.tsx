@@ -61,19 +61,33 @@ const RoomChatPage: React.FC = () => {
         }
     };
 
-    const messagesEndRef = React.useRef<HTMLDivElement>(null);
+    const [isNearBottom, setIsNearBottom] = useState(true);
 
-    const scrollToBottom = () => {
-        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    const messagesEndRef = React.useRef<HTMLDivElement>(null);
+    const scrollContainerRef = React.useRef<HTMLDivElement>(null);
+
+    const scrollToBottom = (behavior: ScrollBehavior = "smooth") => {
+        messagesEndRef.current?.scrollIntoView({ behavior });
+    };
+
+    const handleScroll = () => {
+        if (scrollContainerRef.current) {
+            const { scrollTop, scrollHeight, clientHeight } = scrollContainerRef.current;
+            const scrollBottom = scrollHeight - scrollTop - clientHeight;
+            setIsNearBottom(scrollBottom < 100);
+        }
     };
 
     useEffect(() => {
-        scrollToBottom();
+        // Only auto-scroll if user was already near bottom or it's the first load
+        if (isNearBottom) {
+            scrollToBottom();
+        }
         if (currentUser && messages.length > 0) {
             // Mark as read
             messageAPI.markAsRead(roomId).catch(console.error);
         }
-    }, [messages, roomId, currentUser]);
+    }, [messages, roomId, currentUser]); // Removed isNearBottom from deps to avoid loop
 
     // Socket listeners for Typing and Read Receipts
     useEffect(() => {
@@ -186,7 +200,7 @@ const RoomChatPage: React.FC = () => {
     }
 
     return (
-        <div className="flex flex-col h-screen bg-slate-50 font-sans overflow-hidden">
+        <div className="fixed inset-0 flex flex-col bg-slate-50 font-sans overflow-hidden" style={{ top: '64px' }}>
             {/* Room Header - Comicy Style */}
             <div className="bg-white border-b-2 border-slate-900 px-4 py-3 flex items-center justify-between flex-shrink-0 z-10 w-full min-h-[60px]">
                 <div className="flex items-center gap-3 flex-shrink-0">
@@ -293,8 +307,12 @@ const RoomChatPage: React.FC = () => {
             </div>
 
             {/* Chat Area - Scrollable messages only */}
-            <div className="flex-1 flex flex-col min-h-0 w-full">
-                <div className="flex-1 px-6 py-6 space-y-4 overflow-y-auto w-full">
+            <div className="flex-1 flex flex-col min-h-0 w-full relative">
+                <div
+                    ref={scrollContainerRef}
+                    onScroll={handleScroll}
+                    className="flex-1 px-6 py-6 space-y-4 overflow-y-auto w-full custom-scrollbar"
+                >
                     {messages.length === 0 && !loading && (
                         <div className="flex flex-col items-center justify-center flex-1 text-slate-400 space-y-4">
                             <div className="w-16 h-16 bg-slate-100 rounded-2xl flex items-center justify-center">
@@ -443,6 +461,11 @@ const RoomChatPage: React.FC = () => {
                         <button
                             type="submit"
                             disabled={!newMessage.trim()}
+                            onClick={() => {
+                                // Force scroll to bottom on send
+                                setIsNearBottom(true);
+                                setTimeout(() => scrollToBottom("smooth"), 100);
+                            }}
                             className="px-4 py-2 bg-slate-900 text-white border-2 border-slate-900 hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed transition transform active:scale-95 font-bold uppercase text-xs flex items-center gap-2"
                         >
                             <Send className="w-4 h-4" />

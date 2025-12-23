@@ -131,15 +131,8 @@ const CirclesPage: React.FC = () => {
             room.description?.toLowerCase().includes(searchTerm.toLowerCase())
         );
 
-        if (activeCircleType === 'opportunity') {
-            return (
-                <div className="flex flex-col items-center justify-center h-full text-slate-400 space-y-4">
-                    <Target className="w-16 h-16 text-slate-300" />
-                    <h3 className="text-xl font-bold text-slate-600">Opportunity Circles</h3>
-                    <p className="text-sm">Coming soon...</p>
-                </div>
-            );
-        }
+        // Render content for all types, using the filteredRooms logic
+
 
         // Community Circles content (existing circles page)
         return (
