@@ -434,7 +434,7 @@ export default function Lander() {
                     {/* Scroll to Top - White Accent */}
                     <div
                         onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-                        className="fixed bottom-8 right-8 bg-white/90 backdrop-blur text-primary rounded-full p-3 shadow-lg cursor-pointer hover:scale-110 transition animate-bounce z-50">
+                        className="fixed bottom-8 right-8 bg-white/90 backdrop-blur text-primary rounded-full p-3 shadow-lg cursor-pointer hover:scale-110 transition-transform duration-300 z-[9999] border-2 border-green-100">
                         <ArrowRight className="w-6 h-6 -rotate-90" />
                     </div>
                 </div>
