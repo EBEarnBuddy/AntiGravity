@@ -156,4 +156,4 @@ const BGComponent3 = () => (
     </motion.svg>
 );
 
-export { SquishyOffers, BGComponent1, BGComponent2, BGComponent3, type OfferCardProps };
+export { BGComponent1, BGComponent2, BGComponent3, type OfferCardProps };
