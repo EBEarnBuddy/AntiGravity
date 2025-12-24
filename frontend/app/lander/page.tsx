@@ -1,3 +1,4 @@
+"use client";
 
 import { Check, ChevronDown, ChevronRight, Layout, Menu, Play, Star, Users, Briefcase, Zap, Shield, Globe, ArrowRight, Instagram, Linkedin, Mail, Facebook } from "lucide-react";
 import Link from "next/link";
@@ -70,12 +71,11 @@ export default function Lander() {
 
                     {/* Nav Links - Larger Font */}
                     <div className="hidden lg:flex items-center gap-8 text-lg font-medium text-white/90">
-                        <Link href="#" className="hover:text-white transition">How It Works</Link>
-                        <Link href="#" className="hover:text-white transition">Students</Link>
-                        <Link href="#" className="hover:text-white transition">Startups</Link>
-                        <Link href="#" className="hover:text-white transition">Freelancers</Link>
-                        <Link href="#" className="hover:text-white transition">Communities</Link>
-                        <Link href="#" className="hover:text-white transition">FAQ</Link>
+                        <Link href="#how-it-works" className="hover:text-white transition">How It Works</Link>
+                        <Link href="#partners" className="hover:text-white transition">Partners</Link>
+                        <Link href="#pricing" className="hover:text-white transition">Pricing</Link>
+                        <Link href="#community" className="hover:text-white transition">Community</Link>
+                        <Link href="#faq" className="hover:text-white transition">FAQ</Link>
                     </div>
 
                     <div className="flex items-center gap-4">
@@ -104,7 +104,7 @@ export default function Lander() {
                                 Launch your career with <br className="hidden md:block" /> real startup experience.
                             </h1>
                             <p className="text-2xl text-green-50 max-w-xl leading-relaxed font-medium">
-                                Join a community of builders. Get trained by technical founders, work on real products, and get hired by top startups.
+                                Join India's fastest growing community of student builders. Learn from founders, ship real products, and get hired.
                             </p>
                             <div className="flex items-center gap-4">
                                 <Link href="/auth" className="bg-white text-primary px-8 py-4 rounded-xl text-xl font-bold shadow-lg hover:shadow-xl hover:bg-green-50 transition flex items-center gap-2">
@@ -161,7 +161,7 @@ export default function Lander() {
 
 
             {/* What EarnBuddy Offers - Black Background with Squishy Cards */}
-            <section className="py-24 bg-black text-white relative overflow-hidden">
+            <section id="how-it-works" className="py-24 bg-black text-white relative overflow-hidden">
                 <div className="container mx-auto px-6 relative z-10 pt-10">
                     <div className="text-center max-w-3xl mx-auto mb-12">
                         <h2 className="text-4xl md:text-6xl font-bold mb-6">
@@ -432,7 +432,9 @@ export default function Lander() {
                     </div>
 
                     {/* Scroll to Top - White Accent */}
-                    <div className="fixed bottom-8 right-8 bg-white/90 backdrop-blur text-primary rounded-full p-3 shadow-lg cursor-pointer hover:scale-110 transition animate-bounce">
+                    <div
+                        onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                        className="fixed bottom-8 right-8 bg-white/90 backdrop-blur text-primary rounded-full p-3 shadow-lg cursor-pointer hover:scale-110 transition animate-bounce z-50">
                         <ArrowRight className="w-6 h-6 -rotate-90" />
                     </div>
                 </div>

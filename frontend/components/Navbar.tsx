@@ -19,7 +19,7 @@ const Navbar: React.FC = () => {
     const handleLogout = async () => {
         try {
             await logout();
-            router.push('/auth');
+            router.push('/lander');
         } catch (error) {
             console.error("Failed to log out", error);
         }
@@ -41,14 +41,14 @@ const Navbar: React.FC = () => {
     return (
         <nav className="h-16 bg-green-600 text-white flex items-center justify-between px-6 shadow-md sticky top-0 z-50">
             {/* Logo */}
-            <Link href="/dashboard" className="flex items-center gap-2">
+            <Link href="/discover" className="flex items-center gap-2">
                 <img src="/logo-white.png" alt="EarnBuddy" className="h-8 w-auto object-contain" />
             </Link>
 
             {/* Desktop Center Links */}
             <div className="hidden md:flex items-center gap-8">
                 <Link href="/discover" className={`text-sm font-bold uppercase tracking-wide hover:text-green-100 transition-colors ${isActive('/discover') ? 'text-white border-b-2 border-white' : 'text-green-100/80'}`}>Home</Link>
-                <Link href="/startups" className={`text-sm font-bold uppercase tracking-wide hover:text-green-100 transition-colors ${isActive('/startups') ? 'text-white border-b-2 border-white' : 'text-green-100/80'}`}>LaunchPad</Link>
+                <Link href="/startups" className={`text-sm font-bold uppercase tracking-wide hover:text-green-100 transition-colors ${isActive('/startups') ? 'text-white border-b-2 border-white' : 'text-green-100/80'}`}>Startup</Link>
                 <Link href="/freelance" className={`text-sm font-bold uppercase tracking-wide hover:text-green-100 transition-colors ${isActive('/freelance') ? 'text-white border-b-2 border-white' : 'text-green-100/80'}`}>CoLancing</Link>
                 <Link href="/circles" className={`text-sm font-bold uppercase tracking-wide hover:text-green-100 transition-colors ${isActive('/circles') ? 'text-white border-b-2 border-white' : 'text-green-100/80'}`}>Circles</Link>
             </div>
@@ -99,7 +99,7 @@ const Navbar: React.FC = () => {
             {isMobileMenuOpen && (
                 <div className="absolute top-16 left-0 w-full bg-green-600 border-t border-green-500 shadow-xl md:hidden flex flex-col p-4 space-y-4 animate-in slide-in-from-top-2">
                     <Link href="/discover" className="text-white font-bold text-lg py-2 border-b border-green-500" onClick={() => setIsMobileMenuOpen(false)}>Home</Link>
-                    <Link href="/startups" className="text-white font-bold text-lg py-2 border-b border-green-500" onClick={() => setIsMobileMenuOpen(false)}>LaunchPad</Link>
+                    <Link href="/startups" className="text-white font-bold text-lg py-2 border-b border-green-500" onClick={() => setIsMobileMenuOpen(false)}>Startup</Link>
                     <Link href="/freelance" className="text-white font-bold text-lg py-2 border-b border-green-500" onClick={() => setIsMobileMenuOpen(false)}>CoLancing</Link>
                     <Link href="/circles" className="text-white font-bold text-lg py-2" onClick={() => setIsMobileMenuOpen(false)}>Circles</Link>
                 </div>

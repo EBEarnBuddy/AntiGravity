@@ -98,21 +98,8 @@ export default function DiscoverPage() {
                             <p className="text-slate-500 font-medium">Here's what's happening in your network.</p>
                         </div>
 
-                        {/* Search Bar */}
-                        <div className="relative w-full md:w-96">
-                            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-5 h-5" />
-                            <input
-                                type="text"
-                                placeholder="Search opportunities, circles..."
-                                className="w-full pl-10 pr-10 py-2.5 bg-white border-2 border-slate-900 text-slate-900 font-bold placeholder:text-slate-500 focus:outline-none shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] focus:translate-x-[2px] focus:translate-y-[2px] focus:shadow-none transition-all"
-                            />
-                            <button
-                                onClick={() => setShowAdvancedSearch(true)}
-                                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-green-600 transition-colors"
-                            >
-                                <Filter className="w-4 h-4" />
-                            </button>
-                        </div>
+                        {/* Search Bar - Removed as per clean up */}
+                        <div className="hidden"></div>
                     </div>
                 </div>
             </div>
@@ -120,8 +107,8 @@ export default function DiscoverPage() {
             <div className="container mx-auto px-4 py-8">
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
 
-                    {/* Main Content - Left Column (8 cols) */}
-                    <div className="lg:col-span-8 space-y-10">
+                    {/* Main Content - Full Width */}
+                    <div className="lg:col-span-12 space-y-10">
 
                         {/* Quick Actions */}
                         <section className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -286,79 +273,6 @@ export default function DiscoverPage() {
                                 )}
                             </div>
                         </section>
-                    </div>
-
-                    {/* Right Sidebar (4 cols) */}
-                    <div className="lg:col-span-4 space-y-8">
-
-                        {/* Upcoming Events */}
-                        <div className="bg-white border-2 border-slate-900 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] p-6 sticky top-24">
-                            <h3 className="font-bold text-slate-900 text-lg mb-6 flex items-center gap-2">
-                                <Calendar className="w-5 h-5 text-green-600" />
-                                Upcoming Events
-                            </h3>
-
-                            <div className="space-y-6 relative">
-                                {/* Vertical Line */}
-                                <div className="absolute left-2.5 top-2 bottom-2 w-0.5 bg-slate-200"></div>
-
-                                {eventsLoading ? (
-                                    [1, 2].map(i => <div key={i} className="pl-8"><Skeleton className="h-16 w-full" /></div>)
-                                ) : events.length > 0 ? (
-                                    events.map((event, i) => (
-                                        <div key={i} className="relative pl-8 group cursor-pointer">
-                                            {/* Dot */}
-                                            <div className="absolute left-0 top-1.5 w-5 h-5 border-2 border-slate-900 bg-green-500 shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] z-10 group-hover:scale-110 transition-transform"></div>
-
-                                            <h4 className="font-bold text-slate-900 group-hover:text-green-600 transition-colors">
-                                                {event.name}
-                                            </h4>
-                                            <p className="text-xs text-slate-500 mb-1">{formatDate(event.date)} • {event.location || 'Online'}</p>
-                                            <p className="text-sm text-slate-600 line-clamp-2">{event.description}</p>
-
-                                            {/* Host Circle */}
-                                            {event.hostCircles && event.hostCircles[0] && (
-                                                <div className="flex items-center gap-1.5 mt-2">
-                                                    <span className="text-[10px] uppercase font-bold text-slate-400">Host:</span>
-                                                    <span className="text-xs font-semibold text-slate-700 bg-slate-100 px-1.5 py-0.5 rounded">
-                                                        {event.hostCircles[0].name}
-                                                    </span>
-                                                </div>
-                                            )}
-                                        </div>
-                                    ))
-                                ) : (
-                                    <div className="pl-8 text-sm text-slate-400">No upcoming events.</div>
-                                )}
-                            </div>
-
-                            <button className="w-full mt-6 py-2.5 text-sm font-bold uppercase tracking-wide text-slate-900 bg-white border-2 border-slate-900 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all">
-                                View Calendar
-                            </button>
-                        </div>
-
-                        {/* Trending Circles (Simple List) */}
-                        <div className="bg-slate-900 border-2 border-slate-900 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] p-6 text-white relative overflow-hidden">
-                            <div className="absolute top-0 right-0 w-32 h-32 bg-green-500 opacity-20 blur-3xl rounded-full transform translate-x-10 -translate-y-10"></div>
-
-                            <h3 className="font-bold text-lg mb-4 relative z-10">Trendsetters</h3>
-                            <p className="text-slate-300 text-sm mb-6 relative z-10">Top circles making waves this week.</p>
-
-                            <div className="space-y-4 relative z-10">
-                                {pods.slice(0, 3).map((pod, i) => (
-                                    <div key={i} className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/10 transition-colors cursor-pointer" onClick={() => router.push(`/circles`)}>
-                                        <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-xl">
-                                            {pod.icon || '🔥'}
-                                        </div>
-                                        <div>
-                                            <h4 className="font-bold">{pod.name}</h4>
-                                            <p className="text-xs text-slate-400">{pod.memberCount || 0} members</p>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-
                     </div>
                 </div>
             </div>

@@ -31,14 +31,11 @@ const CollaborationRequestModal: React.FC<CollaborationRequestModalProps> = ({
     const [error, setError] = useState('');
 
     // Filter to only show circles owned by current user
-    console.log('🔍 myRooms:', myRooms);
-    console.log('🔍 currentUser.uid:', currentUser?.uid);
     const ownedCircles = myRooms.filter(room => {
         // Use createdByUid if available, fallback to createdBy
         const creatorUid = (room as any).createdByUid || room.createdBy;
         return creatorUid === currentUser?.uid && room.id !== targetCircle?.id;
     });
-    console.log('✅ ownedCircles:', ownedCircles);
 
     useEffect(() => {
         if (isOpen && ownedCircles.length > 0 && !selectedCircleId) {

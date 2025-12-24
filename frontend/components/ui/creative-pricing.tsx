@@ -109,7 +109,7 @@ function CreativePricing({
                                     "text-4xl font-bold",
                                     tier.popular ? "text-white" : "text-zinc-100"
                                 )}>
-                                    {typeof tier.price === 'number' ? `$${tier.price}` : tier.price}
+                                    {typeof tier.price === 'number' ? `₹${tier.price}` : tier.price}
                                 </span>
                                 {typeof tier.price === 'number' && (
                                     <span className={cn(

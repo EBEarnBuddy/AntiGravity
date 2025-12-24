@@ -70,7 +70,8 @@ export const createOpportunity = async (req: AuthRequest, res: Response) => {
                 // Skip the circle just created for this opportunity (optional, but maybe redundant to announce there)
                 if (membership.room.toString() === room._id.toString()) return;
 
-                const content = `${user.displayName} has posted a new opportunity "${opportunity.title}" — click here to apply: ${process.env.FRONTEND_URL || 'http://localhost:3000'}/startups?id=${opportunity._id}`;
+                const siteUrl = process.env.CLIENT_URL?.split(',')[0] || process.env.FRONTEND_URL || 'http://localhost:3000';
+                const content = `${user.displayName} has posted a new opportunity "${opportunity.title}" — click here to apply: ${siteUrl}/startups?id=${opportunity._id}`;
 
                 const message = await Message.create({
                     room: membership.room,

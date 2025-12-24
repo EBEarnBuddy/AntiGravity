@@ -65,7 +65,10 @@ const FreelancePage: React.FC = () => {
                 </p>
 
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                    <button className="px-8 py-3 bg-slate-900 text-white font-bold rounded-xl hover:bg-slate-800 transition shadow-lg">
+                    <button
+                        onClick={() => alert("We'll notify you when CoLancing launches!")}
+                        className="px-8 py-3 bg-slate-900 text-white font-bold rounded-xl hover:bg-slate-800 transition shadow-lg"
+                    >
                         Notify Me
                     </button>
                     <button
