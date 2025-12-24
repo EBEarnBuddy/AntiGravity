@@ -16,7 +16,8 @@ import {
     CheckCircle,
     Globe,
     Linkedin,
-    Mail
+    Mail,
+    Rocket
 } from 'lucide-react';
 import { useStartups, useMyApplications, useBookmarks } from '@/hooks/useFirestore';
 import { useAuth } from '@/contexts/AuthContext';
@@ -73,6 +74,7 @@ const StartupDetailPage: React.FC = () => {
 
     const handleApply = (roleId?: string) => {
         if (roleId) setSelectedRole(roleId);
+        else setSelectedRole(null);
         setShowApplicationModal(true);
     };
 
@@ -84,7 +86,7 @@ const StartupDetailPage: React.FC = () => {
     if (loading) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-slate-50">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
+                <div className="animate-spin h-12 w-12 border-4 border-slate-900 border-b-transparent"></div>
             </div>
         );
     }
@@ -92,14 +94,14 @@ const StartupDetailPage: React.FC = () => {
     if (error || !startup) {
         return (
             <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50 text-center p-4">
-                <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4">
+                <div className="w-16 h-16 bg-red-100 border-2 border-slate-900 flex items-center justify-center mb-4">
                     <Users className="w-8 h-8 text-red-600" />
                 </div>
-                <h1 className="text-2xl font-black text-slate-900 mb-2">Opportunity Not Found</h1>
-                <p className="text-slate-600 mb-6">{error || "This opportunity doesn't exist or has been removed."}</p>
+                <h1 className="text-3xl font-black text-slate-900 mb-2 uppercase">Opportunity Not Found</h1>
+                <p className="text-slate-600 mb-6 font-bold">{error || "This opportunity doesn't exist or has been removed."}</p>
                 <button
                     onClick={() => router.push('/startups')}
-                    className="px-6 py-2 bg-slate-900 text-white font-bold rounded-xl hover:bg-slate-800 transition"
+                    className="px-6 py-2 bg-slate-900 text-white font-black uppercase tracking-wide border-2 border-slate-900 hover:bg-white hover:text-slate-900 hover:shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] transition-all"
                 >
                     Back to Launchpad
                 </button>
@@ -110,36 +112,38 @@ const StartupDetailPage: React.FC = () => {
     return (
         <div className="min-h-screen bg-slate-50 font-sans text-slate-900 pb-20">
             {/* Nav Back */}
-            <div className="sticky top-[64px] z-10 bg-slate-50/80 backdrop-blur-sm border-b border-slate-200">
-                <div className="container mx-auto px-4 py-3 max-w-5xl flex items-center justify-between">
+            <div className="sticky top-[64px] z-10 bg-slate-50/90 backdrop-blur-md border-b-2 border-slate-900">
+                <div className="container mx-auto px-4 py-3 max-w-6xl flex items-center justify-between">
                     <button
                         onClick={() => router.push('/startups')}
-                        className="flex items-center gap-2 text-slate-500 hover:text-slate-900 font-bold text-sm transition"
+                        className="flex items-center gap-2 text-slate-900 font-black uppercase tracking-wide text-sm hover:underline decoration-2 underline-offset-4"
                     >
                         <ArrowLeft className="w-4 h-4" /> Back to Launchpad
                     </button>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-3">
                         <button
                             onClick={handleCopyLink}
-                            className="p-2 hover:bg-white rounded-full border border-transparent hover:border-slate-200 transition text-slate-500 hover:text-green-600"
+                            className="p-2 border-2 border-slate-200 hover:border-slate-900 hover:shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] transition-all text-slate-500 hover:text-slate-900 bg-white"
                         >
                             <Share2 className="w-5 h-5" />
                         </button>
                         <button
                             onClick={() => toggleBookmark(startup.id)}
-                            className="p-2 hover:bg-white rounded-full border border-transparent hover:border-slate-200 transition text-slate-500"
+                            className={`p-2 border-2 transition-all ${isBookmarked(startup.id)
+                                ? 'bg-green-100 border-green-600 text-green-700 shadow-[2px_2px_0px_0px_rgba(22,163,74,1)]'
+                                : 'bg-white border-slate-200 hover:border-slate-900 text-slate-500 hover:text-slate-900 hover:shadow-[2px_2px_0px_0px_rgba(15,23,42,1)]'}`}
                         >
-                            <Bookmark className={`w-5 h-5 ${isBookmarked(startup.id) ? 'fill-current text-green-600' : 'hover:text-green-600'}`} />
+                            <Bookmark className={`w-5 h-5 ${isBookmarked(startup.id) ? 'fill-current' : ''}`} />
                         </button>
                     </div>
                 </div>
             </div>
 
-            <div className="container mx-auto px-4 py-8 max-w-5xl">
+            <div className="container mx-auto px-4 py-8 max-w-6xl">
                 {/* Header Card */}
-                <div className="bg-white border-2 border-slate-900 rounded-2xl overflow-hidden shadow-[8px_8px_0px_0px_rgba(15,23,42,1)] mb-10">
+                <div className="bg-white border-4 border-slate-900 shadow-[12px_12px_0px_0px_rgba(15,23,42,1)] mb-12">
                     {/* Cover Image */}
-                    <div className="h-64 md:h-80 bg-slate-100 relative overflow-hidden">
+                    <div className="h-64 md:h-80 bg-slate-100 relative overflow-hidden border-b-4 border-slate-900">
                         {startup.image || startup.logo ? (
                             <img
                                 src={startup.image || startup.logo}
@@ -147,74 +151,76 @@ const StartupDetailPage: React.FC = () => {
                                 className="w-full h-full object-cover"
                             />
                         ) : (
-                            <div className="absolute inset-0 opacity-10 bg-[linear-gradient(45deg,#000_25%,transparent_25%,transparent_75%,#000_75%,#000),linear-gradient(45deg,#000_25%,transparent_25%,transparent_75%,#000_75%,#000)] [background-size:20px_20px] [background-position:0_0,10px_10px]"></div>
+                            <div className="absolute inset-0 opacity-20 bg-[linear-gradient(45deg,#000_25%,transparent_25%,transparent_75%,#000_75%,#000)] [background-size:24px_24px]"></div>
                         )}
-                        <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm px-4 py-1.5 rounded-full border border-slate-200 text-xs font-black uppercase tracking-wide text-green-700">
+                        <div className="absolute top-6 left-6 bg-white px-4 py-2 border-2 border-slate-900 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] text-xs font-black uppercase tracking-widest text-slate-900">
                             {startup.type === 'project' ? 'Project' : 'Startup'}
                         </div>
                         {status && (
-                            <div className={`absolute bottom-4 right-4 px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-wide shadow-sm border border-black/10
-                                ${status === 'accepted' ? 'bg-green-500 text-white' :
-                                    status === 'rejected' ? 'bg-red-500 text-white' :
-                                        'bg-yellow-400 text-slate-900'}`}>
+                            <div className={`absolute bottom-6 right-6 px-4 py-2 text-xs font-black uppercase tracking-widest border-2 border-slate-900 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]
+                                ${status === 'accepted' ? 'bg-green-400 text-slate-900' :
+                                    status === 'rejected' ? 'bg-red-400 text-white' :
+                                        'bg-yellow-300 text-slate-900'}`}>
                                 {status}
                             </div>
                         )}
                     </div>
 
                     <div className="p-6 md:p-10">
-                        <div className="flex flex-col md:flex-row gap-6 md:items-start justify-between">
+                        <div className="flex flex-col lg:flex-row gap-10 lg:items-start justify-between">
                             <div className="flex-1">
-                                <h1 className="text-3xl md:text-5xl font-black text-slate-900 leading-tight mb-2">
+                                <h1 className="text-4xl md:text-6xl font-black text-slate-900 leading-none mb-4 uppercase tracking-tighter">
                                     {startup.name || startup.title}
                                 </h1>
-                                <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm font-bold text-slate-500 mb-6">
-                                    <div className="flex items-center gap-2">
+                                <div className="flex flex-wrap items-center gap-x-6 gap-y-3 text-sm font-bold text-slate-500 mb-8 border-b-2 border-slate-100 pb-8">
+                                    <div className="flex items-center gap-2 px-3 py-1 bg-slate-100 border-2 border-slate-200 text-slate-700 uppercase tracking-wide text-xs">
                                         <Briefcase className="w-4 h-4" /> {startup.industry || 'Tech'}
                                     </div>
-                                    <div className="flex items-center gap-2">
+                                    <div className="flex items-center gap-2 px-3 py-1 bg-slate-100 border-2 border-slate-200 text-slate-700 uppercase tracking-wide text-xs">
                                         <MapPin className="w-4 h-4" /> {startup.location || 'Remote'}
                                     </div>
-                                    <div className="flex items-center gap-2">
+                                    <div className="flex items-center gap-2 px-3 py-1 bg-slate-100 border-2 border-slate-200 text-slate-700 uppercase tracking-wide text-xs">
                                         <Calendar className="w-4 h-4" /> Posted {formatTimeAgo(startup.createdAt)}
                                     </div>
                                 </div>
-                                <p className="text-lg md:text-xl text-slate-700 leading-relaxed font-medium">
-                                    {startup.description}
-                                </p>
+                                <div className="prose prose-slate max-w-none">
+                                    <p className="text-xl text-slate-800 leading-relaxed font-medium">
+                                        {startup.description}
+                                    </p>
+                                </div>
                             </div>
 
                             {/* Sidebar-ish Info */}
-                            <div className="w-full md:w-72 flex-shrink-0 space-y-4">
-                                <div className="p-5 bg-slate-50 rounded-xl border border-slate-200">
-                                    <h3 className="text-xs font-black uppercase text-slate-400 mb-4 tracking-wider">Details</h3>
-                                    <div className="space-y-3">
+                            <div className="w-full lg:w-80 flex-shrink-0 space-y-6">
+                                <div className="p-6 bg-white border-4 border-slate-900 shadow-[8px_8px_0px_0px_rgba(203,213,225,1)]">
+                                    <h3 className="text-sm font-black uppercase text-slate-900 mb-6 tracking-widest border-b-2 border-slate-900 pb-2">At a Glance</h3>
+                                    <div className="space-y-4">
                                         {startup.equity && (
-                                            <div className="flex items-center justify-between">
-                                                <span className="text-sm font-bold text-slate-600 flex items-center gap-2">
+                                            <div className="flex items-center justify-between group">
+                                                <span className="text-sm font-bold text-slate-500 group-hover:text-slate-900 flex items-center gap-2 uppercase tracking-wide">
                                                     <PieChart className="w-4 h-4" /> Equity
                                                 </span>
-                                                <span className="text-sm font-black text-slate-900">{startup.equity}</span>
+                                                <span className="text-sm font-black text-slate-900 bg-green-100 px-2 py-0.5 border border-green-300">{startup.equity}</span>
                                             </div>
                                         )}
                                         {startup.salary && (
-                                            <div className="flex items-center justify-between">
-                                                <span className="text-sm font-bold text-slate-600 flex items-center gap-2">
+                                            <div className="flex items-center justify-between group">
+                                                <span className="text-sm font-bold text-slate-500 group-hover:text-slate-900 flex items-center gap-2 uppercase tracking-wide">
                                                     <DollarSign className="w-4 h-4" /> Salary
                                                 </span>
-                                                <span className="text-sm font-black text-slate-900">{startup.salary}</span>
+                                                <span className="text-sm font-black text-slate-900 bg-yellow-100 px-2 py-0.5 border border-yellow-300">{startup.salary}</span>
                                             </div>
                                         )}
                                         {startup.stage && (
-                                            <div className="flex items-center justify-between">
-                                                <span className="text-sm font-bold text-slate-600 flex items-center gap-2">
+                                            <div className="flex items-center justify-between group">
+                                                <span className="text-sm font-bold text-slate-500 group-hover:text-slate-900 flex items-center gap-2 uppercase tracking-wide">
                                                     <Rocket className="w-4 h-4" /> Stage
                                                 </span>
                                                 <span className="text-sm font-black text-slate-900">{startup.stage}</span>
                                             </div>
                                         )}
-                                        <div className="flex items-center justify-between">
-                                            <span className="text-sm font-bold text-slate-600 flex items-center gap-2">
+                                        <div className="flex items-center justify-between group">
+                                            <span className="text-sm font-bold text-slate-500 group-hover:text-slate-900 flex items-center gap-2 uppercase tracking-wide">
                                                 <Users className="w-4 h-4" /> Team
                                             </span>
                                             <span className="text-sm font-black text-slate-900">{startup.teamSize || '1-10'}</span>
@@ -224,7 +230,7 @@ const StartupDetailPage: React.FC = () => {
                                     {!isOwner && !status && (
                                         <button
                                             onClick={() => handleApply()}
-                                            className="w-full mt-6 py-3 bg-green-600 text-white font-black uppercase rounded-lg hover:bg-green-700 transition shadow-[4px_4px_0px_0px_rgba(22,101,52,1)] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_0px_rgba(22,101,52,1)]"
+                                            className="w-full mt-8 py-4 bg-green-500 text-slate-900 font-black uppercase tracking-widest border-2 border-slate-900 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] hover:shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] hover:translate-y-[2px] hover:translate-x-[2px] transition-all"
                                         >
                                             Apply Now
                                         </button>
@@ -232,43 +238,43 @@ const StartupDetailPage: React.FC = () => {
                                     {isOwner && (
                                         <button
                                             onClick={() => alert('Manage flow coming soon')}
-                                            className="w-full mt-6 py-3 bg-slate-900 text-white font-black uppercase rounded-lg hover:bg-slate-800 transition"
+                                            className="w-full mt-8 py-4 bg-slate-900 text-white font-black uppercase tracking-widest border-2 border-slate-900 hover:bg-white hover:text-slate-900 transition-all"
                                         >
-                                            Manage Opportunity
+                                            Manage
                                         </button>
                                     )}
                                 </div>
 
                                 {/* Founder Info */}
-                                <div className="p-5 bg-white rounded-xl border border-slate-200">
-                                    <h3 className="text-xs font-black uppercase text-slate-400 mb-4 tracking-wider">Posted By</h3>
-                                    <div className="flex items-center gap-3">
-                                        <div className="h-10 w-10 rounded-full bg-slate-100 border border-slate-300 flex items-center justify-center overflow-hidden">
+                                <div className="p-6 bg-slate-900 text-white border-4 border-slate-900">
+                                    <h3 className="text-xs font-black uppercase text-slate-400 mb-6 tracking-widest">Posted By</h3>
+                                    <div className="flex items-center gap-4">
+                                        <div className="h-12 w-12 bg-white border-2 border-white flex items-center justify-center overflow-hidden">
                                             {startup.founderAvatar ? (
                                                 <img src={startup.founderAvatar} alt="Founder" className="w-full h-full object-cover" />
                                             ) : (
-                                                <Users className="w-5 h-5 text-slate-400" />
+                                                <Users className="w-6 h-6 text-slate-900" />
                                             )}
                                         </div>
                                         <div>
-                                            <p className="text-sm font-black text-slate-900">{startup.founderName || 'Unknown Founder'}</p>
-                                            <p className="text-xs font-bold text-slate-500">Founder</p>
+                                            <p className="text-lg font-black text-white">{startup.founderName || 'Unknown Founder'}</p>
+                                            <p className="text-xs font-bold text-green-400 uppercase tracking-wider">Project Lead</p>
                                         </div>
                                     </div>
                                     {startup.contact && (
-                                        <div className="flex gap-2 mt-4">
+                                        <div className="flex gap-3 mt-6">
                                             {startup.contact.linkedin && (
-                                                <a href={startup.contact.linkedin} target="_blank" className="p-2 bg-slate-50 rounded-full hover:bg-blue-50 text-slate-400 hover:text-blue-600 transition">
+                                                <a href={startup.contact.linkedin} target="_blank" className="p-2 border-2 border-slate-700 hover:border-white hover:bg-white hover:text-slate-900 text-slate-400 transition-all">
                                                     <Linkedin className="w-4 h-4" />
                                                 </a>
                                             )}
                                             {startup.contact.website && (
-                                                <a href={startup.contact.website} target="_blank" className="p-2 bg-slate-50 rounded-full hover:bg-green-50 text-slate-400 hover:text-green-600 transition">
+                                                <a href={startup.contact.website} target="_blank" className="p-2 border-2 border-slate-700 hover:border-white hover:bg-white hover:text-slate-900 text-slate-400 transition-all">
                                                     <Globe className="w-4 h-4" />
                                                 </a>
                                             )}
                                             {startup.contact.email && (
-                                                <a href={`mailto:${startup.contact.email}`} className="p-2 bg-slate-50 rounded-full hover:bg-yellow-50 text-slate-400 hover:text-yellow-600 transition">
+                                                <a href={`mailto:${startup.contact.email}`} className="p-2 border-2 border-slate-700 hover:border-white hover:bg-white hover:text-slate-900 text-slate-400 transition-all">
                                                     <Mail className="w-4 h-4" />
                                                 </a>
                                             )}
@@ -282,36 +288,51 @@ const StartupDetailPage: React.FC = () => {
 
                 {/* Roles Section */}
                 {startup.roles && startup.roles.length > 0 && (
-                    <div className="mb-10">
-                        <h2 className="text-2xl font-black text-slate-900 mb-6 flex items-center gap-3">
-                            <span className="w-8 h-8 rounded-lg bg-green-100 flex items-center justify-center text-green-700">
-                                <Users className="w-5 h-5" />
-                            </span>
-                            Open Roles
-                        </h2>
-                        <div className="grid gap-4">
+                    <div className="mb-12">
+                        <div className="flex items-center gap-4 mb-8">
+                            <div className="h-4 w-4 bg-green-500 border-2 border-slate-900"></div>
+                            <h2 className="text-3xl font-black text-slate-900 uppercase tracking-tighter">Open Roles</h2>
+                        </div>
+
+                        <div className="grid gap-6">
                             {startup.roles.map((role: any) => (
-                                <div key={role.id || role._id} className="bg-white border text-left border-slate-200 p-6 rounded-xl hover:border-green-400 transition group relative overflow-hidden">
-                                    <div className="absolute top-0 right-0 w-24 h-24 bg-green-50 rounded-full -mr-12 -mt-12 transition-transform group-hover:scale-150 duration-500"></div>
-                                    <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                                        <div>
-                                            <h3 className="text-xl font-bold text-slate-900">{role.title}</h3>
-                                            <div className="flex items-center gap-3 mt-1 text-sm font-medium text-slate-500">
-                                                <span className="bg-slate-100 px-2 py-0.5 rounded text-xs font-bold uppercase">{role.type}</span>
-                                                <span>{role.location}</span>
-                                                {role.salary && <span>• {role.salary}</span>}
+                                <div key={role.id || role._id} className="bg-white border-4 border-slate-900 p-8 hover:shadow-[12px_12px_0px_0px_rgba(22,163,74,1)] transition-all group relative">
+                                    <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
+                                        <div className="flex-1">
+                                            <div className="flex items-center gap-3 mb-3">
+                                                <h3 className="text-2xl font-black text-slate-900 uppercase">{role.title}</h3>
+                                                <span className="bg-slate-900 text-white px-2 py-0.5 text-xs font-bold uppercase tracking-wide border-2 border-slate-900">{role.type}</span>
                                             </div>
-                                            <p className="mt-3 text-slate-600 max-w-2xl">{role.description}</p>
+
+                                            <div className="flex items-center gap-4 text-sm font-bold text-slate-500 mb-4">
+                                                <span className="flex items-center gap-1"><MapPin className="w-4 h-4" /> {role.location}</span>
+                                                {role.salary && <span className="flex items-center gap-1"><DollarSign className="w-4 h-4" /> {role.salary}</span>}
+                                            </div>
+
+                                            <p className="text-slate-700 text-lg font-medium leading-relaxed max-w-3xl">{role.description}</p>
                                         </div>
+
                                         {!isOwner && (
                                             <button
                                                 onClick={() => handleApply(role.id)}
-                                                className="px-6 py-2 bg-white border-2 border-slate-900 text-slate-900 font-bold uppercase rounded-lg hover:bg-slate-900 hover:text-white transition whitespace-nowrap"
+                                                className="px-8 py-3 bg-white border-4 border-slate-900 text-slate-900 font-black uppercase tracking-widest hover:bg-slate-900 hover:text-white transition-all whitespace-nowrap shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]"
                                             >
-                                                Apply
+                                                Apply Role
                                             </button>
                                         )}
                                     </div>
+
+                                    {role.requirements && role.requirements.length > 0 && (
+                                        <div className="mt-6 pt-6 border-t-2 border-slate-100">
+                                            <div className="flex flex-wrap gap-2 transition-all">
+                                                {role.requirements.map((req: string, idx: number) => (
+                                                    <span key={idx} className="px-3 py-1 bg-slate-100 border-2 border-slate-200 text-slate-700 text-xs font-bold uppercase tracking-wide group-hover:border-green-500 group-hover:bg-green-50 group-hover:text-green-700">
+                                                        {req}
+                                                    </span>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
                             ))}
                         </div>
@@ -322,14 +343,14 @@ const StartupDetailPage: React.FC = () => {
                 {(startup.requirements?.length > 0 || startup.additionalInfo) && (
                     <div className="grid md:grid-cols-2 gap-8">
                         {startup.requirements?.length > 0 && (
-                            <div>
-                                <h3 className="text-xl font-black text-slate-900 mb-4 flex items-center gap-2">
-                                    <CheckCircle className="w-5 h-5 text-green-600" /> Requirements
+                            <div className="bg-white border-4 border-slate-900 p-8 shadow-[8px_8px_0px_0px_rgba(15,23,42,1)]">
+                                <h3 className="text-xl font-black text-slate-900 mb-6 flex items-center gap-3 uppercase tracking-tight">
+                                    <CheckCircle className="w-6 h-6 text-green-600" /> General Requirements
                                 </h3>
-                                <ul className="space-y-3">
+                                <ul className="space-y-4">
                                     {startup.requirements.map((req: string, i: number) => (
-                                        <li key={i} className="flex items-start gap-3 text-slate-700 font-medium">
-                                            <span className="w-1.5 h-1.5 rounded-full bg-green-500 mt-2 flex-shrink-0"></span>
+                                        <li key={i} className="flex items-start gap-4 text-slate-800 font-bold">
+                                            <div className="w-2 h-2 bg-slate-900 mt-2 flex-shrink-0"></div>
                                             {req}
                                         </li>
                                     ))}
@@ -337,9 +358,9 @@ const StartupDetailPage: React.FC = () => {
                             </div>
                         )}
                         {startup.additionalInfo && (
-                            <div>
-                                <h3 className="text-xl font-black text-slate-900 mb-4">Additional Info</h3>
-                                <div className="bg-white p-6 rounded-xl border border-slate-200 text-slate-600">
+                            <div className="bg-slate-50 border-4 border-slate-200 p-8">
+                                <h3 className="text-xl font-black text-slate-900 mb-6 uppercase tracking-tight">Additional Info</h3>
+                                <div className="text-slate-600 font-medium leading-relaxed">
                                     {startup.additionalInfo}
                                 </div>
                             </div>
@@ -356,15 +377,11 @@ const StartupDetailPage: React.FC = () => {
                 selectedRole={startup.roles?.find((r: any) => r.id === selectedRole) || null}
                 onSuccess={() => {
                     setShowApplicationModal(false);
-                    // Optimistic update logic if needed
-                    router.refresh();
+                    router.refresh(); // Or optimistically update status
                 }}
             />
         </div>
     );
 };
-
-// Simple Icon component helper if needed, but imported lucid-react icons work fine.
-import { Rocket } from 'lucide-react';
 
 export default StartupDetailPage;

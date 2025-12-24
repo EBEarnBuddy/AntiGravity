@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Send, FileText, Globe, Mail } from 'lucide-react';
+import { X, Send, FileText, Globe, Mail, AlertCircle, CheckCircle } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useStartups } from '../hooks/useFirestore';
 
@@ -47,6 +47,14 @@ const StartupApplicationModal: React.FC<StartupApplicationModalProps> = ({
   const { applyToStartup } = useStartups();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedRoleId, setSelectedRoleId] = useState(selectedRole?.id || '');
+
+  // Update selected role if prop changes
+  React.useEffect(() => {
+    if (selectedRole) {
+      setSelectedRoleId(selectedRole.id);
+    }
+  }, [selectedRole]);
+
   const [formData, setFormData] = useState({
     coverLetter: '',
     portfolio: '',
@@ -57,19 +65,47 @@ const StartupApplicationModal: React.FC<StartupApplicationModalProps> = ({
     availability: 'full-time'
   });
 
+  const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const validate = () => {
+    const newErrors: Record<string, string> = {};
+    let isValid = true;
+
+    if (!selectedRoleId) { newErrors.role = 'Please select a role'; isValid = false; }
+    if (!formData.coverLetter.trim()) { newErrors.coverLetter = 'Cover letter is required'; isValid = false; }
+    if (!formData.experience.trim()) { newErrors.experience = 'Experience details are required'; isValid = false; }
+    if (!formData.whyInterested.trim()) { newErrors.whyInterested = 'Please explain your interest'; isValid = false; }
+
+    const isValidUrl = (url: string) => {
+      if (!url) return true;
+      try { new URL(url); return true; } catch { return false; }
+    };
+
+    if (formData.portfolio && !isValidUrl(formData.portfolio)) { newErrors.portfolio = 'Invalid URL'; isValid = false; }
+    if (formData.linkedin && !isValidUrl(formData.linkedin)) { newErrors.linkedin = 'Invalid URL'; isValid = false; }
+    if (formData.github && !isValidUrl(formData.github)) { newErrors.github = 'Invalid URL'; isValid = false; }
+
+    setErrors(newErrors);
+    return isValid;
+  };
+
   const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value
-    }));
+    setFormData(prev => ({ ...prev, [field]: value }));
+    if (errors[field]) {
+      setErrors(prev => {
+        const newErrs = { ...prev };
+        delete newErrs[field];
+        return newErrs;
+      });
+    }
   };
 
   const handleSubmit = async () => {
-    if (!currentUser || !startup || !selectedRoleId) return;
+    if (!currentUser || !startup) return;
+    if (!validate()) return;
 
     try {
       setIsSubmitting(true);
-
       await applyToStartup(startup.id, selectedRoleId, currentUser.uid, {
         coverLetter: formData.coverLetter,
         portfolio: formData.portfolio,
@@ -85,13 +121,7 @@ const StartupApplicationModal: React.FC<StartupApplicationModalProps> = ({
 
       // Reset form
       setFormData({
-        coverLetter: '',
-        portfolio: '',
-        linkedin: '',
-        github: '',
-        experience: '',
-        whyInterested: '',
-        availability: 'full-time'
+        coverLetter: '', portfolio: '', linkedin: '', github: '', experience: '', whyInterested: '', availability: 'full-time'
       });
       setSelectedRoleId('');
     } catch (error) {
@@ -103,264 +133,168 @@ const StartupApplicationModal: React.FC<StartupApplicationModalProps> = ({
 
   if (!startup) return null;
 
+  const inputClass = (hasError: boolean) =>
+    `w-full px-4 py-3 border-2 rounded-none transition-all outline-none font-bold placeholder:text-slate-400 text-slate-900 ${hasError
+      ? 'border-red-500 bg-red-50 focus:border-red-600'
+      : 'border-slate-900 bg-white focus:bg-green-50 focus:border-green-600 focus:shadow-[4px_4px_0px_0px_rgba(22,163,74,1)]'
+    }`;
+
+  const labelClass = "block text-sm font-black text-slate-900 mb-2 uppercase tracking-wide";
+  const errorClass = "text-xs font-bold text-red-500 mt-1 flex items-center gap-1";
+
   return (
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+          className="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           onClick={onClose}
         >
           <motion.div
-            className="flex flex-col bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] shadow-xl overflow-hidden"
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0.9, opacity: 0 }}
+            className="flex flex-col bg-white border-4 border-slate-900 w-full max-w-2xl max-h-[90vh] shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] overflow-hidden"
+            initial={{ scale: 0.9, opacity: 0, y: 20 }}
+            animate={{ scale: 1, opacity: 1, y: 0 }}
+            exit={{ scale: 0.9, opacity: 0, y: 20 }}
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Header - Fixed */}
-            <div className="flex-none px-8 py-6 border-b border-slate-100 bg-white">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h2 className="text-2xl font-black text-slate-900 tracking-tight">Apply to {startup.name}</h2>
-                  <p className="text-slate-500 font-medium mt-1">Join this exciting startup team</p>
-                </div>
-                <button
-                  onClick={onClose}
-                  className="p-2 hover:bg-slate-100 rounded-lg transition-colors text-slate-400 hover:text-slate-600"
-                >
-                  <X className="w-6 h-6" />
-                </button>
+            {/* Header */}
+            <div className="flex-none px-8 py-6 border-b-4 border-slate-900 bg-white flex justify-between items-center">
+              <div>
+                <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tighter">Apply to {startup.name}</h2>
+                <p className="text-slate-500 font-bold mt-1 text-sm">Make your move.</p>
               </div>
+              <button
+                onClick={onClose}
+                className="p-2 border-2 border-transparent hover:border-slate-900 hover:bg-red-100 hover:text-red-600 transition-all rounded-none"
+              >
+                <X className="w-8 h-8" />
+              </button>
             </div>
 
-            {/* Scrollable Content */}
-            <div className="flex-1 overflow-y-auto px-8 py-6 custom-scrollbar">
-              {/* Startup Info */}
-              <div className="bg-slate-50 rounded-xl p-6 mb-8 border border-slate-100">
-                <h3 className="text-lg font-bold text-slate-900 mb-2">{startup.name}</h3>
-                <p className="text-slate-600 mb-4 leading-relaxed">{startup.description}</p>
-                <div className="flex flex-wrap gap-2">
-                  <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium border border-green-200">
-                    {startup.industry}
-                  </span>
-                  <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-medium border border-blue-200">
-                    {startup.stage}
-                  </span>
-                  <span className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm font-medium border border-purple-200">
-                    {startup.equity} equity
-                  </span>
-                </div>
-              </div>
-
+            {/* Content */}
+            <div className="flex-1 overflow-y-auto px-8 py-8 custom-scrollbar bg-slate-50">
               {/* Role Selection */}
-              <div className="mb-8">
-                <label className="block text-sm font-bold text-slate-700 mb-2">
-                  Select Role *
-                </label>
+              <div className="mb-8 p-6 bg-white border-2 border-slate-900 shadow-[4px_4px_0px_0px_rgba(203,213,225,1)]">
+                <label className={labelClass}>Select Role *</label>
                 <select
                   value={selectedRoleId}
                   onChange={(e) => setSelectedRoleId(e.target.value)}
-                  className="w-full px-4 py-3 border border-slate-200 rounded-xl bg-white text-slate-900 focus:ring-2 focus:ring-green-600 focus:border-transparent transition-all duration-300 font-medium outline-none"
+                  className={inputClass(!!errors.role)}
                 >
-                  <option value="">Choose a role...</option>
+                  <option value="">-- Choose a Role --</option>
                   {startup.roles?.map((role) => (
                     <option key={role.id} value={role.id}>
-                      {role.title} - {role.type} ({role.location})
+                      {role.title} ({role.type})
                     </option>
                   ))}
                 </select>
+                {errors.role && <p className={errorClass}><AlertCircle className="w-3 h-3" /> {errors.role}</p>}
+
+                {/* Role Details Preview */}
+                {selectedRoleId && (
+                  <div className="mt-4 pt-4 border-t-2 border-slate-100">
+                    {(() => {
+                      const role = startup.roles?.find(r => r.id === selectedRoleId);
+                      if (!role) return null;
+                      return (
+                        <div className="text-sm">
+                          <p className="font-bold text-slate-900 mb-1">{role.location} • {role.salary || 'No Salary Info'}</p>
+                          <p className="text-slate-600">{role.description.substring(0, 100)}...</p>
+                        </div>
+                      )
+                    })()}
+                  </div>
+                )}
               </div>
 
-              {/* Selected Role Details */}
-              {selectedRoleId && (
-                <div className="bg-blue-50/50 rounded-xl p-6 mb-8 border border-blue-100">
-                  {(() => {
-                    const role = startup.roles?.find(r => r.id === selectedRoleId);
-                    if (!role) return null;
-
-                    return (
-                      <div>
-                        <h4 className="text-lg font-bold text-slate-900 mb-2">{role.title}</h4>
-                        <p className="text-slate-600 mb-4">{role.description}</p>
-                        <div className="flex flex-wrap gap-2 mb-4">
-                          <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-semibold uppercase tracking-wide">
-                            {role.type}
-                          </span>
-                          <span className="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-semibold uppercase tracking-wide">
-                            {role.location}
-                          </span>
-                          {role.salary && (
-                            <span className="px-2 py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs font-semibold uppercase tracking-wide">
-                              {role.salary}
-                            </span>
-                          )}
-                          {role.equity && (
-                            <span className="px-2 py-1 bg-purple-100 text-purple-700 rounded-full text-xs font-semibold uppercase tracking-wide">
-                              {role.equity} equity
-                            </span>
-                          )}
-                        </div>
-                        <div>
-                          <h5 className="text-sm font-bold text-slate-700 mb-2">Requirements:</h5>
-                          <ul className="space-y-2">
-                            {role.requirements?.map((req, index) => (
-                              <li key={index} className="flex items-start gap-2 text-sm text-slate-600">
-                                <span className="text-green-500 mt-1.5">•</span>
-                                {req}
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      </div>
-                    );
-                  })()}
-                </div>
-              )}
-
-              {/* Application Form */}
+              {/* Form */}
               <div className="space-y-6">
                 <div>
-                  <label className="block text-sm font-bold text-slate-700 mb-2">
-                    Cover Letter *
-                  </label>
+                  <label className={labelClass}>Why You? (Cover Letter) *</label>
                   <textarea
                     value={formData.coverLetter}
                     onChange={(e) => handleInputChange('coverLetter', e.target.value)}
                     rows={4}
-                    className="w-full px-4 py-3 border border-slate-200 rounded-xl bg-white text-slate-900 focus:ring-2 focus:ring-green-600 focus:border-transparent transition-all duration-300 font-medium outline-none placeholder:text-slate-400"
-                    placeholder="Tell us why you're interested in joining this startup and what you can bring to the team..."
+                    className={inputClass(!!errors.coverLetter)}
+                    placeholder="Don't be boring."
                   />
+                  {errors.coverLetter && <p className={errorClass}><AlertCircle className="w-3 h-3" /> {errors.coverLetter}</p>}
                 </div>
 
-                <div>
-                  <label className="block text-sm font-bold text-slate-700 mb-2">
-                    Portfolio/Website
-                  </label>
-                  <div className="relative">
-                    <Globe className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-5 h-5" />
-                    <input
-                      type="url"
-                      value={formData.portfolio}
-                      onChange={(e) => handleInputChange('portfolio', e.target.value)}
-                      className="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-xl bg-white text-slate-900 focus:ring-2 focus:ring-green-600 focus:border-transparent transition-all duration-300 font-medium outline-none placeholder:text-slate-400"
-                      placeholder="https://yourportfolio.com"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-sm font-bold text-slate-700 mb-2">
-                      LinkedIn Profile
-                    </label>
+                    <label className={labelClass}>LinkedIn URL</label>
                     <div className="relative">
-                      <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-5 h-5" />
                       <input
                         type="url"
                         value={formData.linkedin}
                         onChange={(e) => handleInputChange('linkedin', e.target.value)}
-                        className="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-xl bg-white text-slate-900 focus:ring-2 focus:ring-green-600 focus:border-transparent transition-all duration-300 font-medium outline-none placeholder:text-slate-400"
-                        placeholder="https://linkedin.com/in/yourprofile"
+                        className={`${inputClass(!!errors.linkedin)} pl-10`}
+                        placeholder="https://linkedin.com/..."
                       />
+                      <Mail className="absolute left-3 top-3.5 w-5 h-5 text-slate-400 pointer-events-none" />
                     </div>
+                    {errors.linkedin && <p className={errorClass}><AlertCircle className="w-3 h-3" /> {errors.linkedin}</p>}
                   </div>
-
                   <div>
-                    <label className="block text-sm font-bold text-slate-700 mb-2">
-                      GitHub Profile
-                    </label>
+                    <label className={labelClass}>Portfolio URL</label>
                     <div className="relative">
-                      <FileText className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-5 h-5" />
                       <input
                         type="url"
-                        value={formData.github}
-                        onChange={(e) => handleInputChange('github', e.target.value)}
-                        className="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-xl bg-white text-slate-900 focus:ring-2 focus:ring-green-600 focus:border-transparent transition-all duration-300 font-medium outline-none placeholder:text-slate-400"
-                        placeholder="https://github.com/yourusername"
+                        value={formData.portfolio}
+                        onChange={(e) => handleInputChange('portfolio', e.target.value)}
+                        className={`${inputClass(!!errors.portfolio)} pl-10`}
+                        placeholder="https://mywork.com"
                       />
+                      <Globe className="absolute left-3 top-3.5 w-5 h-5 text-slate-400 pointer-events-none" />
                     </div>
+                    {errors.portfolio && <p className={errorClass}><AlertCircle className="w-3 h-3" /> {errors.portfolio}</p>}
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-bold text-slate-700 mb-2">
-                    Relevant Experience *
-                  </label>
+                  <label className={labelClass}>Relevant Experience *</label>
                   <textarea
                     value={formData.experience}
                     onChange={(e) => handleInputChange('experience', e.target.value)}
                     rows={3}
-                    className="w-full px-4 py-3 border border-slate-200 rounded-xl bg-white text-slate-900 focus:ring-2 focus:ring-green-600 focus:border-transparent transition-all duration-300 font-medium outline-none placeholder:text-slate-400"
-                    placeholder="Describe your relevant experience, skills, and achievements..."
+                    className={inputClass(!!errors.experience)}
+                    placeholder="What have you built?"
                   />
+                  {errors.experience && <p className={errorClass}><AlertCircle className="w-3 h-3" /> {errors.experience}</p>}
                 </div>
 
                 <div>
-                  <label className="block text-sm font-bold text-slate-700 mb-2">
-                    Why are you interested in this startup? *
-                  </label>
+                  <label className={labelClass}>Why Us? *</label>
                   <textarea
                     value={formData.whyInterested}
                     onChange={(e) => handleInputChange('whyInterested', e.target.value)}
-                    rows={3}
-                    className="w-full px-4 py-3 border border-slate-200 rounded-xl bg-white text-slate-900 focus:ring-2 focus:ring-green-600 focus:border-transparent transition-all duration-300 font-medium outline-none placeholder:text-slate-400"
-                    placeholder="What excites you about this startup and its mission?"
+                    rows={2}
+                    className={inputClass(!!errors.whyInterested)}
+                    placeholder="Flattery helps, but specifics are better."
                   />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-bold text-slate-700 mb-2">
-                    Availability
-                  </label>
-                  <select
-                    value={formData.availability}
-                    onChange={(e) => handleInputChange('availability', e.target.value)}
-                    className="w-full px-4 py-3 border border-slate-200 rounded-xl bg-white text-slate-900 focus:ring-2 focus:ring-green-600 focus:border-transparent transition-all duration-300 font-medium outline-none"
-                  >
-                    <option value="full-time">Full-time</option>
-                    <option value="part-time">Part-time</option>
-                    <option value="contract">Contract</option>
-                    <option value="consulting">Consulting</option>
-                  </select>
+                  {errors.whyInterested && <p className={errorClass}><AlertCircle className="w-3 h-3" /> {errors.whyInterested}</p>}
                 </div>
               </div>
             </div>
 
-            {/* Footer - Fixed */}
-            <div className="flex-none px-8 py-6 border-t border-slate-100 bg-slate-50 flex justify-end gap-4 rounded-b-2xl">
-              <motion.button
+            {/* Footer */}
+            <div className="flex-none px-8 py-6 border-t-4 border-slate-900 bg-slate-50 flex justify-end gap-4">
+              <button
                 onClick={onClose}
-                className="px-6 py-3 border-2 border-slate-200 text-slate-600 font-bold rounded-xl hover:bg-slate-100 hover:border-slate-300 transition-all duration-300"
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
+                className="px-6 py-3 font-bold uppercase text-slate-500 hover:text-slate-900 transition-colors"
               >
                 Cancel
-              </motion.button>
-              <motion.button
+              </button>
+              <button
                 onClick={handleSubmit}
-                disabled={isSubmitting || !selectedRoleId || !formData.coverLetter || !formData.experience || !formData.whyInterested}
-                className={`px-6 py-3 rounded-xl font-bold uppercase tracking-wide transition-all duration-300 flex items-center gap-2 ${isSubmitting || !selectedRoleId || !formData.coverLetter || !formData.experience || !formData.whyInterested
-                    ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
-                    : 'bg-green-600 text-white hover:bg-green-700 hover:shadow-lg'
-                  }`}
-                whileHover={{ scale: isSubmitting || !selectedRoleId || !formData.coverLetter || !formData.experience || !formData.whyInterested ? 1 : 1.02 }}
-                whileTap={{ scale: isSubmitting || !selectedRoleId || !formData.coverLetter || !formData.experience || !formData.whyInterested ? 1 : 0.98 }}
+                disabled={isSubmitting}
+                className="px-8 py-3 bg-green-600 text-white font-black uppercase tracking-widest border-2 border-green-700 hover:bg-green-500 hover:shadow-[4px_4px_0px_0px_rgba(21,128,61,1)] transition-all flex items-center gap-2 disabled:opacity-70 disabled:cursor-wait shadow-[2px_2px_0px_0px_rgba(21,128,61,1)]"
               >
-                {isSubmitting ? (
-                  <>
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                    Submitting...
-                  </>
-                ) : (
-                  <>
-                    <Send className="w-4 h-4" />
-                    Submit Application
-                  </>
-                )}
-              </motion.button>
+                {isSubmitting ? 'Sending...' : <><Send className="w-4 h-4" /> Submit Application</>}
+              </button>
             </div>
           </motion.div>
         </motion.div>
