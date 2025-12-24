@@ -24,6 +24,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { opportunityAPI } from '@/lib/axios';
 import { formatTimeAgo } from '@/lib/utils';
 import StartupApplicationModal from '@/components/StartupApplicationModal';
+import BrutalistLoader from '@/components/ui/BrutalistLoader';
 
 const StartupDetailPage: React.FC = () => {
     const params = useParams();
@@ -86,7 +87,7 @@ const StartupDetailPage: React.FC = () => {
     if (loading) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-slate-50">
-                <div className="animate-spin h-12 w-12 border-4 border-slate-900 border-b-transparent"></div>
+                <BrutalistLoader />
             </div>
         );
     }
