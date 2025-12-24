@@ -66,6 +66,7 @@ const FreelancePage: React.FC = () => {
 
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                     <button
+                        id="tour-freelance-notify"
                         onClick={() => alert("We'll notify you when CoLancing launches!")}
                         className="px-8 py-3 bg-slate-900 text-white font-bold rounded-xl hover:bg-slate-800 transition shadow-lg"
                     >

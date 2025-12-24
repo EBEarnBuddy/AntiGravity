@@ -85,13 +85,16 @@ export const ProductTour: React.FC = () => {
                         transition={{ duration: 0.3 }}
                         style={{
                             position: 'absolute',
-                            // Simple positioning logic - needs refinement for edge cases
-                            left: targetRect.left + (targetRect.width / 2),
-                            top: currentStep.position === 'top'
+                            // Improved positioning logic
+                            left: (currentStep.position || 'bottom') === 'bottom-end'
+                                ? targetRect.right - 320 // Align right edge
+                                : targetRect.left + (targetRect.width / 2),
+                            top: (currentStep.position || 'bottom').startsWith('top')
                                 ? targetRect.top - 16
                                 : targetRect.bottom + 16,
-                            translateX: '-50%',
-                            translateY: currentStep.position === 'top' ? '-100%' : '0'
+                            translateX: (currentStep.position || 'bottom') === 'bottom-end' ? '0' : '-50%',
+                            translateY: (currentStep.position || 'bottom').startsWith('top') ? '-100%' : '0',
+                            maxWidth: 'calc(100vw - 32px)'
                         }}
                         className="bg-white rounded-2xl shadow-2xl p-6 w-[320px] pointer-events-auto border-2 border-slate-900"
                     >

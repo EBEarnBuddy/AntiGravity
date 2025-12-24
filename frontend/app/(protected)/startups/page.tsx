@@ -156,6 +156,7 @@ const StartupsPage: React.FC = () => {
 
                     <div className="flex items-center justify-center gap-4 pt-6">
                         <button
+                            id="tour-startup-create"
                             onClick={() => setShowCreateModal(true)}
                             className="px-6 py-2.5 bg-green-600 text-white font-bold rounded-xl hover:bg-green-700 transition shadow-lg shadow-green-200 transform hover:-translate-y-0.5"
                         >

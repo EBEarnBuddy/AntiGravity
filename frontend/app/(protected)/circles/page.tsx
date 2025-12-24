@@ -152,6 +152,7 @@ const CirclesPage: React.FC = () => {
                         </p>
                     </div>
                     <button
+                        id="tour-circles-create"
                         onClick={() => setIsCreateModalOpen(true)}
                         className="px-6 py-3 bg-green-600 text-white font-bold rounded-xl hover:bg-green-700 transition shadow-lg shadow-green-200 flex items-center gap-2"
                     >
@@ -349,7 +350,7 @@ const CirclesPage: React.FC = () => {
                     <div className="flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
                         <div className="mb-8 overflow-hidden">
                             <motion.div animate={{ opacity: sidebarOpen ? 1 : 0, height: sidebarOpen ? 'auto' : 0 }}>
-                                <h2 className="text-lg font-black text-slate-900 whitespace-nowrap">Circle Types</h2>
+                                <h2 id="tour-circles-sidebar" className="text-lg font-black text-slate-900 whitespace-nowrap">Circle Types</h2>
                             </motion.div>
                         </div>
                         <div className="flex flex-col gap-2">
