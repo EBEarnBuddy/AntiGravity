@@ -118,19 +118,20 @@ export const TourProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const { currentUser, userProfile, updateProfile } = useAuth();
     const [isActive, setIsActive] = useState(false);
     const [currentStepIndex, setCurrentStepIndex] = useState(0);
+    const [hasCompletedThisSession, setHasCompletedThisSession] = useState(false);
     const pathname = usePathname();
     const router = useRouter();
 
     // Check if tour should start
     useEffect(() => {
-        if (currentUser && userProfile && !userProfile.productTourCompleted) {
+        if (currentUser && userProfile && !userProfile.productTourCompleted && !hasCompletedThisSession) {
             // Only auto-start if we are on the discovery page or if we handle multi-page routing
             // For simplicity, we start it when they land on dashboard/discover
             if (pathname === '/discover' && !isActive) {
                 setIsActive(true);
             }
         }
-    }, [currentUser, userProfile, pathname]);
+    }, [currentUser, userProfile, pathname, hasCompletedThisSession]); // Removed isActive to avoid circular dependency triggers, though logically it's used in the if
 
     const startTour = () => {
         setIsActive(true);
@@ -140,6 +141,7 @@ export const TourProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const endTour = async () => {
         setIsActive(false);
+        setHasCompletedThisSession(true);
         if (currentUser && userProfile && !userProfile.productTourCompleted) {
             try {
                 // Update local state optimistic if needed, but Context updates via auth sync

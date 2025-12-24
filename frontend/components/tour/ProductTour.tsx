@@ -10,6 +10,7 @@ export const ProductTour: React.FC = () => {
     const { isActive, currentStepIndex, steps, nextStep, prevStep, skipTour } = useTour();
     const [targetRect, setTargetRect] = useState<DOMRect | null>(null);
     const [mounted, setMounted] = useState(false);
+    const [coords, setCoords] = useState<{ x: number, y: number, placement: 'top' | 'bottom' }>({ x: 0, y: 0, placement: 'bottom' });
 
     useEffect(() => {
         setMounted(true);
@@ -29,17 +30,14 @@ export const ProductTour: React.FC = () => {
                 element.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 setTargetRect(element.getBoundingClientRect());
             } else {
-                // If element not found, we might want to skip or just show centered
-                // For now, let's just log it
                 console.warn(`Tour target not found: ${step.targetId}`);
                 setTargetRect(null);
             }
         };
 
-        // Small delay to allow for rendering/animations
         const timeout = setTimeout(updatePosition, 100);
         window.addEventListener('resize', updatePosition);
-        window.addEventListener('scroll', updatePosition, true); // Capture scroll events
+        window.addEventListener('scroll', updatePosition, true);
 
         return () => {
             clearTimeout(timeout);
@@ -47,6 +45,38 @@ export const ProductTour: React.FC = () => {
             window.removeEventListener('scroll', updatePosition, true);
         };
     }, [isActive, currentStepIndex, steps]);
+
+    // Calculate Coords with Clamping
+    useEffect(() => {
+        if (!targetRect || !isActive) return;
+
+        const step = steps[currentStepIndex];
+        const TOOLTIP_WIDTH = 320;
+        const PADDING = 16;
+
+        // Calculate horizontal position
+        // improved logic: center by default, unless bottom-end
+        let left = targetRect.left + (targetRect.width / 2) - (TOOLTIP_WIDTH / 2);
+
+        if (step.position === 'bottom-end') {
+            left = targetRect.right - TOOLTIP_WIDTH;
+        }
+
+        // Clamp to viewport
+        if (left < PADDING) left = PADDING;
+        if (left + TOOLTIP_WIDTH > window.innerWidth - PADDING) {
+            left = window.innerWidth - TOOLTIP_WIDTH - PADDING;
+        }
+
+        // Calculate vertical position
+        const isTop = (step.position || 'bottom').startsWith('top');
+        let top = isTop
+            ? targetRect.top - 16
+            : targetRect.bottom + 16;
+
+        setCoords({ x: left, y: top, placement: isTop ? 'top' : 'bottom' });
+
+    }, [targetRect, isActive, currentStepIndex, steps]);
 
     if (!mounted || !isActive) return null;
 
@@ -85,18 +115,13 @@ export const ProductTour: React.FC = () => {
                         transition={{ duration: 0.3 }}
                         style={{
                             position: 'absolute',
-                            // Improved positioning logic
-                            left: (currentStep.position || 'bottom') === 'bottom-end'
-                                ? targetRect.right - 320 // Align right edge
-                                : targetRect.left + (targetRect.width / 2),
-                            top: (currentStep.position || 'bottom').startsWith('top')
-                                ? targetRect.top - 16
-                                : targetRect.bottom + 16,
-                            translateX: (currentStep.position || 'bottom') === 'bottom-end' ? '0' : '-50%',
-                            translateY: (currentStep.position || 'bottom').startsWith('top') ? '-100%' : '0',
+                            left: coords.x,
+                            top: coords.y,
+                            transform: coords.placement === 'top' ? 'translateY(-100%)' : 'none',
+                            width: '320px',
                             maxWidth: 'calc(100vw - 32px)'
                         }}
-                        className="bg-white rounded-2xl shadow-2xl p-6 w-[320px] pointer-events-auto border-2 border-slate-900"
+                        className="bg-white rounded-2xl shadow-2xl p-6 pointer-events-auto border-2 border-slate-900"
                     >
                         {/* Header */}
                         <div className="flex justify-between items-start mb-3">
