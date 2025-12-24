@@ -59,6 +59,16 @@ export const initSocket = (httpServer: HttpServer) => {
             socket.leave(roomId);
         });
 
+        // Typing Indicators
+        socket.on('typing', (data: { roomId: string, userId: string, userName: string }) => {
+            // Broadcast to everyone in the room except the sender
+            socket.to(data.roomId).emit('typing', data);
+        });
+
+        socket.on('stop_typing', (data: { roomId: string, userId: string }) => {
+            socket.to(data.roomId).emit('stop_typing', data);
+        });
+
         socket.on('disconnect', () => {
             console.log('User disconnected');
         });

@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useRoomMessages, useRooms } from '@/hooks/useFirestore';
 import { useAuth } from '@/contexts/AuthContext';
 import {
@@ -333,12 +334,16 @@ const RoomChatPage: React.FC = () => {
 
                         if ((msg as any).type === 'system') {
                             const content = msg.content;
-                            // Basic link detection
                             const urlRegex = /(https?:\/\/[^\s]+)/g;
                             const parts = content.split(urlRegex);
 
                             return (
-                                <div key={msg.id || index} className="flex justify-center w-full mb-4 px-8">
+                                <motion.div
+                                    key={msg.id || index}
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    className="flex justify-center w-full mb-4 px-8"
+                                >
                                     <div className="bg-slate-100 border border-slate-200 text-slate-500 text-xs font-bold px-4 py-2 rounded-full text-center shadow-sm">
                                         {parts.map((part: string, i: number) =>
                                             urlRegex.test(part) ? (
@@ -359,13 +364,16 @@ const RoomChatPage: React.FC = () => {
                                             {formatTimeAgo(msg.timestamp?.seconds ? new Date(msg.timestamp.seconds * 1000) : (msg as any).createdAt)}
                                         </div>
                                     </div>
-                                </div>
+                                </motion.div>
                             );
                         }
 
                         return (
-                            <div
+                            <motion.div
                                 key={msg.id || index}
+                                initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                                animate={{ opacity: 1, scale: 1, y: 0 }}
+                                transition={{ type: "spring", stiffness: 300, damping: 24 }}
                                 className={`flex items-end gap-2 w-full mb-4 ${isMe ? 'justify-end' : 'justify-start'}`}
                             >
                                 {/* Avatar (Receiver Only) */}
@@ -420,7 +428,7 @@ const RoomChatPage: React.FC = () => {
                                         )}
                                     </span>
                                 </div>
-                            </div>
+                            </motion.div>
                         );
                     })}
                     <div ref={messagesEndRef} />
@@ -429,11 +437,22 @@ const RoomChatPage: React.FC = () => {
 
             {/* Input Area - Comicy Style */}
             <div className="bg-slate-50 p-4 shrink-0 border-t-2 border-slate-900 w-full relative">
-                {typingUsers.length > 0 && (
-                    <div className="absolute -top-8 left-6 text-xs font-bold text-slate-500 bg-white px-3 py-1 rounded-t-lg border-2 border-b-0 border-slate-900 animate-pulse">
-                        {typingUsers.join(', ')} {typingUsers.length === 1 ? 'is' : 'are'} typing...
-                    </div>
-                )}
+                <AnimatePresence>
+                    {typingUsers.length > 0 && (
+                        <motion.div
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: 10 }}
+                            className="absolute -top-8 left-6 text-xs font-bold text-slate-500 bg-white px-3 py-1 rounded-t-lg border-2 border-b-0 border-slate-900 flex items-center gap-2"
+                        >
+                            <span className="relative flex h-2 w-2">
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                                <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                            </span>
+                            {typingUsers.join(', ')} {typingUsers.length === 1 ? 'is' : 'are'} typing...
+                        </motion.div>
+                    )}
+                </AnimatePresence>
                 <form
                     onSubmit={handleSend}
                     className="w-full mx-auto relative border-2 border-slate-900 bg-white shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] focus-within:shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] focus-within:translate-x-[2px] focus-within:translate-y-[2px] transition-all"

@@ -224,7 +224,8 @@ const StartupsPage: React.FC = () => {
                                         layout
                                         initial={{ opacity: 0, y: 20 }}
                                         animate={{ opacity: 1, y: 0 }}
-                                        className="bg-white border-2 border-slate-900 rounded-none p-4 hover:border-green-600 transition-colors duration-300 group flex flex-col relative"
+                                        onClick={() => router.push(`/startups/${startup.id || startup._id}`)}
+                                        className="bg-white border-2 border-slate-900 rounded-none p-4 hover:border-green-600 hover:shadow-lg transition-all duration-300 group flex flex-col relative cursor-pointer"
                                     >
                                         {/* Image / Header */}
                                         <div className="aspect-[4/3] bg-slate-50 relative border-2 border-slate-200 mb-4 overflow-hidden">
