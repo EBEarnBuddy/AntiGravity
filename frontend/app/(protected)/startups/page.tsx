@@ -143,37 +143,35 @@ const StartupsPage: React.FC = () => {
             <div className="container mx-auto px-4 py-8 max-w-7xl">
 
                 {/* Hero Section */}
-                <div className="text-center space-y-6 mb-12">
-                    <h1 className="text-6xl md:text-8xl font-black text-slate-900 tracking-tighter uppercase transform -rotate-1">
+                <div className="text-center space-y-4 mb-10">
+                    <h1 className="text-5xl md:text-7xl font-black text-slate-900 tracking-tighter uppercase transform -rotate-1">
                         Startups
                     </h1>
-                    <p className="text-slate-600 max-w-2xl mx-auto font-bold text-xl uppercase tracking-wide">
+                    <p className="text-slate-600 max-w-2xl mx-auto font-bold text-lg uppercase tracking-wide">
                         Join the next unicorn. Or build it.
                     </p>
-
-                    <div className="flex items-center justify-center gap-4 pt-6">
-                        <button
-                            id="tour-startup-create"
-                            onClick={() => setShowCreateModal(true)}
-                            className="px-8 py-4 bg-green-600 text-white font-black uppercase tracking-widest border-4 border-slate-900 hover:bg-green-500 hover:shadow-[8px_8px_0px_0px_rgba(15,23,42,1)] transition-all transform hover:-translate-y-1"
-                        >
-                            Post Opportunity
-                        </button>
-                    </div>
                 </div>
 
-                {/* Search Bar */}
-                <div className="max-w-4xl mx-auto mb-16">
-                    <div className="relative">
+                {/* Search Bar & Post Button */}
+                <div className="max-w-5xl mx-auto mb-12 flex gap-4">
+                    <div className="relative flex-grow">
                         <input
                             type="text"
                             placeholder="SEARCH OPPORTUNITIES..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full h-16 pl-6 pr-14 border-4 border-slate-900 rounded-none text-xl focus:outline-none transition shadow-[8px_8px_0px_0px_rgba(15,23,42,1)] focus:shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] focus:translate-x-[4px] focus:translate-y-[4px] placeholder:text-slate-400 font-black uppercase tracking-wide"
+                            className="w-full h-14 pl-5 pr-12 border-4 border-slate-900 rounded-none text-lg focus:outline-none transition shadow-[6px_6px_0px_0px_rgba(15,23,42,1)] focus:shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] focus:translate-x-[3px] focus:translate-y-[3px] placeholder:text-slate-400 font-black uppercase tracking-wide"
                         />
-                        <Search className="absolute right-5 top-1/2 transform -translate-y-1/2 text-slate-900 w-8 h-8" />
+                        <Search className="absolute right-4 top-1/2 transform -translate-y-1/2 text-slate-900 w-6 h-6" />
                     </div>
+
+                    <button
+                        id="tour-startup-create"
+                        onClick={() => setShowCreateModal(true)}
+                        className="h-14 px-6 bg-green-600 text-white font-black text-lg uppercase tracking-widest border-4 border-slate-900 rounded-none shadow-[6px_6px_0px_0px_rgba(15,23,42,1)] hover:bg-green-500 hover:shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] hover:translate-x-[3px] hover:translate-y-[3px] transition-all whitespace-nowrap"
+                    >
+                        Post Opportunity
+                    </button>
                 </div>
 
                 {/* Tabs */}

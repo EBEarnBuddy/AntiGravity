@@ -16,8 +16,8 @@ import {
     MoreVertical
 } from 'lucide-react';
 import CreateRoomModal from '@/components/CreateCircleModal';
-import CollaborationRequestModal from '@/components/CollaborationRequestModal';
 import { Sidebar, SidebarBody, SidebarLink } from '@/components/ui/sidebar';
+import BrutalistLoader from '@/components/ui/BrutalistLoader';
 
 const CirclesPage: React.FC = () => {
     const { currentUser } = useAuth();
@@ -133,28 +133,27 @@ const CirclesPage: React.FC = () => {
 
         // Render content for all types, using the filteredRooms logic
 
-
         // Community Circles content (existing circles page)
         return (
             <>
                 {/* Header */}
-                <div className="flex items-center justify-between mb-8">
+                <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-10 gap-4">
                     <div>
-                        <h1 className="text-3xl font-black text-slate-900 mb-2">
-                            {activeCircleType === 'community' ? 'Community Circles' : activeCircleType === 'opportunity' ? 'Opportunity Circles' : 'Collab Circles'}
+                        <h1 className="text-4xl md:text-5xl font-black text-slate-900 mb-2 uppercase tracking-tighter transform -rotate-1">
+                            {activeCircleType === 'community' ? 'Community' : activeCircleType === 'opportunity' ? 'Opportunity' : 'Collab'} Circles
                         </h1>
-                        <p className="text-slate-500 font-medium">
+                        <p className="text-slate-500 font-bold uppercase tracking-wide">
                             {activeCircleType === 'community'
-                                ? 'Connect with verified builders and creators'
+                                ? 'Connect with verified builders'
                                 : activeCircleType === 'opportunity'
-                                    ? 'Your startup opportunity circles'
-                                    : 'Your collaboration circles'}
+                                    ? 'Your startup squads'
+                                    : 'Your project teams'}
                         </p>
                     </div>
                     <button
                         id="tour-circles-create"
                         onClick={() => setIsCreateModalOpen(true)}
-                        className="px-6 py-3 bg-green-600 text-white font-bold rounded-xl hover:bg-green-700 transition shadow-lg shadow-green-200 flex items-center gap-2"
+                        className="px-6 py-3 bg-green-600 text-white font-black uppercase tracking-widest border-4 border-slate-900 hover:bg-green-500 hover:shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] transition-all flex items-center gap-2"
                     >
                         <Plus className="w-5 h-5" />
                         Create Circle
@@ -162,63 +161,53 @@ const CirclesPage: React.FC = () => {
                 </div>
 
                 {/* Search Bar */}
-                <div className="relative mb-6">
+                <div className="relative mb-10 max-w-4xl">
                     <input
                         type="text"
-                        placeholder="Search circles..."
+                        placeholder="SEARCH CIRCLES..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full h-14 pl-6 pr-14 border-2 border-slate-900 rounded-xl text-lg focus:outline-none transition shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] focus:shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] focus:translate-x-[2px] focus:translate-y-[2px] placeholder:text-slate-400 font-bold"
+                        className="w-full h-14 pl-6 pr-14 border-4 border-slate-900 rounded-none text-lg focus:outline-none transition shadow-[6px_6px_0px_0px_rgba(15,23,42,1)] focus:shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] focus:translate-x-[3px] focus:translate-y-[3px] placeholder:text-slate-400 font-black uppercase tracking-wide"
                     />
                     <Search className="absolute right-5 top-1/2 transform -translate-y-1/2 text-slate-900 w-6 h-6" />
                 </div>
 
                 {/* Tabs - Only show for Community Circles */}
                 {activeCircleType === 'community' && (
-                    <div className="flex gap-2 mb-6 border-b border-slate-200">
+                    <div className="flex gap-4 mb-8">
                         <button
                             onClick={() => setActiveTab('explore')}
-                            className={`px-6 py-3 font-bold transition-all relative ${activeTab === 'explore'
-                                ? 'text-green-600'
-                                : 'text-slate-400 hover:text-slate-600'
+                            className={`px-6 py-2 font-black uppercase tracking-widest border-4 border-slate-900 transition-all ${activeTab === 'explore'
+                                ? 'bg-slate-900 text-white shadow-[4px_4px_0px_0px_rgba(22,163,74,1)]'
+                                : 'bg-white text-slate-500 hover:bg-slate-100'
                                 }`}
                         >
                             Explore
-                            {activeTab === 'explore' && (
-                                <motion.div
-                                    layoutId="activeTab"
-                                    className="absolute bottom-0 left-0 right-0 h-0.5 bg-green-600"
-                                />
-                            )}
                         </button>
                         <button
                             onClick={() => setActiveTab('my-circles')}
-                            className={`px-6 py-3 font-bold transition-all relative ${activeTab === 'my-circles'
-                                ? 'text-green-600'
-                                : 'text-slate-400 hover:text-slate-600'
+                            className={`px-6 py-2 font-black uppercase tracking-widest border-4 border-slate-900 transition-all ${activeTab === 'my-circles'
+                                ? 'bg-slate-900 text-white shadow-[4px_4px_0px_0px_rgba(22,163,74,1)]'
+                                : 'bg-white text-slate-500 hover:bg-slate-100'
                                 }`}
                         >
                             My Circles
-                            {activeTab === 'my-circles' && (
-                                <motion.div
-                                    layoutId="activeTab"
-                                    className="absolute bottom-0 left-0 right-0 h-0.5 bg-green-600"
-                                />
-                            )}
                         </button>
                     </div>
                 )}
 
                 {/* Circles Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     <AnimatePresence mode="wait">
                         {loading ? (
                             <div className="col-span-full flex justify-center py-12">
-                                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
+                                <BrutalistLoader />
                             </div>
                         ) : filteredRooms.length === 0 ? (
-                            <div className="col-span-full text-center py-12 text-slate-400 font-bold">
-                                {activeTab === 'explore' ? "No communities found." : "You haven't joined any circles yet."}
+                            <div className="col-span-full text-center py-20 border-4 border-dashed border-slate-300">
+                                <h3 className="text-xl font-black text-slate-300 uppercase">
+                                    {activeTab === 'explore' ? "No communities found." : "You haven't joined any circles yet."}
+                                </h3>
                             </div>
                         ) : (
                             filteredRooms.map((room: any, index: number) => {
@@ -234,37 +223,37 @@ const CirclesPage: React.FC = () => {
                                         initial={{ opacity: 0, y: 20 }}
                                         animate={{ opacity: 1, y: 0 }}
                                         transition={{ duration: 0.3, delay: index * 0.05 }}
-                                        className="bg-white border-2 border-slate-900 rounded-none p-6 hover:border-green-600 transition-colors duration-300 group flex flex-col relative"
+                                        className="bg-white border-4 border-slate-900 p-0 hover:shadow-[8px_8px_0px_0px_rgba(22,163,74,1)] transition-all duration-300 group flex flex-col relative"
                                     >
                                         {/* Status Indicator (top right) */}
-                                        <div className={`absolute top-4 right-4 w-3 h-3 rounded-full ${room.isPrivate ? 'bg-purple-500' : 'bg-green-500'} ring-4 ring-white`}></div>
+                                        <div className={`absolute top-4 right-4 px-2 py-1 text-[10px] font-black uppercase border-2 border-slate-900 shadow-sm ${room.isPrivate ? 'bg-purple-300 text-slate-900' : 'bg-green-400 text-slate-900'}`}>{room.isPrivate ? 'PRIVATE' : 'PUBLIC'}</div>
 
-                                        {/* Owner Badge (top left) - Only show in My Circles tab for owned circles */}
+                                        {/* Owner Badge (top left) */}
                                         {activeTab === 'my-circles' && isOwner && activeCircleType === 'community' && (
-                                            <div className="absolute top-4 left-4 px-2 py-1 bg-green-600 text-white text-xs font-black rounded-lg shadow-lg">
+                                            <div className="absolute top-4 left-4 px-2 py-1 bg-slate-900 text-white text-[10px] font-black uppercase border-2 border-slate-900">
                                                 OWNER
                                             </div>
                                         )}
 
-                                        {/* 3-Dot Menu - Show in Explore for non-owned circles, and in My Circles for circles user is member of but doesn't own */}
+                                        {/* 3-Dot Menu */}
                                         {((activeTab === 'explore' && !isOwnCircle) || (activeTab === 'my-circles' && !isOwner)) && (
-                                            <div className="absolute top-4 left-4">
+                                            <div className="absolute top-4 left-4 z-20">
                                                 <button
                                                     onClick={(e) => {
                                                         e.stopPropagation();
                                                         setShowMenuForCircle(showMenuForCircle === room.id ? null : room.id);
                                                     }}
-                                                    className="p-2 hover:bg-slate-100 rounded-full transition"
+                                                    className="p-1.5 bg-white border-2 border-slate-900 hover:bg-slate-100 transition shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]"
                                                 >
-                                                    <MoreVertical className="w-4 h-4 text-slate-600" />
+                                                    <MoreVertical className="w-4 h-4 text-slate-900" />
                                                 </button>
 
                                                 {/* Dropdown Menu */}
                                                 {showMenuForCircle === room.id && (
-                                                    <div className="absolute left-0 top-10 bg-white border-2 border-slate-900 rounded-xl shadow-xl z-10 min-w-[180px]">
+                                                    <div className="absolute left-0 top-10 bg-white border-4 border-slate-900 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] z-30 min-w-[200px]">
                                                         <button
                                                             onClick={() => handleCollaborationRequest(room)}
-                                                            className="w-full px-4 py-3 text-left text-sm font-bold text-slate-900 hover:bg-green-50 hover:text-green-700 transition rounded-xl"
+                                                            className="w-full px-4 py-3 text-left text-xs font-black uppercase text-slate-900 hover:bg-green-50 transition"
                                                         >
                                                             Request Collaboration
                                                         </button>
@@ -273,65 +262,59 @@ const CirclesPage: React.FC = () => {
                                             </div>
                                         )}
 
-                                        {/* Avatar/Icon Area with Pattern Background */}
-                                        <div className="aspect-square w-24 bg-slate-50 relative border-2 border-slate-200 mb-4 overflow-hidden mx-auto">
-                                            {/* Pattern Background */}
-                                            <div className="absolute inset-0 opacity-10 bg-[linear-gradient(45deg,#000_25%,transparent_25%,transparent_75%,#000_75%,#000),linear-gradient(45deg,#000_25%,transparent_25%,transparent_75%,#000_75%,#000)] [background-size:20px_20px] [background-position:0_0,10px_10px]"></div>
+                                        {/* Avatar/Icon Area */}
+                                        <div className="aspect-[4/3] bg-slate-100 relative border-b-4 border-slate-900 overflow-hidden">
+                                            <div className="absolute inset-0 opacity-20 bg-[linear-gradient(45deg,#000_25%,transparent_25%,transparent_75%,#000_75%,#000),linear-gradient(45deg,#000_25%,transparent_25%,transparent_75%,#000_75%,#000)] [background-size:24px_24px]"></div>
 
                                             {room.avatar ? (
-                                                <img src={room.avatar} alt={room.name} className="w-full h-full object-cover relative z-10" />
+                                                <img src={room.avatar} alt={room.name} className="w-full h-full object-cover relative z-10 transition-transform group-hover:scale-105 duration-500" />
                                             ) : (
                                                 <div className="w-full h-full flex items-center justify-center relative z-10">
-                                                    <Users className="w-10 h-10 text-slate-300" />
+                                                    <Users className="w-16 h-16 text-slate-400" />
                                                 </div>
                                             )}
                                         </div>
 
-                                        {/* Circle Info - Centered */}
-                                        <div className="text-center mb-4">
-                                            <h3 className="text-lg font-black text-slate-900 leading-tight group-hover:text-green-600 transition-colors mb-1">
+                                        {/* Circle Info */}
+                                        <div className="p-6 flex flex-col flex-grow text-center">
+                                            <h3 className="text-xl font-black text-slate-900 leading-tight group-hover:text-green-600 transition-colors uppercase mb-2">
                                                 {room.name}
                                             </h3>
-                                            <p className="text-xs text-slate-500 line-clamp-2 font-medium">
-                                                {room.description || 'No description'}
+                                            <p className="text-xs text-slate-500 line-clamp-2 font-bold uppercase mb-4">
+                                                {room.description || 'No description provided.'}
                                             </p>
-                                        </div>
 
-                                        {/* Stats */}
-                                        <div className="flex items-center justify-center gap-4 mb-4 text-xs text-slate-500 font-bold">
-                                            <div className="flex items-center gap-1">
+                                            {/* Stats */}
+                                            <div className="flex items-center justify-center gap-2 mb-6 text-xs text-slate-500 font-black uppercase">
                                                 <Users className="w-3 h-3" />
                                                 {(room.memberCount || room.members?.length || 0)} Members
                                             </div>
-                                            <div className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${room.isPrivate ? 'bg-purple-100 text-purple-700' : 'bg-green-100 text-green-700'}`}>
-                                                {room.isPrivate ? 'Private' : 'Public'}
-                                            </div>
-                                        </div>
 
-                                        {/* Action Button */}
-                                        <div className="mt-auto w-full pt-4 border-t border-slate-100">
-                                            <button
-                                                onClick={() => handleRoomAction(room)}
-                                                disabled={!!isPending}
-                                                className={`w-full py-2 text-xs font-bold uppercase transition-all transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed ${isMember
-                                                    ? 'bg-slate-900 text-white hover:bg-slate-800'
-                                                    : isPending
-                                                        ? 'bg-green-100 text-green-700 border-2 border-green-300'
-                                                        : 'bg-white border-2 border-slate-900 text-slate-900 hover:bg-slate-900 hover:text-white'
-                                                    }`}
-                                            >
-                                                {(activeCircleType as string) === 'collab' || (activeCircleType as string) === 'opportunity' ? (
-                                                    'Enter Circle'
-                                                ) : activeTab === 'my-circles' ? (
-                                                    <>Enter Circle <ArrowRight className="w-4 h-4 inline" /></>
-                                                ) : isPending ? (
-                                                    'Requested'
-                                                ) : isMember ? (
-                                                    <>Open Circle <ArrowRight className="w-4 h-4 inline" /></>
-                                                ) : (
-                                                    'Join Circle'
-                                                )}
-                                            </button>
+                                            {/* Action Button */}
+                                            <div className="mt-auto w-full pt-4 border-t-4 border-slate-100">
+                                                <button
+                                                    onClick={() => handleRoomAction(room)}
+                                                    disabled={!!isPending}
+                                                    className={`w-full py-3 text-xs font-black uppercase transition-all shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] disabled:opacity-50 disabled:cursor-not-allowed border-4 border-slate-900 flex items-center justify-center gap-2 ${isMember
+                                                        ? 'bg-slate-900 text-white hover:bg-slate-800'
+                                                        : isPending
+                                                            ? 'bg-green-100 text-green-700 border-green-600 shadow-none'
+                                                            : 'bg-white text-slate-900 hover:bg-green-50'
+                                                        }`}
+                                                >
+                                                    {(activeCircleType as string) === 'collab' || (activeCircleType as string) === 'opportunity' ? (
+                                                        'Enter Circle'
+                                                    ) : activeTab === 'my-circles' ? (
+                                                        <>Enter Circle <ArrowRight className="w-3 h-3" /></>
+                                                    ) : isPending ? (
+                                                        'Requested'
+                                                    ) : isMember ? (
+                                                        <>Open Circle <ArrowRight className="w-3 h-3" /></>
+                                                    ) : (
+                                                        'Join Circle'
+                                                    )}
+                                                </button>
+                                            </div>
                                         </div>
                                     </motion.div >
                                 );
@@ -350,10 +333,10 @@ const CirclesPage: React.FC = () => {
                     <div className="flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
                         <div className="mb-8 overflow-hidden">
                             <motion.div animate={{ opacity: sidebarOpen ? 1 : 0, height: sidebarOpen ? 'auto' : 0 }}>
-                                <h2 id="tour-circles-sidebar" className="text-lg font-black text-slate-900 whitespace-nowrap">Circle Types</h2>
+                                <h2 id="tour-circles-sidebar" className="text-xl font-black text-slate-900 whitespace-nowrap uppercase">Circle Types</h2>
                             </motion.div>
                         </div>
-                        <div className="flex flex-col gap-2">
+                        <div className="flex flex-col gap-4">
                             {sidebarLinks.map((link, idx) => (
                                 <div
                                     key={idx}
