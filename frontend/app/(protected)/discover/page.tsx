@@ -91,7 +91,7 @@ export default function DiscoverPage() {
             <div className="bg-white border-b border-slate-100 sticky top-0 z-30">
                 <div className="container mx-auto px-4 py-6">
                     <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                        <div>
+                        <div id="tour-dashboard-welcome">
                             <h1 className="text-2xl font-black text-slate-900 tracking-tight">
                                 Welcome back, {userProfile?.displayName?.split(' ')[0] || 'Builder'}! 👋
                             </h1>
@@ -128,7 +128,7 @@ export default function DiscoverPage() {
                         </section>
 
                         {/* My Workbench */}
-                        <section>
+                        <section id="tour-dashboard-workbench">
                             <div className="flex items-center gap-2 mb-6">
                                 <Sparkles className="w-5 h-5 text-green-600" />
                                 <h2 className="text-xl font-black text-slate-900">My Workbench</h2>

@@ -1,5 +1,8 @@
 "use client";
 
+import { useEffect, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useAuth } from '@/contexts/AuthContext';
 import { Check, ChevronDown, ChevronRight, Layout, Menu, Play, Star, Users, Briefcase, Zap, Shield, Globe, ArrowRight, Instagram, Linkedin, Mail, Facebook } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
@@ -10,7 +13,26 @@ import { CreativePricing, type PricingTier } from "@/components/ui/creative-pric
 import { SquishyOffers, BGComponent1, BGComponent2, BGComponent3 } from "@/components/ui/squishy-offers";
 import { CircularGallery, type GalleryItem } from "@/components/ui/circular-gallery";
 
-export default function Lander() {
+function LanderContent() {
+    const router = useRouter();
+    const searchParams = useSearchParams();
+    const { logout, currentUser } = useAuth();
+
+    useEffect(() => {
+        const performLogout = async () => {
+            if (searchParams.get('logout') === 'true' && currentUser) {
+                try {
+                    await logout();
+                    // Clear the query param to essentially "clean" the URL
+                    router.replace('/lander');
+                } catch (error) {
+                    console.error("Logout failed on lander:", error);
+                }
+            }
+        };
+        performLogout();
+    }, [searchParams, logout, currentUser, router]);
+
     const testimonials = [
         {
             id: 1,
@@ -440,5 +462,13 @@ export default function Lander() {
                 </div>
             </footer>
         </div>
+    );
+}
+
+export default function Lander() {
+    return (
+        <Suspense fallback={<div className="min-h-screen bg-black" />}>
+            <LanderContent />
+        </Suspense>
     );
 }

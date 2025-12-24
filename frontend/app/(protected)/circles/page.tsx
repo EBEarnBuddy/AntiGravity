@@ -345,7 +345,7 @@ const CirclesPage: React.FC = () => {
     return (
         <div className="fixed inset-0 bg-slate-50 flex overflow-hidden" style={{ top: '64px' }}>
             <Sidebar open={sidebarOpen} setOpen={setSidebarOpen}>
-                <SidebarBody className="justify-between gap-10">
+                <SidebarBody className="justify-center gap-10">
                     <div className="flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
                         <div className="mb-8 overflow-hidden">
                             <motion.div animate={{ opacity: sidebarOpen ? 1 : 0, height: sidebarOpen ? 'auto' : 0 }}>

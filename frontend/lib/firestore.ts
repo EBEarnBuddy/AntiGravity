@@ -298,6 +298,7 @@ export interface UserProfile {
   linkedin?: string;
   twitter?: string;
   onboardingCompleted: boolean;
+  productTourCompleted?: boolean;
   onboardingData?: OnboardingData;
   joinedPods: string[];
   joinedRooms: string[];

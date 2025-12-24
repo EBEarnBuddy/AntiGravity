@@ -17,12 +17,9 @@ const Navbar: React.FC = () => {
     const isActive = (path: string) => pathname === path;
 
     const handleLogout = async () => {
-        try {
-            await logout();
-            router.push('/lander');
-        } catch (error) {
-            console.error("Failed to log out", error);
-        }
+        // Redirect to lander first, then let lander handle the actual logout
+        // This avoids race conditions with ProtectedLayout redirecting to /auth
+        router.push('/lander?logout=true');
     };
 
     // Close dropdown when clicking outside
@@ -48,9 +45,9 @@ const Navbar: React.FC = () => {
             {/* Desktop Center Links */}
             <div className="hidden md:flex items-center gap-8">
                 <Link href="/discover" className={`text-sm font-bold uppercase tracking-wide hover:text-green-100 transition-colors ${isActive('/discover') ? 'text-white border-b-2 border-white' : 'text-green-100/80'}`}>Home</Link>
-                <Link href="/startups" className={`text-sm font-bold uppercase tracking-wide hover:text-green-100 transition-colors ${isActive('/startups') ? 'text-white border-b-2 border-white' : 'text-green-100/80'}`}>Startup</Link>
-                <Link href="/freelance" className={`text-sm font-bold uppercase tracking-wide hover:text-green-100 transition-colors ${isActive('/freelance') ? 'text-white border-b-2 border-white' : 'text-green-100/80'}`}>CoLancing</Link>
-                <Link href="/circles" className={`text-sm font-bold uppercase tracking-wide hover:text-green-100 transition-colors ${isActive('/circles') ? 'text-white border-b-2 border-white' : 'text-green-100/80'}`}>Circles</Link>
+                <Link id="tour-startups-link" href="/startups" className={`text-sm font-bold uppercase tracking-wide hover:text-green-100 transition-colors ${isActive('/startups') ? 'text-white border-b-2 border-white' : 'text-green-100/80'}`}>Startup</Link>
+                <Link id="tour-freelance-link" href="/freelance" className={`text-sm font-bold uppercase tracking-wide hover:text-green-100 transition-colors ${isActive('/freelance') ? 'text-white border-b-2 border-white' : 'text-green-100/80'}`}>CoLancing</Link>
+                <Link id="tour-circles-link" href="/circles" className={`text-sm font-bold uppercase tracking-wide hover:text-green-100 transition-colors ${isActive('/circles') ? 'text-white border-b-2 border-white' : 'text-green-100/80'}`}>Circles</Link>
             </div>
 
             {/* Right Icons */}
@@ -60,6 +57,7 @@ const Navbar: React.FC = () => {
                 {/* Profile Dropdown */}
                 <div className="relative" ref={dropdownRef}>
                     <button
+                        id="tour-navbar-profile"
                         onClick={() => setIsProfileOpen(!isProfileOpen)}
                         className="w-9 h-9 rounded-full bg-green-800 border-2 border-green-400 overflow-hidden hover:border-white transition focus:outline-none"
                     >
