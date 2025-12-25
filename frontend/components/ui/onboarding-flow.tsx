@@ -1,24 +1,24 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  ArrowRight, 
-  ArrowLeft, 
-  Check, 
-  User, 
-  Briefcase, 
-  Target, 
-  Users,
-  Code,
-  Palette,
-  Megaphone,
-  BarChart,
-  Globe,
-  MapPin,
-  Star,
-  TrendingUp,
-  DollarSign,
-  Settings
-} from 'lucide-react';
+import {
+  ArrowRightIcon,
+  ArrowLeftIcon,
+  CheckIcon,
+  UserIcon,
+  BriefcaseIcon,
+  RocketLaunchIcon,
+  UserGroupIcon,
+  CodeBracketIcon,
+  PaintBrushIcon,
+  MegaphoneIcon,
+  ChartBarIcon,
+  GlobeAltIcon,
+  MapPinIcon,
+  StarIcon,
+  ArrowTrendingUpIcon,
+  CurrencyDollarIcon,
+  Cog6ToothIcon
+} from '@heroicons/react/24/solid';
 
 interface OnboardingData {
   role: string;
@@ -182,7 +182,7 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
                 disabled={currentStep === 0}
                 className="flex items-center gap-2 px-6 py-3 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <ArrowLeft className="w-4 h-4" />
+                <ArrowLeftIcon className="w-4 h-4" />
                 Back
               </button>
 
@@ -194,13 +194,13 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
               >
                 {currentStep === steps.length - 1 ? (
                   <>
-                    <Check className="w-4 h-4" />
+                    <CheckIcon className="w-4 h-4" />
                     Complete Setup
                   </>
                 ) : (
                   <>
                     Continue
-                    <ArrowRight className="w-4 h-4" />
+                    <ArrowRightIcon className="w-4 h-4" />
                   </>
                 )}
               </motion.button>
@@ -215,11 +215,11 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
 // Step Components
 const RoleStep: React.FC<{ data: OnboardingData; updateData: (key: keyof OnboardingData, value: any) => void }> = ({ data, updateData }) => {
   const roles = [
-    { id: 'freelancer', label: 'Freelancer', icon: Briefcase, description: 'I want to find projects and clients' },
-    { id: 'founder', label: 'Startup Founder', icon: Target, description: 'I\'m building a startup and need co-founders/team' },
-    { id: 'builder', label: 'Builder/Creator', icon: User, description: 'I want to collaborate on projects and ideas' },
-    { id: 'investor', label: 'Investor/Mentor', icon: Star, description: 'I want to support and invest in startups' },
-    { id: 'explorer', label: 'Just Exploring', icon: Globe, description: 'I\'m here to learn and discover opportunities' }
+    { id: 'freelancer', label: 'Freelancer', icon: BriefcaseIcon, description: 'I want to find projects and clients' },
+    { id: 'founder', label: 'Startup Founder', icon: RocketLaunchIcon, description: 'I\'m building a startup and need co-founders/team' },
+    { id: 'builder', label: 'Builder/Creator', icon: UserIcon, description: 'I want to collaborate on projects and ideas' },
+    { id: 'investor', label: 'Investor/Mentor', icon: StarIcon, description: 'I want to support and invest in startups' },
+    { id: 'explorer', label: 'Just Exploring', icon: GlobeAltIcon, description: 'I\'m here to learn and discover opportunities' }
   ];
 
   return (
@@ -228,17 +228,15 @@ const RoleStep: React.FC<{ data: OnboardingData; updateData: (key: keyof Onboard
         <motion.button
           key={role.id}
           onClick={() => updateData('role', role.id)}
-          className={`p-6 rounded-xl border-2 transition-all duration-300 text-left ${
-            data.role === role.id
-              ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-900/20'
-              : 'border-gray-200 dark:border-gray-700 hover:border-emerald-300 dark:hover:border-emerald-600'
-          }`}
+          className={`p-6 rounded-xl border-2 transition-all duration-300 text-left ${data.role === role.id
+            ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-900/20'
+            : 'border-gray-200 dark:border-gray-700 hover:border-emerald-300 dark:hover:border-emerald-600'
+            }`}
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
         >
-          <role.icon className={`w-8 h-8 mb-3 ${
-            data.role === role.id ? 'text-emerald-600' : 'text-gray-600 dark:text-gray-400'
-          }`} />
+          <role.icon className={`w-8 h-8 mb-3 ${data.role === role.id ? 'text-emerald-600' : 'text-gray-600 dark:text-gray-400'
+            }`} />
           <h3 className="font-semibold text-gray-900 dark:text-white mb-2">{role.label}</h3>
           <p className="text-sm text-gray-600 dark:text-gray-400">{role.description}</p>
         </motion.button>
@@ -249,18 +247,18 @@ const RoleStep: React.FC<{ data: OnboardingData; updateData: (key: keyof Onboard
 
 const SkillsStep: React.FC<{ data: OnboardingData; updateData: (key: keyof OnboardingData, value: any) => void }> = ({ data, updateData }) => {
   const skills = [
-    { id: 'frontend', label: 'Frontend Development', icon: Code },
-    { id: 'backend', label: 'Backend Development', icon: Code },
-    { id: 'design', label: 'UI/UX Design', icon: Palette },
-    { id: 'marketing', label: 'Digital Marketing', icon: Megaphone },
-    { id: 'data', label: 'Data Science', icon: BarChart },
-    { id: 'mobile', label: 'Mobile Development', icon: Code },
-    { id: 'blockchain', label: 'Blockchain', icon: Globe },
-    { id: 'ai', label: 'AI/Machine Learning', icon: Code },
-    { id: 'product', label: 'Product Management', icon: Target },
-    { id: 'sales', label: 'Sales & Business Development', icon: TrendingUp },
-    { id: 'finance', label: 'Finance & Accounting', icon: DollarSign },
-    { id: 'operations', label: 'Operations & Strategy', icon: Settings }
+    { id: 'frontend', label: 'Frontend Development', icon: CodeBracketIcon },
+    { id: 'backend', label: 'Backend Development', icon: CodeBracketIcon },
+    { id: 'design', label: 'UI/UX Design', icon: PaintBrushIcon },
+    { id: 'marketing', label: 'Digital Marketing', icon: MegaphoneIcon },
+    { id: 'data', label: 'Data Science', icon: ChartBarIcon },
+    { id: 'mobile', label: 'Mobile Development', icon: CodeBracketIcon },
+    { id: 'blockchain', label: 'Blockchain', icon: GlobeAltIcon },
+    { id: 'ai', label: 'AI/Machine Learning', icon: CodeBracketIcon },
+    { id: 'product', label: 'Product Management', icon: RocketLaunchIcon },
+    { id: 'sales', label: 'Sales & Business Development', icon: ArrowTrendingUpIcon },
+    { id: 'finance', label: 'Finance & Accounting', icon: CurrencyDollarIcon },
+    { id: 'operations', label: 'Operations & Strategy', icon: Cog6ToothIcon }
   ];
 
   const toggleSkill = (skillId: string) => {
@@ -278,17 +276,15 @@ const SkillsStep: React.FC<{ data: OnboardingData; updateData: (key: keyof Onboa
         <motion.button
           key={skill.id}
           onClick={() => toggleSkill(skill.id)}
-          className={`p-4 rounded-xl border-2 transition-all duration-300 ${
-            data.skills.includes(skill.id)
-              ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-900/20'
-              : 'border-gray-200 dark:border-gray-700 hover:border-emerald-300 dark:hover:border-emerald-600'
-          }`}
+          className={`p-4 rounded-xl border-2 transition-all duration-300 ${data.skills.includes(skill.id)
+            ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-900/20'
+            : 'border-gray-200 dark:border-gray-700 hover:border-emerald-300 dark:hover:border-emerald-600'
+            }`}
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
         >
-          <skill.icon className={`w-6 h-6 mb-2 mx-auto ${
-            data.skills.includes(skill.id) ? 'text-emerald-600' : 'text-gray-600 dark:text-gray-400'
-          }`} />
+          <skill.icon className={`w-6 h-6 mb-2 mx-auto ${data.skills.includes(skill.id) ? 'text-emerald-600' : 'text-gray-600 dark:text-gray-400'
+            }`} />
           <p className="text-sm font-medium text-gray-900 dark:text-white">{skill.label}</p>
         </motion.button>
       ))}
@@ -331,11 +327,10 @@ const InterestsStep: React.FC<{ data: OnboardingData; updateData: (key: keyof On
         <motion.button
           key={interest}
           onClick={() => toggleInterest(interest)}
-          className={`p-3 rounded-lg border transition-all duration-300 text-sm ${
-            data.interests.includes(interest)
-              ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300'
-              : 'border-gray-200 dark:border-gray-700 hover:border-emerald-300 dark:hover:border-emerald-600 text-gray-700 dark:text-gray-300'
-          }`}
+          className={`p-3 rounded-lg border transition-all duration-300 text-sm ${data.interests.includes(interest)
+            ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300'
+            : 'border-gray-200 dark:border-gray-700 hover:border-emerald-300 dark:hover:border-emerald-600 text-gray-700 dark:text-gray-300'
+            }`}
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
         >
@@ -362,11 +357,10 @@ const ExperienceStep: React.FC<{ data: OnboardingData; updateData: (key: keyof O
         <motion.button
           key={exp.id}
           onClick={() => updateData('experience', exp.id)}
-          className={`w-full p-4 rounded-xl border-2 transition-all duration-300 text-left ${
-            data.experience === exp.id
-              ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-900/20'
-              : 'border-gray-200 dark:border-gray-700 hover:border-emerald-300 dark:hover:border-emerald-600'
-          }`}
+          className={`w-full p-4 rounded-xl border-2 transition-all duration-300 text-left ${data.experience === exp.id
+            ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-900/20'
+            : 'border-gray-200 dark:border-gray-700 hover:border-emerald-300 dark:hover:border-emerald-600'
+            }`}
           whileHover={{ scale: 1.01 }}
           whileTap={{ scale: 0.99 }}
         >
@@ -382,7 +376,7 @@ const LocationStep: React.FC<{ data: OnboardingData; updateData: (key: keyof Onb
   return (
     <div className="space-y-4">
       <div className="relative">
-        <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+        <MapPinIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
         <input
           type="text"
           value={data.location}
@@ -391,9 +385,9 @@ const LocationStep: React.FC<{ data: OnboardingData; updateData: (key: keyof Onb
           className="w-full pl-10 pr-4 py-3 border border-gray-200 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
         />
       </div>
-      
+
       <div className="flex items-center gap-3 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-xl">
-        <Globe className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+        <GlobeAltIcon className="w-5 h-5 text-blue-600 dark:text-blue-400" />
         <div>
           <p className="text-sm font-medium text-blue-900 dark:text-blue-100">
             Open to remote work?
@@ -438,21 +432,19 @@ const GoalsStep: React.FC<{ data: OnboardingData; updateData: (key: keyof Onboar
         <motion.button
           key={goal}
           onClick={() => toggleGoal(goal)}
-          className={`p-4 rounded-xl border-2 transition-all duration-300 text-left ${
-            data.goals.includes(goal)
-              ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-900/20'
-              : 'border-gray-200 dark:border-gray-700 hover:border-emerald-300 dark:hover:border-emerald-600'
-          }`}
+          className={`p-4 rounded-xl border-2 transition-all duration-300 text-left ${data.goals.includes(goal)
+            ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-900/20'
+            : 'border-gray-200 dark:border-gray-700 hover:border-emerald-300 dark:hover:border-emerald-600'
+            }`}
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
         >
           <div className="flex items-center gap-3">
-            <div className={`w-4 h-4 rounded border-2 flex items-center justify-center ${
-              data.goals.includes(goal)
-                ? 'border-emerald-500 bg-emerald-500'
-                : 'border-gray-300 dark:border-gray-600'
-            }`}>
-              {data.goals.includes(goal) && <Check className="w-3 h-3 text-white" />}
+            <div className={`w-4 h-4 rounded border-2 flex items-center justify-center ${data.goals.includes(goal)
+              ? 'border-emerald-500 bg-emerald-500'
+              : 'border-gray-300 dark:border-gray-600'
+              }`}>
+              {data.goals.includes(goal) && <CheckIcon className="w-3 h-3 text-white" />}
             </div>
             <span className="font-medium text-gray-900 dark:text-white">{goal}</span>
           </div>

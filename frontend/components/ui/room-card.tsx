@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Users, MessageCircle, Lock, Globe, Video, Edit } from 'lucide-react';
+import { UserGroupIcon, ChatBubbleLeftRightIcon, LockClosedIcon, GlobeAltIcon, VideoCameraIcon, PencilSquareIcon } from '@heroicons/react/24/solid';
 import { cn } from '@/lib/utils';
 
 interface RoomCardProps {
@@ -23,57 +23,56 @@ export const RoomCard: React.FC<RoomCardProps> = ({ room, onJoin, onEnter }) => 
   return (
     <motion.div
       className="group relative"
-      whileHover={{ y: -8, scale: 1.02 }}
+      whileHover={{ y: -4 }}
       transition={{ type: "spring", stiffness: 300, damping: 30 }}
     >
-      {/* Glow Effect */}
-      <div className={`absolute -inset-1 bg-gradient-to-r ${room.gradient} rounded-2xl blur opacity-0 group-hover:opacity-20 transition-opacity duration-500`} />
-      
-      <div className="relative bg-white/80 backdrop-blur-xl border border-gray-200/50 rounded-2xl p-6 shadow-lg group-hover:shadow-2xl transition-all duration-500 overflow-hidden">
+      {/* Shadow layer */}
+      <div className="absolute inset-0 bg-slate-900 translate-x-[6px] translate-y-[6px] rounded-none z-0" />
+
+      <div className="relative bg-white border-2 border-slate-900 rounded-none p-6 z-10 hover:translate-x-[1px] hover:translate-y-[1px] transition-transform duration-200">
         {/* Privacy Indicator */}
         <div className="absolute top-4 right-4">
           {room.isPrivate ? (
-            <Lock className="w-4 h-4 text-gray-500" />
+            <LockClosedIcon className="w-5 h-5 text-gray-500" />
           ) : (
-            <Globe className="w-4 h-4 text-emerald-500" />
+            <GlobeAltIcon className="w-5 h-5 text-green-600" />
           )}
         </div>
 
         {/* Room Icon */}
         <motion.div
-          className={`w-16 h-16 bg-gradient-to-br ${room.gradient} rounded-2xl flex items-center justify-center mb-4 relative overflow-hidden`}
-          whileHover={{ rotate: 5, scale: 1.1 }}
+          className={`w-16 h-16 bg-white border-2 border-slate-900 rounded-none flex items-center justify-center mb-4 relative overflow-hidden shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]`}
+          whileHover={{ rotate: 3, scale: 1.05 }}
           transition={{ type: "spring", stiffness: 400 }}
         >
-          <MessageCircle className="w-8 h-8 text-white relative z-10" />
-          <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+          <ChatBubbleLeftRightIcon className="w-8 h-8 text-slate-900" />
         </motion.div>
 
         {/* Content */}
         <div className="space-y-3">
           <div>
-            <h3 className="text-xl font-bold text-gray-900 group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-gray-900 group-hover:to-gray-700 group-hover:bg-clip-text transition-all duration-300">
+            <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight">
               {room.name}
             </h3>
-            <p className="text-gray-600 text-sm leading-relaxed">{room.description}</p>
+            <p className="text-slate-600 text-sm leading-relaxed font-medium border-l-4 border-slate-200 pl-2 my-2">{room.description}</p>
           </div>
 
           {/* Stats */}
-          <div className="flex items-center justify-between text-sm">
-            <div className="flex items-center gap-1 text-gray-500">
-              <Users className="w-4 h-4" />
+          <div className="flex items-center justify-between text-sm font-bold">
+            <div className="flex items-center gap-1 text-slate-500">
+              <UserGroupIcon className="w-4 h-4" />
               <span>{room.members} members</span>
             </div>
-            <div className="text-gray-500">
+            <div className="text-slate-400 font-mono text-xs">
               <span>{room.lastActivity}</span>
             </div>
           </div>
 
           {/* Unread Messages */}
           {room.unreadMessages && room.unreadMessages > 0 && (
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
-              <span className="text-sm text-emerald-600 font-medium">
+            <div className="flex items-center gap-2 border-2 border-green-600 bg-green-50 p-1 px-2 w-fit">
+              <div className="w-2 h-2 bg-green-600 rounded-none animate-pulse"></div>
+              <span className="text-sm text-green-700 font-bold uppercase">
                 {room.unreadMessages} new messages
               </span>
             </div>
@@ -83,31 +82,15 @@ export const RoomCard: React.FC<RoomCardProps> = ({ room, onJoin, onEnter }) => 
           <motion.button
             onClick={() => room.isJoined ? onEnter(room.id) : onJoin(room.id)}
             className={cn(
-              "w-full py-3 px-4 rounded-xl font-semibold transition-all duration-300 relative overflow-hidden",
+              "w-full py-3 px-4 rounded-none font-black uppercase tracking-wider transition-all duration-200 border-2 border-slate-900 relative",
               room.isJoined
-                ? "bg-gradient-to-r from-emerald-600 to-emerald-500 text-white shadow-lg hover:shadow-emerald-500/25"
-                : "bg-gray-100 text-gray-700 hover:bg-gradient-to-r hover:from-emerald-600 hover:to-emerald-500 hover:text-white"
+                ? "bg-green-600 text-white shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] hover:bg-green-500"
+                : "bg-white text-slate-900 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] hover:bg-slate-50"
             )}
-            whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
           >
-            <span className="relative z-10">
-              {room.isJoined ? 'Enter Room' : 'Join Room'}
-            </span>
-            {!room.isJoined && (
-              <motion.div
-                className="absolute inset-0 bg-gradient-to-r from-emerald-600 to-emerald-500"
-                initial={{ x: "-100%" }}
-                whileHover={{ x: "0%" }}
-                transition={{ duration: 0.3 }}
-              />
-            )}
+            {room.isJoined ? 'Enter Room' : 'Join Room'}
           </motion.button>
-        </div>
-
-        {/* Background Pattern */}
-        <div className="absolute top-0 right-0 w-32 h-32 opacity-5">
-          <div className={`w-full h-full bg-gradient-to-br ${room.gradient} rounded-full transform translate-x-8 -translate-y-8`} />
         </div>
       </div>
     </motion.div>

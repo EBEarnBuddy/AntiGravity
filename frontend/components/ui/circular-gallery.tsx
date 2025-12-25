@@ -653,7 +653,7 @@ class App {
 const CircularGallery = ({
     items,
     bend = 3,
-    borderRadius = 0.05,
+    borderRadius = 0,
     scrollSpeed = 2,
     scrollEase = 0.05,
     className,

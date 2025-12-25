@@ -4,22 +4,22 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter, useSearchParams } from 'next/navigation';
 import {
-    Search,
-    Bookmark,
-    Rocket,
-    Share2,
-    ChevronRight,
-    ChevronLeft,
-    Users,
-    CheckCircle,
-    UserCircle,
-    MoreVertical,
-    Edit2,
-    Trash2,
-    XCircle as CloseIcon,
-    Link as LinkIcon,
-    ArrowRight
-} from 'lucide-react';
+    MagnifyingGlassIcon,
+    BookmarkIcon,
+    RocketLaunchIcon,
+    ShareIcon,
+    ChevronRightIcon,
+    ChevronLeftIcon,
+    UserGroupIcon,
+    CheckCircleIcon,
+    UserCircleIcon,
+    EllipsisVerticalIcon,
+    PencilSquareIcon,
+    TrashIcon,
+    XCircleIcon as CloseIcon,
+    LinkIcon,
+    ArrowRightIcon
+} from '@heroicons/react/24/solid';
 import { useStartups, useMyApplications, useBookmarks } from '@/hooks/useFirestore';
 import { useAuth } from '@/contexts/AuthContext';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -163,7 +163,7 @@ const StartupsPage: React.FC = () => {
                             onChange={(e) => setSearchTerm(e.target.value)}
                             className="w-full h-12 pl-4 pr-10 border-4 border-slate-900 rounded-none text-base focus:outline-none transition shadow-[6px_6px_0px_0px_rgba(15,23,42,1)] focus:shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] focus:translate-x-[3px] focus:translate-y-[3px] placeholder:text-slate-400 font-black uppercase tracking-wide"
                         />
-                        <Search className="absolute right-4 top-1/2 transform -translate-y-1/2 text-slate-900 w-5 h-5" />
+                        <MagnifyingGlassIcon className="absolute right-4 top-1/2 transform -translate-y-1/2 text-slate-900 w-5 h-5" />
                     </div>
 
                     <button
@@ -251,7 +251,7 @@ const StartupsPage: React.FC = () => {
                                                     }}
                                                     className="p-1.5 border-2 border-transparent hover:border-slate-900 hover:bg-slate-100 transition-all text-slate-400 hover:text-slate-900"
                                                 >
-                                                    <Bookmark className={`w-5 h-5 ${isBookmarked(startup.id || startup._id) ? 'fill-current text-green-600' : ''}`} />
+                                                    <BookmarkIcon className={`w-5 h-5 ${isBookmarked(startup.id || startup._id) ? 'fill-current text-green-600' : ''}`} />
                                                 </button>
 
                                                 {isOwner && (
@@ -263,7 +263,7 @@ const StartupsPage: React.FC = () => {
                                                             }}
                                                             className="p-1.5 border-2 border-transparent hover:border-slate-900 hover:bg-slate-100 transition-all text-slate-400 hover:text-slate-900"
                                                         >
-                                                            <MoreVertical className="w-5 h-5" />
+                                                            <EllipsisVerticalIcon className="w-5 h-5" />
                                                         </button>
                                                         <AnimatePresence>
                                                             {actionMenuOpen === (startup.id || startup._id) && (
@@ -273,8 +273,8 @@ const StartupsPage: React.FC = () => {
                                                                     exit={{ opacity: 0, scale: 0.9, y: 5 }}
                                                                     className="absolute right-0 top-full mt-1 w-48 bg-white border-2 border-slate-900 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] z-10"
                                                                 >
-                                                                    <button onClick={(e) => { e.stopPropagation(); setActionMenuOpen(null); handleDelete(startup.id || startup._id); }} className="w-full text-left px-4 py-3 text-xs font-black uppercase hover:bg-red-50 text-red-600 flex gap-2"><Trash2 className="w-3 h-3" /> Delete</button>
-                                                                    <button onClick={(e) => { e.stopPropagation(); setActionMenuOpen(null); handleCopyLink(startup.id || startup._id); }} className="w-full text-left px-4 py-3 text-xs font-black uppercase hover:bg-slate-50 text-slate-900 flex gap-2"><Share2 className="w-3 h-3" /> Share</button>
+                                                                    <button onClick={(e) => { e.stopPropagation(); setActionMenuOpen(null); handleDelete(startup.id || startup._id); }} className="w-full text-left px-4 py-3 text-xs font-black uppercase hover:bg-red-50 text-red-600 flex gap-2"><TrashIcon className="w-3 h-3" /> Delete</button>
+                                                                    <button onClick={(e) => { e.stopPropagation(); setActionMenuOpen(null); handleCopyLink(startup.id || startup._id); }} className="w-full text-left px-4 py-3 text-xs font-black uppercase hover:bg-slate-50 text-slate-900 flex gap-2"><ShareIcon className="w-3 h-3" /> Share</button>
                                                                 </motion.div>
                                                             )}
                                                         </AnimatePresence>
@@ -284,7 +284,7 @@ const StartupsPage: React.FC = () => {
                                         </div>
 
                                         <div className="flex gap-2 text-xs font-bold text-slate-500 mb-6 uppercase tracking-tight">
-                                            <span className="flex items-center gap-1"><Users className="w-3 h-3" /> {startup.roles?.length || 1} Roles</span>
+                                            <span className="flex items-center gap-1"><UserGroupIcon className="w-3 h-3" /> {startup.roles?.length || 1} Roles</span>
                                             <span>•</span>
                                             <span>{startup.equity || 'Equity'}</span>
                                         </div>
@@ -299,14 +299,14 @@ const StartupsPage: React.FC = () => {
                                                     >
                                                         Manage ({startup.totalApplicants || 0})
                                                     </button>
-                                                    <button onClick={() => router.push(`/startups/${startup.id || startup._id}`)} className="px-3 border-2 border-slate-900 hover:bg-slate-100"><ArrowRight className="w-4 h-4" /></button>
+                                                    <button onClick={() => router.push(`/startups/${startup.id || startup._id}`)} className="px-3 border-2 border-slate-900 hover:bg-slate-100"><ArrowRightIcon className="w-4 h-4" /></button>
                                                 </div>
                                             ) : (
                                                 <button
                                                     onClick={() => router.push(`/startups/${startup.id || startup._id}`)}
                                                     className="w-full py-3 bg-white border-4 border-slate-900 text-slate-900 text-xs font-black uppercase hover:bg-slate-900 hover:text-white transition-all shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] flex items-center justify-center gap-2"
                                                 >
-                                                    View Opportunity <ArrowRight className="w-3 h-3" />
+                                                    View Opportunity <ArrowRightIcon className="w-3 h-3" />
                                                 </button>
                                             )}
                                         </div>

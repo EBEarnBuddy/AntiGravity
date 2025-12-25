@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
-import { Check, Pencil, Star, Sparkles, Zap } from "lucide-react";
+// import { Check, Pencil, Star, Sparkles, Zap } from "lucide-react"; // REMOVED unused and replaced Check
+import { CheckIcon } from "@heroicons/react/24/solid";
 import { cn } from "@/lib/utils";
 
 interface PricingTier {
@@ -28,11 +29,11 @@ function CreativePricing({
     return (
         <div className="w-full max-w-6xl mx-auto px-4">
             <div className="text-center space-y-6 mb-16">
-                <div className="text-xl text-white rotate-[-1deg]">
+                <div className="text-xl text-white rotate-[-1deg] font-black uppercase tracking-widest bg-white/10 inline-block px-4 py-1 border-2 border-white">
                     {tag}
                 </div>
                 <div className="relative">
-                    <h2 className="text-4xl md:text-5xl font-bold text-white rotate-[-1deg]">
+                    <h2 className="text-4xl md:text-5xl font-black text-white rotate-[-1deg] uppercase tracking-tighter">
                         {title}
                         <div className="absolute -right-12 top-0 text-amber-500 rotate-12 hidden">
 
@@ -43,10 +44,10 @@ function CreativePricing({
                     </h2>
                     <div
                         className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-44 h-3 bg-primary/20 
-                        rotate-[-1deg] rounded-full blur-sm"
+                        rotate-[-1deg] rounded-none blur-sm"
                     />
                 </div>
-                <p className="text-xl text-gray-300 rotate-[-1deg]">
+                <p className="text-xl text-gray-300 rotate-[-1deg] font-bold">
                     {description}
                 </p>
             </div>
@@ -67,12 +68,11 @@ function CreativePricing({
                         <div
                             className={cn(
                                 "absolute inset-0",
-                                tier.popular ? "bg-primary" : "bg-zinc-800",
-                                "border-2",
-                                tier.popular ? "border-white" : "border-zinc-700",
-                                "rounded-lg shadow-[4px_4px_0px_0px] shadow-white",
+                                tier.popular ? "bg-primary" : "bg-white",
+                                "border-2 border-slate-900",
+                                "rounded-none shadow-[4px_4px_0px_0px] shadow-slate-900",
                                 "transition-all duration-300",
-                                "group-hover:shadow-[8px_8px_0px_0px]",
+                                "group-hover:shadow-[8px_8px_0px_0px] group-hover:shadow-slate-900",
                                 "group-hover:translate-x-[-4px]",
                                 "group-hover:translate-y-[-4px]"
                             )}
@@ -81,8 +81,8 @@ function CreativePricing({
                         <div className="relative p-6">
                             {tier.popular && (
                                 <div
-                                    className="absolute -top-2 -right-2 bg-black text-white 
-                                    px-3 py-1 rounded-full rotate-12 text-sm border-2 border-white font-bold"
+                                    className="absolute -top-4 -right-4 bg-black text-white 
+                                    px-3 py-1 rounded-none rotate-12 text-sm border-2 border-white font-black uppercase shadow-[2px_2px_0px_0px_rgba(255,255,255,1)]"
                                 >
                                     Popular!
                                 </div>
@@ -90,14 +90,14 @@ function CreativePricing({
 
                             <div className="mb-6">
                                 <h3 className={cn(
-                                    "text-2xl font-bold mb-2",
-                                    tier.popular ? "text-white" : "text-zinc-100"
+                                    "text-2xl font-black mb-2 uppercase",
+                                    tier.popular ? "text-white" : "text-slate-900"
                                 )}>
                                     {tier.name}
                                 </h3>
                                 <p className={cn(
-                                    "text-sm",
-                                    tier.popular ? "text-white/90" : "text-zinc-400"
+                                    "text-sm font-bold",
+                                    tier.popular ? "text-white/90" : "text-slate-500"
                                 )}>
                                     {tier.description}
                                 </p>
@@ -106,14 +106,15 @@ function CreativePricing({
                             {/* Price */}
                             <div className="mb-6">
                                 <span className={cn(
-                                    "text-4xl font-bold",
-                                    tier.popular ? "text-white" : "text-zinc-100"
+                                    "text-4xl font-black",
+                                    tier.popular ? "text-white" : "text-slate-900"
                                 )}>
                                     {typeof tier.price === 'number' ? `₹${tier.price}` : tier.price}
                                 </span>
                                 {typeof tier.price === 'number' && (
                                     <span className={cn(
-                                        tier.popular ? "text-white/80" : "text-zinc-400"
+                                        "font-bold",
+                                        tier.popular ? "text-white/80" : "text-slate-400"
                                     )}>
                                         /month
                                     </span>
@@ -128,18 +129,18 @@ function CreativePricing({
                                     >
                                         <div
                                             className={cn(
-                                                "w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 mt-0.5",
-                                                tier.popular ? "border-white" : "border-zinc-500"
+                                                "w-5 h-5 rounded-none border-2 flex items-center justify-center flex-shrink-0 mt-0.5 bg-white",
+                                                tier.popular ? "border-slate-900" : "border-slate-900"
                                             )}
                                         >
-                                            <Check className={cn(
-                                                "w-3 h-3",
-                                                tier.popular ? "text-white" : "text-zinc-300"
+                                            <CheckIcon className={cn(
+                                                "w-4 h-4",
+                                                "text-primary"
                                             )} />
                                         </div>
                                         <span className={cn(
-                                            "text-sm",
-                                            tier.popular ? "text-white" : "text-zinc-300"
+                                            "text-sm font-bold",
+                                            tier.popular ? "text-white" : "text-slate-700"
                                         )}>
                                             {feature}
                                         </span>

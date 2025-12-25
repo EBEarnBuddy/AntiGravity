@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Check, XCircle, User, MessageSquare } from 'lucide-react';
+import { XMarkIcon, CheckIcon, XCircleIcon, UserIcon, ChatBubbleLeftRightIcon } from '@heroicons/react/24/solid';
 import { useStartups } from '@/hooks/useFirestore';
 import { Application } from '@/lib/firestore';
 
@@ -80,7 +80,7 @@ const ApplicantsModal: React.FC<ApplicantsModalProps> = ({ isOpen, onClose, star
                             <p className="text-white/90 font-bold text-sm">Managing: <span className="text-yellow-300 font-black">{startupName}</span></p>
                         </div>
                         <button onClick={onClose} className="relative z-10 p-2 bg-white hover:bg-red-500 hover:text-white border-2 border-slate-900 transition-all text-slate-900 hover:scale-110 duration-200">
-                            <X className="w-5 h-5" />
+                            <XMarkIcon className="w-5 h-5" />
                         </button>
                     </div>
 
@@ -97,7 +97,7 @@ const ApplicantsModal: React.FC<ApplicantsModalProps> = ({ isOpen, onClose, star
                                 <div className="absolute inset-0 opacity-5 bg-[linear-gradient(45deg,#000_25%,transparent_25%,transparent_75%,#000_75%,#000),linear-gradient(45deg,#000_25%,transparent_25%,transparent_75%,#000_75%,#000)] [background-size:20px_20px] [background-position:0_0,10px_10px]"></div>
                                 <div className="relative z-10">
                                     <div className="w-16 h-16 bg-red-500 border-2 border-slate-900 flex items-center justify-center mx-auto mb-3">
-                                        <XCircle className="w-8 h-8 text-white" />
+                                        <XCircleIcon className="w-8 h-8 text-white" />
                                     </div>
                                     <p className="text-red-900 font-black text-lg uppercase">{error}</p>
                                 </div>
@@ -107,7 +107,7 @@ const ApplicantsModal: React.FC<ApplicantsModalProps> = ({ isOpen, onClose, star
                                 <div className="absolute inset-0 opacity-5 bg-[linear-gradient(45deg,#000_25%,transparent_25%,transparent_75%,#000_75%,#000),linear-gradient(45deg,#000_25%,transparent_25%,transparent_75%,#000_75%,#000)] [background-size:20px_20px] [background-position:0_0,10px_10px]"></div>
                                 <div className="relative z-10">
                                     <div className="w-24 h-24 bg-green-500 border-4 border-slate-900 flex items-center justify-center mb-6 mx-auto">
-                                        <User className="w-12 h-12 text-white" />
+                                        <UserIcon className="w-12 h-12 text-white" />
                                     </div>
                                     <h3 className="text-2xl font-black text-slate-900 mb-3 uppercase">No Applicants Yet!</h3>
                                     <p className="text-slate-600 font-bold max-w-xs">Your startup is live! Talented builders will discover it soon. 🚀</p>
@@ -131,7 +131,7 @@ const ApplicantsModal: React.FC<ApplicantsModalProps> = ({ isOpen, onClose, star
                                                     <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 border-2 border-white"></div>
                                                 </div>
                                                 <div>
-                                                    <h3 className="font-black text-xl text-slate-900 leading-tight uppercase tracking-tight">{(app.applicant as any)?.displayName || 'Anonymous User'}</h3>
+                                                    <h3 className="font-black text-xl text-slate-900 leading-tight uppercase tracking-tight">{(app.applicant as any)?.displayName || 'Anonymous UserIcon'}</h3>
                                                     <p className="text-xs text-slate-500 font-black uppercase tracking-wider">Applied {new Date(app.createdAt).toLocaleDateString()}</p>
                                                 </div>
                                             </div>
@@ -140,7 +140,7 @@ const ApplicantsModal: React.FC<ApplicantsModalProps> = ({ isOpen, onClose, star
                                                 <div className="bg-yellow-100 border-2 border-slate-900 p-4 mb-4 relative overflow-hidden">
                                                     <div className="absolute inset-0 opacity-5 bg-[linear-gradient(45deg,#000_25%,transparent_25%,transparent_75%,#000_75%,#000),linear-gradient(45deg,#000_25%,transparent_25%,transparent_75%,#000_75%,#000)] [background-size:20px_20px] [background-position:0_0,10px_10px]"></div>
                                                     <div className="relative z-10">
-                                                        <MessageSquare className="w-4 h-4 text-slate-900 mb-2" />
+                                                        <ChatBubbleLeftRightIcon className="w-4 h-4 text-slate-900 mb-2" />
                                                         <p className="text-sm text-slate-900 font-bold italic">"{app.message}"</p>
                                                     </div>
                                                 </div>
@@ -165,8 +165,8 @@ const ApplicantsModal: React.FC<ApplicantsModalProps> = ({ isOpen, onClose, star
                                                     ${app.status === 'accepted' ? 'bg-green-500 text-white' :
                                                         app.status === 'rejected' ? 'bg-red-500 text-white' :
                                                             'bg-yellow-400 text-slate-900'}`}>
-                                                    {app.status === 'accepted' && <Check className="w-3 h-3" />}
-                                                    {app.status === 'rejected' && <XCircle className="w-3 h-3" />}
+                                                    {app.status === 'accepted' && <CheckIcon className="w-3 h-3" />}
+                                                    {app.status === 'rejected' && <XCircleIcon className="w-3 h-3" />}
                                                     {app.status}
                                                 </span>
                                             </div>
@@ -180,13 +180,13 @@ const ApplicantsModal: React.FC<ApplicantsModalProps> = ({ isOpen, onClose, star
                                                         onClick={() => handleAction(app._id || app.id, 'accepted')}
                                                         className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-green-600 border-2 border-slate-900 text-white text-xs font-black uppercase hover:bg-green-700 transition-all hover:-translate-y-1 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] hover:shadow-[4px_4px_0px_0px_rgba(15,23,42,1)]"
                                                     >
-                                                        <Check className="w-4 h-4" /> Accept
+                                                        <CheckIcon className="w-4 h-4" /> Accept
                                                     </button>
                                                     <button
                                                         onClick={() => handleAction(app._id || app.id, 'rejected')}
                                                         className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-white border-2 border-slate-900 text-slate-900 text-xs font-black uppercase hover:bg-red-500 hover:text-white transition-all hover:-translate-y-1 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] hover:shadow-[4px_4px_0px_0px_rgba(15,23,42,1)]"
                                                     >
-                                                        <XCircle className="w-4 h-4" /> Reject
+                                                        <XCircleIcon className="w-4 h-4" /> Reject
                                                     </button>
                                                 </>
                                             ) : (
@@ -196,7 +196,7 @@ const ApplicantsModal: React.FC<ApplicantsModalProps> = ({ isOpen, onClose, star
                                             )}
 
                                             <button
-                                                onClick={() => alert('User reported to admins.')}
+                                                onClick={() => alert('UserIcon reported to admins.')}
                                                 className="w-full flex items-center justify-center gap-2 px-4 py-2 text-xs font-black text-slate-400 hover:text-red-600 transition mt-auto uppercase hover:bg-red-50 border-2 border-transparent hover:border-red-200"
                                             >
                                                 Report

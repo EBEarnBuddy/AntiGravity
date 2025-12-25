@@ -3,7 +3,26 @@
 import { useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
-import { Check, ChevronDown, ChevronRight, Layout, Menu, Play, Star, Users, Briefcase, Zap, Shield, Globe, ArrowRight, Instagram, Linkedin, Mail, Facebook } from "lucide-react";
+import {
+    CheckIcon,
+    ChevronDownIcon,
+    ChevronRightIcon,
+    Squares2X2Icon,
+    Bars3Icon,
+    PlayIcon,
+    StarIcon,
+    UserGroupIcon,
+    BriefcaseIcon,
+    BoltIcon,
+    ShieldCheckIcon,
+    GlobeAltIcon,
+    ArrowRightIcon,
+    EnvelopeIcon,
+    LinkIcon,
+    CameraIcon
+} from "@heroicons/react/24/solid";
+// Removed lucide-react imports
+
 import Link from "next/link";
 import Image from "next/image";
 import { Faq5 } from "@/components/ui/faq-5";
@@ -101,15 +120,15 @@ function LanderContent() {
                     </div>
 
                     <div className="flex items-center gap-4">
-                        {/* Login - Rounded Buttons */}
-                        <Link href="/auth" className="hidden md:block bg-white text-primary px-6 py-2.5 rounded-lg text-lg font-bold shadow-md hover:bg-green-50 transition transform hover:-translate-y-0.5">
+                        {/* Login - Brutalist Buttons */}
+                        <Link href="/auth" className="hidden md:block bg-white text-slate-900 px-6 py-2.5 rounded-none border-2 border-slate-900 text-lg font-black uppercase tracking-wide shadow-[4px_4px_0px_0px_rgba(255,255,255,0.5)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
                             Log In
                         </Link>
-                        {/* Get Started - Rounded Buttons */}
-                        <Link href="/auth" className="bg-transparent border border-white text-white px-6 py-2.5 rounded-lg text-lg font-bold hover:bg-white/10 transition transform hover:-translate-y-0.5">
+                        {/* Get Started - Brutalist Buttons */}
+                        <Link href="/auth" className="bg-slate-900 border-2 border-white text-white px-6 py-2.5 rounded-none text-lg font-black uppercase tracking-wide hover:bg-slate-800 transition shadow-[4px_4px_0px_0px_rgba(255,255,255,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]">
                             Get Started
                         </Link>
-                        <button className="lg:hidden text-white"><Menu /></button>
+                        <button className="lg:hidden text-white"><Bars3Icon className="w-8 h-8" /></button>
                     </div>
                 </div>
             </nav>
@@ -119,21 +138,21 @@ function LanderContent() {
                 <div className="container mx-auto px-6 max-w-7xl">
                     <div className="flex flex-col md:flex-row items-center gap-12">
                         <div className="flex-1 space-y-8 pb-32 z-10">
-                            <div className="inline-block bg-white/10 text-white px-4 py-1.5 rounded-full text-sm font-bold uppercase tracking-widest border border-white/20">
+                            <div className="inline-block bg-white/10 text-white px-4 py-1.5 rounded-none border-2 border-white text-sm font-black uppercase tracking-widest backdrop-blur-sm">
                                 Early Access
                             </div>
-                            <h1 className="text-6xl md:text-7xl font-bold leading-none tracking-tight">
+                            <h1 className="text-6xl md:text-7xl font-black leading-none tracking-tight uppercase">
                                 Launch your career with <br className="hidden md:block" /> real startup experience.
                             </h1>
-                            <p className="text-2xl text-green-50 max-w-xl leading-relaxed font-medium">
+                            <p className="text-2xl text-green-50 max-w-xl leading-relaxed font-bold">
                                 Join India's fastest growing community of student builders. Learn from founders, ship real products, and get hired.
                             </p>
                             <div className="flex items-center gap-4">
-                                <Link href="/auth" className="bg-white text-primary px-8 py-4 rounded-xl text-xl font-bold shadow-lg hover:shadow-xl hover:bg-green-50 transition flex items-center gap-2">
+                                <Link href="/auth" className="bg-white text-slate-900 px-8 py-4 rounded-none border-2 border-slate-900 text-xl font-black uppercase tracking-wide shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition flex items-center gap-2">
                                     Find a Team
                                 </Link>
-                                <button className="px-6 py-4 rounded-xl text-xl font-bold text-white hover:bg-white/10 transition flex items-center gap-2">
-                                    <Play className="w-6 h-6 fill-current" /> Watch Video
+                                <button className="px-6 py-4 rounded-none border-2 border-white text-xl font-black uppercase tracking-wide text-white hover:bg-white/10 transition flex items-center gap-2 shadow-[6px_6px_0px_0px_rgba(255,255,255,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]">
+                                    <PlayIcon className="w-6 h-6 fill-current" /> Watch Video
                                 </button>
                             </div>
                         </div>
@@ -141,7 +160,7 @@ function LanderContent() {
                         {/* Hero Image Mockup (iMac style from Page 2) */}
                         <div className="flex-1 relative translate-x-4 md:translate-x-0 translate-y-10 md:translate-y-20">
                             <div className="relative z-10">
-                                <div className="bg-white rounded-t-xl shadow-2xl overflow-hidden border-4 border-b-0 border-gray-200">
+                                <div className="bg-white rounded-none shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] overflow-hidden border-4 border-slate-900">
                                     <div className="bg-gray-100 h-8 flex items-center px-4 gap-2 border-b">
                                         <div className="flex gap-1.5">
                                             <div className="w-2.5 h-2.5 rounded-full bg-red-400"></div>
@@ -301,7 +320,7 @@ function LanderContent() {
                     tiers={[
                         {
                             name: "Free",
-                            icon: <Zap className="w-6 h-6 text-primary" />,
+                            icon: <BoltIcon className="w-6 h-6 text-primary" />,
                             price: "Free",
                             description: "For exploring and getting started",
                             color: "green",
@@ -321,7 +340,7 @@ function LanderContent() {
                         },
                         {
                             name: "Creator",
-                            icon: <Star className="w-6 h-6 text-amber-500" />,
+                            icon: <StarIcon className="w-6 h-6 text-amber-500" />,
                             price: 29,
                             description: "For founders & freelancers who want to create",
                             color: "amber",
@@ -340,7 +359,7 @@ function LanderContent() {
                         },
                         {
                             name: "Builder",
-                            icon: <Briefcase className="w-6 h-6 text-blue-500" />,
+                            icon: <BriefcaseIcon className="w-6 h-6 text-blue-500" />,
                             price: 79,
                             description: "For serious builders, teams, and agencies",
                             color: "blue",
@@ -359,7 +378,7 @@ function LanderContent() {
                         },
                         {
                             name: "Organization",
-                            icon: <Globe className="w-6 h-6 text-purple-500" />,
+                            icon: <GlobeAltIcon className="w-6 h-6 text-purple-500" />,
                             price: 199,
                             description: "For large teams, incubators, and institutions",
                             color: "purple",
@@ -419,9 +438,9 @@ function LanderContent() {
                                 Where ambitious builders come together to turn ideas into reality. Build. Collaborate. Earn.
                             </p>
                             <div className="flex gap-6">
-                                <Mail className="w-5 h-5 text-green-100 hover:text-white cursor-pointer transition" />
-                                <Linkedin className="w-5 h-5 text-green-100 hover:text-white cursor-pointer transition" />
-                                <Instagram className="w-5 h-5 text-green-100 hover:text-white cursor-pointer transition" />
+                                <EnvelopeIcon className="w-5 h-5 text-green-100 hover:text-white cursor-pointer transition" />
+                                <LinkIcon className="w-5 h-5 text-green-100 hover:text-white cursor-pointer transition" />
+                                <CameraIcon className="w-5 h-5 text-green-100 hover:text-white cursor-pointer transition" />
                             </div>
                         </div>
 
@@ -456,12 +475,12 @@ function LanderContent() {
                     {/* Scroll to Top - White Accent */}
                     <div
                         onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-                        className="fixed bottom-8 right-8 bg-white/90 backdrop-blur text-primary rounded-full p-3 shadow-lg cursor-pointer hover:scale-110 transition-transform duration-300 z-[9999] border-2 border-green-100">
-                        <ArrowRight className="w-6 h-6 -rotate-90" />
+                        className="fixed bottom-8 right-8 bg-white text-slate-900 rounded-none border-2 border-slate-900 p-3 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] cursor-pointer hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all duration-300 z-[9999]">
+                        <ArrowRightIcon className="w-6 h-6 -rotate-90" />
                     </div>
                 </div>
-            </footer>
-        </div>
+            </footer >
+        </div >
     );
 }
 

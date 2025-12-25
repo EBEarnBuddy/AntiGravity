@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 import Link, { LinkProps } from "next/link";
 import React, { useState, createContext, useContext } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Menu, X } from "lucide-react";
+import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/solid";
 
 interface Links {
     label: string;
@@ -115,13 +115,13 @@ export const MobileSidebar = ({
         <>
             <div
                 className={cn(
-                    "h-16 px-4 py-4 flex flex-row md:hidden items-center justify-between bg-white border-b border-slate-200 w-full"
+                    "h-16 px-4 py-4 flex flex-row md:hidden items-center justify-between bg-white border-b-2 border-slate-900 w-full"
                 )}
                 {...props}
             >
                 <div className="flex justify-end z-20 w-full">
-                    <Menu
-                        className="text-slate-800 cursor-pointer"
+                    <Bars3Icon
+                        className="w-8 h-8 text-slate-900 cursor-pointer"
                         onClick={() => setOpen(!open)}
                     />
                 </div>
@@ -136,7 +136,7 @@ export const MobileSidebar = ({
                                 ease: "easeInOut",
                             }}
                             className={cn(
-                                "fixed h-full w-full inset-0 bg-white p-10 z-[100] flex flex-col justify-between",
+                                "fixed h-full w-full inset-0 bg-white p-10 z-[100] flex flex-col justify-between border-r-4 border-slate-900",
                                 className
                             )}
                         >
@@ -144,7 +144,7 @@ export const MobileSidebar = ({
                                 className="absolute right-10 top-10 z-50 text-slate-800 cursor-pointer"
                                 onClick={() => setOpen(!open)}
                             >
-                                <X />
+                                <XMarkIcon className="w-8 h-8" />
                             </div>
                             {children}
                         </motion.div>
@@ -171,10 +171,10 @@ export const SidebarLink = ({
         <Link
             href={link.href}
             className={cn(
-                "flex items-center justify-start gap-3 group/sidebar py-3 px-3 rounded-xl transition-all duration-200",
+                "flex items-center justify-start gap-3 group/sidebar py-3 px-3 rounded-none transition-all duration-200 border-l-4 border-transparent",
                 isActive
-                    ? (!open ? "bg-white text-green-700 font-bold" : "bg-green-50 text-green-700 font-bold")
-                    : (!open ? "text-white/80 hover:bg-white/10 hover:text-white" : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"),
+                    ? (!open ? "bg-white text-green-700 font-bold border-green-700" : "bg-green-50 text-green-700 font-bold border-green-700")
+                    : (!open ? "text-white/80 hover:bg-white/10 hover:text-white" : "text-slate-600 hover:bg-slate-50 hover:text-slate-900 hover:border-slate-300"),
                 className
             )}
             {...props}
@@ -185,7 +185,7 @@ export const SidebarLink = ({
                     display: animate ? (open ? "inline-block" : "none") : "inline-block",
                     opacity: animate ? (open ? 1 : 0) : 1,
                 }}
-                className="text-sm group-hover/sidebar:translate-x-1 transition duration-150 whitespace-pre inline-block !p-0 !m-0"
+                className="text-sm group-hover/sidebar:translate-x-1 transition duration-150 whitespace-pre inline-block !p-0 !m-0 uppercase tracking-wide font-bold"
             >
                 {link.label}
             </motion.span>

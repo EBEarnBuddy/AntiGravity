@@ -4,20 +4,20 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import {
-    Users,
-    Briefcase,
-    Rocket,
-    MessageCircle,
-    Search,
-    TrendingUp,
-    Filter,
-    Calendar,
-    Bookmark,
-    Clock,
-    CheckCircle,
-    ChevronRight,
-    Sparkles
-} from 'lucide-react';
+    UserGroupIcon,
+    BriefcaseIcon,
+    RocketLaunchIcon,
+    ChatBubbleLeftIcon,
+    MagnifyingGlassIcon,
+    ArrowTrendingUpIcon,
+    FunnelIcon,
+    CalendarIcon,
+    BookmarkIcon,
+    ClockIcon,
+    CheckCircleIcon,
+    ChevronRightIcon,
+    SparklesIcon
+} from '@heroicons/react/24/solid';
 import { useAuth } from '@/contexts/AuthContext';
 import { usePods, useProjects, useStartups, useEvents, useBookmarks, useRooms } from '@/hooks/useFirestore';
 import { FloatingCard } from '@/components/ui/floating-card';
@@ -80,10 +80,10 @@ export default function DiscoverPage() {
         .slice(0, 10);
 
     const quickActions = [
-        { title: 'Find Work', icon: Briefcase, path: '/freelance', color: 'bg-emerald-500' },
-        { title: 'Join a Circle', icon: Users, path: '/circles', color: 'bg-blue-500' },
-        { title: 'Browse Startups', icon: Rocket, path: '/startups', color: 'bg-purple-500' },
-        { title: 'Events', icon: Calendar, path: '#events', color: 'bg-orange-500' },
+        { title: 'Find Work', icon: BriefcaseIcon, path: '/freelance', color: 'bg-emerald-500' },
+        { title: 'Join a Circle', icon: UserGroupIcon, path: '/circles', color: 'bg-blue-500' },
+        { title: 'Browse Startups', icon: RocketLaunchIcon, path: '/startups', color: 'bg-purple-500' },
+        { title: 'Events', icon: CalendarIcon, path: '#events', color: 'bg-orange-500' },
     ];
 
 
@@ -157,16 +157,16 @@ export default function DiscoverPage() {
                                             myApplications.map((app: any) => (
                                                 <div key={app._id} className="group flex items-start gap-4 p-3 hover:bg-slate-50 transition-colors border-2 border-transparent hover:border-slate-900">
                                                     <div className="w-10 h-10 bg-white border-2 border-slate-900 flex items-center justify-center flex-shrink-0 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)]">
-                                                        <Briefcase className="w-5 h-5 text-slate-900" />
+                                                        <BriefcaseIcon className="w-5 h-5 text-slate-900" />
                                                     </div>
                                                     <div className="flex-1 min-w-0">
                                                         <h4 className="font-bold text-slate-900 text-sm truncate uppercase">{app.opportunityId?.title || app.opportunityId?.name || 'Unknown Opportunity'}</h4>
                                                         <p className="text-xs text-slate-500 truncate uppercase bold">{app.status}</p>
                                                     </div>
                                                     {app.status === 'accepted' ? (
-                                                        <CheckCircle className="w-5 h-5 text-green-600" />
+                                                        <CheckCircleIcon className="w-5 h-5 text-green-600" />
                                                     ) : (
-                                                        <Clock className="w-5 h-5 text-slate-300" />
+                                                        <ClockIcon className="w-5 h-5 text-slate-300" />
                                                     )}
                                                 </div>
                                             ))
@@ -202,7 +202,7 @@ export default function DiscoverPage() {
                                                             <p className="text-xs text-slate-500 truncate capitalize font-bold">{item.type}</p>
                                                         </div>
                                                     </div>
-                                                    <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-slate-900" />
+                                                    <ChevronRightIcon className="w-4 h-4 text-slate-300 group-hover:text-slate-900" />
                                                 </div>
                                             ))
                                         ) : (

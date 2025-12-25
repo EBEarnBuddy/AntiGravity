@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { TrendingUp, Users, Zap } from 'lucide-react';
+import { ArrowTrendingUpIcon, UserGroupIcon, BoltIcon } from '@heroicons/react/24/solid';
 import { FloatingCard } from './floating-card';
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -46,30 +46,30 @@ export const BuilderFeed: React.FC = () => {
 
   const getTypeIcon = (type: string) => {
     switch (type) {
-      case 'launch': return TrendingUp;
-      case 'join': return Users;
-      case 'fund': return TrendingUp;
-      default: return Zap;
+      case 'launch': return ArrowTrendingUpIcon;
+      case 'join': return UserGroupIcon;
+      case 'fund': return ArrowTrendingUpIcon;
+      default: return BoltIcon;
     }
   };
 
   const getTypeColor = (type: string) => {
     switch (type) {
-      case 'launch': return 'text-emerald-600 bg-emerald-100';
-      case 'join': return 'text-blue-600 bg-blue-100';
-      case 'fund': return 'text-purple-600 bg-purple-100';
-      case 'apply': return 'text-orange-600 bg-orange-100';
-      default: return 'text-gray-600 bg-gray-100';
+      case 'launch': return 'text-emerald-900 bg-emerald-100 border-2 border-emerald-900';
+      case 'join': return 'text-blue-900 bg-blue-100 border-2 border-blue-900';
+      case 'fund': return 'text-purple-900 bg-purple-100 border-2 border-purple-900';
+      case 'apply': return 'text-orange-900 bg-orange-100 border-2 border-orange-900';
+      default: return 'text-slate-900 bg-slate-100 border-2 border-slate-900';
     }
   };
 
   return (
-    <FloatingCard className="p-6 h-full">
+    <FloatingCard className="p-6 h-full border-2 border-slate-900 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] rounded-none">
       <div className="flex items-center justify-between mb-6">
-        <h3 className="text-xl font-semibold text-gray-900">Live Builder Activity</h3>
-        <div className="flex items-center gap-2">
-          <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
-          <span className="text-sm text-gray-600">Live</span>
+        <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight">Live Builder Activity</h3>
+        <div className="flex items-center gap-2 border-2 border-red-500 bg-red-100 px-2 py-0.5">
+          <div className="w-2 h-2 bg-red-500 rounded-none animate-pulse"></div>
+          <span className="text-sm font-bold text-red-700 uppercase">Live</span>
         </div>
       </div>
 
@@ -79,7 +79,7 @@ export const BuilderFeed: React.FC = () => {
           return (
             <motion.div
               key={activity.id}
-              className="flex items-start gap-3 p-3 rounded-xl hover:bg-gray-50/80 transition-colors"
+              className="flex items-start gap-3 p-3 rounded-none border-2 border-slate-200 hover:border-slate-900 hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[-1px] hover:translate-y-[-1px] transition-all bg-white"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3, delay: index * 0.1 }}
@@ -87,19 +87,19 @@ export const BuilderFeed: React.FC = () => {
               <img
                 src={activity.user.avatar}
                 alt={activity.user.name}
-                className="w-10 h-10 rounded-full object-cover"
+                className="w-10 h-10 rounded-none border-2 border-slate-900 object-cover"
               />
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1">
-                  <span className="font-medium text-gray-900">{activity.user.name}</span>
-                  <div className={`p-1 rounded-full ${getTypeColor(activity.type)}`}>
+                  <span className="font-bold text-slate-900">{activity.user.name}</span>
+                  <div className={`p-1 rounded-none ${getTypeColor(activity.type)}`}>
                     <Icon className="w-3 h-3" />
                   </div>
                 </div>
-                <p className="text-sm text-gray-600">
-                  {activity.action} <span className="font-medium">{activity.project}</span>
+                <p className="text-sm text-slate-600 font-medium">
+                  {activity.action} <span className="font-bold underline decoration-2 decoration-emerald-500">{activity.project}</span>
                 </p>
-                <p className="text-xs text-gray-500 mt-1">{activity.timestamp}</p>
+                <p className="text-xs text-slate-400 mt-1 font-mono">{activity.timestamp}</p>
               </div>
             </motion.div>
           );

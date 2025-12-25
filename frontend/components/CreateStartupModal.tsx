@@ -1,25 +1,25 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  X,
-  Plus,
-  Trash2,
-  Building,
-  DollarSign,
-  MapPin,
-  Users,
-  Rocket,
-  Zap,
-  Heart,
-  Globe,
-  Star,
-  Award,
-  Briefcase,
-  Code,
-  Palette,
-  Megaphone,
-  BarChart
-} from 'lucide-react';
+  XMarkIcon,
+  PlusIcon,
+  TrashIcon,
+  BuildingOfficeIcon,
+  CurrencyDollarIcon,
+  MapPinIcon,
+  UserGroupIcon,
+  RocketLaunchIcon,
+  BoltIcon,
+  HeartIcon,
+  GlobeAltIcon,
+  StarIcon,
+  TrophyIcon,
+  BriefcaseIcon,
+  CodeBracketIcon,
+  PaintBrushIcon,
+  MegaphoneIcon,
+  ChartBarIcon
+} from '@heroicons/react/24/solid';
 import { useAuth } from '../contexts/AuthContext';
 import { useStartups } from '../hooks/useFirestore';
 
@@ -65,15 +65,15 @@ const CreateStartupModal: React.FC<CreateStartupModalProps> = ({ isOpen, onClose
   const [newRoleRequirement, setNewRoleRequirement] = useState('');
 
   const industries = [
-    { id: 'healthcare', name: 'Healthcare', icon: Heart },
-    { id: 'fintech', name: 'FinTech', icon: DollarSign },
-    { id: 'education', name: 'EdTech', icon: Users },
-    { id: 'climate', name: 'Climate Tech', icon: Zap },
-    { id: 'ai', name: 'AI/ML', icon: Code },
-    { id: 'design', name: 'Design', icon: Palette },
-    { id: 'marketing', name: 'Marketing', icon: Megaphone },
-    { id: 'analytics', name: 'Analytics', icon: BarChart },
-    { id: 'other', name: 'Other', icon: Building }
+    { id: 'healthcare', name: 'Healthcare', icon: HeartIcon },
+    { id: 'fintech', name: 'FinTech', icon: CurrencyDollarIcon },
+    { id: 'education', name: 'EdTech', icon: UserGroupIcon },
+    { id: 'climate', name: 'Climate Tech', icon: BoltIcon },
+    { id: 'ai', name: 'AI/ML', icon: CodeBracketIcon },
+    { id: 'design', name: 'Design', icon: PaintBrushIcon },
+    { id: 'marketing', name: 'Marketing', icon: MegaphoneIcon },
+    { id: 'analytics', name: 'Analytics', icon: ChartBarIcon },
+    { id: 'other', name: 'Other', icon: BuildingOfficeIcon }
   ];
 
   const stages = [
@@ -277,7 +277,7 @@ const CreateStartupModal: React.FC<CreateStartupModalProps> = ({ isOpen, onClose
                   onClick={onClose}
                   className="p-2 hover:bg-slate-100 rounded-full transition-colors text-slate-400 hover:text-slate-600"
                 >
-                  <X className="w-6 h-6" />
+                  <XMarkIcon className="w-6 h-6" />
                 </button>
               </div>
 
@@ -543,7 +543,7 @@ const CreateStartupModal: React.FC<CreateStartupModalProps> = ({ isOpen, onClose
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
                           >
-                            <Plus className="w-5 h-5" />
+                            <PlusIcon className="w-5 h-5" />
                           </motion.button>
                         </div>
                         <div className="flex flex-wrap gap-2">
@@ -560,7 +560,7 @@ const CreateStartupModal: React.FC<CreateStartupModalProps> = ({ isOpen, onClose
                                 onClick={() => removeRoleRequirement(req)}
                                 className="hover:text-green-900"
                               >
-                                <X className="w-4 h-4" />
+                                <XMarkIcon className="w-4 h-4" />
                               </button>
                             </motion.span>
                           ))}
@@ -591,7 +591,7 @@ const CreateStartupModal: React.FC<CreateStartupModalProps> = ({ isOpen, onClose
                         whileHover={{ scale: !newRole.title || !newRole.description || newRole.requirements.length === 0 ? 1 : 1.02 }}
                         whileTap={{ scale: !newRole.title || !newRole.description || newRole.requirements.length === 0 ? 1 : 0.98 }}
                       >
-                        <Plus className="w-5 h-5 inline mr-2" />
+                        <PlusIcon className="w-5 h-5 inline mr-2" />
                         Add Position
                       </motion.button>
                     </div>
@@ -609,7 +609,7 @@ const CreateStartupModal: React.FC<CreateStartupModalProps> = ({ isOpen, onClose
                                   onClick={() => removeRole(role.id)}
                                   className="p-1 hover:bg-red-50 rounded-lg transition-colors group"
                                 >
-                                  <Trash2 className="w-4 h-4 text-slate-400 group-hover:text-red-500" />
+                                  <TrashIcon className="w-4 h-4 text-slate-400 group-hover:text-red-500" />
                                 </button>
                               </div>
                               <p className="text-sm text-slate-600 mb-2 font-medium">{role.description}</p>

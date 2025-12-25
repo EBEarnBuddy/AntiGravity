@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Send, FileText, Globe, Mail, AlertCircle, CheckCircle } from 'lucide-react';
+import { XMarkIcon, PaperAirplaneIcon, DocumentTextIcon, GlobeAltIcon, EnvelopeIcon, ExclamationCircleIcon, CheckCircleIcon } from '@heroicons/react/24/solid';
 import { useAuth } from '../contexts/AuthContext';
 import { useStartups } from '../hooks/useFirestore';
 
@@ -169,7 +169,7 @@ const StartupApplicationModal: React.FC<StartupApplicationModalProps> = ({
                 onClick={onClose}
                 className="p-2 border-2 border-transparent hover:border-slate-900 hover:bg-red-100 hover:text-red-600 transition-all rounded-none"
               >
-                <X className="w-8 h-8" />
+                <XMarkIcon className="w-8 h-8" />
               </button>
             </div>
 
@@ -190,7 +190,7 @@ const StartupApplicationModal: React.FC<StartupApplicationModalProps> = ({
                     </option>
                   ))}
                 </select>
-                {errors.role && <p className={errorClass}><AlertCircle className="w-3 h-3" /> {errors.role}</p>}
+                {errors.role && <p className={errorClass}><ExclamationCircleIcon className="w-3 h-3" /> {errors.role}</p>}
 
                 {/* Role Details Preview */}
                 {selectedRoleId && (
@@ -220,7 +220,7 @@ const StartupApplicationModal: React.FC<StartupApplicationModalProps> = ({
                     className={inputClass(!!errors.coverLetter)}
                     placeholder="Don't be boring."
                   />
-                  {errors.coverLetter && <p className={errorClass}><AlertCircle className="w-3 h-3" /> {errors.coverLetter}</p>}
+                  {errors.coverLetter && <p className={errorClass}><ExclamationCircleIcon className="w-3 h-3" /> {errors.coverLetter}</p>}
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -234,9 +234,9 @@ const StartupApplicationModal: React.FC<StartupApplicationModalProps> = ({
                         className={`${inputClass(!!errors.linkedin)} pl-10`}
                         placeholder="https://linkedin.com/..."
                       />
-                      <Mail className="absolute left-3 top-3.5 w-5 h-5 text-slate-400 pointer-events-none" />
+                      <EnvelopeIcon className="absolute left-3 top-3.5 w-5 h-5 text-slate-400 pointer-events-none" />
                     </div>
-                    {errors.linkedin && <p className={errorClass}><AlertCircle className="w-3 h-3" /> {errors.linkedin}</p>}
+                    {errors.linkedin && <p className={errorClass}><ExclamationCircleIcon className="w-3 h-3" /> {errors.linkedin}</p>}
                   </div>
                   <div>
                     <label className={labelClass}>Portfolio URL</label>
@@ -248,9 +248,9 @@ const StartupApplicationModal: React.FC<StartupApplicationModalProps> = ({
                         className={`${inputClass(!!errors.portfolio)} pl-10`}
                         placeholder="https://mywork.com"
                       />
-                      <Globe className="absolute left-3 top-3.5 w-5 h-5 text-slate-400 pointer-events-none" />
+                      <GlobeAltIcon className="absolute left-3 top-3.5 w-5 h-5 text-slate-400 pointer-events-none" />
                     </div>
-                    {errors.portfolio && <p className={errorClass}><AlertCircle className="w-3 h-3" /> {errors.portfolio}</p>}
+                    {errors.portfolio && <p className={errorClass}><ExclamationCircleIcon className="w-3 h-3" /> {errors.portfolio}</p>}
                   </div>
                 </div>
 
@@ -263,7 +263,7 @@ const StartupApplicationModal: React.FC<StartupApplicationModalProps> = ({
                     className={inputClass(!!errors.experience)}
                     placeholder="What have you built?"
                   />
-                  {errors.experience && <p className={errorClass}><AlertCircle className="w-3 h-3" /> {errors.experience}</p>}
+                  {errors.experience && <p className={errorClass}><ExclamationCircleIcon className="w-3 h-3" /> {errors.experience}</p>}
                 </div>
 
                 <div>
@@ -275,7 +275,7 @@ const StartupApplicationModal: React.FC<StartupApplicationModalProps> = ({
                     className={inputClass(!!errors.whyInterested)}
                     placeholder="Flattery helps, but specifics are better."
                   />
-                  {errors.whyInterested && <p className={errorClass}><AlertCircle className="w-3 h-3" /> {errors.whyInterested}</p>}
+                  {errors.whyInterested && <p className={errorClass}><ExclamationCircleIcon className="w-3 h-3" /> {errors.whyInterested}</p>}
                 </div>
               </div>
             </div>
@@ -293,7 +293,7 @@ const StartupApplicationModal: React.FC<StartupApplicationModalProps> = ({
                 disabled={isSubmitting}
                 className="px-8 py-3 bg-green-600 text-white font-black uppercase tracking-widest border-2 border-green-700 hover:bg-green-500 hover:shadow-[4px_4px_0px_0px_rgba(21,128,61,1)] transition-all flex items-center gap-2 disabled:opacity-70 disabled:cursor-wait shadow-[2px_2px_0px_0px_rgba(21,128,61,1)]"
               >
-                {isSubmitting ? 'Sending...' : <><Send className="w-4 h-4" /> Submit Application</>}
+                {isSubmitting ? 'Sending...' : <><PaperAirplaneIcon className="w-4 h-4" /> Submit Application</>}
               </button>
             </div>
           </motion.div>

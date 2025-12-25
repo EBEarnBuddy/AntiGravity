@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState, useEffect } from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/solid';
 import { cn } from '@/lib/utils';
 
 const SQRT_5000 = Math.sqrt(5000);
@@ -255,24 +255,24 @@ export const StaggerTestimonials: React.FC = () => {
                 <button
                     onClick={() => handleMove(-1)}
                     className={cn(
-                        "flex h-14 w-14 items-center justify-center text-2xl transition-colors",
-                        "bg-white border-2 border-gray-300 hover:bg-primary hover:text-primary-foreground",
+                        "flex h-14 w-14 items-center justify-center text-2xl transition-colors rounded-none",
+                        "bg-white border-2 border-slate-900 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none hover:bg-white hover:text-slate-900",
                         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                     )}
                     aria-label="Previous testimonial"
                 >
-                    <ChevronLeft />
+                    <ChevronLeftIcon className="w-8 h-8" />
                 </button>
                 <button
                     onClick={() => handleMove(1)}
                     className={cn(
-                        "flex h-14 w-14 items-center justify-center text-2xl transition-colors",
-                        "bg-white border-2 border-gray-300 hover:bg-primary hover:text-primary-foreground",
+                        "flex h-14 w-14 items-center justify-center text-2xl transition-colors rounded-none",
+                        "bg-white border-2 border-slate-900 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none hover:bg-white hover:text-slate-900",
                         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                     )}
                     aria-label="Next testimonial"
                 >
-                    <ChevronRight />
+                    <ChevronRightIcon className="w-8 h-8" />
                 </button>
             </div>
         </div>

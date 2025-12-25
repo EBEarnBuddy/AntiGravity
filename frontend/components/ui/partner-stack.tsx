@@ -3,7 +3,7 @@
 import { useState, type ReactNode } from "react"
 import { motion, AnimatePresence, LayoutGroup, type PanInfo } from "framer-motion"
 import { cn } from "@/lib/utils"
-import { Grid3X3, Layers, LayoutList } from "lucide-react"
+import { Squares2X2Icon, Square3Stack3DIcon, ListBulletIcon } from "@heroicons/react/24/solid"
 import Image from "next/image"
 
 export type LayoutMode = "stack" | "grid" | "list"
@@ -22,9 +22,9 @@ export interface PartnerCardStackProps {
 }
 
 const layoutIcons = {
-    stack: Layers,
-    grid: Grid3X3,
-    list: LayoutList,
+    stack: Square3Stack3DIcon,
+    grid: Squares2X2Icon,
+    list: ListBulletIcon,
 }
 
 const SWIPE_THRESHOLD = 50

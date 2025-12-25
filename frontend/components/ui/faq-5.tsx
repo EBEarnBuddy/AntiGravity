@@ -49,8 +49,8 @@ export const Faq5 = ({
                 </div>
                 <div className="mx-auto mt-14">
                     {faqs.map((faq, index) => (
-                        <div key={index} className="mb-8 flex gap-6 bg-white/10 p-6 rounded-2xl border border-white/10 hover:bg-white/20 transition">
-                            <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-white text-primary font-bold font-mono text-sm">
+                        <div key={index} className="mb-8 flex gap-6 bg-white/10 p-6 rounded-none border border-white/10 hover:bg-white/20 transition">
+                            <span className="flex size-8 shrink-0 items-center justify-center rounded-none bg-white text-primary font-bold font-mono text-sm">
                                 {index + 1}
                             </span>
                             <div>

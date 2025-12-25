@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Settings, Trash2, Save, UploadCloud } from 'lucide-react';
+import { XMarkIcon, Cog6ToothIcon, TrashIcon, CheckIcon, CloudArrowUpIcon } from '@heroicons/react/24/solid';
 import { uploadImage } from '../lib/cloudinary';
 import { roomAPI } from '../lib/axios';
 
@@ -97,10 +97,10 @@ const ChatSettingsModal: React.FC<ChatSettingsModalProps> = ({ isOpen, onClose, 
                 >
                     <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
                         <h2 className="text-xl font-black text-slate-900 flex items-center gap-2">
-                            <Settings className="w-5 h-5" /> Chat Settings
+                            <Cog6ToothIcon className="w-5 h-5" /> Chat Settings
                         </h2>
                         <button onClick={onClose} className="p-2 hover:bg-slate-200 rounded-full transition">
-                            <X className="w-5 h-5 text-slate-500" />
+                            <XMarkIcon className="w-5 h-5 text-slate-500" />
                         </button>
                     </div>
 
@@ -114,7 +114,7 @@ const ChatSettingsModal: React.FC<ChatSettingsModalProps> = ({ isOpen, onClose, 
                                     <div className="w-full h-full flex items-center justify-center text-slate-400 font-bold">Img</div>
                                 )}
                                 <label className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition cursor-pointer">
-                                    <UploadCloud className="w-6 h-6 text-white" />
+                                    <CloudArrowUpIcon className="w-6 h-6 text-white" />
                                     <input type="file" className="hidden" accept="image/*" onChange={handleFileChange} />
                                 </label>
                             </div>
@@ -150,7 +150,7 @@ const ChatSettingsModal: React.FC<ChatSettingsModalProps> = ({ isOpen, onClose, 
                             disabled={loading}
                             className="w-full py-3 bg-slate-900 text-white font-bold rounded-xl hover:bg-slate-800 transition flex items-center justify-center gap-2 uppercase text-sm disabled:opacity-50"
                         >
-                            {loading ? 'Saving...' : <><Save className="w-4 h-4" /> Save Changes</>}
+                            {loading ? 'Saving...' : <><CheckIcon className="w-4 h-4" /> Save Changes</>}
                         </button>
 
                         <button
@@ -158,7 +158,7 @@ const ChatSettingsModal: React.FC<ChatSettingsModalProps> = ({ isOpen, onClose, 
                             disabled={loading}
                             className="w-full py-3 bg-red-100 text-red-600 font-bold rounded-xl hover:bg-red-200 transition flex items-center justify-center gap-2 uppercase text-sm"
                         >
-                            <Trash2 className="w-4 h-4" /> Delete Chat
+                            <TrashIcon className="w-4 h-4" /> Delete Chat
                         </button>
                     </div>
                 </motion.div>

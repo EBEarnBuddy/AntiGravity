@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { X } from 'lucide-react';
+import { XMarkIcon } from '@heroicons/react/24/solid';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRooms } from '@/hooks/useFirestore';
 import { collaborationAPI } from '@/lib/axios';
@@ -81,7 +81,7 @@ const CollaborationRequestModal: React.FC<CollaborationRequestModalProps> = ({
                     onClick={onClose}
                     className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 transition"
                 >
-                    <X className="w-5 h-5" />
+                    <XMarkIcon className="w-5 h-5" />
                 </button>
 
                 {/* Header */}

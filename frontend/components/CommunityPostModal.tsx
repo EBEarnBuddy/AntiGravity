@@ -1,30 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import {
-  X,
-  Send,
-  Image as ImageIcon,
-  FileText,
-  Smile,
-  Paperclip,
-  Video,
-  Music,
-  MapPin,
-  Calendar,
-  Hash,
-  Globe,
-  Users,
-  Zap,
-  Heart,
-  Star,
-  ThumbsUp,
-  Rocket,
-  Code,
-  Palette,
-  DollarSign,
-  Leaf,
-  Cpu
-} from 'lucide-react';
+import { XMarkIcon, PaperAirplaneIcon, PhotoIcon, DocumentTextIcon, FaceSmileIcon, PaperClipIcon, VideoCameraIcon, MusicalNoteIcon, MapPinIcon, CalendarIcon, HashtagIcon, GlobeAltIcon, UserGroupIcon, BoltIcon, HeartIcon, StarIcon, HandThumbUpIcon, RocketLaunchIcon, CodeBracketIcon, PaintBrushIcon, CurrencyDollarIcon, SparklesIcon, CpuChipIcon } from '@heroicons/react/24/solid';
 import { useAuth } from '../contexts/AuthContext';
 import { usePods } from '../hooks/useFirestore';
 import { FirestoreService } from '../lib/firestore';
@@ -154,7 +130,7 @@ const CommunityPostModal: React.FC<CommunityPostModalProps> = ({
     }));
   };
 
-    const handleSubmit = async () => {
+  const handleSubmit = async () => {
     if (!currentUser || !postData.content.trim()) return;
 
     try {
@@ -282,7 +258,7 @@ const CommunityPostModal: React.FC<CommunityPostModalProps> = ({
                 onClick={onClose}
                 className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
               >
-                <X className="w-5 h-5" />
+                <XMarkIcon className="w-5 h-5" />
               </button>
             </div>
 
@@ -322,7 +298,7 @@ const CommunityPostModal: React.FC<CommunityPostModalProps> = ({
                     onClick={() => setPostData(prev => ({ ...prev, emoji: undefined }))}
                     className="text-gray-500 hover:text-red-500"
                   >
-                    <X className="w-4 h-4" />
+                    <XMarkIcon className="w-4 h-4" />
                   </button>
                 </div>
               )}
@@ -340,7 +316,7 @@ const CommunityPostModal: React.FC<CommunityPostModalProps> = ({
                         onClick={() => removeTag(tag)}
                         className="hover:text-emerald-900 dark:hover:text-emerald-100"
                       >
-                        <X className="w-3 h-3" />
+                        <XMarkIcon className="w-3 h-3" />
                       </button>
                     </span>
                   ))}
@@ -361,7 +337,7 @@ const CommunityPostModal: React.FC<CommunityPostModalProps> = ({
                         onClick={() => removeImage(index)}
                         className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
                       >
-                        <X className="w-4 h-4" />
+                        <XMarkIcon className="w-4 h-4" />
                       </button>
                     </div>
                   ))}
@@ -374,14 +350,14 @@ const CommunityPostModal: React.FC<CommunityPostModalProps> = ({
                   {postData.documents.map((doc, index) => (
                     <div key={index} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
                       <div className="flex items-center gap-3">
-                        <FileText className="w-5 h-5 text-gray-500" />
+                        <DocumentTextIcon className="w-5 h-5 text-gray-500" />
                         <span className="text-sm text-gray-700 dark:text-gray-300">{doc.name}</span>
                       </div>
                       <button
                         onClick={() => removeDocument(index)}
                         className="text-red-500 hover:text-red-700"
                       >
-                        <X className="w-4 h-4" />
+                        <XMarkIcon className="w-4 h-4" />
                       </button>
                     </div>
                   ))}
@@ -397,7 +373,7 @@ const CommunityPostModal: React.FC<CommunityPostModalProps> = ({
                     className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
                     title="Add image"
                   >
-                    <ImageIcon className="w-5 h-5 text-gray-500" />
+                    <PhotoIcon className="w-5 h-5 text-gray-500" />
                   </button>
                   <input
                     ref={fileInputRef}
@@ -414,7 +390,7 @@ const CommunityPostModal: React.FC<CommunityPostModalProps> = ({
                     className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
                     title="Add document"
                   >
-                    <FileText className="w-5 h-5 text-gray-500" />
+                    <DocumentTextIcon className="w-5 h-5 text-gray-500" />
                   </button>
                   <input
                     ref={documentInputRef}
@@ -432,7 +408,7 @@ const CommunityPostModal: React.FC<CommunityPostModalProps> = ({
                       className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
                       title="Add emoji"
                     >
-                      <Smile className="w-5 h-5 text-gray-500" />
+                      <FaceSmileIcon className="w-5 h-5 text-gray-500" />
                     </button>
 
                     <AnimatePresence>
@@ -465,7 +441,7 @@ const CommunityPostModal: React.FC<CommunityPostModalProps> = ({
                       className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
                       title="Select pod"
                     >
-                      <Hash className="w-5 h-5 text-gray-500" />
+                      <HashtagIcon className="w-5 h-5 text-gray-500" />
                     </button>
 
                     <AnimatePresence>
@@ -512,11 +488,10 @@ const CommunityPostModal: React.FC<CommunityPostModalProps> = ({
                   <motion.button
                     onClick={handleSubmit}
                     disabled={!canSubmit || isSubmitting}
-                    className={`px-6 py-2 rounded-lg font-semibold transition-all duration-300 flex items-center gap-2 ${
-                      canSubmit && !isSubmitting
-                        ? 'bg-gradient-to-r from-emerald-600 to-emerald-500 text-white hover:shadow-lg'
-                        : 'bg-gray-100 dark:bg-gray-800 text-gray-400 cursor-not-allowed'
-                    }`}
+                    className={`px-6 py-2 rounded-lg font-semibold transition-all duration-300 flex items-center gap-2 ${canSubmit && !isSubmitting
+                      ? 'bg-gradient-to-r from-emerald-600 to-emerald-500 text-white hover:shadow-lg'
+                      : 'bg-gray-100 dark:bg-gray-800 text-gray-400 cursor-not-allowed'
+                      }`}
                     whileHover={{ scale: canSubmit && !isSubmitting ? 1.02 : 1 }}
                     whileTap={{ scale: canSubmit && !isSubmitting ? 0.98 : 1 }}
                   >
@@ -527,7 +502,7 @@ const CommunityPostModal: React.FC<CommunityPostModalProps> = ({
                       </>
                     ) : (
                       <>
-                        <Send className="w-4 h-4" />
+                        <PaperAirplaneIcon className="w-4 h-4" />
                         Post
                       </>
                     )}

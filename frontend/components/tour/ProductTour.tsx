@@ -4,7 +4,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTour } from './TourContext';
-import { X, ChevronRight, ChevronLeft } from 'lucide-react';
+import { XMarkIcon, ChevronRightIcon, ChevronLeftIcon } from '@heroicons/react/24/solid';
 
 export const ProductTour: React.FC = () => {
     const { isActive, currentStepIndex, steps, nextStep, prevStep, skipTour } = useTour();
@@ -156,7 +156,7 @@ export const ProductTour: React.FC = () => {
                                 onClick={skipTour}
                                 className="text-slate-400 hover:text-slate-900 transition"
                             >
-                                <X className="w-5 h-5" />
+                                <XMarkIcon className="w-5 h-5" />
                             </button>
                         </div>
 
@@ -191,7 +191,7 @@ export const ProductTour: React.FC = () => {
                                     className="px-4 py-1.5 bg-green-600 text-white font-black text-[10px] uppercase tracking-wider border-2 border-slate-900 hover:bg-green-500 transition flex items-center gap-1 shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] hover:shadow-none hover:translate-x-[3px] hover:translate-y-[3px]"
                                 >
                                     {isLast ? 'Finish' : 'Next'}
-                                    {!isLast && <ChevronRight className="w-3 h-3" />}
+                                    {!isLast && <ChevronRightIcon className="w-3 h-3" />}
                                 </button>
                             </div>
                         </div>

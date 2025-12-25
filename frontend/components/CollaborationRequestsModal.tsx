@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Check, XCircle, Handshake, Loader2 } from 'lucide-react';
+import { XMarkIcon, CheckIcon, XCircleIcon, UserGroupIcon, ArrowPathIcon } from '@heroicons/react/24/solid';
 import { collaborationAPI } from '@/lib/axios';
 
 interface CollabRequest {
@@ -99,7 +99,7 @@ const CollaborationRequestsModal: React.FC<CollaborationRequestsModalProps> = ({
                     {/* Header */}
                     <div className="bg-purple-600 text-white p-6 flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                            <Handshake className="w-6 h-6" />
+                            <UserGroupIcon className="w-6 h-6" />
                             <div>
                                 <h2 className="text-2xl font-black">Collaboration Requests</h2>
                                 <p className="text-purple-100 text-sm font-medium">Pending collaboration invitations</p>
@@ -109,7 +109,7 @@ const CollaborationRequestsModal: React.FC<CollaborationRequestsModalProps> = ({
                             onClick={onClose}
                             className="p-2 hover:bg-purple-700 rounded-lg transition"
                         >
-                            <X className="w-6 h-6" />
+                            <XMarkIcon className="w-6 h-6" />
                         </button>
                     </div>
 
@@ -117,11 +117,11 @@ const CollaborationRequestsModal: React.FC<CollaborationRequestsModalProps> = ({
                     <div className="p-6 overflow-y-auto max-h-[60vh]">
                         {loading ? (
                             <div className="flex items-center justify-center py-12">
-                                <Loader2 className="w-8 h-8 animate-spin text-purple-600" />
+                                <ArrowPathIcon className="w-8 h-8 animate-spin text-purple-600" />
                             </div>
                         ) : requests.length === 0 ? (
                             <div className="text-center py-12">
-                                <Handshake className="w-16 h-16 mx-auto text-slate-300 mb-4" />
+                                <UserGroupIcon className="w-16 h-16 mx-auto text-slate-300 mb-4" />
                                 <h3 className="text-xl font-bold text-slate-900 mb-2">No Pending Requests</h3>
                                 <p className="text-slate-500">No one has requested to collaborate with your circles yet.</p>
                             </div>
@@ -175,9 +175,9 @@ const CollaborationRequestsModal: React.FC<CollaborationRequestsModalProps> = ({
                                                 className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg font-bold hover:bg-green-700 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                                             >
                                                 {processingId === request._id ? (
-                                                    <Loader2 className="w-4 h-4 animate-spin" />
+                                                    <ArrowPathIcon className="w-4 h-4 animate-spin" />
                                                 ) : (
-                                                    <Check className="w-4 h-4" />
+                                                    <CheckIcon className="w-4 h-4" />
                                                 )}
                                                 Accept
                                             </button>
@@ -187,9 +187,9 @@ const CollaborationRequestsModal: React.FC<CollaborationRequestsModalProps> = ({
                                                 className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg font-bold hover:bg-red-700 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                                             >
                                                 {processingId === request._id ? (
-                                                    <Loader2 className="w-4 h-4 animate-spin" />
+                                                    <ArrowPathIcon className="w-4 h-4 animate-spin" />
                                                 ) : (
-                                                    <XCircle className="w-4 h-4" />
+                                                    <XCircleIcon className="w-4 h-4" />
                                                 )}
                                                 Reject
                                             </button>

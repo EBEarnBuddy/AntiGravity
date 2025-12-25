@@ -1,23 +1,23 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  X,
-  Plus,
-  Trash2,
-  Building,
-  DollarSign,
-  Briefcase,
-  Zap,
-  Heart,
-  Code,
-  Palette,
-  Megaphone,
-  BarChart,
-  Star,
-  Target,
-  Award,
-  Users
-} from 'lucide-react';
+  XMarkIcon,
+  PlusIcon,
+  TrashIcon,
+  BuildingOfficeIcon,
+  CurrencyDollarIcon,
+  BriefcaseIcon,
+  BoltIcon,
+  HeartIcon,
+  CodeBracketIcon,
+  PaintBrushIcon,
+  MegaphoneIcon,
+  ChartBarIcon,
+  StarIcon,
+  CpuChipIcon,
+  TrophyIcon,
+  UserGroupIcon
+} from '@heroicons/react/24/solid';
 import { useAuth } from '../contexts/AuthContext';
 import { useProjects } from '../hooks/useFirestore';
 
@@ -81,15 +81,15 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose
   const [newSkill, setNewSkill] = useState('');
 
   const industries = [
-    { id: 'fintech', name: 'FinTech', icon: DollarSign },
-    { id: 'e-commerce', name: 'E-commerce', icon: Briefcase },
-    { id: 'climate-tech', name: 'Climate Tech', icon: Zap },
-    { id: 'healthcare', name: 'HealthTech', icon: Heart },
-    { id: 'ai', name: 'AI/ML', icon: Code },
-    { id: 'design', name: 'Design', icon: Palette },
-    { id: 'marketing', name: 'Marketing', icon: Megaphone },
-    { id: 'analytics', name: 'Analytics', icon: BarChart },
-    { id: 'other', name: 'Other', icon: Building }
+    { id: 'fintech', name: 'FinTech', icon: CurrencyDollarIcon },
+    { id: 'e-commerce', name: 'E-commerce', icon: BriefcaseIcon },
+    { id: 'climate-tech', name: 'Climate Tech', icon: BoltIcon },
+    { id: 'healthcare', name: 'HealthTech', icon: HeartIcon },
+    { id: 'ai', name: 'AI/ML', icon: CodeBracketIcon },
+    { id: 'design', name: 'Design', icon: PaintBrushIcon },
+    { id: 'marketing', name: 'Marketing', icon: MegaphoneIcon },
+    { id: 'analytics', name: 'Analytics', icon: ChartBarIcon },
+    { id: 'other', name: 'Other', icon: BuildingOfficeIcon }
   ];
 
   const projectTypes = [
@@ -361,7 +361,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose
                   onClick={onClose}
                   className="p-2 hover:bg-slate-100 rounded-full transition-colors text-slate-400 hover:text-slate-600"
                 >
-                  <X className="w-6 h-6" />
+                  <XMarkIcon className="w-6 h-6" />
                 </button>
               </div>
 
@@ -375,7 +375,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose
                         : 'bg-white border-slate-200 text-slate-400'
                         }`}>
                         {currentStep > step.number ? (
-                          <Award className="w-4 h-4" />
+                          <TrophyIcon className="w-4 h-4" />
                         ) : (
                           <span className="text-sm font-bold">{step.number}</span>
                         )}
@@ -525,7 +525,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose
                               onClick={() => removeTag(tag)}
                               className="hover:text-green-900"
                             >
-                              <X className="w-3 h-3" />
+                              <XMarkIcon className="w-3 h-3" />
                             </button>
                           </span>
                         ))}
@@ -706,7 +706,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose
                               onClick={() => removeBenefit(benefit)}
                               className="hover:text-blue-900"
                             >
-                              <X className="w-3 h-3" />
+                              <XMarkIcon className="w-3 h-3" />
                             </button>
                           </span>
                         ))}
@@ -766,14 +766,14 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose
                         onClick={addRole}
                         className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center gap-2 font-bold shadow-sm"
                       >
-                        <Plus className="w-4 h-4" />
+                        <PlusIcon className="w-4 h-4" />
                         Add Role
                       </button>
                     </div>
 
                     {formData.roles.length === 0 && (
                       <div className="text-center py-8 text-slate-500 bg-slate-50 rounded-xl border border-slate-200 border-dashed">
-                        <Users className="w-12 h-12 mx-auto mb-4 text-slate-400" />
+                        <UserGroupIcon className="w-12 h-12 mx-auto mb-4 text-slate-400" />
                         <p className="font-medium">No roles added yet. Add at least one role to continue.</p>
                       </div>
                     )}
@@ -792,7 +792,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose
                             onClick={() => removeRole(roleIndex)}
                             className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors group"
                           >
-                            <Trash2 className="w-4 h-4 group-hover:scale-110 transition-transform" />
+                            <TrashIcon className="w-4 h-4 group-hover:scale-110 transition-transform" />
                           </button>
                         </div>
 

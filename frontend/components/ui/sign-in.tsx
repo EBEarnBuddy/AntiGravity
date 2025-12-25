@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Eye, EyeOff } from 'lucide-react';
+import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/solid';
 
 // --- HELPER COMPONENTS (ICONS) ---
 
@@ -103,7 +103,7 @@ export const SignInPage: React.FC<SignInPageProps> = ({
                                     <div className="relative">
                                         <input name="password" type={showPassword ? 'text' : 'password'} placeholder="Enter your password" className="w-full bg-transparent text-sm p-4 pr-12 rounded-2xl focus:outline-none placeholder:text-slate-400" disabled={isLoading} />
                                         <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute inset-y-0 right-3 flex items-center" disabled={isLoading}>
-                                            {showPassword ? <EyeOff className="w-5 h-5 text-slate-400 hover:text-slate-600 transition-colors" /> : <Eye className="w-5 h-5 text-slate-400 hover:text-slate-600 transition-colors" />}
+                                            {showPassword ? <EyeSlashIcon className="w-5 h-5 text-slate-400 hover:text-slate-600 transition-colors" /> : <EyeIcon className="w-5 h-5 text-slate-400 hover:text-slate-600 transition-colors" />}
                                         </button>
                                     </div>
                                 </GlassInputWrapper>

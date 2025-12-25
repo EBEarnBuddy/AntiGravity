@@ -27,31 +27,31 @@ const OfferCard = ({ label, title, description, features, cta, BGComponent }: Of
             whileHover="hover"
             transition={{ duration: 1, ease: "backInOut" }}
             variants={{ hover: { scale: 1.05 } }}
-            className="relative h-[500px] w-80 shrink-0 overflow-hidden rounded-xl p-8 bg-primary shadow-lg hover:shadow-xl transition-shadow"
+            className="relative h-[500px] w-80 shrink-0 overflow-hidden rounded-none border-2 border-slate-900 p-8 bg-slate-900 shadow-[8px_8px_0px_0px_rgba(255,255,255,1)] hover:shadow-[12px_12px_0px_0px_rgba(255,255,255,1)] transition-all"
         >
             <div className="relative z-10 text-white">
-                <span className="mb-3 block w-fit rounded-full bg-white/20 backdrop-blur-sm px-3 py-0.5 text-sm font-medium text-white border border-white/20">
+                <span className="mb-3 block w-fit rounded-none bg-white text-slate-900 px-3 py-0.5 text-sm font-black uppercase tracking-widest border-2 border-transparent">
                     {label}
                 </span>
                 <motion.h3
                     initial={{ scale: 0.85 }}
                     variants={{ hover: { scale: 1 } }}
                     transition={{ duration: 1, ease: "backInOut" }}
-                    className="my-2 block origin-top-left text-4xl font-black leading-[1.2] text-white"
+                    className="my-2 block origin-top-left text-4xl font-black leading-[1.2] text-white uppercase"
                 >
                     {title}
                 </motion.h3>
-                <p className="text-base text-white/90 mb-4">{description}</p>
+                <p className="text-base text-white/90 mb-4 font-bold">{description}</p>
                 <ul className="space-y-2">
                     {features.map((feature, idx) => (
-                        <li key={idx} className="flex items-start gap-2 text-sm text-white/90">
-                            <span className="text-white/70">•</span>
+                        <li key={idx} className="flex items-start gap-2 text-sm text-white/90 font-medium">
+                            <span className="text-green-400 font-bold">•</span>
                             <span>{feature}</span>
                         </li>
                     ))}
                 </ul>
             </div>
-            <button className="absolute bottom-4 left-4 right-4 z-20 rounded-lg border-2 border-white bg-white py-2 text-center font-mono font-black uppercase text-neutral-800 backdrop-blur-sm transition-all duration-200 hover:bg-white/10 hover:text-white hover:border-white/80 focus:outline-none focus:ring-2 focus:ring-white/50 focus:ring-offset-2 focus:ring-offset-transparent">
+            <button className="absolute bottom-4 left-4 right-4 z-20 rounded-none border-2 border-white bg-white py-2 text-center font-mono font-black uppercase text-slate-900 backdrop-blur-sm transition-all duration-200 hover:bg-slate-900 hover:text-white hover:border-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]">
                 {cta}
             </button>
             <BGComponent />

@@ -2,12 +2,12 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Mail, MessageCircle, HelpCircle, FileText, Bug, AlertTriangle, ChevronRight } from 'lucide-react';
+import { EnvelopeIcon, ChatBubbleLeftRightIcon, QuestionMarkCircleIcon, DocumentTextIcon, BugAntIcon, ExclamationTriangleIcon, ChevronRightIcon } from '@heroicons/react/24/solid';
 
 const SettingsPage: React.FC = () => {
     const contactOptions = [
         {
-            icon: Mail,
+            icon: EnvelopeIcon,
             title: "Email Support",
             description: "Get in touch with our support team for any account-related or general inquiries.",
             action: "support@earnbuddy.com",
@@ -16,7 +16,7 @@ const SettingsPage: React.FC = () => {
             bg: "bg-blue-100"
         },
         {
-            icon: MessageCircle,
+            icon: ChatBubbleLeftRightIcon,
             title: "Community Chat",
             description: "Join our discord or public circles to chat with other builders and moderators.",
             action: "Join Discord",
@@ -28,17 +28,17 @@ const SettingsPage: React.FC = () => {
 
     const helpResources = [
         {
-            icon: HelpCircle,
+            icon: QuestionMarkCircleIcon,
             title: "Frequently Asked Questions",
             link: "/lander#faq"
         },
         {
-            icon: FileText,
+            icon: DocumentTextIcon,
             title: "Terms of Service & Privacy",
             link: "#"
         },
         {
-            icon: Bug,
+            icon: BugAntIcon,
             title: "Report a Bug",
             link: "mailto:bugs@earnbuddy.com"
         }
@@ -80,7 +80,7 @@ const SettingsPage: React.FC = () => {
                                 <h3 className="text-xl font-bold text-slate-900 mb-2">{option.title}</h3>
                                 <p className="text-slate-600 mb-4 text-sm font-medium">{option.description}</p>
                                 <div className="text-green-600 font-bold text-sm flex items-center gap-1 group-hover:gap-2 transition-all">
-                                    {option.action} <ChevronRight className="w-4 h-4" />
+                                    {option.action} <ChevronRightIcon className="w-4 h-4" />
                                 </div>
                             </motion.a>
                         ))}
@@ -89,7 +89,7 @@ const SettingsPage: React.FC = () => {
                     {/* Resources Section */}
                     <div className="bg-white border-2 border-slate-200 rounded-2xl p-8 shadow-sm">
                         <h3 className="text-xl font-black text-slate-900 mb-6 flex items-center gap-2">
-                            <HelpCircle className="w-6 h-6 text-green-600" />
+                            <QuestionMarkCircleIcon className="w-6 h-6 text-green-600" />
                             Resources
                         </h3>
                         <div className="space-y-4">
@@ -103,7 +103,7 @@ const SettingsPage: React.FC = () => {
                                         <resource.icon className="w-5 h-5 text-slate-500 group-hover:text-green-600 transition-colors" />
                                         <span className="font-bold text-slate-700 group-hover:text-slate-900">{resource.title}</span>
                                     </div>
-                                    <ChevronRight className="w-5 h-5 text-slate-400 group-hover:text-green-600 transition-colors" />
+                                    <ChevronRightIcon className="w-5 h-5 text-slate-400 group-hover:text-green-600 transition-colors" />
                                 </a>
                             ))}
                         </div>
@@ -111,7 +111,7 @@ const SettingsPage: React.FC = () => {
 
                     {/* Footer Note */}
                     <div className="bg-yellow-50 border-2 border-yellow-100 rounded-2xl p-6 flex gap-4 items-start">
-                        <AlertTriangle className="w-6 h-6 text-yellow-600 flex-shrink-0 mt-1" />
+                        <ExclamationTriangleIcon className="w-6 h-6 text-yellow-600 flex-shrink-0 mt-1" />
                         <div>
                             <h4 className="font-bold text-yellow-800 mb-1">Note on Account Settings</h4>
                             <p className="text-yellow-700 text-sm font-medium">
