@@ -97,9 +97,9 @@ export const ProductTour: React.FC = () => {
                             width: targetRect.width + 8,
                             height: targetRect.height + 8,
                             boxShadow: '0 0 0 9999px rgba(0, 0, 0, 0.75)',
-                            borderRadius: '12px',
+                            borderRadius: '0px',
                         }}
-                        className="transition-all duration-300 ease-in-out border-2 border-green-500/50"
+                        className="transition-all duration-300 ease-in-out border-4 border-green-500"
                     />
                 )}
             </div>
@@ -121,48 +121,48 @@ export const ProductTour: React.FC = () => {
                             width: '320px',
                             maxWidth: 'calc(100vw - 32px)'
                         }}
-                        className="bg-white rounded-2xl shadow-2xl p-6 pointer-events-auto border-2 border-slate-900"
+                        className="bg-white rounded-none shadow-[8px_8px_0px_0px_rgba(15,23,42,1)] p-6 pointer-events-auto border-4 border-slate-900"
                     >
                         {/* Header */}
-                        <div className="flex justify-between items-start mb-3">
-                            <h3 className="font-black text-lg text-slate-900">{currentStep.title}</h3>
+                        <div className="flex justify-between items-start mb-4">
+                            <h3 className="font-black text-xl text-slate-900 uppercase tracking-wide">{currentStep.title}</h3>
                             <button
                                 onClick={skipTour}
-                                className="text-slate-400 hover:text-slate-600 transition"
+                                className="text-slate-400 hover:text-slate-900 transition"
                             >
-                                <X className="w-5 h-5" />
+                                <X className="w-6 h-6" />
                             </button>
                         </div>
 
                         {/* Content */}
-                        <p className="text-slate-600 mb-6 text-sm font-medium leading-relaxed">
+                        <p className="text-slate-600 mb-8 text-sm font-bold uppercase leading-relaxed tracking-wide">
                             {currentStep.content}
                         </p>
 
                         {/* Footer / Controls */}
                         <div className="flex justify-between items-center">
-                            <div className="flex gap-1">
+                            <div className="flex gap-1.5">
                                 {steps.map((_, idx) => (
                                     <div
                                         key={idx}
-                                        className={`h-1.5 rounded-full transition-all duration-300 ${idx === currentStepIndex ? 'w-6 bg-green-600' : 'w-1.5 bg-slate-200'
+                                        className={`h-2 transition-all duration-300 ${idx === currentStepIndex ? 'w-6 bg-green-600 border-2 border-slate-900' : 'w-2 bg-slate-200 border-2 border-slate-300'
                                             }`}
                                     />
                                 ))}
                             </div>
 
-                            <div className="flex gap-2">
+                            <div className="flex gap-3">
                                 {!isFirst && (
                                     <button
                                         onClick={prevStep}
-                                        className="px-3 py-2 text-slate-500 font-bold text-sm hover:text-slate-900 transition"
+                                        className="px-4 py-2 text-slate-900 font-black text-xs uppercase tracking-wider border-2 border-slate-900 hover:bg-slate-100 transition shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]"
                                     >
                                         Back
                                     </button>
                                 )}
                                 <button
                                     onClick={nextStep}
-                                    className="px-4 py-2 bg-slate-900 text-white font-bold rounded-lg hover:bg-slate-700 transition flex items-center gap-1 shadow-lg text-sm"
+                                    className="px-6 py-2 bg-green-600 text-white font-black text-xs uppercase tracking-wider border-2 border-slate-900 hover:bg-green-500 transition flex items-center gap-1 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]"
                                 >
                                     {isLast ? 'Finish' : 'Next'}
                                     {!isLast && <ChevronRight className="w-4 h-4" />}

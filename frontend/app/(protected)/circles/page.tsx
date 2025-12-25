@@ -16,6 +16,7 @@ import {
     MoreVertical
 } from 'lucide-react';
 import CreateRoomModal from '@/components/CreateCircleModal';
+import CollaborationRequestModal from '@/components/CollaborationRequestModal';
 import { Sidebar, SidebarBody, SidebarLink } from '@/components/ui/sidebar';
 import BrutalistLoader from '@/components/ui/BrutalistLoader';
 
