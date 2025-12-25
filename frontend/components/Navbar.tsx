@@ -59,7 +59,7 @@ const Navbar: React.FC = () => {
                     <button
                         id="tour-navbar-profile"
                         onClick={() => setIsProfileOpen(!isProfileOpen)}
-                        className="w-9 h-9 rounded-none bg-green-800 border-2 border-white overflow-hidden hover:bg-green-700 transition focus:outline-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]"
+                        className="w-9 h-9 rounded-full bg-green-800 border-2 border-white overflow-hidden hover:bg-green-700 transition focus:outline-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]"
                     >
                         <img
                             src={currentUser?.photoURL || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&q=80"}

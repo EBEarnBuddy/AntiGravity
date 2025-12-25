@@ -126,18 +126,23 @@ export const TourProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const pathname = usePathname();
     const router = useRouter();
 
-    const isCompleted = userProfile?.productTourCompleted || false;
+    const isCompleted = userProfile?.hasCompletedTour || false;
+    const isSkippedDB = userProfile?.hasSkippedOnboarding || false;
 
     // Check if tour should start
     useEffect(() => {
-        if (currentUser && userProfile && !userProfile.productTourCompleted && !hasCompletedThisSession && !isSkipped) {
-            // Only auto-start if we are on the discovery page or if we handle multi-page routing
-            // For simplicity, we start it when they land on dashboard/discover
-            if (pathname === '/discover' && !isActive) {
-                setIsActive(true);
+        if (currentUser && userProfile) {
+            // Logic: Is new user AND hasn't completed AND hasn't skipped (unless we decide to force new users regardless of skip)
+            const shouldStart = userProfile.isNewUser && !userProfile.hasCompletedTour && !userProfile.hasSkippedOnboarding;
+
+            if (shouldStart && !isActive && !hasCompletedThisSession && !isSkipped) {
+                // Determine if we are on the right page
+                if (pathname === '/discover') {
+                    setIsActive(true);
+                }
             }
         }
-    }, [currentUser, userProfile, pathname, hasCompletedThisSession, isSkipped]);
+    }, [currentUser, userProfile, pathname, hasCompletedThisSession, isSkipped, isActive]);
 
     const startTour = () => {
         setIsActive(true);
@@ -148,14 +153,13 @@ export const TourProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const dismissForever = async () => {
         setIsActive(false);
-        setIsSkipped(false); // No longer skipped, it's done.
+        setIsSkipped(false);
         setHasCompletedThisSession(true);
 
-        if (currentUser && userProfile && !userProfile.productTourCompleted) {
+        if (currentUser && userProfile && !userProfile.hasCompletedTour) {
             try {
-                const updated = { ...userProfile, productTourCompleted: true };
-                await updateProfile({ productTourCompleted: true });
-                await FirestoreService.updateUserProfile(currentUser.uid, { productTourCompleted: true });
+                await updateProfile({ hasCompletedTour: true, isNewUser: false });
+                await FirestoreService.updateUserProfile(currentUser.uid, { hasCompletedTour: true, isNewUser: false });
             } catch (error) {
                 console.error("Failed to mark tour as completed:", error);
             }
@@ -163,14 +167,21 @@ export const TourProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
 
     const endTour = () => {
-        // Called when user clicks "Finish" at the end
         dismissForever();
     };
 
-    const skipTour = () => {
-        // Called when user clicks "X"
+    const skipTour = async () => {
         setIsActive(false);
         setIsSkipped(true);
+        // Persist skip
+        if (currentUser && userProfile) {
+            try {
+                await updateProfile({ hasSkippedOnboarding: true });
+                await FirestoreService.updateUserProfile(currentUser.uid, { hasSkippedOnboarding: true });
+            } catch (error) {
+                console.error("Failed to mark tour as skipped:", error);
+            }
+        }
     };
 
     const resetTour = () => {

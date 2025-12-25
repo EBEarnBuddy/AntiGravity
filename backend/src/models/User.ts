@@ -15,6 +15,9 @@ export interface IUser extends Document {
         portfolio?: string;
     };
     bookmarks?: string[]; // IDs of bookmarked opportunities
+    isNewUser?: boolean;
+    hasSkippedOnboarding?: boolean;
+    hasCompletedTour?: boolean;
     createdAt: Date;
     updatedAt: Date;
     lastLogin?: Date;
@@ -52,6 +55,10 @@ const UserSchema: Schema = new Schema({
         earnedAt: Date
     }],
     bookmarks: [{ type: Schema.Types.ObjectId, ref: 'Opportunity' }],
+    // Onboarding Flags
+    isNewUser: { type: Boolean, default: true },
+    hasSkippedOnboarding: { type: Boolean, default: false },
+    hasCompletedTour: { type: Boolean, default: false },
     lastLogin: { type: Date },
 }, { timestamps: true });
 

@@ -133,16 +133,28 @@ const RoomChatPage: React.FC = () => {
         };
     }, [roomId, currentUser]);
 
-    const handleTyping = async () => {
-        const socket = await getSocket();
-        if (socket && currentUser) {
-            socket.emit('typing', { roomId, userId: currentUser.uid, userName: currentUser.displayName });
+    const lastTypingEmitRef = useRef<number>(0);
 
-            if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
-            typingTimeoutRef.current = setTimeout(() => {
-                socket.emit('stop_typing', { roomId, userId: currentUser.uid });
-            }, 2000);
+    const handleTyping = async () => {
+        const now = Date.now();
+        const THROTTLE_DELAY = 2000; // 2 seconds
+
+        if (now - lastTypingEmitRef.current > THROTTLE_DELAY) {
+            const socket = await getSocket();
+            if (socket && currentUser) {
+                socket.emit('typing', { roomId, userId: currentUser.uid, userName: currentUser.displayName });
+                lastTypingEmitRef.current = now;
+            }
         }
+
+        // Always reset the stop timer on every keystroke
+        if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+        typingTimeoutRef.current = setTimeout(async () => {
+            const socket = await getSocket();
+            if (socket && currentUser) {
+                socket.emit('stop_typing', { roomId, userId: currentUser.uid });
+            }
+        }, 3000); // 3 seconds timeout to stop
     };
 
     // Access control

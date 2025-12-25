@@ -25,7 +25,10 @@ export const syncUser = async (req: AuthRequest, res: Response) => {
                 },
                 $setOnInsert: {
                     role: 'user',
-                    skills: []
+                    skills: [],
+                    isNewUser: true,
+                    hasCompletedTour: false,
+                    hasSkippedOnboarding: false
                 }
             },
             {
