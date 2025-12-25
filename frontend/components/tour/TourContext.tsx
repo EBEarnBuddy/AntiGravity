@@ -18,10 +18,13 @@ export interface TourStep {
 
 interface TourContextType {
     isActive: boolean;
+    isSkipped: boolean;
+    isCompleted: boolean;
     currentStepIndex: number;
     steps: TourStep[];
     startTour: () => void;
     endTour: () => void;
+    dismissForever: () => void;
     nextStep: () => void; // Made available for manual control if needed
     prevStep: () => void; // Made available for manual control if needed
     skipTour: () => void;
@@ -119,35 +122,39 @@ export const TourProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const [isActive, setIsActive] = useState(false);
     const [currentStepIndex, setCurrentStepIndex] = useState(0);
     const [hasCompletedThisSession, setHasCompletedThisSession] = useState(false);
+    const [isSkipped, setIsSkipped] = useState(false);
     const pathname = usePathname();
     const router = useRouter();
 
+    const isCompleted = userProfile?.productTourCompleted || false;
+
     // Check if tour should start
     useEffect(() => {
-        if (currentUser && userProfile && !userProfile.productTourCompleted && !hasCompletedThisSession) {
+        if (currentUser && userProfile && !userProfile.productTourCompleted && !hasCompletedThisSession && !isSkipped) {
             // Only auto-start if we are on the discovery page or if we handle multi-page routing
             // For simplicity, we start it when they land on dashboard/discover
             if (pathname === '/discover' && !isActive) {
                 setIsActive(true);
             }
         }
-    }, [currentUser, userProfile, pathname, hasCompletedThisSession]); // Removed isActive to avoid circular dependency triggers, though logically it's used in the if
+    }, [currentUser, userProfile, pathname, hasCompletedThisSession, isSkipped]);
 
     const startTour = () => {
         setIsActive(true);
+        setIsSkipped(false);
         setCurrentStepIndex(0);
         if (pathname !== '/discover') router.push('/discover');
     };
 
-    const endTour = async () => {
+    const dismissForever = async () => {
         setIsActive(false);
+        setIsSkipped(false); // No longer skipped, it's done.
         setHasCompletedThisSession(true);
+
         if (currentUser && userProfile && !userProfile.productTourCompleted) {
             try {
-                // Update local state optimistic if needed, but Context updates via auth sync
                 const updated = { ...userProfile, productTourCompleted: true };
                 await updateProfile({ productTourCompleted: true });
-                // Also hard update firestore just in case
                 await FirestoreService.updateUserProfile(currentUser.uid, { productTourCompleted: true });
             } catch (error) {
                 console.error("Failed to mark tour as completed:", error);
@@ -155,13 +162,21 @@ export const TourProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
     };
 
+    const endTour = () => {
+        // Called when user clicks "Finish" at the end
+        dismissForever();
+    };
+
     const skipTour = () => {
-        endTour();
+        // Called when user clicks "X"
+        setIsActive(false);
+        setIsSkipped(true);
     };
 
     const resetTour = () => {
         setCurrentStepIndex(0);
         setIsActive(true);
+        setIsSkipped(false);
         router.push('/discover');
     };
 
@@ -172,10 +187,6 @@ export const TourProvider: React.FC<{ children: React.ReactNode }> = ({ children
             // Handle Navigation
             if (nextStepConfig.page && nextStepConfig.page !== pathname && nextStepConfig.page !== window.location.pathname) {
                 router.push(nextStepConfig.page);
-                // We don't increment index immediately if we want to wait for page load?
-                // Actually, if we increment, the UI might try to find element on current page.
-                // Ideally we wait. But simple React state updates happen fast.
-                // let's blindly increment and assume the ProductTour component waits for element to exist
             }
             setCurrentStepIndex(prev => prev + 1);
         } else {
@@ -196,10 +207,13 @@ export const TourProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return (
         <TourContext.Provider value={{
             isActive,
+            isSkipped,
+            isCompleted,
             currentStepIndex,
             steps: TOUR_STEPS,
             startTour,
             endTour,
+            dismissForever,
             nextStep,
             prevStep,
             skipTour,

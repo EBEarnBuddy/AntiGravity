@@ -24,6 +24,7 @@ import { FloatingCard } from '@/components/ui/floating-card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AdvancedSearch } from '@/components/ui/advanced-search';
 import { applicationAPI } from '@/lib/axios';
+import { TourReengagementBox } from '@/components/tour/TourReengagementBox';
 
 const formatDate = (dateString: any) => {
     if (!dateString) return '';
@@ -85,6 +86,7 @@ export default function DiscoverPage() {
         { title: 'Events', icon: Calendar, path: '#events', color: 'bg-orange-500' },
     ];
 
+
     return (
         <div className="min-h-screen bg-slate-50 pb-20">
             {/* Header Section */}
@@ -92,10 +94,10 @@ export default function DiscoverPage() {
                 <div className="container mx-auto px-4 py-6">
                     <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                         <div id="tour-dashboard-welcome">
-                            <h1 className="text-2xl font-black text-slate-900 tracking-tight">
-                                Welcome back, {userProfile?.displayName?.split(' ')[0] || 'Builder'}! 👋
+                            <h1 className="text-2xl font-black text-slate-900 tracking-tight uppercase">
+                                Welcome back, {userProfile?.displayName?.split(' ')[0] || 'Builder'}
                             </h1>
-                            <p className="text-slate-500 font-medium">Here's what's happening in your network.</p>
+                            <p className="text-slate-500 font-bold text-xs uppercase tracking-wide">Here's what's happening in your network.</p>
                         </div>
 
                         {/* Search Bar - Removed as per clean up */}
@@ -105,6 +107,7 @@ export default function DiscoverPage() {
             </div>
 
             <div className="container mx-auto px-4 py-8">
+                {/* ... existing content ... */}
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
 
                     {/* Main Content - Full Width */}
@@ -112,6 +115,7 @@ export default function DiscoverPage() {
 
                         {/* Quick Actions */}
                         <section className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            {/* ... quick actions map ... */}
                             {quickActions.map((action, idx) => (
                                 <motion.div
                                     key={idx}
@@ -130,45 +134,44 @@ export default function DiscoverPage() {
                         {/* My Workbench */}
                         <section id="tour-dashboard-workbench">
                             <div className="flex items-center gap-2 mb-6">
-                                <Sparkles className="w-5 h-5 text-green-600" />
-                                <h2 className="text-xl font-black text-slate-900">My Workbench</h2>
+                                <h2 className="text-xl font-black text-slate-900 uppercase tracking-tight">My Workbench</h2>
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                {/* My Applications Card */}
+                                {/* ... workbench cards ... */}
                                 <div className="bg-white p-6 border-2 border-slate-900 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] h-full">
                                     <div className="flex items-center justify-between mb-4">
-                                        <h3 className="font-bold text-slate-900 flex items-center gap-2">
-                                            <Briefcase className="w-4 h-4 text-blue-500" />
+                                        <h3 className="font-bold text-slate-900 flex items-center gap-2 uppercase text-sm">
                                             Active Applications
                                         </h3>
-                                        <span className="bg-blue-50 text-blue-600 px-2.5 py-1 rounded-full text-xs font-bold">
+                                        {/* ... */}
+                                        <span className="bg-blue-50 text-blue-600 px-2.5 py-1 text-xs font-black border border-blue-100">
                                             {myApplications.length}
                                         </span>
                                     </div>
 
                                     <div className="space-y-4 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar md:h-[calc(100%-3rem)]">
                                         {loadingApplications ? (
-                                            [1, 2].map(i => <Skeleton key={i} className="h-16 w-full rounded-xl" />)
+                                            [1, 2].map(i => <Skeleton key={i} className="h-16 w-full rounded-none" />)
                                         ) : myApplications.length > 0 ? (
                                             myApplications.map((app: any) => (
                                                 <div key={app._id} className="group flex items-start gap-4 p-3 hover:bg-slate-50 transition-colors border-2 border-transparent hover:border-slate-900">
                                                     <div className="w-10 h-10 bg-white border-2 border-slate-900 flex items-center justify-center flex-shrink-0 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)]">
-                                                        <Briefcase className="w-5 h-5 text-slate-400" />
+                                                        <Briefcase className="w-5 h-5 text-slate-900" />
                                                     </div>
                                                     <div className="flex-1 min-w-0">
-                                                        <h4 className="font-bold text-slate-900 text-sm truncate">{app.opportunityId?.title || app.opportunityId?.name || 'Unknown Opportunity'}</h4>
-                                                        <p className="text-xs text-slate-500 truncate">{app.status}</p>
+                                                        <h4 className="font-bold text-slate-900 text-sm truncate uppercase">{app.opportunityId?.title || app.opportunityId?.name || 'Unknown Opportunity'}</h4>
+                                                        <p className="text-xs text-slate-500 truncate uppercase bold">{app.status}</p>
                                                     </div>
                                                     {app.status === 'accepted' ? (
-                                                        <CheckCircle className="w-5 h-5 text-green-500" />
+                                                        <CheckCircle className="w-5 h-5 text-green-600" />
                                                     ) : (
                                                         <Clock className="w-5 h-5 text-slate-300" />
                                                     )}
                                                 </div>
                                             ))
                                         ) : (
-                                            <div className="text-center py-8 text-slate-400 text-sm">
+                                            <div className="text-center py-8 text-slate-400 text-xs font-bold uppercase">
                                                 No active applications yet.
                                             </div>
                                         )}
@@ -178,11 +181,10 @@ export default function DiscoverPage() {
                                 {/* Bookmarks Card */}
                                 <div className="bg-white p-6 border-2 border-slate-900 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] h-full">
                                     <div className="flex items-center justify-between mb-4">
-                                        <h3 className="font-bold text-slate-900 flex items-center gap-2">
-                                            <Bookmark className="w-4 h-4 text-purple-500" />
+                                        <h3 className="font-bold text-slate-900 flex items-center gap-2 uppercase text-sm">
                                             Saved Opportunities
                                         </h3>
-                                        <span className="bg-purple-50 text-purple-600 px-2.5 py-1 rounded-full text-xs font-bold">
+                                        <span className="bg-purple-50 text-purple-600 px-2.5 py-1 text-xs font-black border border-purple-100">
                                             {bookmarkedOpportunities.length}
                                         </span>
                                     </div>
@@ -196,16 +198,16 @@ export default function DiscoverPage() {
                                                         <div className="w-8 h-8 bg-slate-100 flex-shrink-0 border-2 border-slate-900"
                                                             style={{ backgroundImage: `url(${item.logo || item.companyLogo})`, backgroundSize: 'cover' }} />
                                                         <div className="min-w-0">
-                                                            <h4 className="font-bold text-slate-900 text-sm truncate">{item.name || item.title}</h4>
-                                                            <p className="text-xs text-slate-500 truncate capitalize">{item.type}</p>
+                                                            <h4 className="font-bold text-slate-900 text-sm truncate uppercase">{item.name || item.title}</h4>
+                                                            <p className="text-xs text-slate-500 truncate capitalize font-bold">{item.type}</p>
                                                         </div>
                                                     </div>
-                                                    <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-slate-500" />
+                                                    <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-slate-900" />
                                                 </div>
                                             ))
                                         ) : (
-                                            <div className="text-center py-8 text-slate-400 text-sm">
-                                                No bookmarks yet.
+                                            <div className="text-center py-8 text-slate-400 text-xs font-bold uppercase">
+                                                No bookmarks.
                                             </div>
                                         )}
                                     </div>
@@ -217,14 +219,13 @@ export default function DiscoverPage() {
                         <section>
                             <div className="flex items-center justify-between mb-6">
                                 <div className="flex items-center gap-2">
-                                    <TrendingUp className="w-5 h-5 text-green-600" />
-                                    <h2 className="text-xl font-black text-slate-900">Recommended for You</h2>
+                                    <h2 className="text-xl font-black text-slate-900 uppercase tracking-tight">Recommended for You</h2>
                                 </div>
                             </div>
 
                             <div className="space-y-4">
                                 {(projectsLoading || startupsLoading) ? (
-                                    [1, 2, 3].map(i => <Skeleton key={i} className="h-32 w-full rounded-xl" />)
+                                    [1, 2, 3].map(i => <Skeleton key={i} className="h-32 w-full rounded-none" />)
                                 ) : (
                                     feedItems.map((item: any) => (
                                         <motion.div
@@ -245,26 +246,26 @@ export default function DiscoverPage() {
                                                         )}
                                                     </div>
                                                     <div>
-                                                        <h3 className="text-lg font-bold text-slate-900 group-hover:text-green-600 transition-colors">
+                                                        <h3 className="text-lg font-black uppercase text-slate-900 group-hover:text-green-600 transition-colors">
                                                             {item.name || item.title}
                                                         </h3>
-                                                        <p className="text-slate-600 text-sm line-clamp-1 mb-2">{item.description}</p>
-                                                        <div className="flex flex-wrap gap-2 text-xs font-bold uppercase tracking-wide">
-                                                            <span className="px-2 py-1 bg-white border border-slate-900 text-slate-900">
+                                                        <p className="text-slate-600 text-sm line-clamp-1 mb-2 font-medium">{item.description}</p>
+                                                        <div className="flex flex-wrap gap-2 text-xs font-black uppercase tracking-wide">
+                                                            <span className="px-2 py-1 bg-white border-2 border-slate-900 text-slate-900">
                                                                 {item.industry || item.category || 'Tech'}
                                                             </span>
                                                             {item.location && (
-                                                                <span className="px-2 py-1 bg-white border border-slate-900 text-slate-900">
+                                                                <span className="px-2 py-1 bg-white border-2 border-slate-900 text-slate-900">
                                                                     {item.location}
                                                                 </span>
                                                             )}
-                                                            <span className="px-2 py-1 bg-green-600 text-white border border-slate-900">
+                                                            <span className="px-2 py-1 bg-green-600 text-white border-2 border-slate-900">
                                                                 {item.salary || item.funding || 'Funded'}
                                                             </span>
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <div className="text-xs font-medium text-slate-400 whitespace-nowrap">
+                                                <div className="text-xs font-black uppercase text-slate-400 whitespace-nowrap">
                                                     {item.createdAt ? formatDate(item.createdAt) : 'Recently'}
                                                 </div>
                                             </div>
@@ -282,6 +283,8 @@ export default function DiscoverPage() {
                 onClose={() => setShowAdvancedSearch(false)}
                 onSearch={() => { }}
             />
+
+            <TourReengagementBox />
         </div>
     );
 }
