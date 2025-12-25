@@ -16,7 +16,8 @@ import {
   StarIcon,
   CpuChipIcon,
   TrophyIcon,
-  UserGroupIcon
+  UserGroupIcon,
+  ArrowRightIcon
 } from '@heroicons/react/24/solid';
 import { useAuth } from '../contexts/AuthContext';
 import { useProjects } from '../hooks/useFirestore';
@@ -910,7 +911,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose
                                   onClick={() => removeSkillFromRole(roleIndex, skill)}
                                   className="hover:text-green-900"
                                 >
-                                  <X className="w-3 h-3" />
+                                  <XMarkIcon className="w-3 h-3" />
                                 </button>
                               </span>
                             ))}
@@ -966,7 +967,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose
                                   onClick={() => removeBenefitFromRole(roleIndex, benefit)}
                                   className="hover:text-blue-900"
                                 >
-                                  <X className="w-3 h-3" />
+                                  <XMarkIcon className="w-3 h-3" />
                                 </button>
                               </span>
                             ))}
@@ -1037,13 +1038,13 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose
                   </>
                 ) : currentStep === 3 ? (
                   <>
-                    <Star className="w-5 h-5 fill-current" />
+                    <StarIcon className="w-5 h-5" />
                     Create Project
                   </>
                 ) : (
                   <>
                     Next Step
-                    <Target className="w-5 h-5" />
+                    <ArrowRightIcon className="w-5 h-5" />
                   </>
                 )}
               </button>

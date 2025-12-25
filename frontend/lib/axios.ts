@@ -73,6 +73,7 @@ export const userAPI = {
   getMe: () => api.get('/users/me'),
   updateMe: (data: Record<string, unknown>) => api.put('/users/me', data),
   toggleBookmark: (opportunityId: string) => api.post('/users/bookmarks/toggle', { opportunityId }),
+  getByUsername: (username: string) => api.get(`/users/${username}`),
 };
 
 export const opportunityAPI = {

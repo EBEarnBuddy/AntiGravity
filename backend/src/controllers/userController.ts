@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import User from '../models/User';
+import mongoose from 'mongoose';
 import { AuthRequest } from '../middlewares/auth';
 
 // Sync User (Create if not exists, return updated)
@@ -127,5 +128,30 @@ export const toggleBookmark = async (req: AuthRequest, res: Response) => {
     } catch (error) {
         console.error('Error toggling bookmark:', error);
         res.status(500).json({ error: 'Failed to toggle bookmark' });
+    }
+};
+
+// Get User by Username
+export const getUserByUsername = async (req: Request, res: Response) => {
+    try {
+        const { username } = req.params;
+        // Search by username OR firebaseUid (fallback for linking)
+        const user = await User.findOne({
+            $or: [
+                { username: username },
+                { firebaseUid: username },
+                { _id: mongoose.isValidObjectId(username) ? username : null }
+            ]
+        }).select('-email'); // Exclude email for privacy if viewing others
+
+        if (!user) {
+            res.status(404).json({ error: 'User not found' });
+            return;
+        }
+
+        res.json(user);
+    } catch (error) {
+        console.error('Error fetching user:', error);
+        res.status(500).json({ error: 'Server error' });
     }
 };
