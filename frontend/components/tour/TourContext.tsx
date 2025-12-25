@@ -10,7 +10,7 @@ export interface TourStep {
     targetId: string;
     title: string;
     content: string;
-    position?: 'top' | 'bottom' | 'left' | 'right' | 'center' | 'bottom-end';
+    position?: 'top' | 'bottom' | 'left' | 'right' | 'center' | 'bottom-end' | 'top-end' | 'bottom-start' | 'top-start';
     page: string; // The route where this step should appear
     action?: 'next' | 'back' | 'close';
     onNext?: () => void;

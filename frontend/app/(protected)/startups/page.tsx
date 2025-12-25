@@ -140,220 +140,199 @@ const StartupsPage: React.FC = () => {
             {/* Header Spacing */}
             <div className="h-12"></div>
 
-            <div className="container mx-auto px-4 py-8 max-w-7xl">
+            {/* Main Content */}
+            <div className="container mx-auto px-4 py-6 max-w-6xl">
 
                 {/* Hero Section */}
-                <div className="text-center space-y-4 mb-10">
-                    <h1 className="text-5xl md:text-7xl font-black text-slate-900 tracking-tighter uppercase transform -rotate-1">
+                <div className="text-center space-y-3 mb-8">
+                    <h1 className="text-4xl md:text-6xl font-black text-slate-900 tracking-tighter uppercase transform -rotate-1">
                         Startups
                     </h1>
-                    <p className="text-slate-600 max-w-2xl mx-auto font-bold text-lg uppercase tracking-wide">
+                    <p className="text-slate-600 max-w-2xl mx-auto font-bold text-base uppercase tracking-wide">
                         Join the next unicorn. Or build it.
                     </p>
                 </div>
 
                 {/* Search Bar & Post Button */}
-                <div className="max-w-5xl mx-auto mb-12 flex gap-4">
+                <div className="max-w-4xl mx-auto mb-10 flex gap-3">
                     <div className="relative flex-grow">
                         <input
                             type="text"
                             placeholder="SEARCH OPPORTUNITIES..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full h-14 pl-5 pr-12 border-4 border-slate-900 rounded-none text-lg focus:outline-none transition shadow-[6px_6px_0px_0px_rgba(15,23,42,1)] focus:shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] focus:translate-x-[3px] focus:translate-y-[3px] placeholder:text-slate-400 font-black uppercase tracking-wide"
+                            className="w-full h-12 pl-4 pr-10 border-4 border-slate-900 rounded-none text-base focus:outline-none transition shadow-[6px_6px_0px_0px_rgba(15,23,42,1)] focus:shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] focus:translate-x-[3px] focus:translate-y-[3px] placeholder:text-slate-400 font-black uppercase tracking-wide"
                         />
-                        <Search className="absolute right-4 top-1/2 transform -translate-y-1/2 text-slate-900 w-6 h-6" />
+                        <Search className="absolute right-4 top-1/2 transform -translate-y-1/2 text-slate-900 w-5 h-5" />
                     </div>
 
                     <button
                         id="tour-startup-create"
                         onClick={() => setShowCreateModal(true)}
-                        className="h-14 px-6 bg-green-600 text-white font-black text-lg uppercase tracking-widest border-4 border-slate-900 rounded-none shadow-[6px_6px_0px_0px_rgba(15,23,42,1)] hover:bg-green-500 hover:shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] hover:translate-x-[3px] hover:translate-y-[3px] transition-all whitespace-nowrap"
+                        className="h-12 px-5 bg-green-600 text-white font-black text-sm uppercase tracking-widest border-4 border-slate-900 rounded-none shadow-[6px_6px_0px_0px_rgba(15,23,42,1)] hover:bg-green-500 hover:shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] hover:translate-x-[3px] hover:translate-y-[3px] transition-all whitespace-nowrap"
                     >
                         Post Opportunity
                     </button>
                 </div>
 
                 {/* Tabs */}
-                <div className="flex justify-center mb-12">
-                    <div className="bg-white p-2 border-4 border-slate-900 shadow-[8px_8px_0px_0px_rgba(15,23,42,1)] inline-flex gap-2">
-                        {(['discover', 'posted', 'applied'] as const).map(tab => (
-                            <button
-                                key={tab}
-                                onClick={() => setActiveTab(tab)}
-                                className={`px-6 py-3 font-black text-sm transition-all uppercase tracking-widest
-                                    ${activeTab === tab
-                                        ? 'bg-slate-900 text-white'
-                                        : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100'
-                                    }`}
-                            >
-                                {tab === 'discover' ? 'Discover' : tab === 'posted' ? 'My Startups' : 'Applied'}
-                            </button>
-                        ))}
+                {isLoading ? (
+                    <div className="flex justify-center py-20">
+                        <BrutalistLoader />
                     </div>
-                </div>
+                ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+                        {(activeTab === 'applied' ? applications : displayItems).map((item, index) => {
+                            // Unified item handling based on tab
+                            const isAppTab = activeTab === 'applied';
+                            const startup = isAppTab ? (item as any).opportunity : item;
+                            const status = isAppTab ? (item as any).status : getAppStatus(startup.id || startup._id);
+                            const isOwner = startup.postedBy?.firebaseUid === currentUser?.uid || startup.founderId === currentUser?.uid;
 
-                {/* Main Content */}
-                <div className="w-full">
-                    {/* Active Tab Content */}
-                    {isLoading ? (
-                        <div className="flex justify-center py-20">
-                            <BrutalistLoader />
-                        </div>
-                    ) : (
-                        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
-                            {(activeTab === 'applied' ? applications : displayItems).map((item, index) => {
-                                // Unified item handling based on tab
-                                const isAppTab = activeTab === 'applied';
-                                const startup = isAppTab ? (item as any).opportunity : item;
-                                const status = isAppTab ? (item as any).status : getAppStatus(startup.id || startup._id);
-                                const isOwner = startup.postedBy?.firebaseUid === currentUser?.uid || startup.founderId === currentUser?.uid;
+                            if (!startup) return null; // Safety check
 
-                                if (!startup) return null; // Safety check
+                            return (
+                                <motion.div
+                                    key={item._id || item.id || index}
+                                    layout
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    className="bg-white border-4 border-slate-900 p-0 hover:shadow-[12px_12px_0px_0px_rgba(22,163,74,1)] transition-all duration-300 group flex flex-col relative"
+                                >
+                                    {/* Image / Header */}
+                                    <div className="aspect-[4/3] bg-slate-100 relative border-b-4 border-slate-900 overflow-hidden">
+                                        {startup.logo || startup.image ? (
+                                            <img
+                                                src={startup.logo || startup.image}
+                                                alt={startup.name}
+                                                className="w-full h-full object-cover transition-transform group-hover:scale-105 duration-500"
+                                            />
+                                        ) : (
+                                            <div className="absolute inset-0 opacity-20 bg-[linear-gradient(45deg,#000_25%,transparent_25%,transparent_75%,#000_75%,#000),linear-gradient(45deg,#000_25%,transparent_25%,transparent_75%,#000_75%,#000)] [background-size:24px_24px]"></div>
+                                        )}
 
-                                return (
-                                    <motion.div
-                                        key={item._id || item.id || index}
-                                        layout
-                                        initial={{ opacity: 0, y: 20 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        className="bg-white border-4 border-slate-900 p-0 hover:shadow-[12px_12px_0px_0px_rgba(22,163,74,1)] transition-all duration-300 group flex flex-col relative"
-                                    >
-                                        {/* Image / Header */}
-                                        <div className="aspect-[4/3] bg-slate-100 relative border-b-4 border-slate-900 overflow-hidden">
-                                            {startup.logo || startup.image ? (
-                                                <img
-                                                    src={startup.logo || startup.image}
-                                                    alt={startup.name}
-                                                    className="w-full h-full object-cover transition-transform group-hover:scale-105 duration-500"
-                                                />
-                                            ) : (
-                                                <div className="absolute inset-0 opacity-20 bg-[linear-gradient(45deg,#000_25%,transparent_25%,transparent_75%,#000_75%,#000),linear-gradient(45deg,#000_25%,transparent_25%,transparent_75%,#000_75%,#000)] [background-size:24px_24px]"></div>
-                                            )}
-
-                                            {/* Status Badge for Applications */}
-                                            {status && (
-                                                <div className={`absolute top-4 right-4 px-3 py-1 text-xs font-black uppercase shadow-sm border-2 border-slate-900
+                                        {/* Status Badge for Applications */}
+                                        {status && (
+                                            <div className={`absolute top-4 right-4 px-3 py-1 text-xs font-black uppercase shadow-sm border-2 border-slate-900
                                                     ${status === 'accepted' ? 'bg-green-400 text-slate-900' :
-                                                        status === 'rejected' ? 'bg-red-500 text-white' :
-                                                            'bg-yellow-300 text-slate-900'}`}>
-                                                    {status}
-                                                </div>
-                                            )}
-
-                                            <div className="absolute left-0 bottom-0 bg-slate-900 text-white text-xs font-black px-4 py-2 uppercase tracking-wide border-t-4 border-r-4 border-slate-900">
-                                                {startup.industry || 'Tech'}
+                                                    status === 'rejected' ? 'bg-red-500 text-white' :
+                                                        'bg-yellow-300 text-slate-900'}`}>
+                                                {status}
                                             </div>
+                                        )}
+
+                                        <div className="absolute left-0 bottom-0 bg-slate-900 text-white text-xs font-black px-4 py-2 uppercase tracking-wide border-t-4 border-r-4 border-slate-900">
+                                            {startup.industry || 'Tech'}
                                         </div>
+                                    </div>
 
-                                        {/* Card Content */}
-                                        <div className="p-6 flex flex-col flex-grow">
-                                            <div className="flex justify-between items-start mb-4">
-                                                <div className="flex-1 pr-2">
-                                                    <h3 className="text-xl font-black text-slate-900 leading-none group-hover:text-green-600 transition-colors uppercase truncate">
-                                                        {startup.name || startup.title}
-                                                    </h3>
-                                                    <div className="flex items-center gap-2 mt-2">
-                                                        <span className="text-xs font-bold bg-slate-100 px-2 py-0.5 border border-slate-200 uppercase">
-                                                            {startup.location || 'Remote'}
-                                                        </span>
-                                                        <span className="text-xs font-bold text-slate-400 uppercase">
-                                                            {formatTimeAgo(isAppTab ? (item as any).createdAt : startup.createdAt)}
-                                                        </span>
-                                                    </div>
-                                                </div>
-
-                                                {/* Actions (Bookmark/Share) */}
-                                                <div className="flex gap-1 shrink-0">
-                                                    <button
-                                                        onClick={() => {
-                                                            if (startup.id || startup._id) toggleBookmark(startup.id || startup._id);
-                                                        }}
-                                                        className="p-1.5 border-2 border-transparent hover:border-slate-900 hover:bg-slate-100 transition-all text-slate-400 hover:text-slate-900"
-                                                    >
-                                                        <Bookmark className={`w-5 h-5 ${isBookmarked(startup.id || startup._id) ? 'fill-current text-green-600' : ''}`} />
-                                                    </button>
-
-                                                    {isOwner && (
-                                                        <div className="relative">
-                                                            <button
-                                                                onClick={(e) => {
-                                                                    e.stopPropagation();
-                                                                    setActionMenuOpen(actionMenuOpen === (startup.id || startup._id) ? null : (startup.id || startup._id));
-                                                                }}
-                                                                className="p-1.5 border-2 border-transparent hover:border-slate-900 hover:bg-slate-100 transition-all text-slate-400 hover:text-slate-900"
-                                                            >
-                                                                <MoreVertical className="w-5 h-5" />
-                                                            </button>
-                                                            <AnimatePresence>
-                                                                {actionMenuOpen === (startup.id || startup._id) && (
-                                                                    <motion.div
-                                                                        initial={{ opacity: 0, scale: 0.9, y: 5 }}
-                                                                        animate={{ opacity: 1, scale: 1, y: 0 }}
-                                                                        exit={{ opacity: 0, scale: 0.9, y: 5 }}
-                                                                        className="absolute right-0 top-full mt-1 w-48 bg-white border-2 border-slate-900 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] z-10"
-                                                                    >
-                                                                        <button onClick={(e) => { e.stopPropagation(); setActionMenuOpen(null); handleDelete(startup.id || startup._id); }} className="w-full text-left px-4 py-3 text-xs font-black uppercase hover:bg-red-50 text-red-600 flex gap-2"><Trash2 className="w-3 h-3" /> Delete</button>
-                                                                        <button onClick={(e) => { e.stopPropagation(); setActionMenuOpen(null); handleCopyLink(startup.id || startup._id); }} className="w-full text-left px-4 py-3 text-xs font-black uppercase hover:bg-slate-50 text-slate-900 flex gap-2"><Share2 className="w-3 h-3" /> Share</button>
-                                                                    </motion.div>
-                                                                )}
-                                                            </AnimatePresence>
-                                                        </div>
-                                                    )}
+                                    {/* Card Content */}
+                                    <div className="p-6 flex flex-col flex-grow">
+                                        <div className="flex justify-between items-start mb-4">
+                                            <div className="flex-1 pr-2">
+                                                <h3 className="text-xl font-black text-slate-900 leading-none group-hover:text-green-600 transition-colors uppercase truncate">
+                                                    {startup.name || startup.title}
+                                                </h3>
+                                                <div className="flex items-center gap-2 mt-2">
+                                                    <span className="text-xs font-bold bg-slate-100 px-2 py-0.5 border border-slate-200 uppercase">
+                                                        {startup.location || 'Remote'}
+                                                    </span>
+                                                    <span className="text-xs font-bold text-slate-400 uppercase">
+                                                        {formatTimeAgo(isAppTab ? (item as any).createdAt : startup.createdAt)}
+                                                    </span>
                                                 </div>
                                             </div>
 
-                                            <div className="flex gap-2 text-xs font-bold text-slate-500 mb-6 uppercase tracking-tight">
-                                                <span className="flex items-center gap-1"><Users className="w-3 h-3" /> {startup.roles?.length || 1} Roles</span>
-                                                <span>•</span>
-                                                <span>{startup.equity || 'Equity'}</span>
-                                            </div>
+                                            {/* Actions (Bookmark/Share) */}
+                                            <div className="flex gap-1 shrink-0">
+                                                <button
+                                                    onClick={() => {
+                                                        if (startup.id || startup._id) toggleBookmark(startup.id || startup._id);
+                                                    }}
+                                                    className="p-1.5 border-2 border-transparent hover:border-slate-900 hover:bg-slate-100 transition-all text-slate-400 hover:text-slate-900"
+                                                >
+                                                    <Bookmark className={`w-5 h-5 ${isBookmarked(startup.id || startup._id) ? 'fill-current text-green-600' : ''}`} />
+                                                </button>
 
-                                            {/* Footer Actions */}
-                                            <div className="mt-auto pt-4 border-t-4 border-slate-100 flex flex-col gap-2">
-                                                {isOwner ? (
-                                                    <div className="flex gap-2">
+                                                {isOwner && (
+                                                    <div className="relative">
                                                         <button
-                                                            onClick={() => handleManage(startup)}
-                                                            className="flex-1 py-3 bg-slate-900 text-white text-xs font-black uppercase hover:bg-slate-700 transition-all flex items-center justify-center gap-2"
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                setActionMenuOpen(actionMenuOpen === (startup.id || startup._id) ? null : (startup.id || startup._id));
+                                                            }}
+                                                            className="p-1.5 border-2 border-transparent hover:border-slate-900 hover:bg-slate-100 transition-all text-slate-400 hover:text-slate-900"
                                                         >
-                                                            Manage ({startup.totalApplicants || 0})
+                                                            <MoreVertical className="w-5 h-5" />
                                                         </button>
-                                                        <button onClick={() => router.push(`/startups/${startup.id || startup._id}`)} className="px-3 border-2 border-slate-900 hover:bg-slate-100"><ArrowRight className="w-4 h-4" /></button>
+                                                        <AnimatePresence>
+                                                            {actionMenuOpen === (startup.id || startup._id) && (
+                                                                <motion.div
+                                                                    initial={{ opacity: 0, scale: 0.9, y: 5 }}
+                                                                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                                                                    exit={{ opacity: 0, scale: 0.9, y: 5 }}
+                                                                    className="absolute right-0 top-full mt-1 w-48 bg-white border-2 border-slate-900 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] z-10"
+                                                                >
+                                                                    <button onClick={(e) => { e.stopPropagation(); setActionMenuOpen(null); handleDelete(startup.id || startup._id); }} className="w-full text-left px-4 py-3 text-xs font-black uppercase hover:bg-red-50 text-red-600 flex gap-2"><Trash2 className="w-3 h-3" /> Delete</button>
+                                                                    <button onClick={(e) => { e.stopPropagation(); setActionMenuOpen(null); handleCopyLink(startup.id || startup._id); }} className="w-full text-left px-4 py-3 text-xs font-black uppercase hover:bg-slate-50 text-slate-900 flex gap-2"><Share2 className="w-3 h-3" /> Share</button>
+                                                                </motion.div>
+                                                            )}
+                                                        </AnimatePresence>
                                                     </div>
-                                                ) : (
-                                                    <button
-                                                        onClick={() => router.push(`/startups/${startup.id || startup._id}`)}
-                                                        className="w-full py-3 bg-white border-4 border-slate-900 text-slate-900 text-xs font-black uppercase hover:bg-slate-900 hover:text-white transition-all shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] flex items-center justify-center gap-2"
-                                                    >
-                                                        View Opportunity <ArrowRight className="w-3 h-3" />
-                                                    </button>
                                                 )}
                                             </div>
                                         </div>
-                                    </motion.div>
-                                );
-                            })}
-                        </div>
-                    )}
 
-                    {/* Empty State */}
-                    {!isLoading && activeTab !== 'discover' && displayItems.length === 0 && applications.length === 0 && (
-                        <div className="text-center py-20 border-4 border-dashed border-slate-300">
-                            <h3 className="text-2xl font-black text-slate-300 uppercase">No {activeTab} opportunities.</h3>
-                            <button onClick={() => setActiveTab('discover')} className="mt-4 text-green-600 font-bold hover:underline uppercase tracking-wide">
-                                Browse all opportunities
-                            </button>
-                        </div>
-                    )}
-                </div>
+                                        <div className="flex gap-2 text-xs font-bold text-slate-500 mb-6 uppercase tracking-tight">
+                                            <span className="flex items-center gap-1"><Users className="w-3 h-3" /> {startup.roles?.length || 1} Roles</span>
+                                            <span>•</span>
+                                            <span>{startup.equity || 'Equity'}</span>
+                                        </div>
 
-                {/* Footer */}
-                <footer className="text-center text-slate-400 text-xs font-black uppercase tracking-widest mt-20">
-                    Earnbuddy Pvt. Ltd. © 2024
-                </footer>
+                                        {/* Footer Actions */}
+                                        <div className="mt-auto pt-4 border-t-4 border-slate-100 flex flex-col gap-2">
+                                            {isOwner ? (
+                                                <div className="flex gap-2">
+                                                    <button
+                                                        onClick={() => handleManage(startup)}
+                                                        className="flex-1 py-3 bg-slate-900 text-white text-xs font-black uppercase hover:bg-slate-700 transition-all flex items-center justify-center gap-2"
+                                                    >
+                                                        Manage ({startup.totalApplicants || 0})
+                                                    </button>
+                                                    <button onClick={() => router.push(`/startups/${startup.id || startup._id}`)} className="px-3 border-2 border-slate-900 hover:bg-slate-100"><ArrowRight className="w-4 h-4" /></button>
+                                                </div>
+                                            ) : (
+                                                <button
+                                                    onClick={() => router.push(`/startups/${startup.id || startup._id}`)}
+                                                    className="w-full py-3 bg-white border-4 border-slate-900 text-slate-900 text-xs font-black uppercase hover:bg-slate-900 hover:text-white transition-all shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] flex items-center justify-center gap-2"
+                                                >
+                                                    View Opportunity <ArrowRight className="w-3 h-3" />
+                                                </button>
+                                            )}
+                                        </div>
+                                    </div>
+                                </motion.div>
+                            );
+                        })}
+                    </div>
+                )}
 
+                {/* Empty State */}
+                {!isLoading && activeTab !== 'discover' && displayItems.length === 0 && applications.length === 0 && (
+                    <div className="text-center py-20 border-4 border-dashed border-slate-300">
+                        <h3 className="text-2xl font-black text-slate-300 uppercase">No {activeTab} opportunities.</h3>
+                        <button onClick={() => setActiveTab('discover')} className="mt-4 text-green-600 font-bold hover:underline uppercase tracking-wide">
+                            Browse all opportunities
+                        </button>
+                    </div>
+                )}
             </div>
+
+            {/* Footer */}
+            {/* Footer */}
+            <footer className="text-center text-slate-400 text-xs font-black uppercase tracking-widest mt-20">
+                Earnbuddy Pvt. Ltd. © 2024
+            </footer>
 
             {/* Modals */}
             <CreateStartupModal
@@ -401,8 +380,7 @@ const StartupsPage: React.FC = () => {
                     setSelectedTargetStartup(null);
                 }}
             />
-
-        </div >
+        </div>
     );
 };
 

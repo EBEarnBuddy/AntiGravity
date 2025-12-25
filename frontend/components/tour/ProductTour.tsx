@@ -46,35 +46,61 @@ export const ProductTour: React.FC = () => {
         };
     }, [isActive, currentStepIndex, steps]);
 
-    // Calculate Coords with Clamping
+    // Calculate Coords with Clamping and Auto-Flipping
     useEffect(() => {
         if (!targetRect || !isActive) return;
 
         const step = steps[currentStepIndex];
-        const TOOLTIP_WIDTH = 320;
+        const TOOLTIP_WIDTH = 300;
+        const ESTIMATED_HEIGHT = 200; // Safe estimate for collision detection
         const PADDING = 16;
+        const GAP = 16;
 
-        // Calculate horizontal position
-        // improved logic: center by default, unless bottom-end
+        const viewportWidth = window.innerWidth;
+        const viewportHeight = window.innerHeight;
+
+        // 1. Calculate Horizontal Position (X)
         let left = targetRect.left + (targetRect.width / 2) - (TOOLTIP_WIDTH / 2);
 
-        if (step.position === 'bottom-end') {
+        // Position preference handling
+        if (step.position === 'bottom-end' || step.position === 'top-end') {
             left = targetRect.right - TOOLTIP_WIDTH;
+        } else if (step.position === 'bottom-start' || step.position === 'top-start') {
+            left = targetRect.left;
         }
 
-        // Clamp to viewport
+        // Clamp to viewport edges
         if (left < PADDING) left = PADDING;
-        if (left + TOOLTIP_WIDTH > window.innerWidth - PADDING) {
-            left = window.innerWidth - TOOLTIP_WIDTH - PADDING;
+        if (left + TOOLTIP_WIDTH > viewportWidth - PADDING) {
+            left = viewportWidth - TOOLTIP_WIDTH - PADDING;
         }
 
-        // Calculate vertical position
-        const isTop = (step.position || 'bottom').startsWith('top');
-        let top = isTop
-            ? targetRect.top - 16
-            : targetRect.bottom + 16;
+        // 2. Calculate Vertical Position (Y) and Placement
+        const preferredPlacement = (step.position || 'bottom').startsWith('top') ? 'top' : 'bottom';
+        let placement = preferredPlacement;
 
-        setCoords({ x: left, y: top, placement: isTop ? 'top' : 'bottom' });
+        // Coordinates for Top placement
+        const topY = targetRect.top - GAP; // Bottom of tooltip will be here (handled by transform)
+        // Coordinates for Bottom placement
+        const bottomY = targetRect.bottom + GAP; // Top of tooltip will be here
+
+        // Check vertical collisions
+        if (preferredPlacement === 'top') {
+            // If top doesn't fit (goes off top edge), flip to bottom
+            if (topY - ESTIMATED_HEIGHT < 0) {
+                placement = 'bottom';
+            }
+        } else {
+            // If bottom doesn't fit (goes off bottom edge), flip to top
+            if (bottomY + ESTIMATED_HEIGHT > viewportHeight) {
+                placement = 'top';
+            }
+        }
+
+        // Final Y assignment
+        let finalY = placement === 'top' ? topY : bottomY;
+
+        setCoords({ x: left, y: finalY, placement: placement as 'top' | 'bottom' });
 
     }, [targetRect, isActive, currentStepIndex, steps]);
 
@@ -118,24 +144,24 @@ export const ProductTour: React.FC = () => {
                             left: coords.x,
                             top: coords.y,
                             transform: coords.placement === 'top' ? 'translateY(-100%)' : 'none',
-                            width: '320px',
+                            width: '300px',
                             maxWidth: 'calc(100vw - 32px)'
                         }}
-                        className="bg-white rounded-none shadow-[8px_8px_0px_0px_rgba(15,23,42,1)] p-6 pointer-events-auto border-4 border-slate-900"
+                        className="bg-white rounded-none shadow-[6px_6px_0px_0px_rgba(15,23,42,1)] p-5 pointer-events-auto border-4 border-slate-900"
                     >
                         {/* Header */}
-                        <div className="flex justify-between items-start mb-4">
-                            <h3 className="font-black text-xl text-slate-900 uppercase tracking-wide">{currentStep.title}</h3>
+                        <div className="flex justify-between items-start mb-3">
+                            <h3 className="font-black text-lg text-slate-900 uppercase tracking-wide">{currentStep.title}</h3>
                             <button
                                 onClick={skipTour}
                                 className="text-slate-400 hover:text-slate-900 transition"
                             >
-                                <X className="w-6 h-6" />
+                                <X className="w-5 h-5" />
                             </button>
                         </div>
 
                         {/* Content */}
-                        <p className="text-slate-600 mb-8 text-sm font-bold uppercase leading-relaxed tracking-wide">
+                        <p className="text-slate-600 mb-6 text-xs font-bold uppercase leading-relaxed tracking-wide">
                             {currentStep.content}
                         </p>
 
@@ -145,27 +171,27 @@ export const ProductTour: React.FC = () => {
                                 {steps.map((_, idx) => (
                                     <div
                                         key={idx}
-                                        className={`h-2 transition-all duration-300 ${idx === currentStepIndex ? 'w-6 bg-green-600 border-2 border-slate-900' : 'w-2 bg-slate-200 border-2 border-slate-300'
+                                        className={`h-1.5 transition-all duration-300 ${idx === currentStepIndex ? 'w-5 bg-green-600 border-2 border-slate-900' : 'w-1.5 bg-slate-200 border-2 border-slate-300'
                                             }`}
                                     />
                                 ))}
                             </div>
 
-                            <div className="flex gap-3">
+                            <div className="flex gap-2">
                                 {!isFirst && (
                                     <button
                                         onClick={prevStep}
-                                        className="px-4 py-2 text-slate-900 font-black text-xs uppercase tracking-wider border-2 border-slate-900 hover:bg-slate-100 transition shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]"
+                                        className="px-3 py-1.5 text-slate-900 font-black text-[10px] uppercase tracking-wider border-2 border-slate-900 hover:bg-slate-100 transition shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]"
                                     >
                                         Back
                                     </button>
                                 )}
                                 <button
                                     onClick={nextStep}
-                                    className="px-6 py-2 bg-green-600 text-white font-black text-xs uppercase tracking-wider border-2 border-slate-900 hover:bg-green-500 transition flex items-center gap-1 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]"
+                                    className="px-4 py-1.5 bg-green-600 text-white font-black text-[10px] uppercase tracking-wider border-2 border-slate-900 hover:bg-green-500 transition flex items-center gap-1 shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] hover:shadow-none hover:translate-x-[3px] hover:translate-y-[3px]"
                                 >
                                     {isLast ? 'Finish' : 'Next'}
-                                    {!isLast && <ChevronRight className="w-4 h-4" />}
+                                    {!isLast && <ChevronRight className="w-3 h-3" />}
                                 </button>
                             </div>
                         </div>
