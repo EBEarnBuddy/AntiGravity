@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { sendMessage, getMessages, markRoomAsRead } from '../controllers/messageController';
-import { verifyToken } from '../middlewares/auth';
+import { sendMessage, getMessages, markRoomAsRead } from '../controllers/messageController.js';
+import { verifyToken } from '../middlewares/auth.js';
 
 const router = Router({ mergeParams: true }); // Enable access to :roomId from parent router
 

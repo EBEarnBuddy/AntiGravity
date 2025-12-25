@@ -1,11 +1,11 @@
 import { Response } from 'express';
-import Message from '../models/Message';
-import Room from '../models/Room';
-import User from '../models/User';
-import RoomMembership from '../models/RoomMembership';
-import { AuthRequest } from '../middlewares/auth';
-import { getIO } from '../socket';
-import { createNotification } from './notificationController';
+import Message from '../models/Message.js';
+import Room from '../models/Room.js';
+import User from '../models/User.js';
+import RoomMembership from '../models/RoomMembership.js';
+import { AuthRequest } from '../middlewares/auth.js';
+import { getIO } from '../socket.js';
+import { createNotification } from './notificationController.js';
 
 // Send Message
 export const sendMessage = async (req: AuthRequest, res: Response) => {

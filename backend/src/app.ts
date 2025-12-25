@@ -42,15 +42,15 @@ app.use(cors({
 app.use(helmet());
 app.use(morgan('dev'));
 
-import userRoutes from './routes/userRoutes';
-import opportunityRoutes from './routes/opportunityRoutes';
-import applicationRoutes from './routes/applicationRoutes';
-import roomRoutes from './routes/roomRoutes';
-import collabRoutes from './routes/collabRoutes';
-import eventRoutes from './routes/eventRoutes';
-import notificationRoutes from './routes/notificationRoutes';
-import collaborationRoutes from './routes/collaborationRoutes';
-import uploadRoutes from './routes/uploadRoutes';
+import userRoutes from './routes/userRoutes.js';
+import opportunityRoutes from './routes/opportunityRoutes.js';
+import applicationRoutes from './routes/applicationRoutes.js';
+import roomRoutes from './routes/roomRoutes.js';
+import collabRoutes from './routes/collabRoutes.js';
+import eventRoutes from './routes/eventRoutes.js';
+import notificationRoutes from './routes/notificationRoutes.js';
+import collaborationRoutes from './routes/collaborationRoutes.js';
+import uploadRoutes from './routes/uploadRoutes.js';
 
 // Routes Configuration
 const apiRoutes = [

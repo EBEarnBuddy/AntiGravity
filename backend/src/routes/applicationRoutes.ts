@@ -4,8 +4,8 @@ import {
     getMyApplications,
     getApplicationsForOpportunity,
     updateApplicationStatus,
-} from '../controllers/applicationController';
-import { verifyToken } from '../middlewares/auth';
+} from '../controllers/applicationController.js';
+import { verifyToken } from '../middlewares/auth.js';
 
 const router = Router();
 

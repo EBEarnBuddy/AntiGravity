@@ -1,10 +1,10 @@
 import { Request, Response } from 'express';
-import Room from '../models/Room';
-import RoomMembership from '../models/RoomMembership';
-import User from '../models/User';
-import Message from '../models/Message';
-import { AuthRequest } from '../middlewares/auth';
-import { getIO } from '../socket';
+import Room from '../models/Room.js';
+import RoomMembership from '../models/RoomMembership.js';
+import User from '../models/User.js';
+import Message from '../models/Message.js';
+import { AuthRequest } from '../middlewares/auth.js';
+import { getIO } from '../socket.js';
 
 // Create a Room
 export const createRoom = async (req: AuthRequest, res: Response) => {
@@ -119,7 +119,7 @@ export const joinRoom = async (req: AuthRequest, res: Response) => {
             // Notify Room Owner/Admins
             const roomOwner = await RoomMembership.findOne({ room: roomId, role: 'admin' }).populate('user');
             if (roomOwner && roomOwner.user) {
-                const { createNotification } = await import('./notificationController');
+                const { createNotification } = await import('./notificationController.js');
                 await createNotification(
                     (roomOwner.user as any).firebaseUid,
                     user.firebaseUid,

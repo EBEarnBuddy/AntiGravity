@@ -1,6 +1,6 @@
 import express from 'express';
-import { getUploadSignature } from '../controllers/uploadController';
-import { verifyToken } from '../middlewares/auth';
+import { getUploadSignature } from '../controllers/uploadController.js';
+import { verifyToken } from '../middlewares/auth.js';
 
 const router = express.Router();
 

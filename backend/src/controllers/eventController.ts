@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
-import { AuthRequest } from '../middlewares/auth';
-import Event from '../models/Event';
+import { AuthRequest } from '../middlewares/auth.js';
+import Event from '../models/Event.js';
 
 export const getEvents = async (req: Request, res: Response) => {
     try {

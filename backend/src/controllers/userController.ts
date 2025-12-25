@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
-import User from '../models/User';
+import User from '../models/User.js';
 import mongoose from 'mongoose';
-import { AuthRequest } from '../middlewares/auth';
+import { AuthRequest } from '../middlewares/auth.js';
 
 // Sync User (Create if not exists, return updated)
 export const syncUser = async (req: AuthRequest, res: Response) => {

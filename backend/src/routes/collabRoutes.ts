@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { verifyToken } from '../middlewares/auth';
-import { createCollabRequest, acceptCollabRequest, getMyRequests } from '../controllers/collabController';
+import { verifyToken } from '../middlewares/auth.js';
+import { createCollabRequest, acceptCollabRequest, getMyRequests } from '../controllers/collabController.js';
 
 const router = Router();
 

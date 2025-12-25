@@ -1,10 +1,10 @@
 import { Response } from 'express';
-import { AuthRequest } from '../middlewares/auth';
-import CollaborationRequest from '../models/CollaborationRequest';
-import Room from '../models/Room';
-import User from '../models/User';
-import RoomMembership from '../models/RoomMembership';
-import Notification from '../models/Notification';
+import { AuthRequest } from '../middlewares/auth.js';
+import CollaborationRequest from '../models/CollaborationRequest.js';
+import Room from '../models/Room.js';
+import User from '../models/User.js';
+import RoomMembership from '../models/RoomMembership.js';
+import Notification from '../models/Notification.js';
 
 // Send Collaboration Request
 export const sendCollaborationRequest = async (req: AuthRequest, res: Response) => {

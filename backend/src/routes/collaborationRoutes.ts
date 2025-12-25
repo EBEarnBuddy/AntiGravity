@@ -1,11 +1,11 @@
 import express from 'express';
-import { verifyToken } from '../middlewares/auth';
+import { verifyToken } from '../middlewares/auth.js';
 import {
     sendCollaborationRequest,
     getPendingCollaborationRequests,
     acceptCollaborationRequest,
     rejectCollaborationRequest
-} from '../controllers/collaborationController';
+} from '../controllers/collaborationController.js';
 
 const router = express.Router();
 

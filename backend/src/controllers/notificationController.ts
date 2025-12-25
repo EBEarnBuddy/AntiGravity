@@ -1,7 +1,7 @@
 import { Response } from 'express';
-import { AuthRequest } from '../middlewares/auth';
-import Notification from '../models/Notification';
-import { getIO } from '../socket'; // Assuming socket.ts exports a getter for IO
+import { AuthRequest } from '../middlewares/auth.js';
+import Notification from '../models/Notification.js';
+import { getIO } from '../socket.js'; // Assuming socket.ts exports a getter for IO
 
 // Get My Notifications
 export const getMyNotifications = async (req: AuthRequest, res: Response) => {

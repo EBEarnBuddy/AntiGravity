@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
-import app from './app';
+import app from './app.js';
 import http from 'http';
-import { initSocket, setIO } from './socket';
+import { initSocket, setIO } from './socket.js';
 import dotenv from 'dotenv';
 
 dotenv.config();

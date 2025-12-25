@@ -1,11 +1,11 @@
 import { Request, Response } from 'express';
-import Opportunity from '../models/Opportunity';
-import { AuthRequest } from '../middlewares/auth';
-import User from '../models/User';
-import Room from '../models/Room';
-import RoomMembership from '../models/RoomMembership';
-import Message from '../models/Message';
-import { getIO } from '../socket';
+import Opportunity from '../models/Opportunity.js';
+import { AuthRequest } from '../middlewares/auth.js';
+import User from '../models/User.js';
+import Room from '../models/Room.js';
+import RoomMembership from '../models/RoomMembership.js';
+import Message from '../models/Message.js';
+import { getIO } from '../socket.js';
 
 // Create Opportunity
 // For startup opportunities this will also auto-create a private Room

@@ -1,10 +1,10 @@
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
-import User from '../models/User';
-import Opportunity, { IStartupRole } from '../models/Opportunity';
-import Room from '../models/Room';
-import RoomMembership from '../models/RoomMembership';
-import Event from '../models/Event';
+import User from '../models/User.js';
+import Opportunity, { IStartupRole } from '../models/Opportunity.js';
+import Room from '../models/Room.js';
+import RoomMembership from '../models/RoomMembership.js';
+import Event from '../models/Event.js';
 
 dotenv.config();
 

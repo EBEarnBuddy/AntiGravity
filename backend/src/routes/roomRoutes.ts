@@ -1,8 +1,8 @@
 import { Router } from 'express';
-import { createRoom, getRooms, joinRoom, getMyRooms, getPendingRequests, updateMembershipStatus, updateRoom, deleteRoom, leaveRoom } from '../controllers/roomController';
-import { verifyToken } from '../middlewares/auth';
+import { createRoom, getRooms, joinRoom, getMyRooms, getPendingRequests, updateMembershipStatus, updateRoom, deleteRoom, leaveRoom } from '../controllers/roomController.js';
+import { verifyToken } from '../middlewares/auth.js';
 
-import messageRoutes from './messageRoutes';
+import messageRoutes from './messageRoutes.js';
 
 const router = Router();
 

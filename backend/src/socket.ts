@@ -1,8 +1,8 @@
 import { Server, Socket } from 'socket.io';
 import { Server as HttpServer } from 'http';
-import { auth } from './config/firebase';
-import RoomMembership from './models/RoomMembership';
-import User from './models/User';
+import { auth } from './config/firebase.js';
+import RoomMembership from './models/RoomMembership.js';
+import User from './models/User.js';
 
 export const initSocket = (httpServer: HttpServer) => {
     const io = new Server(httpServer, {

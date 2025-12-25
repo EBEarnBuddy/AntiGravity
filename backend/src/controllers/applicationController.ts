@@ -1,12 +1,12 @@
 import { Response } from 'express';
-import Application from '../models/Application';
-import Opportunity from '../models/Opportunity';
-import User from '../models/User';
-import { AuthRequest } from '../middlewares/auth';
-import Room from '../models/Room';
-import RoomMembership from '../models/RoomMembership';
-import { createNotification } from './notificationController';
-import { getIO } from '../socket';
+import Application from '../models/Application.js';
+import Opportunity from '../models/Opportunity.js';
+import User from '../models/User.js';
+import { AuthRequest } from '../middlewares/auth.js';
+import Room from '../models/Room.js';
+import RoomMembership from '../models/RoomMembership.js';
+import { createNotification } from './notificationController.js';
+import { getIO } from '../socket.js';
 
 // Apply to an Opportunity
 // This endpoint is intentionally flexible to support the current frontend,

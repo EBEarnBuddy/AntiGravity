@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
-import Opportunity from '../models/Opportunity';
+import Opportunity from '../models/Opportunity.js';
 
 dotenv.config();
 
