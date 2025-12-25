@@ -299,6 +299,9 @@ export interface UserProfile {
   twitter?: string;
   onboardingCompleted: boolean;
   productTourCompleted?: boolean;
+  hasCompletedTour?: boolean;
+  isNewUser?: boolean;
+  hasSkippedOnboarding?: boolean;
   onboardingData?: OnboardingData;
   joinedPods: string[];
   joinedRooms: string[];
