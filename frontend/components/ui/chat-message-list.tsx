@@ -1,5 +1,5 @@
 import * as React from "react";
-import { ArrowDownIcon } from "@heroicons/react/24/solid";
+import { ArrowDown } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { useAutoScroll } from "@/components/hooks/use-auto-scroll";
 
@@ -42,7 +42,7 @@ const ChatMessageList = React.forwardRef<HTMLDivElement, ChatMessageListProps>(
                         className="absolute bottom-4 left-1/2 transform -translate-x-1/2 inline-flex rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] bg-white hover:bg-slate-50 border-2 border-slate-900 hover:shadow-none hover:translate-x-[1px] hover:translate-y-[1px] transition-all"
                         aria-label="Scroll to bottom"
                     >
-                        <ArrowDownIcon className="h-4 w-4" />
+                        <ArrowDown className="h-4 w-4" />
                     </Button>
                 )}
             </div>

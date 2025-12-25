@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { CircleStackIcon, ArrowPathIcon, CheckCircleIcon, ExclamationCircleIcon } from '@heroicons/react/24/solid';
+import { Database, RefreshCw, CheckCircle, AlertCircle } from 'lucide-react';
 import { seedPermanentProjects } from '../lib/seedProjects';
+import { BrutalistSpinner } from '@/components/ui/BrutalistSpinner';
 
 const AdminSeedButton: React.FC = () => {
   const [isSeeding, setIsSeeding] = useState(false);
@@ -38,16 +39,16 @@ const AdminSeedButton: React.FC = () => {
         onClick={handleSeedProjects}
         disabled={isSeeding}
         className={`px-4 py-3 rounded-lg shadow-lg font-medium transition-all duration-300 flex items-center gap-2 ${isSeeding
-            ? 'bg-gray-400 text-white cursor-not-allowed'
-            : 'bg-emerald-600 hover:bg-emerald-700 text-white hover:shadow-xl'
+          ? 'bg-gray-400 text-white cursor-not-allowed'
+          : 'bg-emerald-600 hover:bg-emerald-700 text-white hover:shadow-xl'
           }`}
         whileHover={!isSeeding ? { scale: 1.05 } : {}}
         whileTap={!isSeeding ? { scale: 0.95 } : {}}
       >
         {isSeeding ? (
-          <ArrowPathIcon className="w-5 h-5 animate-spin" />
+          <BrutalistSpinner size={20} />
         ) : (
-          <CircleStackIcon className="w-5 h-5" />
+          <Database className="w-5 h-5" />
         )}
         {isSeeding ? 'Seeding...' : 'Seed Projects'}
       </motion.button>
@@ -59,15 +60,15 @@ const AdminSeedButton: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -20 }}
           className={`mt-3 p-3 rounded-lg shadow-lg max-w-sm ${result.success
-              ? 'bg-green-100 border border-green-300 text-green-800'
-              : 'bg-red-100 border border-red-300 text-red-800'
+            ? 'bg-green-100 border border-green-300 text-green-800'
+            : 'bg-red-100 border border-red-300 text-red-800'
             }`}
         >
           <div className="flex items-center gap-2">
             {result.success ? (
-              <CheckCircleIcon className="w-4 h-4" />
+              <CheckCircle className="w-4 h-4" />
             ) : (
-              <ExclamationCircleIcon className="w-4 h-4" />
+              <AlertCircle className="w-4 h-4" />
             )}
             <span className="text-sm font-medium">{result.message}</span>
           </div>

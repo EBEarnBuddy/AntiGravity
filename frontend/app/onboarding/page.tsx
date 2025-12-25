@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { FirestoreService } from '@/lib/firestore';
-import { CheckIcon, ArrowRightIcon, UserIcon, RocketLaunchIcon, HeartIcon, CodeBracketIcon } from '@heroicons/react/24/solid';
+import { Check, ArrowRight, User, Rocket, Heart, Code } from 'lucide-react';
 
 const INTERESTS = [
     "Web Development", "Mobile Apps", "Blockchain", "AI/ML",
@@ -12,10 +12,10 @@ const INTERESTS = [
 ];
 
 const ROLES = [
-    { id: 'freelancer', label: 'Freelancer', icon: CodeBracketIcon, desc: 'I want to find works & gigs' },
-    { id: 'founder', label: 'Founder', icon: RocketLaunchIcon, desc: 'I want to hire talent & build' },
-    { id: 'builder', label: 'Builder', icon: UserIcon, desc: 'I want to join a team' },
-    { id: 'investor', label: 'Investor', icon: HeartIcon, desc: 'I want to fund projects' },
+    { id: 'freelancer', label: 'Freelancer', icon: Code, desc: 'I want to find works & gigs' },
+    { id: 'founder', label: 'Founder', icon: Rocket, desc: 'I want to hire talent & build' },
+    { id: 'builder', label: 'Builder', icon: User, desc: 'I want to join a team' },
+    { id: 'investor', label: 'Investor', icon: Heart, desc: 'I want to fund projects' },
 ];
 
 export default function OnboardingPage() {
@@ -117,7 +117,7 @@ export default function OnboardingPage() {
                                 onClick={() => setStep(2)}
                                 className="w-full py-4 bg-green-600 text-white font-bold rounded-xl hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-md flex items-center justify-center gap-2"
                             >
-                                Continue <ArrowRightIcon className="w-5 h-5" />
+                                Continue <ArrowRight className="w-5 h-5" />
                             </button>
                         </div>
                     )}
@@ -161,7 +161,7 @@ export default function OnboardingPage() {
                                     disabled={formData.interests.length === 0}
                                     className="flex-[2] py-4 bg-green-600 text-white font-bold rounded-xl hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-md flex items-center justify-center gap-2"
                                 >
-                                    Continue <ArrowRightIcon className="w-5 h-5" />
+                                    Continue <ArrowRight className="w-5 h-5" />
                                 </button>
                             </div>
                         </div>
@@ -189,7 +189,7 @@ export default function OnboardingPage() {
                                         <span className={`font-bold capitalize ${formData.experience === exp ? 'text-green-700' : 'text-slate-700'}`}>
                                             {exp}
                                         </span>
-                                        {formData.experience === exp && <CheckIcon className="w-5 h-5 text-green-600" />}
+                                        {formData.experience === exp && <Check className="w-5 h-5 text-green-600" />}
                                     </button>
                                 ))}
                             </div>

@@ -2,8 +2,9 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { XMarkIcon, CheckIcon, XCircleIcon, UserGroupIcon, ArrowPathIcon } from '@heroicons/react/24/solid';
+import { X, Check, XCircle, Users, RefreshCw } from 'lucide-react';
 import { useRooms } from '@/hooks/useFirestore';
+import { BrutalistSpinner } from './ui/BrutalistSpinner';
 
 interface PendingRequest {
     _id: string;
@@ -85,41 +86,43 @@ const PendingRequestsModal: React.FC<PendingRequestsModalProps> = ({
 
     return (
         <AnimatePresence>
-            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
                 <motion.div
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.95 }}
-                    className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[80vh] overflow-hidden border-2 border-slate-900"
+                    className="bg-white border-4 border-slate-900 shadow-[8px_8px_0px_0px_rgba(15,23,42,1)] w-full max-w-2xl max-h-[80vh] overflow-hidden"
                 >
                     {/* Header */}
-                    <div className="bg-green-600 text-white p-6 flex items-center justify-between">
+                    <div className="bg-green-400 border-b-4 border-slate-900 text-slate-900 p-6 flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                            <UserGroupIcon className="w-6 h-6" />
+                            <Users className="w-8 h-8" />
                             <div>
-                                <h2 className="text-2xl font-black">Pending Requests</h2>
-                                <p className="text-green-100 text-sm font-medium">{roomName}</p>
+                                <h2 className="text-2xl font-black uppercase tracking-widest">Pending Requests</h2>
+                                <p className="text-slate-800 text-sm font-black">{roomName}</p>
                             </div>
                         </div>
                         <button
                             onClick={onClose}
-                            className="p-2 hover:bg-green-700 rounded-lg transition"
+                            className="p-2 border-2 border-slate-900 bg-white hover:bg-slate-100 hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] transition-all"
                         >
-                            <XMarkIcon className="w-6 h-6" />
+                            <X className="w-6 h-6" />
                         </button>
                     </div>
 
                     {/* Content */}
-                    <div className="p-6 overflow-y-auto max-h-[60vh]">
+                    <div className="p-6 overflow-y-auto max-h-[60vh] bg-slate-50">
                         {loading ? (
                             <div className="flex items-center justify-center py-12">
-                                <ArrowPathIcon className="w-8 h-8 animate-spin text-green-600" />
+                                <BrutalistSpinner className="w-12 h-12 text-slate-900" />
                             </div>
                         ) : requests.length === 0 ? (
                             <div className="text-center py-12">
-                                <UserGroupIcon className="w-16 h-16 mx-auto text-slate-300 mb-4" />
-                                <h3 className="text-xl font-bold text-slate-900 mb-2">No Pending Requests</h3>
-                                <p className="text-slate-500">All caught up! No one is waiting to join.</p>
+                                <div className="w-20 h-20 mx-auto bg-slate-200 border-2 border-slate-400 flex items-center justify-center mb-6 shadow-[4px_4px_0px_0px_rgba(148,163,184,1)]">
+                                    <Users className="w-10 h-10 text-slate-500" />
+                                </div>
+                                <h3 className="text-xl font-black text-slate-900 uppercase tracking-wide mb-2">No Pending Requests</h3>
+                                <p className="text-slate-500 font-bold">All caught up! No one is waiting.</p>
                             </div>
                         ) : (
                             <div className="space-y-4">
@@ -130,10 +133,10 @@ const PendingRequestsModal: React.FC<PendingRequestsModalProps> = ({
                                         initial={{ opacity: 0, y: 20 }}
                                         animate={{ opacity: 1, y: 0 }}
                                         exit={{ opacity: 0, x: -100 }}
-                                        className="bg-slate-50 border-2 border-slate-200 rounded-xl p-4 flex items-center gap-4 hover:border-green-500 transition-colors"
+                                        className="bg-white border-4 border-slate-900 p-4 flex items-center gap-4 hover:shadow-[8px_8px_0px_0px_rgba(15,23,42,1)] hover:-translate-y-1 transition-all"
                                     >
                                         {/* Avatar */}
-                                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center text-white font-bold text-lg overflow-hidden flex-shrink-0">
+                                        <div className="w-12 h-12 border-2 border-slate-900 bg-green-200 flex items-center justify-center text-slate-900 font-black text-lg overflow-hidden flex-shrink-0 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)]">
                                             {request.user.photoURL ? (
                                                 <img
                                                     src={request.user.photoURL}
@@ -147,10 +150,10 @@ const PendingRequestsModal: React.FC<PendingRequestsModalProps> = ({
 
                                         {/* User Info */}
                                         <div className="flex-1 min-w-0">
-                                            <h4 className="font-bold text-slate-900 truncate">
+                                            <h4 className="font-black text-slate-900 truncate uppercase tracking-tighter text-lg">
                                                 {request.user.displayName || 'Anonymous User'}
                                             </h4>
-                                            <p className="text-sm text-slate-500 truncate">{request.user.email}</p>
+                                            <p className="text-sm text-slate-500 truncate font-bold">{request.user.email}</p>
                                         </div>
 
                                         {/* Actions */}
@@ -158,26 +161,26 @@ const PendingRequestsModal: React.FC<PendingRequestsModalProps> = ({
                                             <button
                                                 onClick={() => handleApprove(request.user.firebaseUid, request._id)}
                                                 disabled={processingId === request._id}
-                                                className="px-4 py-2 bg-green-600 text-white rounded-lg font-bold hover:bg-green-700 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                                                className="px-4 py-2 bg-green-500 border-2 border-slate-900 text-white font-black uppercase hover:bg-green-600 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all disabled:opacity-50 disabled:cursor-wait flex items-center gap-2"
                                             >
                                                 {processingId === request._id ? (
-                                                    <ArrowPathIcon className="w-4 h-4 animate-spin" />
+                                                    <BrutalistSpinner size={16} />
                                                 ) : (
-                                                    <CheckIcon className="w-4 h-4" />
+                                                    <Check className="w-4 h-4" />
                                                 )}
-                                                Accept
+                                                <span className="hidden sm:inline">Accept</span>
                                             </button>
                                             <button
                                                 onClick={() => handleReject(request.user.firebaseUid, request._id)}
                                                 disabled={processingId === request._id}
-                                                className="px-4 py-2 bg-red-600 text-white rounded-lg font-bold hover:bg-red-700 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                                                className="px-4 py-2 bg-red-500 border-2 border-slate-900 text-white font-black uppercase hover:bg-red-600 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all disabled:opacity-50 disabled:cursor-wait flex items-center gap-2"
                                             >
                                                 {processingId === request._id ? (
-                                                    <ArrowPathIcon className="w-4 h-4 animate-spin" />
+                                                    <BrutalistSpinner size={16} />
                                                 ) : (
-                                                    <XCircleIcon className="w-4 h-4" />
+                                                    <XCircle className="w-4 h-4" />
                                                 )}
-                                                Reject
+                                                <span className="hidden sm:inline">Reject</span>
                                             </button>
                                         </div>
                                     </motion.div>

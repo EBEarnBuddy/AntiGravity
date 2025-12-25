@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { XMarkIcon, PaperAirplaneIcon, DocumentTextIcon, GlobeAltIcon, EnvelopeIcon, ExclamationCircleIcon, CheckCircleIcon } from '@heroicons/react/24/solid';
+import { X, Send, FileText, Globe, Mail, AlertCircle, CheckCircle } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useStartups } from '../hooks/useFirestore';
+import { BrutalistSpinner } from '@/components/ui/BrutalistSpinner';
 
 interface StartupRole {
   id: string;
@@ -169,14 +170,14 @@ const StartupApplicationModal: React.FC<StartupApplicationModalProps> = ({
                 onClick={onClose}
                 className="p-2 border-2 border-transparent hover:border-slate-900 hover:bg-red-100 hover:text-red-600 transition-all rounded-none"
               >
-                <XMarkIcon className="w-8 h-8" />
+                <X className="w-8 h-8" />
               </button>
             </div>
 
             {/* Content */}
             <div className="flex-1 overflow-y-auto px-8 py-8 custom-scrollbar bg-slate-50">
               {/* Role Selection */}
-              <div className="mb-8 p-6 bg-white border-2 border-slate-900 shadow-[4px_4px_0px_0px_rgba(203,213,225,1)]">
+              <div className="mb-8 p-6 bg-white border-2 border-slate-900 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)]">
                 <label className={labelClass}>Select Role *</label>
                 <select
                   value={selectedRoleId}
@@ -190,7 +191,7 @@ const StartupApplicationModal: React.FC<StartupApplicationModalProps> = ({
                     </option>
                   ))}
                 </select>
-                {errors.role && <p className={errorClass}><ExclamationCircleIcon className="w-3 h-3" /> {errors.role}</p>}
+                {errors.role && <p className={errorClass}><AlertCircle className="w-3 h-3" /> {errors.role}</p>}
 
                 {/* Role Details Preview */}
                 {selectedRoleId && (
@@ -220,7 +221,7 @@ const StartupApplicationModal: React.FC<StartupApplicationModalProps> = ({
                     className={inputClass(!!errors.coverLetter)}
                     placeholder="Don't be boring."
                   />
-                  {errors.coverLetter && <p className={errorClass}><ExclamationCircleIcon className="w-3 h-3" /> {errors.coverLetter}</p>}
+                  {errors.coverLetter && <p className={errorClass}><AlertCircle className="w-3 h-3" /> {errors.coverLetter}</p>}
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -234,9 +235,9 @@ const StartupApplicationModal: React.FC<StartupApplicationModalProps> = ({
                         className={`${inputClass(!!errors.linkedin)} pl-10`}
                         placeholder="https://linkedin.com/..."
                       />
-                      <EnvelopeIcon className="absolute left-3 top-3.5 w-5 h-5 text-slate-400 pointer-events-none" />
+                      <Mail className="absolute left-3 top-3.5 w-5 h-5 text-slate-400 pointer-events-none" />
                     </div>
-                    {errors.linkedin && <p className={errorClass}><ExclamationCircleIcon className="w-3 h-3" /> {errors.linkedin}</p>}
+                    {errors.linkedin && <p className={errorClass}><AlertCircle className="w-3 h-3" /> {errors.linkedin}</p>}
                   </div>
                   <div>
                     <label className={labelClass}>Portfolio URL</label>
@@ -248,9 +249,9 @@ const StartupApplicationModal: React.FC<StartupApplicationModalProps> = ({
                         className={`${inputClass(!!errors.portfolio)} pl-10`}
                         placeholder="https://mywork.com"
                       />
-                      <GlobeAltIcon className="absolute left-3 top-3.5 w-5 h-5 text-slate-400 pointer-events-none" />
+                      <Globe className="absolute left-3 top-3.5 w-5 h-5 text-slate-400 pointer-events-none" />
                     </div>
-                    {errors.portfolio && <p className={errorClass}><ExclamationCircleIcon className="w-3 h-3" /> {errors.portfolio}</p>}
+                    {errors.portfolio && <p className={errorClass}><AlertCircle className="w-3 h-3" /> {errors.portfolio}</p>}
                   </div>
                 </div>
 
@@ -263,7 +264,7 @@ const StartupApplicationModal: React.FC<StartupApplicationModalProps> = ({
                     className={inputClass(!!errors.experience)}
                     placeholder="What have you built?"
                   />
-                  {errors.experience && <p className={errorClass}><ExclamationCircleIcon className="w-3 h-3" /> {errors.experience}</p>}
+                  {errors.experience && <p className={errorClass}><AlertCircle className="w-3 h-3" /> {errors.experience}</p>}
                 </div>
 
                 <div>
@@ -275,7 +276,7 @@ const StartupApplicationModal: React.FC<StartupApplicationModalProps> = ({
                     className={inputClass(!!errors.whyInterested)}
                     placeholder="Flattery helps, but specifics are better."
                   />
-                  {errors.whyInterested && <p className={errorClass}><ExclamationCircleIcon className="w-3 h-3" /> {errors.whyInterested}</p>}
+                  {errors.whyInterested && <p className={errorClass}><AlertCircle className="w-3 h-3" /> {errors.whyInterested}</p>}
                 </div>
               </div>
             </div>
@@ -284,16 +285,21 @@ const StartupApplicationModal: React.FC<StartupApplicationModalProps> = ({
             <div className="flex-none px-8 py-6 border-t-4 border-slate-900 bg-slate-50 flex justify-end gap-4">
               <button
                 onClick={onClose}
-                className="px-6 py-3 font-bold uppercase text-slate-500 hover:text-slate-900 transition-colors"
+                className="px-6 py-3 border-2 border-slate-900 text-slate-900 font-black uppercase tracking-wider hover:bg-slate-200 transition-all shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]"
               >
                 Cancel
               </button>
               <button
                 onClick={handleSubmit}
                 disabled={isSubmitting}
-                className="px-8 py-3 bg-green-600 text-white font-black uppercase tracking-widest border-2 border-green-700 hover:bg-green-500 hover:shadow-[4px_4px_0px_0px_rgba(21,128,61,1)] transition-all flex items-center gap-2 disabled:opacity-70 disabled:cursor-wait shadow-[2px_2px_0px_0px_rgba(21,128,61,1)]"
+                className="px-8 py-3 bg-green-500 text-white font-black uppercase tracking-widest border-2 border-slate-900 hover:bg-green-600 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center gap-2 disabled:opacity-70 disabled:cursor-wait disabled:shadow-none"
               >
-                {isSubmitting ? 'Sending...' : <><PaperAirplaneIcon className="w-4 h-4" /> Submit Application</>}
+                {isSubmitting ? (
+                  <>
+                    <BrutalistSpinner size={16} className="text-white border-white" />
+                    Sending...
+                  </>
+                ) : <><Send className="w-4 h-4 stroke-[3]" /> Submit Application</>}
               </button>
             </div>
           </motion.div>

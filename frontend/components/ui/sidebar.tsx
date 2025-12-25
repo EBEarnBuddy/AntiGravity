@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 import Link, { LinkProps } from "next/link";
 import React, { useState, createContext, useContext } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/solid";
+import { Menu, X } from "lucide-react";
 
 interface Links {
     label: string;
@@ -120,7 +120,7 @@ export const MobileSidebar = ({
                 {...props}
             >
                 <div className="flex justify-end z-20 w-full">
-                    <Bars3Icon
+                    <Menu
                         className="w-8 h-8 text-slate-900 cursor-pointer"
                         onClick={() => setOpen(!open)}
                     />
@@ -144,7 +144,7 @@ export const MobileSidebar = ({
                                 className="absolute right-10 top-10 z-50 text-slate-800 cursor-pointer"
                                 onClick={() => setOpen(!open)}
                             >
-                                <XMarkIcon className="w-8 h-8" />
+                                <X className="w-8 h-8" />
                             </div>
                             {children}
                         </motion.div>

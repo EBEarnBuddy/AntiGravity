@@ -1,24 +1,24 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  ArrowRightIcon,
-  ArrowLeftIcon,
-  CheckIcon,
-  UserIcon,
-  BriefcaseIcon,
-  RocketLaunchIcon,
-  UserGroupIcon,
-  CodeBracketIcon,
-  PaintBrushIcon,
-  MegaphoneIcon,
-  ChartBarIcon,
-  GlobeAltIcon,
-  MapPinIcon,
-  StarIcon,
-  ArrowTrendingUpIcon,
-  CurrencyDollarIcon,
-  Cog6ToothIcon
-} from '@heroicons/react/24/solid';
+  ArrowRight,
+  ArrowLeft,
+  Check,
+  User,
+  Briefcase,
+  Rocket,
+  Users,
+  Code,
+  Paintbrush,
+  Megaphone,
+  BarChart,
+  Globe,
+  MapPin,
+  Star,
+  TrendingUp,
+  DollarSign,
+  Settings
+} from 'lucide-react';
 
 interface OnboardingData {
   role: string;
@@ -182,7 +182,7 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
                 disabled={currentStep === 0}
                 className="flex items-center gap-2 px-6 py-3 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <ArrowLeftIcon className="w-4 h-4" />
+                <ArrowLeft className="w-4 h-4" />
                 Back
               </button>
 
@@ -194,13 +194,13 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
               >
                 {currentStep === steps.length - 1 ? (
                   <>
-                    <CheckIcon className="w-4 h-4" />
+                    <Check className="w-4 h-4" />
                     Complete Setup
                   </>
                 ) : (
                   <>
                     Continue
-                    <ArrowRightIcon className="w-4 h-4" />
+                    <ArrowRight className="w-4 h-4" />
                   </>
                 )}
               </motion.button>
@@ -215,11 +215,11 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
 // Step Components
 const RoleStep: React.FC<{ data: OnboardingData; updateData: (key: keyof OnboardingData, value: any) => void }> = ({ data, updateData }) => {
   const roles = [
-    { id: 'freelancer', label: 'Freelancer', icon: BriefcaseIcon, description: 'I want to find projects and clients' },
-    { id: 'founder', label: 'Startup Founder', icon: RocketLaunchIcon, description: 'I\'m building a startup and need co-founders/team' },
-    { id: 'builder', label: 'Builder/Creator', icon: UserIcon, description: 'I want to collaborate on projects and ideas' },
-    { id: 'investor', label: 'Investor/Mentor', icon: StarIcon, description: 'I want to support and invest in startups' },
-    { id: 'explorer', label: 'Just Exploring', icon: GlobeAltIcon, description: 'I\'m here to learn and discover opportunities' }
+    { id: 'freelancer', label: 'Freelancer', icon: Briefcase, description: 'I want to find projects and clients' },
+    { id: 'founder', label: 'Startup Founder', icon: Rocket, description: 'I\'m building a startup and need co-founders/team' },
+    { id: 'builder', label: 'Builder/Creator', icon: User, description: 'I want to collaborate on projects and ideas' },
+    { id: 'investor', label: 'Investor/Mentor', icon: Star, description: 'I want to support and invest in startups' },
+    { id: 'explorer', label: 'Just Exploring', icon: Globe, description: 'I\'m here to learn and discover opportunities' }
   ];
 
   return (
@@ -247,18 +247,18 @@ const RoleStep: React.FC<{ data: OnboardingData; updateData: (key: keyof Onboard
 
 const SkillsStep: React.FC<{ data: OnboardingData; updateData: (key: keyof OnboardingData, value: any) => void }> = ({ data, updateData }) => {
   const skills = [
-    { id: 'frontend', label: 'Frontend Development', icon: CodeBracketIcon },
-    { id: 'backend', label: 'Backend Development', icon: CodeBracketIcon },
-    { id: 'design', label: 'UI/UX Design', icon: PaintBrushIcon },
-    { id: 'marketing', label: 'Digital Marketing', icon: MegaphoneIcon },
-    { id: 'data', label: 'Data Science', icon: ChartBarIcon },
-    { id: 'mobile', label: 'Mobile Development', icon: CodeBracketIcon },
-    { id: 'blockchain', label: 'Blockchain', icon: GlobeAltIcon },
-    { id: 'ai', label: 'AI/Machine Learning', icon: CodeBracketIcon },
-    { id: 'product', label: 'Product Management', icon: RocketLaunchIcon },
-    { id: 'sales', label: 'Sales & Business Development', icon: ArrowTrendingUpIcon },
-    { id: 'finance', label: 'Finance & Accounting', icon: CurrencyDollarIcon },
-    { id: 'operations', label: 'Operations & Strategy', icon: Cog6ToothIcon }
+    { id: 'frontend', label: 'Frontend Development', icon: Code },
+    { id: 'backend', label: 'Backend Development', icon: Code },
+    { id: 'design', label: 'UI/UX Design', icon: Paintbrush },
+    { id: 'marketing', label: 'Digital Marketing', icon: Megaphone },
+    { id: 'data', label: 'Data Science', icon: BarChart },
+    { id: 'mobile', label: 'Mobile Development', icon: Code },
+    { id: 'blockchain', label: 'Blockchain', icon: Globe },
+    { id: 'ai', label: 'AI/Machine Learning', icon: Code },
+    { id: 'product', label: 'Product Management', icon: Rocket },
+    { id: 'sales', label: 'Sales & Business Development', icon: TrendingUp },
+    { id: 'finance', label: 'Finance & Accounting', icon: DollarSign },
+    { id: 'operations', label: 'Operations & Strategy', icon: Settings }
   ];
 
   const toggleSkill = (skillId: string) => {
@@ -376,7 +376,7 @@ const LocationStep: React.FC<{ data: OnboardingData; updateData: (key: keyof Onb
   return (
     <div className="space-y-4">
       <div className="relative">
-        <MapPinIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+        <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
         <input
           type="text"
           value={data.location}
@@ -387,7 +387,7 @@ const LocationStep: React.FC<{ data: OnboardingData; updateData: (key: keyof Onb
       </div>
 
       <div className="flex items-center gap-3 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-xl">
-        <GlobeAltIcon className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+        <Globe className="w-5 h-5 text-blue-600 dark:text-blue-400" />
         <div>
           <p className="text-sm font-medium text-blue-900 dark:text-blue-100">
             Open to remote work?
@@ -444,7 +444,7 @@ const GoalsStep: React.FC<{ data: OnboardingData; updateData: (key: keyof Onboar
               ? 'border-emerald-500 bg-emerald-500'
               : 'border-gray-300 dark:border-gray-600'
               }`}>
-              {data.goals.includes(goal) && <CheckIcon className="w-3 h-3 text-white" />}
+              {data.goals.includes(goal) && <Check className="w-3 h-3 text-white" />}
             </div>
             <span className="font-medium text-gray-900 dark:text-white">{goal}</span>
           </div>

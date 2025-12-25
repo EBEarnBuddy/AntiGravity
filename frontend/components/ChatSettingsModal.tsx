@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { XMarkIcon, Cog6ToothIcon, TrashIcon, CheckIcon, CloudArrowUpIcon } from '@heroicons/react/24/solid';
+import { X, Settings, Trash, Check, CloudUpload } from 'lucide-react';
 import { uploadImage } from '../lib/cloudinary';
 import { roomAPI } from '../lib/axios';
+import { BrutalistSpinner } from '@/components/ui/BrutalistSpinner';
 
 interface ChatSettingsModalProps {
     isOpen: boolean;
@@ -93,72 +94,74 @@ const ChatSettingsModal: React.FC<ChatSettingsModalProps> = ({ isOpen, onClose, 
                     initial={{ scale: 0.95, opacity: 0, y: 20 }}
                     animate={{ scale: 1, opacity: 1, y: 0 }}
                     exit={{ scale: 0.95, opacity: 0, y: 20 }}
-                    className="relative w-full max-w-md bg-white rounded-2xl shadow-xl overflow-hidden flex flex-col"
+                    className="relative w-full max-w-md bg-white border-4 border-slate-900 rounded-none shadow-[8px_8px_0px_0px_rgba(15,23,42,1)] overflow-hidden flex flex-col"
                 >
-                    <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
-                        <h2 className="text-xl font-black text-slate-900 flex items-center gap-2">
-                            <Cog6ToothIcon className="w-5 h-5" /> Chat Settings
+                    <div className="p-6 border-b-4 border-slate-900 flex justify-between items-center bg-white">
+                        <h2 className="text-xl font-black text-slate-900 flex items-center gap-2 uppercase tracking-tight">
+                            <Settings className="w-6 h-6" /> Chat Settings
                         </h2>
-                        <button onClick={onClose} className="p-2 hover:bg-slate-200 rounded-full transition">
-                            <XMarkIcon className="w-5 h-5 text-slate-500" />
+                        <button onClick={onClose} className="p-2 hover:bg-slate-100 border-2 border-transparent hover:border-slate-900 transition-all">
+                            <X className="w-6 h-6 text-slate-900 stroke-[3]" />
                         </button>
                     </div>
 
-                    <div className="p-6 space-y-4">
+                    <div className="p-6 space-y-6">
                         {/* Avatar */}
-                        <div className="flex flex-col items-center gap-3">
-                            <div className="w-20 h-20 bg-slate-100 rounded-full border-2 border-slate-900 overflow-hidden relative group">
+                        <div className="flex flex-col items-center gap-4">
+                            <div className="w-24 h-24 bg-slate-100 border-4 border-slate-900 overflow-hidden relative group shadow-[4px_4px_0px_0px_rgba(15,23,42,1)]">
                                 {avatar ? (
                                     <img src={avatar} alt="Avatar" className="w-full h-full object-cover" />
                                 ) : (
-                                    <div className="w-full h-full flex items-center justify-center text-slate-400 font-bold">Img</div>
+                                    <div className="w-full h-full flex items-center justify-center text-slate-400 font-bold text-xl">IMG</div>
                                 )}
                                 <label className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition cursor-pointer">
-                                    <CloudArrowUpIcon className="w-6 h-6 text-white" />
+                                    <CloudUpload className="w-8 h-8 text-white" />
                                     <input type="file" className="hidden" accept="image/*" onChange={handleFileChange} />
                                 </label>
                             </div>
-                            <span className="text-xs font-bold text-slate-500 uppercase">Change Image</span>
+                            <span className="text-xs font-black text-slate-500 uppercase tracking-widest bg-slate-100 px-2 py-1 border border-slate-900">Change Image</span>
                         </div>
 
                         {/* Name */}
                         <div>
-                            <label className="text-xs font-bold text-slate-900 uppercase mb-1 block">Chat Name</label>
+                            <label className="text-sm font-black text-slate-900 uppercase mb-2 block tracking-wide">Chat Name</label>
                             <input
                                 type="text"
                                 value={name}
                                 onChange={(e) => setName(e.target.value)}
-                                className="w-full px-4 py-2 border-2 border-slate-200 rounded-lg font-bold focus:border-slate-900 focus:outline-none"
+                                className="w-full px-4 py-3 border-2 border-slate-900 outline-none font-bold text-slate-900 focus:shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] transition-all placeholder:text-slate-300"
+                                placeholder="ENTER CHAT NAME"
                             />
                         </div>
 
                         {/* Description */}
                         <div>
-                            <label className="text-xs font-bold text-slate-900 uppercase mb-1 block">Description</label>
+                            <label className="text-sm font-black text-slate-900 uppercase mb-2 block tracking-wide">Description</label>
                             <textarea
                                 value={description}
                                 onChange={(e) => setDescription(e.target.value)}
                                 rows={3}
-                                className="w-full px-4 py-2 border-2 border-slate-200 rounded-lg font-medium text-sm focus:border-slate-900 focus:outline-none resize-none"
+                                className="w-full px-4 py-3 border-2 border-slate-900 outline-none font-medium text-slate-900 focus:shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] transition-all resize-none placeholder:text-slate-300"
+                                placeholder="What is this chat about?"
                             />
                         </div>
                     </div>
 
-                    <div className="p-4 border-t border-slate-100 bg-slate-50 flex flex-col gap-3">
+                    <div className="p-6 border-t-4 border-slate-900 bg-slate-50 flex flex-col gap-4">
                         <button
                             onClick={handleSave}
                             disabled={loading}
-                            className="w-full py-3 bg-slate-900 text-white font-bold rounded-xl hover:bg-slate-800 transition flex items-center justify-center gap-2 uppercase text-sm disabled:opacity-50"
+                            className="w-full py-4 bg-slate-900 text-white font-black border-2 border-slate-900 hover:bg-slate-800 transition flex items-center justify-center gap-2 uppercase tracking-widest shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] disabled:opacity-50 disabled:cursor-wait"
                         >
-                            {loading ? 'Saving...' : <><CheckIcon className="w-4 h-4" /> Save Changes</>}
+                            {loading ? <BrutalistSpinner size={20} className="text-white border-white" /> : <><Check className="w-5 h-5 stroke-[3]" /> Save Changes</>}
                         </button>
 
                         <button
                             onClick={handleDelete}
                             disabled={loading}
-                            className="w-full py-3 bg-red-100 text-red-600 font-bold rounded-xl hover:bg-red-200 transition flex items-center justify-center gap-2 uppercase text-sm"
+                            className="w-full py-4 bg-red-500 text-white font-black border-2 border-slate-900 hover:bg-red-600 transition flex items-center justify-center gap-2 uppercase tracking-widest shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] disabled:opacity-50 disabled:cursor-wait"
                         >
-                            <TrashIcon className="w-4 h-4" /> Delete Chat
+                            <Trash className="w-5 h-5 stroke-[3]" /> Delete Chat
                         </button>
                     </div>
                 </motion.div>

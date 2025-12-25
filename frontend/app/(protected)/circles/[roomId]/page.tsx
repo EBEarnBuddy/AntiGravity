@@ -6,15 +6,15 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useRoomMessages, useRooms } from '@/hooks/useFirestore';
 import { useAuth } from '@/contexts/AuthContext';
 import {
-    PaperAirplaneIcon,
-    PaperClipIcon,
-    EllipsisVerticalIcon,
-    ChevronLeftIcon,
-    UserGroupIcon,
-    UserPlusIcon,
-    Cog6ToothIcon,
-    ArrowRightOnRectangleIcon
-} from '@heroicons/react/24/solid';
+    Send,
+    Paperclip,
+    MoreVertical,
+    ChevronLeft,
+    Users,
+    UserPlus,
+    Settings,
+    LogOut
+} from 'lucide-react';
 import { roomAPI } from '@/lib/axios'; // Import API for leaving
 import PendingRequestsModal from '@/components/PendingRequestsModal';
 import CollaborationRequestsModal from '@/components/CollaborationRequestsModal';
@@ -151,7 +151,7 @@ const RoomChatPage: React.FC = () => {
             <div className="min-h-screen flex items-center justify-center bg-slate-50">
                 <div className="max-w-md text-center space-y-4 p-8">
                     <div className="w-20 h-20 mx-auto bg-yellow-100 rounded-full flex items-center justify-center">
-                        <UserPlusIcon className="w-10 h-10 text-yellow-600" />
+                        <UserPlus className="w-10 h-10 text-yellow-600" />
                     </div>
                     <h2 className="text-2xl font-black text-slate-900">Request Pending</h2>
                     <p className="text-slate-600 font-medium">
@@ -173,7 +173,7 @@ const RoomChatPage: React.FC = () => {
             <div className="min-h-screen flex items-center justify-center bg-slate-50">
                 <div className="max-w-md text-center space-y-4 p-8">
                     <div className="w-20 h-20 mx-auto bg-red-100 rounded-full flex items-center justify-center">
-                        <UserGroupIcon className="w-10 h-10 text-red-600" />
+                        <Users className="w-10 h-10 text-red-600" />
                     </div>
                     <h2 className="text-2xl font-black text-slate-900">Access Denied</h2>
                     <p className="text-slate-600 font-medium">
@@ -209,7 +209,7 @@ const RoomChatPage: React.FC = () => {
                         onClick={() => router.push('/circles')}
                         className="p-2 hover:bg-slate-100 rounded-full transition duration-200 group flex-shrink-0"
                     >
-                        <ChevronLeftIcon className="w-6 h-6 text-slate-600 group-hover:text-slate-900" />
+                        <ChevronLeft className="w-6 h-6 text-slate-600 group-hover:text-slate-900" />
                     </button>
 
                     <div className="w-10 h-10 bg-slate-50 border-2 border-slate-900 flex items-center justify-center overflow-hidden relative flex-shrink-0">
@@ -240,7 +240,7 @@ const RoomChatPage: React.FC = () => {
                         onClick={() => setShowMenu(!showMenu)}
                         className="p-2 hover:bg-slate-100 rounded-full text-slate-400 hover:text-slate-900 transition"
                     >
-                        <EllipsisVerticalIcon className="w-5 h-5" />
+                        <MoreVertical className="w-5 h-5" />
                     </button>
 
                     {/* Dropdown Menu */}
@@ -254,7 +254,7 @@ const RoomChatPage: React.FC = () => {
                                     }}
                                     className="w-full px-4 py-3 text-left text-sm font-bold text-slate-900 hover:bg-green-50 hover:text-green-700 transition flex items-center gap-2 border-b border-slate-200"
                                 >
-                                    <UserPlusIcon className="w-4 h-4" />
+                                    <UserPlus className="w-4 h-4" />
                                     Manage Requests
                                 </button>
                             )}
@@ -266,7 +266,7 @@ const RoomChatPage: React.FC = () => {
                                     }}
                                     className="w-full px-4 py-3 text-left text-sm font-bold text-slate-900 hover:bg-purple-50 hover:text-purple-700 transition flex items-center gap-2"
                                 >
-                                    <UserGroupIcon className="w-4 h-4" />
+                                    <Users className="w-4 h-4" />
                                     Collaboration Requests
                                 </button>
                             )}
@@ -278,7 +278,7 @@ const RoomChatPage: React.FC = () => {
                                     }}
                                     className="w-full px-4 py-3 text-left text-sm font-bold text-slate-900 hover:bg-slate-50 transition flex items-center gap-2 rounded-b-xl border-t border-slate-200"
                                 >
-                                    <Cog6ToothIcon className="w-4 h-4" />
+                                    <Settings className="w-4 h-4" />
                                     Chat Settings
                                 </button>
                             )}
@@ -298,7 +298,7 @@ const RoomChatPage: React.FC = () => {
                                     }}
                                     className="w-full px-4 py-3 text-left text-sm font-bold text-red-600 hover:bg-red-50 transition flex items-center gap-2 rounded-b-xl border-t border-slate-200"
                                 >
-                                    <ArrowRightOnRectangleIcon className="w-4 h-4" />
+                                    <LogOut className="w-4 h-4" />
                                     Leave Circle
                                 </button>
                             )}
@@ -317,7 +317,7 @@ const RoomChatPage: React.FC = () => {
                     {messages.length === 0 && !loading && (
                         <div className="flex flex-col items-center justify-center flex-1 text-slate-400 space-y-4">
                             <div className="w-16 h-16 bg-slate-100 rounded-2xl flex items-center justify-center">
-                                <UserGroupIcon className="w-8 h-8 text-slate-300" />
+                                <Users className="w-8 h-8 text-slate-300" />
                             </div>
                             <p className="font-bold">No messages yet. Start the conversation!</p>
                         </div>
@@ -474,7 +474,7 @@ const RoomChatPage: React.FC = () => {
                                 type="button"
                                 className="p-2 text-slate-400 hover:text-green-600 hover:bg-green-50 transition duration-200"
                             >
-                                <PaperClipIcon className="w-5 h-5" />
+                                <Paperclip className="w-5 h-5" />
                             </button>
                         </div>
                         <button
@@ -487,8 +487,8 @@ const RoomChatPage: React.FC = () => {
                             }}
                             className="px-4 py-2 bg-slate-900 text-white border-2 border-slate-900 hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed transition transform active:scale-95 font-bold uppercase text-xs flex items-center gap-2"
                         >
-                            <PaperAirplaneIcon className="w-4 h-4" />
-                            PaperAirplaneIcon
+                            <Send className="w-4 h-4" />
+                            Send
                         </button>
                     </div>
                 </form>

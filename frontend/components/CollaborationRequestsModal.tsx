@@ -2,8 +2,9 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { XMarkIcon, CheckIcon, XCircleIcon, UserGroupIcon, ArrowPathIcon } from '@heroicons/react/24/solid';
+import { X, Check, XCircle, Users, RefreshCw } from 'lucide-react';
 import { collaborationAPI } from '@/lib/axios';
+import { BrutalistSpinner } from '@/components/ui/BrutalistSpinner';
 
 interface CollabRequest {
     _id: string;
@@ -94,36 +95,36 @@ const CollaborationRequestsModal: React.FC<CollaborationRequestsModalProps> = ({
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.95 }}
-                    className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[80vh] overflow-hidden border-2 border-slate-900"
+                    className="bg-white rounded-none shadow-[8px_8px_0px_0px_rgba(15,23,42,1)] max-w-2xl w-full max-h-[80vh] overflow-hidden border-4 border-slate-900"
                 >
                     {/* Header */}
-                    <div className="bg-purple-600 text-white p-6 flex items-center justify-between">
+                    <div className="bg-purple-600 text-white p-6 flex items-center justify-between border-b-4 border-slate-900">
                         <div className="flex items-center gap-3">
-                            <UserGroupIcon className="w-6 h-6" />
+                            <Users className="w-8 h-8" />
                             <div>
-                                <h2 className="text-2xl font-black">Collaboration Requests</h2>
-                                <p className="text-purple-100 text-sm font-medium">Pending collaboration invitations</p>
+                                <h2 className="text-2xl font-black uppercase tracking-tight">Collaboration Requests</h2>
+                                <p className="text-purple-100 text-sm font-bold">Pending collaboration invitations</p>
                             </div>
                         </div>
                         <button
                             onClick={onClose}
-                            className="p-2 hover:bg-purple-700 rounded-lg transition"
+                            className="p-2 hover:bg-purple-700 transition border-2 border-transparent hover:border-white"
                         >
-                            <XMarkIcon className="w-6 h-6" />
+                            <X className="w-6 h-6" strokeWidth={3} />
                         </button>
                     </div>
 
                     {/* Content */}
-                    <div className="p-6 overflow-y-auto max-h-[60vh]">
+                    <div className="p-6 overflow-y-auto max-h-[60vh] bg-slate-50">
                         {loading ? (
                             <div className="flex items-center justify-center py-12">
-                                <ArrowPathIcon className="w-8 h-8 animate-spin text-purple-600" />
+                                <BrutalistSpinner size={32} className="text-purple-600 border-purple-600" />
                             </div>
                         ) : requests.length === 0 ? (
-                            <div className="text-center py-12">
-                                <UserGroupIcon className="w-16 h-16 mx-auto text-slate-300 mb-4" />
-                                <h3 className="text-xl font-bold text-slate-900 mb-2">No Pending Requests</h3>
-                                <p className="text-slate-500">No one has requested to collaborate with your circles yet.</p>
+                            <div className="text-center py-12 border-4 border-dashed border-slate-300 bg-white">
+                                <Users className="w-16 h-16 mx-auto text-slate-300 mb-4" />
+                                <h3 className="text-xl font-black text-slate-900 mb-2 uppercase">No Pending Requests</h3>
+                                <p className="text-slate-500 font-bold">No one has requested to collaborate with your circles yet.</p>
                             </div>
                         ) : (
                             <div className="space-y-4">
@@ -134,12 +135,12 @@ const CollaborationRequestsModal: React.FC<CollaborationRequestsModalProps> = ({
                                         initial={{ opacity: 0, y: 20 }}
                                         animate={{ opacity: 1, y: 0 }}
                                         exit={{ opacity: 0, x: -100 }}
-                                        className="bg-slate-50 border-2 border-slate-200 rounded-xl p-4 hover:border-purple-500 transition-colors"
+                                        className="bg-white border-4 border-slate-900 p-4 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] transition-all"
                                     >
                                         {/* Request Info */}
                                         <div className="flex items-start gap-4 mb-4">
                                             {/* Avatar */}
-                                            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center text-white font-bold text-lg overflow-hidden flex-shrink-0">
+                                            <div className="w-12 h-12 border-2 border-slate-900 bg-purple-100 flex items-center justify-center text-purple-700 font-black text-lg overflow-hidden flex-shrink-0">
                                                 {request.fromOwner.photoURL ? (
                                                     <img
                                                         src={request.fromOwner.photoURL}
@@ -153,14 +154,14 @@ const CollaborationRequestsModal: React.FC<CollaborationRequestsModalProps> = ({
 
                                             {/* Details */}
                                             <div className="flex-1 min-w-0">
-                                                <h4 className="font-bold text-slate-900 mb-1">
+                                                <h4 className="font-black text-slate-900 mb-1 uppercase text-lg">
                                                     {request.fromOwner.displayName || 'Anonymous User'}
                                                 </h4>
-                                                <p className="text-sm text-slate-600 mb-2">
-                                                    Wants to collaborate <span className="font-bold text-purple-600">{request.fromCircle.name}</span> with your circle <span className="font-bold text-purple-600">{request.toCircle.name}</span>
+                                                <p className="text-sm text-slate-600 mb-3 font-medium">
+                                                    Wants to collaborate <span className="font-black text-purple-700 bg-purple-100 px-1 border border-purple-200">{request.fromCircle.name}</span> with your circle <span className="font-black text-purple-700 bg-purple-100 px-1 border border-purple-200">{request.toCircle.name}</span>
                                                 </p>
                                                 {request.message && (
-                                                    <div className="bg-white border border-slate-200 rounded-lg p-3 text-sm text-slate-700 italic">
+                                                    <div className="bg-slate-100 border-l-4 border-slate-900 p-3 text-sm text-slate-700 font-medium italic">
                                                         "{request.message}"
                                                     </div>
                                                 )}
@@ -168,28 +169,28 @@ const CollaborationRequestsModal: React.FC<CollaborationRequestsModalProps> = ({
                                         </div>
 
                                         {/* Actions */}
-                                        <div className="flex gap-2">
+                                        <div className="flex gap-4">
                                             <button
                                                 onClick={() => handleAccept(request._id)}
                                                 disabled={processingId === request._id}
-                                                className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg font-bold hover:bg-green-700 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                                                className="flex-1 px-4 py-3 bg-green-500 text-white border-2 border-slate-900 font-black uppercase tracking-wider hover:bg-green-600 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                                             >
                                                 {processingId === request._id ? (
-                                                    <ArrowPathIcon className="w-4 h-4 animate-spin" />
+                                                    <BrutalistSpinner size={16} className="text-white border-white" />
                                                 ) : (
-                                                    <CheckIcon className="w-4 h-4" />
+                                                    <Check className="w-5 h-5" strokeWidth={3} />
                                                 )}
                                                 Accept
                                             </button>
                                             <button
                                                 onClick={() => handleReject(request._id)}
                                                 disabled={processingId === request._id}
-                                                className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg font-bold hover:bg-red-700 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                                                className="flex-1 px-4 py-3 bg-red-500 text-white border-2 border-slate-900 font-black uppercase tracking-wider hover:bg-red-600 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                                             >
                                                 {processingId === request._id ? (
-                                                    <ArrowPathIcon className="w-4 h-4 animate-spin" />
+                                                    <BrutalistSpinner size={16} className="text-white border-white" />
                                                 ) : (
-                                                    <XCircleIcon className="w-4 h-4" />
+                                                    <XCircle className="w-5 h-5" strokeWidth={3} />
                                                 )}
                                                 Reject
                                             </button>

@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { ArrowTrendingUpIcon, UserGroupIcon, BoltIcon } from '@heroicons/react/24/solid';
+import { TrendingUp, Users, Zap } from 'lucide-react';
 import { FloatingCard } from './floating-card';
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -46,10 +46,10 @@ export const BuilderFeed: React.FC = () => {
 
   const getTypeIcon = (type: string) => {
     switch (type) {
-      case 'launch': return ArrowTrendingUpIcon;
-      case 'join': return UserGroupIcon;
-      case 'fund': return ArrowTrendingUpIcon;
-      default: return BoltIcon;
+      case 'launch': return TrendingUp;
+      case 'join': return Users;
+      case 'fund': return TrendingUp;
+      default: return Zap;
     }
   };
 

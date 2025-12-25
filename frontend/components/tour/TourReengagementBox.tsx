@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { XMarkIcon, PlayIcon } from '@heroicons/react/24/solid';
+import { X, Play } from 'lucide-react';
 import { useTour } from './TourContext';
 
 export const TourReengagementBox: React.FC = () => {
@@ -36,7 +36,7 @@ export const TourReengagementBox: React.FC = () => {
                         onClick={dismissForever}
                         className="text-slate-400 hover:text-slate-900 transition"
                     >
-                        <XMarkIcon className="w-5 h-5" />
+                        <X className="w-5 h-5" />
                     </button>
                 </div>
 
@@ -49,7 +49,7 @@ export const TourReengagementBox: React.FC = () => {
                         onClick={startTour}
                         className="flex-1 px-4 py-2 bg-green-600 text-white font-black text-xs uppercase tracking-widest border-2 border-slate-900 hover:bg-green-500 transition flex items-center justify-center gap-2 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]"
                     >
-                        <PlayIcon className="w-3 h-3" />
+                        <Play className="w-3 h-3" />
                         Take Tour
                     </button>
                     <button

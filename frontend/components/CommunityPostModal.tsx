@@ -1,10 +1,11 @@
 import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { XMarkIcon, PaperAirplaneIcon, PhotoIcon, DocumentTextIcon, FaceSmileIcon, PaperClipIcon, VideoCameraIcon, MusicalNoteIcon, MapPinIcon, CalendarIcon, HashtagIcon, GlobeAltIcon, UserGroupIcon, BoltIcon, HeartIcon, StarIcon, HandThumbUpIcon, RocketLaunchIcon, CodeBracketIcon, PaintBrushIcon, CurrencyDollarIcon, SparklesIcon, CpuChipIcon } from '@heroicons/react/24/solid';
+import { X, Send, Image, FileText, Smile, Paperclip, Video, Music, MapPin, Calendar, Hash, Globe, Users, Zap, Heart, Star, ThumbsUp, Rocket, Code, Paintbrush, DollarSign, Sparkles, Cpu } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { usePods } from '../hooks/useFirestore';
 import { FirestoreService } from '../lib/firestore';
 import { communityPostsAPI } from '../lib/axios';
+import { BrutalistSpinner } from '@/components/ui/BrutalistSpinner';
 
 interface CommunityPostModalProps {
   isOpen: boolean;
@@ -242,38 +243,38 @@ const CommunityPostModal: React.FC<CommunityPostModalProps> = ({
           onClick={onClose}
         >
           <motion.div
-            className="bg-white dark:bg-gray-900 rounded-2xl p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+            className="bg-white rounded-none border-4 border-slate-900 shadow-[8px_8px_0px_0px_rgba(15,23,42,1)] p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto"
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.9, opacity: 0 }}
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
-            <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center justify-between mb-6 border-b-4 border-slate-900 pb-4">
               <div>
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Create Post</h2>
-                <p className="text-gray-600 dark:text-gray-400">Share with the builder community</p>
+                <h2 className="text-3xl font-black text-slate-900 uppercase tracking-tight">Create Post</h2>
+                <p className="text-slate-600 font-bold">Share with the builder community</p>
               </div>
               <button
                 onClick={onClose}
-                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+                className="p-2 border-2 border-transparent hover:border-slate-900 transition-all hover:bg-slate-100"
               >
-                <XMarkIcon className="w-5 h-5" />
+                <X className="w-6 h-6 stroke-[3]" />
               </button>
             </div>
 
             {/* User Info */}
-            <div className="flex items-center gap-3 mb-6">
+            <div className="flex items-center gap-4 mb-6 bg-slate-50 p-4 border-2 border-slate-900">
               <img
                 src={currentUser?.photoURL || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop&crop=face"}
                 alt="Your avatar"
-                className="w-10 h-10 rounded-full object-cover"
+                className="w-12 h-12 rounded-none border-2 border-slate-900 object-cover shadow-[4px_4px_0px_0px_rgba(15,23,42,1)]"
               />
               <div>
-                <p className="font-semibold text-gray-900 dark:text-white">
+                <p className="font-black text-lg text-slate-900 uppercase">
                   {currentUser?.displayName || 'Anonymous User'}
                 </p>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
+                <p className="text-sm font-bold text-slate-500">
                   {postData.selectedPod ? `Posting to ${postData.selectedPod}` : 'Posting to community'}
                 </p>
               </div>
@@ -286,19 +287,19 @@ const CommunityPostModal: React.FC<CommunityPostModalProps> = ({
                   value={postData.content}
                   onChange={(e) => handleContentChange(e.target.value)}
                   placeholder="What's happening in the builder community?"
-                  className="w-full p-4 border border-gray-200 dark:border-gray-700 rounded-xl bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-100 resize-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-lg min-h-[120px]"
+                  className="w-full p-4 border-2 border-slate-900 rounded-none bg-white text-slate-900 resize-none focus:ring-0 focus:outline-none focus:shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] transition-all font-medium text-lg min-h-[120px]"
                 />
               </div>
 
               {/* Emoji Display */}
               {postData.emoji && (
                 <div className="flex items-center gap-2">
-                  <span className="text-2xl">{postData.emoji}</span>
+                  <span className="text-4xl">{postData.emoji}</span>
                   <button
                     onClick={() => setPostData(prev => ({ ...prev, emoji: undefined }))}
-                    className="text-gray-500 hover:text-red-500"
+                    className="text-slate-400 hover:text-red-500 border-2 border-transparent hover:border-red-500 p-1"
                   >
-                    <XMarkIcon className="w-4 h-4" />
+                    <X className="w-4 h-4" />
                   </button>
                 </div>
               )}
@@ -309,14 +310,14 @@ const CommunityPostModal: React.FC<CommunityPostModalProps> = ({
                   {postData.tags.map((tag, index) => (
                     <span
                       key={index}
-                      className="px-3 py-1 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 rounded-full text-sm flex items-center gap-2"
+                      className="px-3 py-1 bg-green-100 border-2 border-slate-900 text-green-800 text-sm font-bold flex items-center gap-2 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)]"
                     >
                       #{tag}
                       <button
                         onClick={() => removeTag(tag)}
-                        className="hover:text-emerald-900 dark:hover:text-emerald-100"
+                        className="hover:text-red-600"
                       >
-                        <XMarkIcon className="w-3 h-3" />
+                        <X className="w-3 h-3 stroke-[3]" />
                       </button>
                     </span>
                   ))}
@@ -325,19 +326,19 @@ const CommunityPostModal: React.FC<CommunityPostModalProps> = ({
 
               {/* Images Preview */}
               {postData.images.length > 0 && (
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-2 gap-4">
                   {postData.images.map((image, index) => (
-                    <div key={index} className="relative group">
+                    <div key={index} className="relative group border-2 border-slate-900 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)]">
                       <img
                         src={URL.createObjectURL(image)}
                         alt={`Upload ${index + 1}`}
-                        className="w-full h-32 object-cover rounded-lg"
+                        className="w-full h-32 object-cover"
                       />
                       <button
                         onClick={() => removeImage(index)}
-                        className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                        className="absolute top-2 right-2 bg-red-500 text-white border-2 border-slate-900 w-8 h-8 flex items-center justify-center shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none transition-all"
                       >
-                        <XMarkIcon className="w-4 h-4" />
+                        <X className="w-4 h-4 stroke-[3]" />
                       </button>
                     </div>
                   ))}
@@ -348,16 +349,16 @@ const CommunityPostModal: React.FC<CommunityPostModalProps> = ({
               {postData.documents.length > 0 && (
                 <div className="space-y-2">
                   {postData.documents.map((doc, index) => (
-                    <div key={index} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                    <div key={index} className="flex items-center justify-between p-3 bg-slate-50 border-2 border-slate-900 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)]">
                       <div className="flex items-center gap-3">
-                        <DocumentTextIcon className="w-5 h-5 text-gray-500" />
-                        <span className="text-sm text-gray-700 dark:text-gray-300">{doc.name}</span>
+                        <FileText className="w-6 h-6 text-slate-700" />
+                        <span className="text-sm font-bold text-slate-900">{doc.name}</span>
                       </div>
                       <button
                         onClick={() => removeDocument(index)}
-                        className="text-red-500 hover:text-red-700"
+                        className="text-slate-400 hover:text-red-500"
                       >
-                        <XMarkIcon className="w-4 h-4" />
+                        <X className="w-5 h-5 stroke-[3]" />
                       </button>
                     </div>
                   ))}
@@ -365,15 +366,15 @@ const CommunityPostModal: React.FC<CommunityPostModalProps> = ({
               )}
 
               {/* Action Buttons */}
-              <div className="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-700">
-                <div className="flex items-center gap-2">
+              <div className="flex items-center justify-between pt-6 mt-6 border-t-4 border-slate-900">
+                <div className="flex items-center gap-3">
                   {/* Image Upload */}
                   <button
                     onClick={() => fileInputRef.current?.click()}
-                    className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+                    className="p-3 border-2 border-slate-900 hover:bg-slate-100 hover:shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] transition-all"
                     title="Add image"
                   >
-                    <PhotoIcon className="w-5 h-5 text-gray-500" />
+                    <Image className="w-5 h-5 text-slate-900" />
                   </button>
                   <input
                     ref={fileInputRef}
@@ -387,10 +388,10 @@ const CommunityPostModal: React.FC<CommunityPostModalProps> = ({
                   {/* Document Upload */}
                   <button
                     onClick={() => documentInputRef.current?.click()}
-                    className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+                    className="p-3 border-2 border-slate-900 hover:bg-slate-100 hover:shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] transition-all"
                     title="Add document"
                   >
-                    <DocumentTextIcon className="w-5 h-5 text-gray-500" />
+                    <FileText className="w-5 h-5 text-slate-900" />
                   </button>
                   <input
                     ref={documentInputRef}
@@ -405,25 +406,25 @@ const CommunityPostModal: React.FC<CommunityPostModalProps> = ({
                   <div className="relative">
                     <button
                       onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-                      className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+                      className="p-3 border-2 border-slate-900 hover:bg-slate-100 hover:shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] transition-all"
                       title="Add emoji"
                     >
-                      <FaceSmileIcon className="w-5 h-5 text-gray-500" />
+                      <Smile className="w-5 h-5 text-slate-900" />
                     </button>
 
                     <AnimatePresence>
                       {showEmojiPicker && (
                         <motion.div
-                          className="absolute bottom-full left-0 mb-2 p-3 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 grid grid-cols-8 gap-1 z-10"
-                          initial={{ opacity: 0, scale: 0.9 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          exit={{ opacity: 0, scale: 0.9 }}
+                          className="absolute bottom-full left-0 mb-4 p-4 bg-white border-2 border-slate-900 shadow-[8px_8px_0px_0px_rgba(15,23,42,1)] grid grid-cols-8 gap-2 z-10 w-80"
+                          initial={{ opacity: 0, scale: 0.9, y: 10 }}
+                          animate={{ opacity: 1, scale: 1, y: 0 }}
+                          exit={{ opacity: 0, scale: 0.9, y: 10 }}
                         >
                           {emojis.map((emoji, index) => (
                             <button
                               key={index}
                               onClick={() => addEmoji(emoji.emoji)}
-                              className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors text-lg"
+                              className="p-2 hover:bg-slate-100 border border-transparent hover:border-slate-900 text-xl transition-all"
                               title={emoji.name}
                             >
                               {emoji.emoji}
@@ -438,19 +439,19 @@ const CommunityPostModal: React.FC<CommunityPostModalProps> = ({
                   <div className="relative">
                     <button
                       onClick={() => setShowPodSelector(!showPodSelector)}
-                      className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+                      className="p-3 border-2 border-slate-900 hover:bg-slate-100 hover:shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] transition-all"
                       title="Select pod"
                     >
-                      <HashtagIcon className="w-5 h-5 text-gray-500" />
+                      <Hash className="w-5 h-5 text-slate-900" />
                     </button>
 
                     <AnimatePresence>
                       {showPodSelector && (
                         <motion.div
-                          className="absolute bottom-full left-0 mb-2 p-3 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 max-h-48 overflow-y-auto z-10"
-                          initial={{ opacity: 0, scale: 0.9 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          exit={{ opacity: 0, scale: 0.9 }}
+                          className="absolute bottom-full left-0 mb-4 p-2 bg-white border-2 border-slate-900 shadow-[8px_8px_0px_0px_rgba(15,23,42,1)] max-h-48 overflow-y-auto z-10 w-48"
+                          initial={{ opacity: 0, scale: 0.9, y: 10 }}
+                          animate={{ opacity: 1, scale: 1, y: 0 }}
+                          exit={{ opacity: 0, scale: 0.9, y: 10 }}
                         >
                           <div className="space-y-1">
                             <button
@@ -458,7 +459,7 @@ const CommunityPostModal: React.FC<CommunityPostModalProps> = ({
                                 setPostData(prev => ({ ...prev, selectedPod: undefined }));
                                 setShowPodSelector(false);
                               }}
-                              className="w-full text-left px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded text-sm"
+                              className="w-full text-left px-3 py-2 hover:bg-slate-100 border-2 border-transparent hover:border-slate-900 font-bold text-sm transition-all"
                             >
                               Community
                             </button>
@@ -469,7 +470,7 @@ const CommunityPostModal: React.FC<CommunityPostModalProps> = ({
                                   setPostData(prev => ({ ...prev, selectedPod: pod.name }));
                                   setShowPodSelector(false);
                                 }}
-                                className="w-full text-left px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded text-sm"
+                                className="w-full text-left px-3 py-2 hover:bg-slate-100 border-2 border-transparent hover:border-slate-900 font-bold text-sm transition-all"
                               >
                                 {pod.name}
                               </button>
@@ -481,28 +482,28 @@ const CommunityPostModal: React.FC<CommunityPostModalProps> = ({
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3">
-                  <span className="text-sm text-gray-500">
+                <div className="flex items-center gap-4">
+                  <span className="text-sm font-bold text-slate-500">
                     {postData.content.length}/500
                   </span>
                   <motion.button
                     onClick={handleSubmit}
                     disabled={!canSubmit || isSubmitting}
-                    className={`px-6 py-2 rounded-lg font-semibold transition-all duration-300 flex items-center gap-2 ${canSubmit && !isSubmitting
-                      ? 'bg-gradient-to-r from-emerald-600 to-emerald-500 text-white hover:shadow-lg'
-                      : 'bg-gray-100 dark:bg-gray-800 text-gray-400 cursor-not-allowed'
+                    className={`px-6 py-3 border-2 border-slate-900 font-black uppercase tracking-wider flex items-center gap-2 transition-all ${canSubmit && !isSubmitting
+                      ? 'bg-green-500 text-white shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]'
+                      : 'bg-slate-100 text-slate-400 cursor-not-allowed border-slate-300'
                       }`}
-                    whileHover={{ scale: canSubmit && !isSubmitting ? 1.02 : 1 }}
-                    whileTap={{ scale: canSubmit && !isSubmitting ? 0.98 : 1 }}
+                    whileHover={canSubmit && !isSubmitting ? { scale: 1.02 } : {}}
+                    whileTap={canSubmit && !isSubmitting ? { scale: 0.98 } : {}}
                   >
                     {isSubmitting ? (
                       <>
-                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        <BrutalistSpinner size={16} className="text-white border-white" />
                         Posting...
                       </>
                     ) : (
                       <>
-                        <PaperAirplaneIcon className="w-4 h-4" />
+                        <Send className="w-4 h-4 stroke-[3]" />
                         Post
                       </>
                     )}

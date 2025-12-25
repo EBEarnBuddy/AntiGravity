@@ -1,20 +1,20 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  BellIcon,
-  XMarkIcon,
-  CheckIcon,
-  TrashIcon,
-  Cog6ToothIcon,
-  FunnelIcon,
-  ChatBubbleLeftIcon,
-  UserGroupIcon,
-  BriefcaseIcon,
-  StarIcon,
-  CurrencyDollarIcon,
-  CalendarIcon,
-  ExclamationCircleIcon
-} from '@heroicons/react/24/solid';
+  Bell,
+  X,
+  Check,
+  Trash,
+  Settings,
+  Filter,
+  MessageSquare,
+  Users,
+  Briefcase,
+  Star,
+  DollarSign,
+  Calendar,
+  AlertCircle
+} from 'lucide-react';
 
 interface Notification {
   id: string;
@@ -48,12 +48,12 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
 
   const getNotificationIcon = (type: string) => {
     switch (type) {
-      case 'message': return ChatBubbleLeftIcon;
-      case 'project': return BriefcaseIcon;
-      case 'payment': return CurrencyDollarIcon;
-      case 'social': return UserGroupIcon;
-      case 'system': return Cog6ToothIcon;
-      default: return BellIcon;
+      case 'message': return MessageSquare;
+      case 'project': return Briefcase;
+      case 'payment': return DollarSign;
+      case 'social': return Users;
+      case 'system': return Settings;
+      default: return Bell;
     }
   };
 
@@ -101,7 +101,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
             <div className="p-6 border-b border-gray-200 dark:border-gray-700">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                  <BellIcon className="w-5 h-5" />
+                  <Bell className="w-5 h-5" />
                   Notifications
                   {unreadCount > 0 && (
                     <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full">
@@ -113,7 +113,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
                   onClick={onClose}
                   className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
                 >
-                  <XMarkIcon className="w-5 h-5" />
+                  <X className="w-5 h-5" />
                 </button>
               </div>
 
@@ -144,7 +144,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
                     onClick={onMarkAllAsRead}
                     className="flex items-center gap-2 px-3 py-2 text-sm text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 rounded-lg transition-colors"
                   >
-                    <CheckIcon className="w-4 h-4" />
+                    <Check className="w-4 h-4" />
                     Mark all as read
                   </button>
                 </div>
@@ -155,7 +155,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
             <div className="flex-1 overflow-y-auto">
               {filteredNotifications.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-full text-center p-6">
-                  <BellIcon className="w-12 h-12 text-gray-400 mb-4" />
+                  <Bell className="w-12 h-12 text-gray-400 mb-4" />
                   <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
                     No notifications
                   </h3>
@@ -194,7 +194,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
                                 {notification.title}
                               </h4>
                               {notification.priority === 'high' && (
-                                <ExclamationCircleIcon className="w-4 h-4 text-red-500 flex-shrink-0" />
+                                <AlertCircle className="w-4 h-4 text-red-500 flex-shrink-0" />
                               )}
                             </div>
 
@@ -217,7 +217,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
                                     className="p-1 hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-colors"
                                     title="Mark as read"
                                   >
-                                    <CheckIcon className="w-4 h-4 text-gray-500" />
+                                    <Check className="w-4 h-4 text-gray-500" />
                                   </button>
                                 )}
                                 <button
@@ -225,7 +225,7 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
                                   className="p-1 hover:bg-red-100 dark:hover:bg-red-900/20 rounded transition-colors"
                                   title="Delete"
                                 >
-                                  <TrashIcon className="w-4 h-4 text-gray-500 hover:text-red-500" />
+                                  <Trash className="w-4 h-4 text-gray-500 hover:text-red-500" />
                                 </button>
                               </div>
                             </div>
@@ -241,8 +241,8 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({
             {/* Footer */}
             <div className="p-4 border-t border-gray-200 dark:border-gray-700">
               <button className="w-full flex items-center justify-center gap-2 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
-                <Cog6ToothIcon className="w-4 h-4" />
-                Notification Cog6ToothIcon
+                <Settings className="w-4 h-4" />
+                Notification Settings
               </button>
             </div>
           </motion.div>

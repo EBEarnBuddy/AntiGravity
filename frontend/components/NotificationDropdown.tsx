@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { getSocket } from '../lib/socket';
 import api from '../lib/axios'; // Or create notificationAPI
-import { BellIcon } from '@heroicons/react/24/solid';
+import { Bell } from 'lucide-react';
 import Link from 'next/link';
 
 interface INotification {
@@ -76,7 +76,7 @@ const NotificationDropdown = () => {
                 onClick={() => setIsOpen(!isOpen)}
                 className="relative p-2 rounded-none border-2 border-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[1px] hover:translate-y-[1px] transition-all bg-green-800"
             >
-                <BellIcon className="w-6 h-6 text-white" />
+                <Bell className="w-6 h-6 text-white" />
                 {unreadCount > 0 && (
                     <span className="absolute -top-2 -right-2 inline-flex items-center justify-center w-5 h-5 text-xs font-black text-white bg-red-600 border-2 border-white rounded-none">
                         {unreadCount}

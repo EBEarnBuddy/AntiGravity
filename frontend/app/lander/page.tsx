@@ -4,24 +4,19 @@ import { useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import {
-    CheckIcon,
-    ChevronDownIcon,
-    ChevronRightIcon,
-    Squares2X2Icon,
-    Bars3Icon,
-    PlayIcon,
-    StarIcon,
-    UserGroupIcon,
-    BriefcaseIcon,
-    BoltIcon,
-    ShieldCheckIcon,
-    GlobeAltIcon,
-    ArrowRightIcon,
-    EnvelopeIcon,
-    LinkIcon,
-    CameraIcon
-} from "@heroicons/react/24/solid";
-// Removed lucide-react imports
+    Menu,
+    Play,
+    Star,
+    Users,
+    Briefcase,
+    Zap,
+    ShieldCheck,
+    Globe,
+    ArrowRight,
+    Mail,
+    Link as LinkIconLucide,
+    Camera
+} from "lucide-react";
 
 import Link from "next/link";
 import Image from "next/image";
@@ -120,15 +115,15 @@ function LanderContent() {
                     </div>
 
                     <div className="flex items-center gap-4">
-                        {/* Login - Brutalist Buttons */}
-                        <Link href="/auth" className="hidden md:block bg-white text-slate-900 px-6 py-2.5 rounded-none border-2 border-slate-900 text-lg font-black uppercase tracking-wide shadow-[4px_4px_0px_0px_rgba(255,255,255,0.5)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
+                        {/* Login - Ghost Button */}
+                        <Link href="/auth" className="hidden md:block bg-transparent text-white px-6 py-2.5 rounded-none border-2 border-white text-lg font-black uppercase tracking-wide hover:bg-white/10 transition-all shadow-none">
                             Log In
                         </Link>
-                        {/* Get Started - Brutalist Buttons */}
-                        <Link href="/auth" className="bg-slate-900 border-2 border-white text-white px-6 py-2.5 rounded-none text-lg font-black uppercase tracking-wide hover:bg-slate-800 transition shadow-[4px_4px_0px_0px_rgba(255,255,255,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]">
+                        {/* Get Started - White Fill, Green Text */}
+                        <Link href="/auth" className="bg-white text-green-600 border-2 border-white px-6 py-2.5 rounded-none text-lg font-black uppercase tracking-wide hover:bg-slate-100 transition shadow-none">
                             Get Started
                         </Link>
-                        <button className="lg:hidden text-white"><Bars3Icon className="w-8 h-8" /></button>
+                        <button className="lg:hidden text-white"><Menu className="w-8 h-8" /></button>
                     </div>
                 </div>
             </nav>
@@ -152,7 +147,7 @@ function LanderContent() {
                                     Find a Team
                                 </Link>
                                 <button className="px-6 py-4 rounded-none border-2 border-white text-xl font-black uppercase tracking-wide text-white hover:bg-white/10 transition flex items-center gap-2 shadow-[6px_6px_0px_0px_rgba(255,255,255,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]">
-                                    <PlayIcon className="w-6 h-6 fill-current" /> Watch Video
+                                    <Play className="w-6 h-6 fill-current" /> Watch Video
                                 </button>
                             </div>
                         </div>
@@ -205,12 +200,10 @@ function LanderContent() {
             <section id="how-it-works" className="py-24 bg-black text-white relative overflow-hidden">
                 <div className="container mx-auto px-6 relative z-10 pt-10">
                     <div className="text-center max-w-3xl mx-auto mb-12">
-                        <h2 className="text-4xl md:text-6xl font-bold mb-6">
-                            <span className="bg-clip-text text-transparent bg-gradient-to-r from-green-400 via-emerald-500 to-teal-500">
-                                What EarnBuddy Offers
-                            </span>
+                        <h2 className="text-4xl md:text-6xl font-black mb-6 uppercase tracking-tighter text-white">
+                            What EarnBuddy Offers
                         </h2>
-                        <p className="text-lg text-gray-300">
+                        <p className="text-lg text-gray-300 font-bold">
                             Three powerful ways to connect, collaborate, and grow
                         </p>
                     </div>
@@ -320,7 +313,7 @@ function LanderContent() {
                     tiers={[
                         {
                             name: "Free",
-                            icon: <BoltIcon className="w-6 h-6 text-primary" />,
+                            icon: <Zap className="w-6 h-6 text-primary" />,
                             price: "Free",
                             description: "For exploring and getting started",
                             color: "green",
@@ -340,7 +333,7 @@ function LanderContent() {
                         },
                         {
                             name: "Creator",
-                            icon: <StarIcon className="w-6 h-6 text-amber-500" />,
+                            icon: <Star className="w-6 h-6 text-amber-500" />,
                             price: 29,
                             description: "For founders & freelancers who want to create",
                             color: "amber",
@@ -359,7 +352,7 @@ function LanderContent() {
                         },
                         {
                             name: "Builder",
-                            icon: <BriefcaseIcon className="w-6 h-6 text-blue-500" />,
+                            icon: <Briefcase className="w-6 h-6 text-blue-500" />,
                             price: 79,
                             description: "For serious builders, teams, and agencies",
                             color: "blue",
@@ -378,7 +371,7 @@ function LanderContent() {
                         },
                         {
                             name: "Organization",
-                            icon: <GlobeAltIcon className="w-6 h-6 text-purple-500" />,
+                            icon: <Globe className="w-6 h-6 text-purple-500" />,
                             price: 199,
                             description: "For large teams, incubators, and institutions",
                             color: "purple",
@@ -438,9 +431,9 @@ function LanderContent() {
                                 Where ambitious builders come together to turn ideas into reality. Build. Collaborate. Earn.
                             </p>
                             <div className="flex gap-6">
-                                <EnvelopeIcon className="w-5 h-5 text-green-100 hover:text-white cursor-pointer transition" />
-                                <LinkIcon className="w-5 h-5 text-green-100 hover:text-white cursor-pointer transition" />
-                                <CameraIcon className="w-5 h-5 text-green-100 hover:text-white cursor-pointer transition" />
+                                <Mail className="w-5 h-5 text-green-100 hover:text-white cursor-pointer transition" />
+                                <LinkIconLucide className="w-5 h-5 text-green-100 hover:text-white cursor-pointer transition" />
+                                <Camera className="w-5 h-5 text-green-100 hover:text-white cursor-pointer transition" />
                             </div>
                         </div>
 
@@ -476,7 +469,7 @@ function LanderContent() {
                     <div
                         onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
                         className="fixed bottom-8 right-8 bg-white text-slate-900 rounded-none border-2 border-slate-900 p-3 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] cursor-pointer hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all duration-300 z-[9999]">
-                        <ArrowRightIcon className="w-6 h-6 -rotate-90" />
+                        <ArrowRight className="w-6 h-6 -rotate-90" />
                     </div>
                 </div>
             </footer >

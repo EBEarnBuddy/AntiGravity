@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { UserGroupIcon } from '@heroicons/react/24/solid';
+import { Users } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 const FreelancePage: React.FC = () => {
@@ -19,7 +19,7 @@ const FreelancePage: React.FC = () => {
                 className="max-w-xl w-full border-4 border-slate-900 bg-white p-8 shadow-[8px_8px_0px_0px_rgba(15,23,42,1)]"
             >
                 <div className="w-20 h-20 bg-green-100 border-4 border-slate-900 flex items-center justify-center mx-auto mb-6 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)]">
-                    <UserGroupIcon className="w-10 h-10 text-slate-900" />
+                    <Users className="w-10 h-10 text-slate-900" />
                 </div>
 
                 <h1 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tighter mb-4 uppercase transform -rotate-1">

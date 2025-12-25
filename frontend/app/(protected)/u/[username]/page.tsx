@@ -5,15 +5,15 @@ import { useParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { userAPI } from '@/lib/axios';
 import {
-    UserIcon,
-    MapPinIcon,
-    BriefcaseIcon,
-    CheckCircleIcon,
-    LinkIcon,
-    CalendarIcon,
-    ShareIcon
-} from '@heroicons/react/24/solid';
-import { CheckBadgeIcon } from '@heroicons/react/24/solid';
+    User,
+    MapPin,
+    Briefcase,
+    CheckCircle,
+    Link,
+    Calendar,
+    Share,
+    BadgeCheck
+} from 'lucide-react';
 import BrutalistLoader from '@/components/ui/BrutalistLoader';
 
 const ProfilePage = () => {
@@ -53,7 +53,7 @@ const ProfilePage = () => {
         return (
             <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50 p-4 text-center">
                 <div className="w-20 h-20 bg-red-100 border-4 border-slate-900 flex items-center justify-center mb-6 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)]">
-                    <UserIcon className="w-10 h-10 text-slate-900" />
+                    <User className="w-10 h-10 text-slate-900" />
                 </div>
                 <h1 className="text-4xl font-black text-slate-900 mb-2 uppercase tracking-tighter">User Not Found</h1>
                 <p className="text-slate-600 font-bold mb-8">{error || "The user you are looking for does not exist."}</p>
@@ -82,7 +82,7 @@ const ProfilePage = () => {
                                 <img src={profile.photoURL} alt={profile.displayName} className="w-full h-full object-cover" />
                             ) : (
                                 <div className="w-full h-full bg-green-100 flex items-center justify-center">
-                                    <UserIcon className="w-16 h-16 text-green-600" />
+                                    <User className="w-16 h-16 text-green-600" />
                                 </div>
                             )}
                         </div>
@@ -92,19 +92,19 @@ const ProfilePage = () => {
                             <h1 className="text-3xl md:text-5xl font-black text-slate-900 uppercase tracking-tighter mb-1 flex items-center gap-2">
                                 {profile.displayName}
                                 {profile.badges?.some((b: any) => b.name === 'verified') && (
-                                    <CheckBadgeIcon className="w-8 h-8 text-blue-500" />
+                                    <BadgeCheck className="w-8 h-8 text-blue-500" />
                                 )}
                             </h1>
                             <p className="text-slate-600 font-bold text-lg mb-4 flex flex-wrap items-center gap-4">
                                 <span>@{profile.username || 'user'}</span>
                                 {profile.role && (
                                     <span className="flex items-center gap-1 bg-slate-100 px-2 py-0.5 border-2 border-slate-200 text-xs font-black uppercase tracking-wide">
-                                        <BriefcaseIcon className="w-3 h-3" /> {profile.role}
+                                        <Briefcase className="w-3 h-3" /> {profile.role}
                                     </span>
                                 )}
                                 {profile.location && (
                                     <span className="flex items-center gap-1 text-sm font-medium">
-                                        <MapPinIcon className="w-4 h-4 text-slate-400" /> {profile.location}
+                                        <MapPin className="w-4 h-4 text-slate-400" /> {profile.location}
                                     </span>
                                 )}
                             </p>
@@ -130,7 +130,7 @@ const ProfilePage = () => {
                                 navigator.clipboard.writeText(window.location.href);
                                 alert("Profile link copied!");
                             }}>
-                                <ShareIcon className="w-5 h-5" />
+                                <Share className="w-5 h-5" />
                             </button>
                         </div>
                     </div>
@@ -168,7 +168,7 @@ const ProfilePage = () => {
                     {/* Skills */}
                     <div className="bg-white border-4 border-slate-900 p-6 shadow-[8px_8px_0px_0px_rgba(15,23,42,1)]">
                         <h3 className="text-xl font-black text-slate-900 mb-4 uppercase tracking-tight flex items-center gap-2">
-                            <CheckCircleIcon className="w-5 h-5 text-green-600" /> Skills
+                            <CheckCircle className="w-5 h-5 text-green-600" /> Skills
                         </h3>
                         <div className="flex flex-wrap gap-2">
                             {profile.skills?.length > 0 ? profile.skills.map((skill: string) => (
@@ -187,17 +187,17 @@ const ProfilePage = () => {
                         <div className="space-y-3">
                             {profile.socialLinks?.linkedin && (
                                 <a href={profile.socialLinks.linkedin} target="_blank" className="flex items-center gap-3 text-slate-300 hover:text-white transition-colors">
-                                    <LinkIcon className="w-5 h-5" /> LinkedIn
+                                    <Link className="w-5 h-5" /> LinkedIn
                                 </a>
                             )}
                             {profile.socialLinks?.github && (
                                 <a href={profile.socialLinks.github} target="_blank" className="flex items-center gap-3 text-slate-300 hover:text-white transition-colors">
-                                    <LinkIcon className="w-5 h-5" /> GitHub
+                                    <Link className="w-5 h-5" /> GitHub
                                 </a>
                             )}
                             {profile.socialLinks?.portfolio && (
                                 <a href={profile.socialLinks.portfolio} target="_blank" className="flex items-center gap-3 text-slate-300 hover:text-white transition-colors">
-                                    <LinkIcon className="w-5 h-5" /> Portfolio
+                                    <Link className="w-5 h-5" /> Portfolio
                                 </a>
                             )}
                             {(!profile.socialLinks || Object.keys(profile.socialLinks).length === 0) && (
@@ -244,7 +244,7 @@ const ProfilePage = () => {
                                         {[1, 2, 3].map((i) => (
                                             <div key={i} className="flex flex-col items-center gap-2 min-w-[80px] grayscale opacity-50">
                                                 <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center border-2 border-slate-300">
-                                                    <CheckCircleIcon className="w-8 h-8 text-slate-300" />
+                                                    <CheckCircle className="w-8 h-8 text-slate-300" />
                                                 </div>
                                                 <span className="text-[10px] font-bold uppercase text-slate-400">Locked</span>
                                             </div>
@@ -256,7 +256,7 @@ const ProfilePage = () => {
                                 {/* Activity Timeline (Mock) */}
                                 <div>
                                     <h3 className="text-lg font-black text-slate-900 mb-4 uppercase flex items-center gap-2">
-                                        <CalendarIcon className="w-5 h-5" /> Recent Activity
+                                        <Calendar className="w-5 h-5" /> Recent Activity
                                     </h3>
                                     <div className="relative border-l-2 border-slate-200 ml-3 space-y-8 pl-8 py-2">
                                         <div className="relative">

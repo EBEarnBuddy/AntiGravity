@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { ArrowTrendingUpIcon, UserGroupIcon, BoltIcon, ArrowTopRightOnSquareIcon } from '@heroicons/react/24/solid';
+import { TrendingUp, Users, Zap, ExternalLink } from 'lucide-react';
 import { FloatingCard } from './floating-card';
 import { Pod } from '../../lib/firestore';
 import { useRouter } from 'next/navigation';
@@ -19,7 +19,7 @@ export const TrendingPods: React.FC<TrendingPodsProps> = ({ pods }) => {
     members: pod.memberCount || pod.members?.length || 0,
     growth: (pod as any).growth || '+0%', // Use actual growth data or default to +0%
     gradient: pod.theme,
-    icon: pod.icon === 'Zap' ? BoltIcon : pod.icon === 'Users' ? UserGroupIcon : ArrowTrendingUpIcon
+    icon: pod.icon === 'Zap' ? Zap : pod.icon === 'Users' ? Users : TrendingUp
   }));
 
   return (
@@ -32,7 +32,7 @@ export const TrendingPods: React.FC<TrendingPodsProps> = ({ pods }) => {
           whileHover={{ scale: 1.05 }}
         >
           View All
-          <ArrowTopRightOnSquareIcon className="w-4 h-4" />
+          <ExternalLink className="w-4 h-4" />
         </motion.button>
       </div>
 
@@ -68,7 +68,7 @@ export const TrendingPods: React.FC<TrendingPodsProps> = ({ pods }) => {
                       </div>
                       <p className="text-sm text-slate-600 mb-2 line-clamp-2 font-medium">{pod.description}</p>
                       <div className="flex items-center gap-1 text-xs text-slate-500 font-bold">
-                        <UserGroupIcon className="w-3 h-3" />
+                        <Users className="w-3 h-3" />
                         <span>{pod.members.toLocaleString()} builders</span>
                       </div>
                     </div>

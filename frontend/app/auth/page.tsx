@@ -87,8 +87,8 @@ export default function AuthPage() {
     return (
         <div className="bg-background text-foreground relative">
             {error && (
-                <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-50 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded shadow-lg max-w-sm w-full text-center animate-in fade-in slide-in-from-top-2">
-                    <span className="block sm:inline">{error}</span>
+                <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-50 bg-red-100 border-4 border-slate-900 text-slate-900 px-6 py-4 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] max-w-sm w-full text-center animate-in fade-in slide-in-from-top-2">
+                    <span className="block sm:inline font-black uppercase text-red-600">{error}</span>
                 </div>
             )}
             <SignInPage

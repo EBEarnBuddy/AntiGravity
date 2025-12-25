@@ -1,25 +1,25 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  XMarkIcon,
-  PlusIcon,
-  TrashIcon,
-  BuildingOfficeIcon,
-  CurrencyDollarIcon,
-  MapPinIcon,
-  UserGroupIcon,
-  RocketLaunchIcon,
-  BoltIcon,
-  HeartIcon,
-  GlobeAltIcon,
-  StarIcon,
-  TrophyIcon,
-  BriefcaseIcon,
-  CodeBracketIcon,
-  PaintBrushIcon,
-  MegaphoneIcon,
-  ChartBarIcon
-} from '@heroicons/react/24/solid';
+  X,
+  Plus,
+  Trash,
+  Building2,
+  DollarSign,
+  MapPin,
+  Users,
+  Rocket,
+  Zap,
+  Heart,
+  Globe,
+  Star,
+  Trophy,
+  Briefcase,
+  Code,
+  Paintbrush,
+  Megaphone,
+  BarChart3
+} from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useStartups } from '../hooks/useFirestore';
 
@@ -65,15 +65,15 @@ const CreateStartupModal: React.FC<CreateStartupModalProps> = ({ isOpen, onClose
   const [newRoleRequirement, setNewRoleRequirement] = useState('');
 
   const industries = [
-    { id: 'healthcare', name: 'Healthcare', icon: HeartIcon },
-    { id: 'fintech', name: 'FinTech', icon: CurrencyDollarIcon },
-    { id: 'education', name: 'EdTech', icon: UserGroupIcon },
-    { id: 'climate', name: 'Climate Tech', icon: BoltIcon },
-    { id: 'ai', name: 'AI/ML', icon: CodeBracketIcon },
-    { id: 'design', name: 'Design', icon: PaintBrushIcon },
-    { id: 'marketing', name: 'Marketing', icon: MegaphoneIcon },
-    { id: 'analytics', name: 'Analytics', icon: ChartBarIcon },
-    { id: 'other', name: 'Other', icon: BuildingOfficeIcon }
+    { id: 'healthcare', name: 'Healthcare', icon: Heart },
+    { id: 'fintech', name: 'FinTech', icon: DollarSign },
+    { id: 'education', name: 'EdTech', icon: Users },
+    { id: 'climate', name: 'Climate Tech', icon: Zap },
+    { id: 'ai', name: 'AI/ML', icon: Code },
+    { id: 'design', name: 'Design', icon: Paintbrush },
+    { id: 'marketing', name: 'Marketing', icon: Megaphone },
+    { id: 'analytics', name: 'Analytics', icon: BarChart3 },
+    { id: 'other', name: 'Other', icon: Building2 }
   ];
 
   const stages = [
@@ -260,31 +260,31 @@ const CreateStartupModal: React.FC<CreateStartupModalProps> = ({ isOpen, onClose
           onClick={onClose}
         >
           <motion.div
-            className="flex flex-col bg-white rounded-2xl w-full max-w-2xl max-h-[85vh] shadow-2xl overflow-hidden"
+            className="flex flex-col bg-white border-4 border-slate-900 w-full max-w-2xl max-h-[85vh] shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] overflow-hidden"
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.9, opacity: 0 }}
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header - Fixed */}
-            <div className="flex-none px-8 py-6 border-b border-slate-100 bg-white">
+            <div className="flex-none px-8 py-6 border-b-4 border-slate-900 bg-white">
               <div className="flex items-center justify-between mb-6">
                 <div>
-                  <h2 className="text-2xl font-black text-slate-900 tracking-tight">List Your Startup</h2>
-                  <p className="text-slate-500 font-medium">Step {currentStep} of 3</p>
+                  <h2 className="text-2xl font-black text-slate-900 tracking-tight uppercase">List Your Startup</h2>
+                  <p className="text-slate-500 font-bold">Step {currentStep} of 3</p>
                 </div>
                 <button
                   onClick={onClose}
-                  className="p-2 hover:bg-slate-100 rounded-full transition-colors text-slate-400 hover:text-slate-600"
+                  className="p-2 hover:bg-slate-100 border-2 border-transparent hover:border-slate-900 transition-all text-slate-400 hover:text-slate-600"
                 >
-                  <XMarkIcon className="w-6 h-6" />
+                  <X className="w-6 h-6" />
                 </button>
               </div>
 
               {/* Progress Bar */}
-              <div className="w-full bg-slate-100 rounded-full h-2">
+              <div className="w-full bg-slate-100 h-4 border-2 border-slate-900">
                 <motion.div
-                  className="bg-green-600 h-2 rounded-full"
+                  className="bg-green-500 h-full border-r-2 border-slate-900"
                   initial={{ width: 0 }}
                   animate={{ width: `${(currentStep / 3) * 100}%` }}
                   transition={{ duration: 0.3 }}
@@ -303,37 +303,37 @@ const CreateStartupModal: React.FC<CreateStartupModalProps> = ({ isOpen, onClose
                   exit={{ opacity: 0, x: -20 }}
                   transition={{ duration: 0.3 }}
                 >
-                  <h3 className="text-xl font-bold text-slate-800 mb-6">Basic Information</h3>
+                  <h3 className="text-xl font-black text-slate-800 mb-6 uppercase tracking-wide">Basic Information</h3>
 
                   <div className="space-y-6">
                     <div>
-                      <label className="block text-sm font-bold text-slate-700 mb-2">
+                      <label className="block text-sm font-black text-slate-900 uppercase mb-2">
                         Startup Name *
                       </label>
                       <input
                         type="text"
                         value={formData.name}
                         onChange={(e) => handleInputChange('name', e.target.value)}
-                        className="w-full px-4 py-3 border border-slate-200 rounded-xl bg-white text-slate-900 focus:ring-2 focus:ring-green-600 focus:border-transparent transition-all outline-none font-medium placeholder:text-slate-400"
+                        className="w-full px-4 py-3 border-2 border-slate-900 bg-white text-slate-900 focus:outline-none focus:bg-slate-50 transition-all font-bold placeholder:text-slate-400 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] focus:shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] focus:translate-x-[2px] focus:translate-y-[2px]"
                         placeholder="Enter your startup name"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-bold text-slate-700 mb-2">
+                      <label className="block text-sm font-black text-slate-900 uppercase mb-2">
                         Description *
                       </label>
                       <textarea
                         value={formData.description}
                         onChange={(e) => handleInputChange('description', e.target.value)}
                         rows={4}
-                        className="w-full px-4 py-3 border border-slate-200 rounded-xl bg-white text-slate-900 focus:ring-2 focus:ring-green-600 focus:border-transparent transition-all outline-none font-medium placeholder:text-slate-400 resize-none"
+                        className="w-full px-4 py-3 border-2 border-slate-900 bg-white text-slate-900 focus:outline-none focus:bg-slate-50 transition-all font-bold placeholder:text-slate-400 resize-none shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] focus:shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] focus:translate-x-[2px] focus:translate-y-[2px]"
                         placeholder="Describe your startup, mission, and what you're building..."
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-bold text-slate-700 mb-2">
+                      <label className="block text-sm font-black text-slate-900 uppercase mb-2">
                         Industry *
                       </label>
                       <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
@@ -344,15 +344,15 @@ const CreateStartupModal: React.FC<CreateStartupModalProps> = ({ isOpen, onClose
                               key={industry.id}
                               type="button"
                               onClick={() => handleInputChange('industry', industry.name)}
-                              className={`p-4 rounded-xl border-2 transition-all duration-200 flex flex-col items-center gap-2 ${formData.industry === industry.name
-                                ? 'border-green-600 bg-green-50'
-                                : 'border-slate-200 hover:border-green-300 bg-white'
+                              className={`p-4 border-2 transition-all duration-200 flex flex-col items-center gap-2 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px] ${formData.industry === industry.name
+                                ? 'border-slate-900 bg-green-200'
+                                : 'border-slate-900 hover:bg-slate-50 bg-white'
                                 }`}
                               whileHover={{ scale: 1.02 }}
                               whileTap={{ scale: 0.98 }}
                             >
-                              <Icon className={`w-6 h-6 ${formData.industry === industry.name ? 'text-green-600' : 'text-slate-400'}`} />
-                              <span className={`text-sm font-bold ${formData.industry === industry.name ? 'text-green-700' : 'text-slate-600'}`}>
+                              <Icon className={`w-6 h-6 ${formData.industry === industry.name ? 'text-slate-900' : 'text-slate-500'}`} />
+                              <span className={`text-sm font-bold ${formData.industry === industry.name ? 'text-slate-900' : 'text-slate-700'}`}>
                                 {industry.name}
                               </span>
                             </motion.button>
@@ -362,13 +362,13 @@ const CreateStartupModal: React.FC<CreateStartupModalProps> = ({ isOpen, onClose
                     </div>
 
                     <div>
-                      <label className="block text-sm font-bold text-slate-700 mb-2">
+                      <label className="block text-sm font-black text-slate-900 uppercase mb-2">
                         Stage
                       </label>
                       <select
                         value={formData.stage}
                         onChange={(e) => handleInputChange('stage', e.target.value)}
-                        className="w-full px-4 py-3 border border-slate-200 rounded-xl bg-white text-slate-900 focus:ring-2 focus:ring-green-600 focus:border-transparent transition-all outline-none font-medium appearance-none"
+                        className="w-full px-4 py-3 border-2 border-slate-900 bg-white text-slate-900 focus:outline-none focus:bg-slate-50 transition-all font-bold appearance-none shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] focus:shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] focus:translate-x-[2px] focus:translate-y-[2px]"
                       >
                         {stages.map((stage) => (
                           <option key={stage.id} value={stage.id}>
@@ -543,7 +543,7 @@ const CreateStartupModal: React.FC<CreateStartupModalProps> = ({ isOpen, onClose
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
                           >
-                            <PlusIcon className="w-5 h-5" />
+                            <Plus className="w-5 h-5" />
                           </motion.button>
                         </div>
                         <div className="flex flex-wrap gap-2">
@@ -560,7 +560,7 @@ const CreateStartupModal: React.FC<CreateStartupModalProps> = ({ isOpen, onClose
                                 onClick={() => removeRoleRequirement(req)}
                                 className="hover:text-green-900"
                               >
-                                <XMarkIcon className="w-4 h-4" />
+                                <X className="w-4 h-4" />
                               </button>
                             </motion.span>
                           ))}
@@ -591,7 +591,7 @@ const CreateStartupModal: React.FC<CreateStartupModalProps> = ({ isOpen, onClose
                         whileHover={{ scale: !newRole.title || !newRole.description || newRole.requirements.length === 0 ? 1 : 1.02 }}
                         whileTap={{ scale: !newRole.title || !newRole.description || newRole.requirements.length === 0 ? 1 : 0.98 }}
                       >
-                        <PlusIcon className="w-5 h-5 inline mr-2" />
+                        <Plus className="w-5 h-5 inline mr-2" />
                         Add Position
                       </motion.button>
                     </div>
@@ -609,7 +609,7 @@ const CreateStartupModal: React.FC<CreateStartupModalProps> = ({ isOpen, onClose
                                   onClick={() => removeRole(role.id)}
                                   className="p-1 hover:bg-red-50 rounded-lg transition-colors group"
                                 >
-                                  <TrashIcon className="w-4 h-4 text-slate-400 group-hover:text-red-500" />
+                                  <Trash className="w-4 h-4 text-slate-400 group-hover:text-red-500" />
                                 </button>
                               </div>
                               <p className="text-sm text-slate-600 mb-2 font-medium">{role.description}</p>
@@ -694,13 +694,13 @@ const CreateStartupModal: React.FC<CreateStartupModalProps> = ({ isOpen, onClose
             </div>
 
             {/* Footer - Fixed */}
-            <div className="flex-none px-8 py-6 border-t border-slate-100 bg-slate-50 rounded-b-2xl flex justify-between items-center">
+            <div className="flex-none px-8 py-6 border-t-4 border-slate-900 bg-slate-50 flex justify-between items-center">
               <motion.button
                 onClick={prevStep}
                 disabled={currentStep === 1}
-                className={`px-6 py-3 rounded-xl font-bold transition-all duration-300 ${currentStep === 1
-                  ? 'text-slate-300 cursor-not-allowed'
-                  : 'text-slate-600 hover:bg-slate-200'
+                className={`px-6 py-3 font-black uppercase tracking-wide border-2 transition-all duration-300 ${currentStep === 1
+                  ? 'border-transparent text-slate-300 cursor-not-allowed'
+                  : 'border-slate-900 text-slate-900 hover:bg-white shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]'
                   }`}
                 whileHover={{ scale: currentStep === 1 ? 1 : 1.05 }}
                 whileTap={{ scale: currentStep === 1 ? 1 : 0.95 }}
@@ -712,9 +712,9 @@ const CreateStartupModal: React.FC<CreateStartupModalProps> = ({ isOpen, onClose
                 <motion.button
                   onClick={nextStep}
                   disabled={!validateStep(currentStep)}
-                  className={`px-8 py-3 rounded-xl font-bold uppercase tracking-wide transition-all duration-300 ${validateStep(currentStep)
-                    ? 'bg-green-600 text-white hover:bg-green-700 shadow-lg shadow-green-200'
-                    : 'bg-slate-200 text-slate-400 cursor-not-allowed'
+                  className={`px-8 py-3 font-black uppercase tracking-wide border-2 border-slate-900 transition-all duration-300 ${validateStep(currentStep)
+                    ? 'bg-green-600 text-white hover:bg-green-700 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]'
+                    : 'bg-slate-200 text-slate-400 cursor-not-allowed shadow-none'
                     }`}
                   whileHover={{ scale: validateStep(currentStep) ? 1.02 : 1 }}
                   whileTap={{ scale: validateStep(currentStep) ? 0.98 : 1 }}
@@ -725,9 +725,9 @@ const CreateStartupModal: React.FC<CreateStartupModalProps> = ({ isOpen, onClose
                 <motion.button
                   onClick={handleSubmit}
                   disabled={isSubmitting || !validateStep(currentStep)}
-                  className={`px-8 py-3 rounded-xl font-bold uppercase tracking-wide transition-all duration-300 ${isSubmitting || !validateStep(currentStep)
-                    ? 'bg-slate-200 text-slate-400 cursor-not-allowed'
-                    : 'bg-green-600 text-white hover:bg-green-700 shadow-lg shadow-green-200'
+                  className={`px-8 py-3 font-black uppercase tracking-wide border-2 border-slate-900 transition-all duration-300 ${isSubmitting || !validateStep(currentStep)
+                    ? 'bg-slate-200 text-slate-400 cursor-not-allowed shadow-none'
+                    : 'bg-green-600 text-white hover:bg-green-700 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]'
                     }`}
                   whileHover={{ scale: isSubmitting || !validateStep(currentStep) ? 1 : 1.02 }}
                   whileTap={{ scale: isSubmitting || !validateStep(currentStep) ? 1 : 0.98 }}

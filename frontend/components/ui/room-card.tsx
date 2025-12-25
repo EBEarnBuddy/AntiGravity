@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { UserGroupIcon, ChatBubbleLeftRightIcon, LockClosedIcon, GlobeAltIcon, VideoCameraIcon, PencilSquareIcon } from '@heroicons/react/24/solid';
+import { Users, MessageSquare, Lock, Globe, Video, Edit } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface RoomCardProps {
@@ -33,9 +33,9 @@ export const RoomCard: React.FC<RoomCardProps> = ({ room, onJoin, onEnter }) => 
         {/* Privacy Indicator */}
         <div className="absolute top-4 right-4">
           {room.isPrivate ? (
-            <LockClosedIcon className="w-5 h-5 text-gray-500" />
+            <Lock className="w-5 h-5 text-gray-500" />
           ) : (
-            <GlobeAltIcon className="w-5 h-5 text-green-600" />
+            <Globe className="w-5 h-5 text-green-600" />
           )}
         </div>
 
@@ -45,7 +45,7 @@ export const RoomCard: React.FC<RoomCardProps> = ({ room, onJoin, onEnter }) => 
           whileHover={{ rotate: 3, scale: 1.05 }}
           transition={{ type: "spring", stiffness: 400 }}
         >
-          <ChatBubbleLeftRightIcon className="w-8 h-8 text-slate-900" />
+          <MessageSquare className="w-8 h-8 text-slate-900" />
         </motion.div>
 
         {/* Content */}
@@ -60,7 +60,7 @@ export const RoomCard: React.FC<RoomCardProps> = ({ room, onJoin, onEnter }) => 
           {/* Stats */}
           <div className="flex items-center justify-between text-sm font-bold">
             <div className="flex items-center gap-1 text-slate-500">
-              <UserGroupIcon className="w-4 h-4" />
+              <Users className="w-4 h-4" />
               <span>{room.members} members</span>
             </div>
             <div className="text-slate-400 font-mono text-xs">

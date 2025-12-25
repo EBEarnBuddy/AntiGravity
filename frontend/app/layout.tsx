@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, League_Spartan } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
 import BackendHealthCheck from "@/components/BackendHealthCheck";
@@ -7,6 +7,11 @@ import BackendHealthCheck from "@/components/BackendHealthCheck";
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
+});
+
+const leagueSpartan = League_Spartan({
+  subsets: ["latin"],
+  variable: "--font-heading",
 });
 
 export const metadata: Metadata = {
@@ -24,7 +29,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${inter.variable} antialiased font-sans`}>
+      <body className={`${inter.variable} ${leagueSpartan.variable} antialiased`}>
         <Providers>
           <BackendHealthCheck />
           {children}

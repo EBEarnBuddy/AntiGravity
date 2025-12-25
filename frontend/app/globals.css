@@ -68,7 +68,7 @@
 
 @layer base {
   body {
-    font-family: var(--font-body);
+    font-family: var(--font-inter);
     font-weight: 200;
     /* Extralight as requested */
   }

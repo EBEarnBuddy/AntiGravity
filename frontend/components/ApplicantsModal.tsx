@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { XMarkIcon, CheckIcon, XCircleIcon, UserIcon, ChatBubbleLeftRightIcon } from '@heroicons/react/24/solid';
+import { X, Check, XCircle, User, MessageSquare } from 'lucide-react';
 import { useStartups } from '@/hooks/useFirestore';
 import { Application } from '@/lib/firestore';
+import { BrutalistSpinner } from '@/components/ui/BrutalistSpinner';
 
 interface ApplicantsModalProps {
     isOpen: boolean;
@@ -80,24 +81,23 @@ const ApplicantsModal: React.FC<ApplicantsModalProps> = ({ isOpen, onClose, star
                             <p className="text-white/90 font-bold text-sm">Managing: <span className="text-yellow-300 font-black">{startupName}</span></p>
                         </div>
                         <button onClick={onClose} className="relative z-10 p-2 bg-white hover:bg-red-500 hover:text-white border-2 border-slate-900 transition-all text-slate-900 hover:scale-110 duration-200">
-                            <XMarkIcon className="w-5 h-5" />
+                            <X className="w-5 h-5" />
                         </button>
                     </div>
 
                     {/* Content */}
                     <div className="overflow-y-auto p-6 flex-1 bg-slate-50">
                         {loading ? (
-                            <div className="flex flex-col gap-4">
-                                {[1, 2, 3].map(i => (
-                                    <div key={i} className="h-32 bg-white border-2 border-slate-900 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] animate-pulse" />
-                                ))}
+                            <div className="flex flex-col items-center justify-center py-20 px-6 bg-white border-4 border-slate-900 shadow-[8px_8px_0px_0px_rgba(15,23,42,1)]">
+                                <BrutalistSpinner size={64} className="text-slate-900" />
+                                <p className="mt-6 font-black text-xl uppercase tracking-widest text-slate-900">Loading Applicants...</p>
                             </div>
                         ) : error ? (
                             <div className="text-center py-10 px-6 bg-red-100 border-4 border-red-500 relative overflow-hidden">
                                 <div className="absolute inset-0 opacity-5 bg-[linear-gradient(45deg,#000_25%,transparent_25%,transparent_75%,#000_75%,#000),linear-gradient(45deg,#000_25%,transparent_25%,transparent_75%,#000_75%,#000)] [background-size:20px_20px] [background-position:0_0,10px_10px]"></div>
                                 <div className="relative z-10">
                                     <div className="w-16 h-16 bg-red-500 border-2 border-slate-900 flex items-center justify-center mx-auto mb-3">
-                                        <XCircleIcon className="w-8 h-8 text-white" />
+                                        <XCircle className="w-8 h-8 text-white" />
                                     </div>
                                     <p className="text-red-900 font-black text-lg uppercase">{error}</p>
                                 </div>
@@ -107,7 +107,7 @@ const ApplicantsModal: React.FC<ApplicantsModalProps> = ({ isOpen, onClose, star
                                 <div className="absolute inset-0 opacity-5 bg-[linear-gradient(45deg,#000_25%,transparent_25%,transparent_75%,#000_75%,#000),linear-gradient(45deg,#000_25%,transparent_25%,transparent_75%,#000_75%,#000)] [background-size:20px_20px] [background-position:0_0,10px_10px]"></div>
                                 <div className="relative z-10">
                                     <div className="w-24 h-24 bg-green-500 border-4 border-slate-900 flex items-center justify-center mb-6 mx-auto">
-                                        <UserIcon className="w-12 h-12 text-white" />
+                                        <User className="w-12 h-12 text-white" />
                                     </div>
                                     <h3 className="text-2xl font-black text-slate-900 mb-3 uppercase">No Applicants Yet!</h3>
                                     <p className="text-slate-600 font-bold max-w-xs">Your startup is live! Talented builders will discover it soon. 🚀</p>
@@ -140,7 +140,7 @@ const ApplicantsModal: React.FC<ApplicantsModalProps> = ({ isOpen, onClose, star
                                                 <div className="bg-yellow-100 border-2 border-slate-900 p-4 mb-4 relative overflow-hidden">
                                                     <div className="absolute inset-0 opacity-5 bg-[linear-gradient(45deg,#000_25%,transparent_25%,transparent_75%,#000_75%,#000),linear-gradient(45deg,#000_25%,transparent_25%,transparent_75%,#000_75%,#000)] [background-size:20px_20px] [background-position:0_0,10px_10px]"></div>
                                                     <div className="relative z-10">
-                                                        <ChatBubbleLeftRightIcon className="w-4 h-4 text-slate-900 mb-2" />
+                                                        <MessageSquare className="w-4 h-4 text-slate-900 mb-2" />
                                                         <p className="text-sm text-slate-900 font-bold italic">"{app.message}"</p>
                                                     </div>
                                                 </div>
@@ -165,8 +165,8 @@ const ApplicantsModal: React.FC<ApplicantsModalProps> = ({ isOpen, onClose, star
                                                     ${app.status === 'accepted' ? 'bg-green-500 text-white' :
                                                         app.status === 'rejected' ? 'bg-red-500 text-white' :
                                                             'bg-yellow-400 text-slate-900'}`}>
-                                                    {app.status === 'accepted' && <CheckIcon className="w-3 h-3" />}
-                                                    {app.status === 'rejected' && <XCircleIcon className="w-3 h-3" />}
+                                                    {app.status === 'accepted' && <Check className="w-3 h-3" />}
+                                                    {app.status === 'rejected' && <XCircle className="w-3 h-3" />}
                                                     {app.status}
                                                 </span>
                                             </div>
@@ -180,13 +180,13 @@ const ApplicantsModal: React.FC<ApplicantsModalProps> = ({ isOpen, onClose, star
                                                         onClick={() => handleAction(app._id || app.id, 'accepted')}
                                                         className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-green-600 border-2 border-slate-900 text-white text-xs font-black uppercase hover:bg-green-700 transition-all hover:-translate-y-1 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] hover:shadow-[4px_4px_0px_0px_rgba(15,23,42,1)]"
                                                     >
-                                                        <CheckIcon className="w-4 h-4" /> Accept
+                                                        <Check className="w-4 h-4" /> Accept
                                                     </button>
                                                     <button
                                                         onClick={() => handleAction(app._id || app.id, 'rejected')}
                                                         className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-white border-2 border-slate-900 text-slate-900 text-xs font-black uppercase hover:bg-red-500 hover:text-white transition-all hover:-translate-y-1 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] hover:shadow-[4px_4px_0px_0px_rgba(15,23,42,1)]"
                                                     >
-                                                        <XCircleIcon className="w-4 h-4" /> Reject
+                                                        <XCircle className="w-4 h-4" /> Reject
                                                     </button>
                                                 </>
                                             ) : (

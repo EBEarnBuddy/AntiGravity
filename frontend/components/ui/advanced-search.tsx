@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MagnifyingGlassIcon, FunnelIcon, XMarkIcon, CalendarIcon, MapPinIcon, CurrencyDollarIcon, UserGroupIcon, StarIcon, BoltIcon } from '@heroicons/react/24/solid';
+import { Search, Filter, X, Calendar, MapPin, DollarSign, Users, Star, Zap } from 'lucide-react';
 
 interface SearchFilters {
   query: string;
@@ -82,14 +82,14 @@ export const AdvancedSearch: React.FC<AdvancedSearchProps> = ({ onSearch, onClos
           >
             <div className="flex items-center justify-between mb-8 pb-4 border-b-4 border-slate-900">
               <h2 className="text-3xl font-black text-slate-900 flex items-center gap-3 uppercase tracking-tighter">
-                <FunnelIcon className="w-8 h-8 text-emerald-600" />
+                <Filter className="w-8 h-8 text-emerald-600" />
                 Advanced Search
               </h2>
               <button
                 onClick={onClose}
                 className="p-2 hover:bg-slate-100 rounded-none border-2 border-transparent hover:border-slate-900 transition-all"
               >
-                <XMarkIcon className="w-6 h-6 text-slate-900" />
+                <X className="w-6 h-6 text-slate-900" />
               </button>
             </div>
 
@@ -100,7 +100,7 @@ export const AdvancedSearch: React.FC<AdvancedSearchProps> = ({ onSearch, onClos
                   Search Keywords
                 </label>
                 <div className="relative">
-                  <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-5 h-5" />
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-5 h-5" />
                   <input
                     type="text"
                     value={filters.query}
@@ -134,7 +134,7 @@ export const AdvancedSearch: React.FC<AdvancedSearchProps> = ({ onSearch, onClos
                   Location
                 </label>
                 <div className="relative">
-                  <MapPinIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-5 h-5" />
+                  <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-5 h-5" />
                   <input
                     type="text"
                     value={filters.location}
@@ -190,11 +190,11 @@ export const AdvancedSearch: React.FC<AdvancedSearchProps> = ({ onSearch, onClos
                       key={rating}
                       onClick={() => handleFilterChange('rating', rating)}
                       className={`p-2 rounded-none border-2 transition-all ${filters.rating >= rating
-                          ? 'border-yellow-500 bg-yellow-50 text-yellow-500 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]'
-                          : 'border-slate-200 text-slate-300 hover:border-yellow-400 hover:text-yellow-400'
+                        ? 'border-yellow-500 bg-yellow-50 text-yellow-500 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]'
+                        : 'border-slate-200 text-slate-300 hover:border-yellow-400 hover:text-yellow-400'
                         }`}
                     >
-                      <StarIcon className="w-6 h-6" />
+                      <Star className="w-6 h-6" />
                     </button>
                   ))}
                   <span className="ml-2 text-sm font-bold text-slate-600">
@@ -214,11 +214,11 @@ export const AdvancedSearch: React.FC<AdvancedSearchProps> = ({ onSearch, onClos
                       className="sr-only"
                     />
                     <div className={`w-6 h-6 border-2 border-slate-900 transition-all ${filters.verified ? 'bg-emerald-500 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]' : 'bg-white'}`}>
-                      {filters.verified && <BoltIcon className="w-5 h-5 text-white" />}
+                      {filters.verified && <Zap className="w-5 h-5 text-white" />}
                     </div>
                   </div>
                   <span className="text-sm font-bold text-slate-900 flex items-center gap-2 group-hover:text-emerald-700">
-                    <BoltIcon className="w-4 h-4 text-emerald-600" />
+                    <Zap className="w-4 h-4 text-emerald-600" />
                     Verified professionals only
                   </span>
                 </label>

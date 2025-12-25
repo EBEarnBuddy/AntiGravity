@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { BellIcon, GlobeAltIcon, UserIcon, ArrowRightStartOnRectangleIcon, Squares2X2Icon, Cog6ToothIcon, Bars3Icon } from '@heroicons/react/24/solid';
+import { Bell, Globe, User, LogOut, LayoutGrid, Settings, Menu } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import NotificationDropdown from './NotificationDropdown';
 
@@ -74,11 +74,11 @@ const Navbar: React.FC = () => {
                                 <p className="text-sm font-black text-slate-900 truncate uppercase">{currentUser?.displayName || 'User'}</p>
                                 <p className="text-xs text-slate-500 truncate font-mono">{currentUser?.email}</p>
                             </div>
-                            <Link href="/profile" className="flex items-center gap-2 px-4 py-2 text-sm text-slate-700 hover:bg-green-50 hover:text-green-600 font-bold uppercase" onClick={() => setIsProfileOpen(false)}><UserIcon className="w-4 h-4" /> Profile</Link>
-                            <Link href="/dashboard" className="flex items-center gap-2 px-4 py-2 text-sm text-slate-700 hover:bg-green-50 hover:text-green-600 font-bold uppercase" onClick={() => setIsProfileOpen(false)}><Squares2X2Icon className="w-4 h-4" /> Dashboard</Link>
-                            <Link href="/settings" className="flex items-center gap-2 px-4 py-2 text-sm text-slate-700 hover:bg-green-50 hover:text-green-600 font-bold uppercase" onClick={() => setIsProfileOpen(false)}><Cog6ToothIcon className="w-4 h-4" /> Settings</Link>
+                            <Link href="/profile" className="flex items-center gap-2 px-4 py-2 text-sm text-slate-700 hover:bg-green-50 hover:text-green-600 font-bold uppercase" onClick={() => setIsProfileOpen(false)}><User className="w-4 h-4" /> Profile</Link>
+                            <Link href="/dashboard" className="flex items-center gap-2 px-4 py-2 text-sm text-slate-700 hover:bg-green-50 hover:text-green-600 font-bold uppercase" onClick={() => setIsProfileOpen(false)}><LayoutGrid className="w-4 h-4" /> Dashboard</Link>
+                            <Link href="/settings" className="flex items-center gap-2 px-4 py-2 text-sm text-slate-700 hover:bg-green-50 hover:text-green-600 font-bold uppercase" onClick={() => setIsProfileOpen(false)}><Settings className="w-4 h-4" /> Settings</Link>
                             <div className="border-t-2 border-slate-900 mt-1">
-                                <button onClick={handleLogout} className="w-full text-left flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 font-bold uppercase"><ArrowRightStartOnRectangleIcon className="w-4 h-4" /> Logout</button>
+                                <button onClick={handleLogout} className="w-full text-left flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 font-bold uppercase"><LogOut className="w-4 h-4" /> Logout</button>
                             </div>
                         </div>
                     )}
@@ -89,7 +89,7 @@ const Navbar: React.FC = () => {
                     onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                     className="md:hidden p-2 hover:bg-green-700 rounded-none border-2 border-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition hover:shadow-none hover:translate-x-[1px] hover:translate-y-[1px]"
                 >
-                    <Bars3Icon className="w-6 h-6 text-white" />
+                    <Menu className="w-6 h-6 text-white" />
                 </button>
             </div>
 

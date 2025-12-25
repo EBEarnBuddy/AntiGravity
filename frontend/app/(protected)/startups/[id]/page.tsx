@@ -4,21 +4,21 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-    ArrowLeftIcon,
-    ShareIcon,
-    BookmarkIcon,
-    UserGroupIcon,
-    BriefcaseIcon,
-    MapPinIcon,
-    CurrencyDollarIcon,
-    ChartPieIcon,
-    CalendarIcon,
-    CheckCircleIcon,
-    GlobeAltIcon,
-    LinkIcon,
-    EnvelopeIcon,
-    RocketLaunchIcon
-} from '@heroicons/react/24/solid';
+    ArrowLeft,
+    Share,
+    Bookmark,
+    Users,
+    Briefcase,
+    MapPin,
+    DollarSign,
+    PieChart,
+    Calendar,
+    CheckCircle,
+    Globe,
+    Link,
+    Mail,
+    Rocket
+} from 'lucide-react';
 import { useStartups, useMyApplications, useBookmarks } from '@/hooks/useFirestore';
 import { useAuth } from '@/contexts/AuthContext';
 import { opportunityAPI } from '@/lib/axios';
@@ -96,7 +96,7 @@ const StartupDetailPage: React.FC = () => {
         return (
             <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50 text-center p-4">
                 <div className="w-16 h-16 bg-red-100 border-2 border-slate-900 flex items-center justify-center mb-4">
-                    <UserGroupIcon className="w-8 h-8 text-red-600" />
+                    <Users className="w-8 h-8 text-red-600" />
                 </div>
                 <h1 className="text-3xl font-black text-slate-900 mb-2 uppercase">Opportunity Not Found</h1>
                 <p className="text-slate-600 mb-6 font-bold">{error || "This opportunity doesn't exist or has been removed."}</p>
@@ -119,14 +119,14 @@ const StartupDetailPage: React.FC = () => {
                         onClick={() => router.push('/startups')}
                         className="flex items-center gap-2 text-slate-900 font-black uppercase tracking-wide text-sm hover:underline decoration-2 underline-offset-4"
                     >
-                        <ArrowLeftIcon className="w-4 h-4" /> Back to Launchpad
+                        <ArrowLeft className="w-4 h-4" /> Back to Launchpad
                     </button>
                     <div className="flex items-center gap-3">
                         <button
                             onClick={handleCopyLink}
                             className="p-2 border-2 border-slate-200 hover:border-slate-900 hover:shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] transition-all text-slate-500 hover:text-slate-900 bg-white"
                         >
-                            <ShareIcon className="w-5 h-5" />
+                            <Share className="w-5 h-5" />
                         </button>
                         <button
                             onClick={() => toggleBookmark(startup.id)}
@@ -134,7 +134,7 @@ const StartupDetailPage: React.FC = () => {
                                 ? 'bg-green-100 border-green-600 text-green-700 shadow-[2px_2px_0px_0px_rgba(22,163,74,1)]'
                                 : 'bg-white border-slate-200 hover:border-slate-900 text-slate-500 hover:text-slate-900 hover:shadow-[2px_2px_0px_0px_rgba(15,23,42,1)]'}`}
                         >
-                            <BookmarkIcon className={`w-5 h-5 ${isBookmarked(startup.id) ? 'fill-current' : ''}`} />
+                            <Bookmark className={`w-5 h-5 ${isBookmarked(startup.id) ? 'fill-current' : ''}`} />
                         </button>
                     </div>
                 </div>
@@ -175,13 +175,13 @@ const StartupDetailPage: React.FC = () => {
                                 </h1>
                                 <div className="flex flex-wrap items-center gap-x-6 gap-y-3 text-sm font-bold text-slate-500 mb-8 border-b-2 border-slate-100 pb-8">
                                     <div className="flex items-center gap-2 px-3 py-1 bg-slate-100 border-2 border-slate-200 text-slate-700 uppercase tracking-wide text-xs">
-                                        <BriefcaseIcon className="w-4 h-4" /> {startup.industry || 'Tech'}
+                                        <Briefcase className="w-4 h-4" /> {startup.industry || 'Tech'}
                                     </div>
                                     <div className="flex items-center gap-2 px-3 py-1 bg-slate-100 border-2 border-slate-200 text-slate-700 uppercase tracking-wide text-xs">
-                                        <MapPinIcon className="w-4 h-4" /> {startup.location || 'Remote'}
+                                        <MapPin className="w-4 h-4" /> {startup.location || 'Remote'}
                                     </div>
                                     <div className="flex items-center gap-2 px-3 py-1 bg-slate-100 border-2 border-slate-200 text-slate-700 uppercase tracking-wide text-xs">
-                                        <CalendarIcon className="w-4 h-4" /> Posted {formatTimeAgo(startup.createdAt)}
+                                        <Calendar className="w-4 h-4" /> Posted {formatTimeAgo(startup.createdAt)}
                                     </div>
                                 </div>
                                 <div className="prose prose-slate max-w-none">
@@ -199,7 +199,7 @@ const StartupDetailPage: React.FC = () => {
                                         {startup.equity && (
                                             <div className="flex items-center justify-between group">
                                                 <span className="text-sm font-bold text-slate-500 group-hover:text-slate-900 flex items-center gap-2 uppercase tracking-wide">
-                                                    <ChartPieIcon className="w-4 h-4" /> Equity
+                                                    <PieChart className="w-4 h-4" /> Equity
                                                 </span>
                                                 <span className="text-sm font-black text-slate-900 bg-green-100 px-2 py-0.5 border border-green-300">{startup.equity}</span>
                                             </div>
@@ -207,7 +207,7 @@ const StartupDetailPage: React.FC = () => {
                                         {startup.salary && (
                                             <div className="flex items-center justify-between group">
                                                 <span className="text-sm font-bold text-slate-500 group-hover:text-slate-900 flex items-center gap-2 uppercase tracking-wide">
-                                                    <CurrencyDollarIcon className="w-4 h-4" /> Salary
+                                                    <DollarSign className="w-4 h-4" /> Salary
                                                 </span>
                                                 <span className="text-sm font-black text-slate-900 bg-yellow-100 px-2 py-0.5 border border-yellow-300">{startup.salary}</span>
                                             </div>
@@ -215,14 +215,14 @@ const StartupDetailPage: React.FC = () => {
                                         {startup.stage && (
                                             <div className="flex items-center justify-between group">
                                                 <span className="text-sm font-bold text-slate-500 group-hover:text-slate-900 flex items-center gap-2 uppercase tracking-wide">
-                                                    <RocketLaunchIcon className="w-4 h-4" /> Stage
+                                                    <Rocket className="w-4 h-4" /> Stage
                                                 </span>
                                                 <span className="text-sm font-black text-slate-900">{startup.stage}</span>
                                             </div>
                                         )}
                                         <div className="flex items-center justify-between group">
                                             <span className="text-sm font-bold text-slate-500 group-hover:text-slate-900 flex items-center gap-2 uppercase tracking-wide">
-                                                <UserGroupIcon className="w-4 h-4" /> Team
+                                                <Users className="w-4 h-4" /> Team
                                             </span>
                                             <span className="text-sm font-black text-slate-900">{startup.teamSize || '1-10'}</span>
                                         </div>
@@ -254,7 +254,7 @@ const StartupDetailPage: React.FC = () => {
                                             {startup.founderAvatar ? (
                                                 <img src={startup.founderAvatar} alt="Founder" className="w-full h-full object-cover" />
                                             ) : (
-                                                <UserGroupIcon className="w-6 h-6 text-slate-900" />
+                                                <Users className="w-6 h-6 text-slate-900" />
                                             )}
                                         </div>
                                         <div>
@@ -266,17 +266,17 @@ const StartupDetailPage: React.FC = () => {
                                         <div className="flex gap-3 mt-6">
                                             {startup.contact.linkedin && (
                                                 <a href={startup.contact.linkedin} target="_blank" className="p-2 border-2 border-slate-700 hover:border-white hover:bg-white hover:text-slate-900 text-slate-400 transition-all">
-                                                    <LinkIcon className="w-4 h-4" />
+                                                    <Link className="w-4 h-4" />
                                                 </a>
                                             )}
                                             {startup.contact.website && (
                                                 <a href={startup.contact.website} target="_blank" className="p-2 border-2 border-slate-700 hover:border-white hover:bg-white hover:text-slate-900 text-slate-400 transition-all">
-                                                    <GlobeAltIcon className="w-4 h-4" />
+                                                    <Globe className="w-4 h-4" />
                                                 </a>
                                             )}
                                             {startup.contact.email && (
                                                 <a href={`mailto:${startup.contact.email}`} className="p-2 border-2 border-slate-700 hover:border-white hover:bg-white hover:text-slate-900 text-slate-400 transition-all">
-                                                    <EnvelopeIcon className="w-4 h-4" />
+                                                    <Mail className="w-4 h-4" />
                                                 </a>
                                             )}
                                         </div>
@@ -306,8 +306,8 @@ const StartupDetailPage: React.FC = () => {
                                             </div>
 
                                             <div className="flex items-center gap-4 text-sm font-bold text-slate-500 mb-4">
-                                                <span className="flex items-center gap-1"><MapPinIcon className="w-4 h-4" /> {role.location}</span>
-                                                {role.salary && <span className="flex items-center gap-1"><CurrencyDollarIcon className="w-4 h-4" /> {role.salary}</span>}
+                                                <span className="flex items-center gap-1"><MapPin className="w-4 h-4" /> {role.location}</span>
+                                                {role.salary && <span className="flex items-center gap-1"><DollarSign className="w-4 h-4" /> {role.salary}</span>}
                                             </div>
 
                                             <p className="text-slate-700 text-lg font-medium leading-relaxed max-w-3xl">{role.description}</p>
@@ -346,7 +346,7 @@ const StartupDetailPage: React.FC = () => {
                         {startup.requirements?.length > 0 && (
                             <div className="bg-white border-4 border-slate-900 p-8 shadow-[8px_8px_0px_0px_rgba(15,23,42,1)]">
                                 <h3 className="text-xl font-black text-slate-900 mb-6 flex items-center gap-3 uppercase tracking-tight">
-                                    <CheckCircleIcon className="w-6 h-6 text-green-600" /> General Requirements
+                                    <CheckCircle className="w-6 h-6 text-green-600" /> General Requirements
                                 </h3>
                                 <ul className="space-y-4">
                                     {startup.requirements.map((req: string, i: number) => (

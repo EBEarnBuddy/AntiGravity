@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState, useEffect } from 'react';
-import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/solid';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const SQRT_5000 = Math.sqrt(5000);
@@ -261,7 +261,7 @@ export const StaggerTestimonials: React.FC = () => {
                     )}
                     aria-label="Previous testimonial"
                 >
-                    <ChevronLeftIcon className="w-8 h-8" />
+                    <ChevronLeft className="w-8 h-8" />
                 </button>
                 <button
                     onClick={() => handleMove(1)}
@@ -272,7 +272,7 @@ export const StaggerTestimonials: React.FC = () => {
                     )}
                     aria-label="Next testimonial"
                 >
-                    <ChevronRightIcon className="w-8 h-8" />
+                    <ChevronRight className="w-8 h-8" />
                 </button>
             </div>
         </div>

@@ -1,26 +1,28 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  XMarkIcon,
-  PlusIcon,
-  TrashIcon,
-  BuildingOfficeIcon,
-  CurrencyDollarIcon,
-  BriefcaseIcon,
-  BoltIcon,
-  HeartIcon,
-  CodeBracketIcon,
-  PaintBrushIcon,
-  MegaphoneIcon,
-  ChartBarIcon,
-  StarIcon,
-  CpuChipIcon,
-  TrophyIcon,
-  UserGroupIcon,
-  ArrowRightIcon
-} from '@heroicons/react/24/solid';
+  X,
+  Plus,
+  Trash,
+  Building2,
+  DollarSign,
+  Briefcase,
+  Zap,
+  Heart,
+  Code,
+  Paintbrush,
+  Megaphone,
+  BarChart3,
+  Star,
+  Cpu,
+  Trophy,
+  Users,
+  ArrowRight,
+  Check
+} from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useProjects } from '../hooks/useFirestore';
+import { BrutalistSpinner } from '@/components/ui/BrutalistSpinner';
 
 interface Role {
   title: string;
@@ -82,15 +84,15 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose
   const [newSkill, setNewSkill] = useState('');
 
   const industries = [
-    { id: 'fintech', name: 'FinTech', icon: CurrencyDollarIcon },
-    { id: 'e-commerce', name: 'E-commerce', icon: BriefcaseIcon },
-    { id: 'climate-tech', name: 'Climate Tech', icon: BoltIcon },
-    { id: 'healthcare', name: 'HealthTech', icon: HeartIcon },
-    { id: 'ai', name: 'AI/ML', icon: CodeBracketIcon },
-    { id: 'design', name: 'Design', icon: PaintBrushIcon },
-    { id: 'marketing', name: 'Marketing', icon: MegaphoneIcon },
-    { id: 'analytics', name: 'Analytics', icon: ChartBarIcon },
-    { id: 'other', name: 'Other', icon: BuildingOfficeIcon }
+    { id: 'fintech', name: 'FinTech', icon: DollarSign },
+    { id: 'e-commerce', name: 'E-commerce', icon: Briefcase },
+    { id: 'climate-tech', name: 'Climate Tech', icon: Zap },
+    { id: 'healthcare', name: 'HealthTech', icon: Heart },
+    { id: 'ai', name: 'AI/ML', icon: Code },
+    { id: 'design', name: 'Design', icon: Paintbrush },
+    { id: 'marketing', name: 'Marketing', icon: Megaphone },
+    { id: 'analytics', name: 'Analytics', icon: BarChart3 },
+    { id: 'other', name: 'Other', icon: Building2 }
   ];
 
   const projectTypes = [
@@ -334,35 +336,35 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+          className="fixed inset-0 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+          onClick={onClose}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          onClick={onClose}
         >
           <motion.div
-            className="flex flex-col bg-white rounded-2xl w-full max-w-4xl max-h-[90vh] shadow-2xl overflow-hidden"
+            className="flex flex-col bg-white rounded-none border-4 border-slate-900 w-full max-w-4xl max-h-[90vh] shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] overflow-hidden"
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.9, opacity: 0 }}
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header - Fixed */}
-            <div className="flex-none px-8 py-6 border-b border-slate-100 bg-white">
-              <div className="flex items-center justify-between mb-6">
+            <div className="flex-none px-8 py-6 border-b-4 border-slate-900 bg-white">
+              <div className="flex items-center justify-between mb-8">
                 <div>
-                  <h2 className="text-2xl font-black text-slate-900 tracking-tight">
+                  <h2 className="text-3xl font-black text-slate-900 tracking-tighter uppercase">
                     Post Team Project
                   </h2>
-                  <p className="text-slate-500 font-medium mt-1">
+                  <p className="text-slate-500 font-bold mt-1 text-sm">
                     Create a new project to find talented team members
                   </p>
                 </div>
                 <button
                   onClick={onClose}
-                  className="p-2 hover:bg-slate-100 rounded-full transition-colors text-slate-400 hover:text-slate-600"
+                  className="p-2 border-2 border-transparent hover:border-slate-900 hover:bg-slate-100 transition-all"
                 >
-                  <XMarkIcon className="w-6 h-6" />
+                  <X className="w-8 h-8 stroke-[3]" />
                 </button>
               </div>
 
@@ -371,30 +373,30 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose
                 {steps.map((step, index) => (
                   <div key={step.number} className="flex items-center flex-1">
                     <div className="flex items-center relative">
-                      <div className={`flex items-center justify-center w-8 h-8 rounded-full border-2 transition-colors duration-300 z-10 ${currentStep >= step.number
-                        ? 'bg-green-600 border-green-600 text-white'
-                        : 'bg-white border-slate-200 text-slate-400'
+                      <div className={`flex items-center justify-center w-10 h-10 border-4 transition-all duration-300 z-10 ${currentStep >= step.number
+                        ? 'bg-green-500 border-slate-900 text-slate-900 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)]'
+                        : 'bg-white border-slate-300 text-slate-300'
                         }`}>
                         {currentStep > step.number ? (
-                          <TrophyIcon className="w-4 h-4" />
+                          <Check className="w-6 h-6 stroke-[4]" />
                         ) : (
-                          <span className="text-sm font-bold">{step.number}</span>
+                          <span className="text-lg font-black">{step.number}</span>
                         )}
                       </div>
-                      <div className="ml-3 min-w-[120px]">
-                        <p className={`text-sm font-bold ${currentStep >= step.number
+                      <div className="ml-4 min-w-[120px]">
+                        <p className={`text-sm font-black uppercase tracking-wide ${currentStep >= step.number
                           ? 'text-slate-900'
-                          : 'text-slate-500'
+                          : 'text-slate-400'
                           }`}>
                           {step.title}
                         </p>
-                        <p className="text-xs text-slate-400 font-medium">{step.description}</p>
+                        <p className="text-xs text-slate-500 font-bold">{step.description}</p>
                       </div>
                     </div>
                     {index < steps.length - 1 && (
-                      <div className="flex-1 mx-4 h-0.5 bg-slate-100">
+                      <div className="flex-1 mx-6 h-1 bg-slate-200">
                         <div
-                          className="h-full bg-green-600 transition-all duration-300"
+                          className="h-full bg-slate-900 transition-all duration-300"
                           style={{ width: currentStep > step.number ? '100%' : '0%' }}
                         />
                       </div>
@@ -425,7 +427,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose
                         type="text"
                         value={formData.title}
                         onChange={(e) => handleInputChange('title', e.target.value)}
-                        className="w-full px-4 py-3 border border-slate-200 rounded-xl bg-white text-slate-900 focus:ring-2 focus:ring-green-600 focus:border-transparent transition-all outline-none font-medium placeholder:text-slate-400"
+                        className="w-full px-4 py-3 border-2 border-slate-900 rounded-none bg-white text-slate-900 focus:shadow-[4px_4px_0px_0px_rgba(22,163,74,1)] transition-all outline-none font-bold placeholder:text-slate-300"
                         placeholder="e.g., AI-Powered E-commerce Platform"
                         required
                       />
@@ -439,7 +441,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose
                       <textarea
                         value={formData.description}
                         onChange={(e) => handleInputChange('description', e.target.value)}
-                        className="w-full px-4 py-3 border border-slate-200 rounded-xl bg-white text-slate-900 focus:ring-2 focus:ring-green-600 focus:border-transparent transition-all outline-none font-medium placeholder:text-slate-400 resize-none"
+                        className="w-full px-4 py-3 border-2 border-slate-900 rounded-none bg-white text-slate-900 focus:shadow-[4px_4px_0px_0px_rgba(22,163,74,1)] transition-all outline-none font-bold placeholder:text-slate-300 resize-none"
                         rows={4}
                         placeholder="Describe your project, goals, and what you're building..."
                         required
@@ -455,7 +457,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose
                         type="text"
                         value={formData.company}
                         onChange={(e) => handleInputChange('company', e.target.value)}
-                        className="w-full px-4 py-3 border border-slate-200 rounded-xl bg-white text-slate-900 focus:ring-2 focus:ring-green-600 focus:border-transparent transition-all outline-none font-medium placeholder:text-slate-400"
+                        className="w-full px-4 py-3 border-2 border-slate-900 rounded-none bg-white text-slate-900 focus:shadow-[4px_4px_0px_0px_rgba(22,163,74,1)] transition-all outline-none font-bold placeholder:text-slate-300"
                         placeholder="Your company name"
                         required
                       />
@@ -474,13 +476,13 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose
                               key={industry.id}
                               type="button"
                               onClick={() => handleInputChange('industry', industry.id)}
-                              className={`p-4 border-2 rounded-xl text-left transition-all duration-200 group ${formData.industry === industry.id
-                                ? 'border-green-600 bg-green-50'
-                                : 'border-slate-200 hover:border-green-300 bg-white'
+                              className={`p-4 border-2 rounded-none text-left transition-all duration-200 group ${formData.industry === industry.id
+                                ? 'border-slate-900 bg-green-300 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)]'
+                                : 'border-slate-900 hover:bg-slate-100 bg-white shadow-[2px_2px_0px_0px_rgba(15,23,42,1)]'
                                 }`}
                             >
-                              <Icon className={`w-6 h-6 mb-2 ${formData.industry === industry.id ? 'text-green-600' : 'text-slate-400 group-hover:text-green-500'}`} />
-                              <p className={`font-bold ${formData.industry === industry.id ? 'text-green-700' : 'text-slate-600'}`}>{industry.name}</p>
+                              <Icon className={`w-6 h-6 mb-2 stroke-[3] ${formData.industry === industry.id ? 'text-slate-900' : 'text-slate-900'}`} />
+                              <p className={`font-black uppercase tracking-wide text-sm ${formData.industry === industry.id ? 'text-slate-900' : 'text-slate-900'}`}>{industry.name}</p>
                             </button>
                           );
                         })}
@@ -498,12 +500,12 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose
                             key={type.id}
                             type="button"
                             onClick={() => handleInputChange('projectType', type.id)}
-                            className={`p-4 border-2 rounded-xl text-center transition-all duration-200 ${formData.projectType === type.id
-                              ? 'border-green-600 bg-green-50'
-                              : 'border-slate-200 hover:border-green-300 bg-white'
+                            className={`p-4 border-2 rounded-none text-center transition-all duration-200 ${formData.projectType === type.id
+                              ? 'border-slate-900 bg-green-300 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)]'
+                              : 'border-slate-900 hover:bg-slate-100 bg-white shadow-[2px_2px_0px_0px_rgba(15,23,42,1)]'
                               }`}
                           >
-                            <p className={`font-bold ${formData.projectType === type.id ? 'text-green-700' : 'text-slate-600'}`}>{type.name}</p>
+                            <p className={`font-black uppercase tracking-wide text-sm ${formData.projectType === type.id ? 'text-slate-900' : 'text-slate-900'}`}>{type.name}</p>
                           </button>
                         ))}
                       </div>
@@ -526,7 +528,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose
                               onClick={() => removeTag(tag)}
                               className="hover:text-green-900"
                             >
-                              <XMarkIcon className="w-3 h-3" />
+                              <X className="w-3 h-3" />
                             </button>
                           </span>
                         ))}
@@ -543,7 +545,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose
                         <button
                           type="button"
                           onClick={addTag}
-                          className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-bold shadow-sm"
+                          className="px-4 py-3 bg-green-500 text-white rounded-none border-2 border-slate-900 hover:bg-green-600 transition-all font-black uppercase tracking-wider shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] hover:shadow-none hover:translate-x-[1px] hover:translate-y-[1px]"
                         >
                           Add
                         </button>
@@ -573,7 +575,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose
                             type="number"
                             value={formData.totalBudget.min}
                             onChange={(e) => handleNestedChange('totalBudget', 'min', parseInt(e.target.value) || 0)}
-                            className="w-full px-4 py-3 border border-slate-200 rounded-xl bg-white text-slate-900 focus:ring-2 focus:ring-green-600 focus:border-transparent transition-all outline-none font-medium"
+                            className="w-full px-4 py-3 border-2 border-slate-900 rounded-none bg-white text-slate-900 focus:shadow-[4px_4px_0px_0px_rgba(22,163,74,1)] transition-all outline-none font-bold"
                             placeholder="0"
                             min="0"
                             required
@@ -585,7 +587,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose
                             type="number"
                             value={formData.totalBudget.max}
                             onChange={(e) => handleNestedChange('totalBudget', 'max', parseInt(e.target.value) || 0)}
-                            className="w-full px-4 py-3 border border-slate-200 rounded-xl bg-white text-slate-900 focus:ring-2 focus:ring-green-600 focus:border-transparent transition-all outline-none font-medium"
+                            className="w-full px-4 py-3 border-2 border-slate-900 rounded-none bg-white text-slate-900 focus:shadow-[4px_4px_0px_0px_rgba(22,163,74,1)] transition-all outline-none font-bold"
                             placeholder="0"
                             min="0"
                             required
@@ -596,7 +598,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose
                           <select
                             value={formData.totalBudget.currency}
                             onChange={(e) => handleNestedChange('totalBudget', 'currency', e.target.value)}
-                            className="w-full px-4 py-3 border border-slate-200 rounded-xl bg-white text-slate-900 focus:ring-2 focus:ring-green-600 focus:border-transparent transition-all outline-none font-medium"
+                            className="w-full px-4 py-3 border-2 border-slate-900 rounded-none bg-white text-slate-900 focus:shadow-[4px_4px_0px_0px_rgba(22,163,74,1)] transition-all outline-none font-bold"
                           >
                             <option value="USD">USD</option>
                             <option value="EUR">EUR</option>
@@ -616,7 +618,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose
                         type="text"
                         value={formData.duration}
                         onChange={(e) => handleInputChange('duration', e.target.value)}
-                        className="w-full px-4 py-3 border border-slate-200 rounded-xl bg-white text-slate-900 focus:ring-2 focus:ring-green-600 focus:border-transparent transition-all outline-none font-medium"
+                        className="w-full px-4 py-3 border-2 border-slate-900 rounded-none bg-white text-slate-900 focus:shadow-[4px_4px_0px_0px_rgba(22,163,74,1)] transition-all outline-none font-bold"
                         placeholder="e.g., 2-3 months, 6 weeks, Ongoing"
                         required
                       />
@@ -632,7 +634,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose
                           type="text"
                           value={formData.location}
                           onChange={(e) => handleInputChange('location', e.target.value)}
-                          className="w-full px-4 py-3 border border-slate-200 rounded-xl bg-white text-slate-900 focus:ring-2 focus:ring-green-600 focus:border-transparent transition-all outline-none font-medium"
+                          className="w-full px-4 py-3 border-2 border-slate-900 rounded-none bg-white text-slate-900 focus:shadow-[4px_4px_0px_0px_rgba(22,163,74,1)] transition-all outline-none font-bold"
                           placeholder="e.g., San Francisco, CA or Remote"
                           required
                         />
@@ -659,7 +661,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose
                         type="text"
                         value={formData.equity}
                         onChange={(e) => handleInputChange('equity', e.target.value)}
-                        className="w-full px-4 py-3 border border-slate-200 rounded-xl bg-white text-slate-900 focus:ring-2 focus:ring-green-600 focus:border-transparent transition-all outline-none font-medium"
+                        className="w-full px-4 py-3 border-2 border-slate-900 rounded-none bg-white text-slate-900 focus:shadow-[4px_4px_0px_0px_rgba(22,163,74,1)] transition-all outline-none font-bold"
                         placeholder="e.g., 0.5% - 2% equity"
                       />
                     </div>
@@ -679,12 +681,12 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose
                             key={urgency.id}
                             type="button"
                             onClick={() => handleInputChange('urgency', urgency.id)}
-                            className={`p-4 border-2 rounded-xl text-center transition-all duration-200 ${formData.urgency === urgency.id
-                              ? `border-green-600 ${urgency.color}`
-                              : 'border-slate-200 hover:border-green-300 bg-white'
+                            className={`p-4 border-2 rounded-none text-center transition-all duration-200 ${formData.urgency === urgency.id
+                              ? `border-slate-900 ${urgency.color} shadow-[4px_4px_0px_0px_rgba(15,23,42,1)]`
+                              : 'border-slate-900 hover:bg-slate-100 bg-white shadow-[2px_2px_0px_0px_rgba(15,23,42,1)]'
                               }`}
                           >
-                            <p className="font-bold">{urgency.name}</p>
+                            <p className="font-black uppercase tracking-wide text-sm">{urgency.name}</p>
                           </button>
                         ))}
                       </div>
@@ -707,7 +709,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose
                               onClick={() => removeBenefit(benefit)}
                               className="hover:text-blue-900"
                             >
-                              <XMarkIcon className="w-3 h-3" />
+                              <X className="w-3 h-3" />
                             </button>
                           </span>
                         ))}
@@ -724,7 +726,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose
                         <button
                           type="button"
                           onClick={addBenefit}
-                          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-bold shadow-sm"
+                          className="px-4 py-3 bg-blue-500 text-white rounded-none border-2 border-slate-900 hover:bg-blue-600 transition-all font-black uppercase tracking-wider shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] hover:shadow-none hover:translate-x-[1px] hover:translate-y-[1px]"
                         >
                           Add
                         </button>
@@ -737,7 +739,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose
                               key={benefit}
                               type="button"
                               onClick={() => addBenefit()}
-                              className="px-2 py-1 text-xs bg-slate-100 text-slate-600 rounded hover:bg-slate-200 transition-colors font-medium border border-slate-200"
+                              className="px-3 py-2 text-xs bg-white text-slate-900 hover:bg-slate-100 transition-all font-bold border-2 border-slate-900 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] hover:shadow-none hover:translate-x-[1px] hover:translate-y-[1px]"
                             >
                               {benefit}
                             </button>
@@ -765,16 +767,16 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose
                       <button
                         type="button"
                         onClick={addRole}
-                        className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center gap-2 font-bold shadow-sm"
+                        className="px-4 py-3 bg-green-500 text-white rounded-none border-2 border-slate-900 hover:bg-green-600 transition-all flex items-center gap-2 font-black uppercase tracking-wider shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] hover:shadow-none hover:translate-x-[1px] hover:translate-y-[1px]"
                       >
-                        <PlusIcon className="w-4 h-4" />
+                        <Plus className="w-4 h-4" />
                         Add Role
                       </button>
                     </div>
 
                     {formData.roles.length === 0 && (
                       <div className="text-center py-8 text-slate-500 bg-slate-50 rounded-xl border border-slate-200 border-dashed">
-                        <UserGroupIcon className="w-12 h-12 mx-auto mb-4 text-slate-400" />
+                        <Users className="w-12 h-12 mx-auto mb-4 text-slate-400" />
                         <p className="font-medium">No roles added yet. Add at least one role to continue.</p>
                       </div>
                     )}
@@ -782,7 +784,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose
                     {formData.roles.map((role, roleIndex) => (
                       <div
                         key={roleIndex}
-                        className="border border-slate-200 rounded-xl p-6 bg-slate-50/50"
+                        className="border-4 border-slate-900 rounded-none p-6 bg-white shadow-[8px_8px_0px_0px_rgba(15,23,42,1)] mb-6"
                       >
                         <div className="flex items-center justify-between mb-4">
                           <h4 className="text-lg font-bold text-slate-900">
@@ -793,7 +795,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose
                             onClick={() => removeRole(roleIndex)}
                             className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors group"
                           >
-                            <TrashIcon className="w-4 h-4 group-hover:scale-110 transition-transform" />
+                            <Trash className="w-4 h-4 group-hover:scale-110 transition-transform" />
                           </button>
                         </div>
 
@@ -807,7 +809,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose
                               type="text"
                               value={role.title}
                               onChange={(e) => updateRole(roleIndex, 'title', e.target.value)}
-                              className="w-full px-4 py-3 border border-slate-200 rounded-xl bg-white text-slate-900 focus:ring-2 focus:ring-green-600 focus:border-transparent transition-all outline-none font-medium"
+                              className="w-full px-4 py-3 border-2 border-slate-900 rounded-none bg-white text-slate-900 focus:shadow-[4px_4px_0px_0px_rgba(22,163,74,1)] transition-all outline-none font-bold"
                               placeholder="e.g., Senior Frontend Developer"
                               required
                             />
@@ -821,7 +823,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose
                             <select
                               value={role.experience}
                               onChange={(e) => updateRole(roleIndex, 'experience', e.target.value)}
-                              className="w-full px-4 py-3 border border-slate-200 rounded-xl bg-white text-slate-900 focus:ring-2 focus:ring-green-600 focus:border-transparent transition-all outline-none font-medium"
+                              className="w-full px-4 py-3 border-2 border-slate-900 rounded-none bg-white text-slate-900 focus:shadow-[4px_4px_0px_0px_rgba(22,163,74,1)] transition-all outline-none font-bold"
                               required
                             >
                               {experienceLevels.map((level) => (
@@ -860,7 +862,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose
                                 type="number"
                                 value={role.salary.min}
                                 onChange={(e) => updateRoleNested(roleIndex, 'salary', 'min', parseInt(e.target.value) || 0)}
-                                className="w-full px-4 py-3 border border-slate-200 rounded-xl bg-white text-slate-900 focus:ring-2 focus:ring-green-600 focus:border-transparent transition-all outline-none font-medium"
+                                className="w-full px-4 py-3 border-2 border-slate-900 rounded-none bg-white text-slate-900 focus:shadow-[4px_4px_0px_0px_rgba(22,163,74,1)] transition-all outline-none font-bold"
                                 placeholder="0"
                                 min="0"
                                 required
@@ -872,7 +874,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose
                                 type="number"
                                 value={role.salary.max}
                                 onChange={(e) => updateRoleNested(roleIndex, 'salary', 'max', parseInt(e.target.value) || 0)}
-                                className="w-full px-4 py-3 border border-slate-200 rounded-xl bg-white text-slate-900 focus:ring-2 focus:ring-green-600 focus:border-transparent transition-all outline-none font-medium"
+                                className="w-full px-4 py-3 border-2 border-slate-900 rounded-none bg-white text-slate-900 focus:shadow-[4px_4px_0px_0px_rgba(22,163,74,1)] transition-all outline-none font-bold"
                                 placeholder="0"
                                 min="0"
                                 required
@@ -883,7 +885,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose
                               <select
                                 value={role.salary.currency}
                                 onChange={(e) => updateRoleNested(roleIndex, 'salary', 'currency', e.target.value)}
-                                className="w-full px-4 py-3 border border-slate-200 rounded-xl bg-white text-slate-900 focus:ring-2 focus:ring-green-600 focus:border-transparent transition-all outline-none font-medium"
+                                className="w-full px-4 py-3 border-2 border-slate-900 rounded-none bg-white text-slate-900 focus:shadow-[4px_4px_0px_0px_rgba(22,163,74,1)] transition-all outline-none font-bold"
                               >
                                 <option value="USD">USD</option>
                                 <option value="EUR">EUR</option>
@@ -911,7 +913,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose
                                   onClick={() => removeSkillFromRole(roleIndex, skill)}
                                   className="hover:text-green-900"
                                 >
-                                  <XMarkIcon className="w-3 h-3" />
+                                  <X className="w-3 h-3" />
                                 </button>
                               </span>
                             ))}
@@ -928,7 +930,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose
                             <button
                               type="button"
                               onClick={() => addSkillToRole(roleIndex)}
-                              className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-bold shadow-sm"
+                              className="px-4 py-3 bg-green-500 text-white rounded-none border-2 border-slate-900 hover:bg-green-600 transition-all font-black uppercase tracking-wider shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] hover:shadow-none hover:translate-x-[1px] hover:translate-y-[1px]"
                             >
                               Add
                             </button>
@@ -941,7 +943,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose
                                   key={skill}
                                   type="button"
                                   onClick={() => addSkillToRole(roleIndex)}
-                                  className="px-2 py-1 text-xs bg-slate-100 text-slate-600 rounded hover:bg-slate-200 transition-colors font-medium border border-slate-200"
+                                  className="px-3 py-2 text-xs bg-white text-slate-900 hover:bg-slate-100 transition-all font-bold border-2 border-slate-900 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] hover:shadow-none hover:translate-x-[1px] hover:translate-y-[1px]"
                                 >
                                   {skill}
                                 </button>
@@ -967,7 +969,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose
                                   onClick={() => removeBenefitFromRole(roleIndex, benefit)}
                                   className="hover:text-blue-900"
                                 >
-                                  <XMarkIcon className="w-3 h-3" />
+                                  <X className="w-3 h-3" />
                                 </button>
                               </span>
                             ))}
@@ -978,7 +980,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose
                                 key={benefit}
                                 type="button"
                                 onClick={() => addBenefitToRole(roleIndex, benefit)}
-                                className="px-2 py-1 text-xs bg-slate-100 text-slate-600 rounded hover:bg-slate-200 transition-colors font-medium border border-slate-200"
+                                className="px-3 py-2 text-xs bg-white text-slate-900 hover:bg-slate-100 transition-all font-bold border-2 border-slate-900 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] hover:shadow-none hover:translate-x-[1px] hover:translate-y-[1px]"
                               >
                                 {benefit}
                               </button>
@@ -1001,12 +1003,12 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose
                                 key={priority.id}
                                 type="button"
                                 onClick={() => updateRole(roleIndex, 'priority', priority.id)}
-                                className={`p-3 border-2 rounded-lg text-center transition-all duration-200 ${role.priority === priority.id
-                                  ? `border-green-600 ${priority.color}`
-                                  : 'border-slate-200 hover:border-green-300 bg-white'
+                                className={`p-4 border-2 rounded-none text-center transition-all duration-200 ${role.priority === priority.id
+                                  ? `border-slate-900 ${priority.color} shadow-[4px_4px_0px_0px_rgba(15,23,42,1)]`
+                                  : 'border-slate-900 hover:bg-slate-100 bg-white shadow-[2px_2px_0px_0px_rgba(15,23,42,1)]'
                                   }`}
                               >
-                                <p className="font-bold">{priority.name}</p>
+                                <p className="font-black uppercase tracking-wide text-sm bg-white/50 px-2 rounded-none inline-block">{priority.name}</p>
                               </button>
                             ))}
                           </div>
@@ -1019,32 +1021,32 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ isOpen, onClose
             </div>
 
             {/* Footer - Fixed */}
-            <div className="flex-none px-8 py-6 border-t border-slate-100 bg-slate-50 flex justify-between items-center rounded-b-2xl">
+            <div className="flex-none px-8 py-6 border-t-4 border-slate-900 bg-slate-50 flex justify-between items-center">
               <button
                 onClick={() => currentStep > 1 ? setCurrentStep(currentStep - 1) : onClose()}
-                className="px-6 py-3 border-2 border-slate-200 text-slate-600 font-bold rounded-xl hover:bg-slate-100 hover:border-slate-300 transition-all duration-300"
+                className="px-6 py-3 border-2 border-slate-900 text-slate-900 font-black uppercase tracking-wider hover:bg-slate-200 transition-all duration-300 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]"
               >
                 {currentStep === 1 ? 'Cancel' : 'Back'}
               </button>
               <button
                 onClick={handleSubmit}
                 disabled={!validateStep(currentStep) || isSubmitting}
-                className="px-8 py-3 bg-green-600 text-white font-bold uppercase tracking-wide rounded-xl hover:bg-green-700 hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 disabled:shadow-none"
+                className="px-8 py-3 bg-green-500 text-white font-black uppercase tracking-widest border-2 border-slate-900 hover:bg-green-600 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none flex items-center gap-2"
               >
                 {isSubmitting ? (
                   <>
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <BrutalistSpinner size={16} className="text-white border-white" />
                     Creating...
                   </>
                 ) : currentStep === 3 ? (
                   <>
-                    <StarIcon className="w-5 h-5" />
+                    <Star className="w-5 h-5 stroke-[3]" />
                     Create Project
                   </>
                 ) : (
                   <>
                     Next Step
-                    <ArrowRightIcon className="w-5 h-5" />
+                    <ArrowRight className="w-5 h-5 stroke-[3]" />
                   </>
                 )}
               </button>
