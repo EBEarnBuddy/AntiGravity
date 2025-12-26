@@ -205,171 +205,173 @@ export const useRoomMessages = (roomId: string) => {
         if (socket) {
           socketInstance = socket;
 
-          // Join Room
-          socket.emit('join_room', roomId);
-          socket.emit('message:read', { roomId, userId: currentUser.uid }); // Mark read on entry
-
-          // -- Listeners --
+          // -- Listeners first --
 
           // New Message
           socket.on('new_message', (newMessage: ChatMessage) => {
-            // Mark as read immediately if window is focused
+            // ... handler logic
+            console.log('Received new message:', newMessage);
+            if ((newMessage as any).room !== roomId) return; // Basic safety check
+
             if (document.visibilityState === 'visible') {
               socket.emit('message:read', { roomId, userId: currentUser.uid });
             }
 
             setMessages((prev) => {
-              // Dedupe: Check by ID or if we have a pending message with same temp characteristics (advanced)
-              // Ideally, backend returns ID matching a temp ID, but here we replace by finding matching content/timestamp/sender? 
-              // Simple approaches for MVP:
-              // 1. If we have a pending message (id starts with 'temp-'), and this new message matches content && sender, REPLACE it.
-
-              const isMyMessage = (newMessage.sender as any)._id === (currentUser as any).uid || (newMessage.sender as any).firebaseUid === currentUser.uid; // Check sender match logic carefully
-
+              // ... dedupe logic
               if (prev.find(m => m.id === newMessage.id || (m as any)._id === (newMessage as any)._id)) {
                 return prev;
               }
 
-              // Reconciliation for Optimistic UI
-              // If this is my message, find the oldest 'pending' message and replace it? 
-              // Or simpler: Just append, and assume 'sendMessage' handles the pending removal/update.
-              // Actually, 'sendMessage' is where we should confirm the message. 
-              // Socket might arrive BEFORE 'sendMessage' returns request response.
+              // If we have a pending message that matches, replace it
+              /* 
+                 Simplified Match: 
+                 If we have a pending message from 'Me' created recently, AND this incoming message is from 'Me'
+                 We assume it's the confirmation.
+                 Ideally, we'd use a UUID generated on client, but for now we rely on the backend response to 'sendMessage' 
+                 to update the specific pending message ID. 
+                 However for incoming socket events that might arrive BEFORE the REST response?
+              */
 
               return [...prev, newMessage];
             });
           });
 
-          // Online Presence
-          socket.on('room_users', (users: any[]) => {
-            // Merge with REST fetched data if needed, or trust socket as live source
-            setOnlineUsers(users);
-          });
+          // Join Room (Once listeners are ready)
+          console.log(`Joining Room: ${roomId}`);
+          socket.emit('join_room', roomId);
+          socket.emit('message:read', { roomId, userId: currentUser.uid });
 
-          socket.on('member:online', (user: any) => {
-            setOnlineUsers(prev => {
-              if (prev.find(u => u.userId === user.userId)) return prev;
-              return [...prev, user];
-            });
-          });
+  // Online Presence
+  socket.on('room_users', (users: any[]) => {
+    // Merge with REST fetched data if needed, or trust socket as live source
+    setOnlineUsers(users);
+  });
 
-          socket.on('member:offline', (data: { userId: string }) => {
-            setOnlineUsers(prev => prev.filter(u => u.userId !== data.userId));
-          });
+  socket.on('member:online', (user: any) => {
+    setOnlineUsers(prev => {
+      if (prev.find(u => u.userId === user.userId)) return prev;
+      return [...prev, user];
+    });
+  });
 
-          // Typing
-          socket.on('typing', (data: any) => {
-            setTypingUsers(prev => {
-              if (prev.find(u => u.userId === data.userId)) return prev;
-              return [...prev, data];
-            });
-          });
+  socket.on('member:offline', (data: { userId: string }) => {
+    setOnlineUsers(prev => prev.filter(u => u.userId !== data.userId));
+  });
 
-          socket.on('stop_typing', (data: any) => {
-            setTypingUsers(prev => prev.filter(u => u.userId !== data.userId));
-          });
+  // Typing
+  socket.on('typing', (data: any) => {
+    setTypingUsers(prev => {
+      if (prev.find(u => u.userId === data.userId)) return prev;
+      return [...prev, data];
+    });
+  });
 
-          // Read Receipts
-          socket.on('messages_read', (data: { roomId: string, userId: string, readAt: string }) => {
-            setMessages(prev => prev.map(msg => {
-              const alreadyRead = msg.readBy?.some((r: any) => (r.user?._id || r.user) === data.userId);
-              if (!alreadyRead) {
-                return {
-                  ...msg,
-                  readBy: [...(msg.readBy || []), { user: data.userId, readAt: data.readAt }]
-                };
-              }
-              return msg;
-            }));
-          });
+  socket.on('stop_typing', (data: any) => {
+    setTypingUsers(prev => prev.filter(u => u.userId !== data.userId));
+  });
 
-          socket.on('error', (err: any) => {
-            console.error('Socket Error:', err);
-            if (err === 'Not a member of this room') {
-              setError('You are not authorized to view this chat.');
-            }
-          });
-        }
+  // Read Receipts
+  socket.on('messages_read', (data: { roomId: string, userId: string, readAt: string }) => {
+    setMessages(prev => prev.map(msg => {
+      const alreadyRead = msg.readBy?.some((r: any) => (r.user?._id || r.user) === data.userId);
+      if (!alreadyRead) {
+        return {
+          ...msg,
+          readBy: [...(msg.readBy || []), { user: data.userId, readAt: data.readAt }]
+        };
+      }
+      return msg;
+    }));
+  });
+
+  socket.on('error', (err: any) => {
+    console.error('Socket Error:', err);
+    if (err === 'Not a member of this room') {
+      setError('You are not authorized to view this chat.');
+    }
+  });
+}
       } catch (err) {
-        console.error('Failed to setup socket:', err);
-      }
+  console.error('Failed to setup socket:', err);
+}
     };
 
-    setupSocket();
+setupSocket();
 
-    return () => {
-      if (socketInstance) {
-        socketInstance.emit('leave_room', roomId);
-        socketInstance.off('new_message');
-        socketInstance.off('room_users');
-        socketInstance.off('member:online');
-        socketInstance.off('member:offline');
-        socketInstance.off('typing');
-        socketInstance.off('stop_typing');
-        socketInstance.off('messages_read');
-        socketInstance.off('error');
-      }
-    };
+return () => {
+  if (socketInstance) {
+    socketInstance.emit('leave_room', roomId);
+    socketInstance.off('new_message');
+    socketInstance.off('room_users');
+    socketInstance.off('member:online');
+    socketInstance.off('member:offline');
+    socketInstance.off('typing');
+    socketInstance.off('stop_typing');
+    socketInstance.off('messages_read');
+    socketInstance.off('error');
+  }
+};
   }, [roomId, currentUser]);
 
-  const sendMessage = async (content: string, type: 'text' | 'image' | 'file' = 'text') => {
-    if (!roomId || !currentUser) return;
+const sendMessage = async (content: string, type: 'text' | 'image' | 'file' = 'text') => {
+  if (!roomId || !currentUser) return;
 
-    // OPTIMISTIC UPDATE
-    const tempId = `temp-${Date.now()}`;
-    const optimisticMessage: any = {
-      id: tempId,
-      _id: tempId,
-      content,
-      type,
-      sender: {
-        _id: 'me', // placeholder
-        firebaseUid: currentUser.uid,
-        displayName: userProfile?.displayName || 'Me',
-        photoURL: currentUser.photoURL,
-      },
-      room: roomId,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      readBy: [],
-      pending: true // Flag for UI
-    };
-
-    setMessages(prev => [...prev, optimisticMessage]);
-
-    try {
-      const { getSocket } = await import('../lib/socket');
-      const socket = await getSocket();
-
-      // Stop typing immediately (Hybrid: Socket + REST? Requirement says Switch typing to REST)
-      // We will call the REST endpoint for certainty, but for sendMessage, we just want to clear it.
-      // Calling stopTyping() helper is safer.
-      sendTyping(false);
-
-      // Send via REST (Authoritative)
-      const response = await messageAPI.send(roomId, content, type);
-      const confirmedMessage = response.data;
-
-      // RECONCILIATION
-      setMessages(prev => prev.map(m => m.id === tempId ? confirmedMessage : m));
-
-      return confirmedMessage;
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to send message');
-      // Rollback optimistic update on failure
-      setMessages(prev => prev.filter(m => m.id !== tempId));
-      throw err;
-    }
+  // OPTIMISTIC UPDATE
+  const tempId = `temp-${Date.now()}`;
+  const optimisticMessage: any = {
+    id: tempId,
+    _id: tempId,
+    content,
+    type,
+    sender: {
+      _id: 'me', // placeholder
+      firebaseUid: currentUser.uid,
+      displayName: userProfile?.displayName || 'Me',
+      photoURL: currentUser.photoURL,
+    },
+    room: roomId,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    readBy: [],
+    pending: true // Flag for UI
   };
 
-  const sendTyping = async (isTyping: boolean) => {
-    if (!roomId || !currentUser) return;
-    try {
-      await messageAPI.sendTyping(roomId, isTyping);
-    } catch (e) { console.error('Failed to update typing status', e); }
-  };
+  setMessages(prev => [...prev, optimisticMessage]);
 
-  return { messages, loading, error, sendMessage, onlineUsers, typingUsers, sendTyping };
+  try {
+    const { getSocket } = await import('../lib/socket');
+    const socket = await getSocket();
+
+    // Stop typing immediately (Hybrid: Socket + REST? Requirement says Switch typing to REST)
+    // We will call the REST endpoint for certainty, but for sendMessage, we just want to clear it.
+    // Calling stopTyping() helper is safer.
+    sendTyping(false);
+
+    // Send via REST (Authoritative)
+    const response = await messageAPI.send(roomId, content, type);
+    const confirmedMessage = response.data;
+
+    // RECONCILIATION
+    setMessages(prev => prev.map(m => m.id === tempId ? confirmedMessage : m));
+
+    return confirmedMessage;
+  } catch (err) {
+    setError(err instanceof Error ? err.message : 'Failed to send message');
+    // Rollback optimistic update on failure
+    setMessages(prev => prev.filter(m => m.id !== tempId));
+    throw err;
+  }
+};
+
+const sendTyping = async (isTyping: boolean) => {
+  if (!roomId || !currentUser) return;
+  try {
+    await messageAPI.sendTyping(roomId, isTyping);
+  } catch (e) { console.error('Failed to update typing status', e); }
+};
+
+return { messages, loading, error, sendMessage, onlineUsers, typingUsers, sendTyping };
 };
 
 export const useRoomChatMessages = useRoomMessages;

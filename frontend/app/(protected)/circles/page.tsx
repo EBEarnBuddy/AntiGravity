@@ -356,8 +356,9 @@ const CirclesPage: React.FC = () => {
             </Sidebar>
 
             {/* Main Content */}
-            <div className="flex-1 overflow-y-auto">
-                <div className="max-w-7xl mx-auto p-8">
+            <div className={`flex-1 overflow-y-auto ${sidebarOpen ? 'hidden md:block' : 'block'}`}>
+                <div className="max-w-7xl mx-auto p-4 md:p-8">
+                    {/* Mobile Toggle for Sidebar (if needed, but usually Sidebar handles it) */}
                     {renderContent()}
                 </div>
             </div>

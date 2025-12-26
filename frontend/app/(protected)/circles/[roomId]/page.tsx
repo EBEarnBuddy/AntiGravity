@@ -407,13 +407,30 @@ const RoomChatPage: React.FC = () => {
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: 10 }}
-                            className="absolute -top-8 left-6 text-xs font-black uppercase tracking-widest text-slate-900 bg-white px-3 py-1 border-2 border-b-0 border-slate-900 flex items-center gap-2 shadow-[2px_-2px_0px_0px_rgba(15,23,42,1)]"
+                            className="absolute -top-12 left-6 flex items-end gap-2 z-20 pointer-events-none"
                         >
-                            <span className="relative flex h-2 w-2">
-                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                                <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
-                            </span>
-                            {typingUsers.map((u: any) => u.userName?.split(' ')[0]).join(', ')} {typingUsers.length === 1 ? 'IS' : 'ARE'} TYPING...
+                            {/* Horizontal Stack of Typing Users */}
+                            <div className="flex -space-x-2 mr-2">
+                                {typingUsers.map((u: any, idx: number) => (
+                                    <div key={idx} className="relative z-10 border-2 border-white rounded-full">
+                                        <UserAvatar
+                                            src={u.userAvatar}
+                                            alt={u.userName}
+                                            uid={u.userId}
+                                            username={u.userName?.replace(' ', '').toLowerCase()}
+                                            size={24}
+                                            className="bg-white"
+                                        />
+                                    </div>
+                                ))}
+                            </div>
+
+                            {/* Typing Bubble with Dots */}
+                            <div className="bg-white border-2 border-slate-900 rounded-2xl rounded-bl-none px-3 py-2 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] flex items-center gap-1 min-h-[36px]">
+                                <span className="w-1.5 h-1.5 bg-slate-900 rounded-full animate-bounce [animation-duration:0.6s]"></span>
+                                <span className="w-1.5 h-1.5 bg-slate-900 rounded-full animate-bounce [animation-duration:0.6s] [animation-delay:0.2s]"></span>
+                                <span className="w-1.5 h-1.5 bg-slate-900 rounded-full animate-bounce [animation-duration:0.6s] [animation-delay:0.4s]"></span>
+                            </div>
                         </motion.div>
                     )}
                 </AnimatePresence>
