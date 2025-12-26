@@ -257,17 +257,27 @@ export interface ChatRoom {
 
 export interface ChatMessage {
   id?: string;
-  senderId: string;
-  senderName: string;
-  senderPhotoURL?: string;
+  _id?: string; // Backend ID
+  senderId?: string; // Legacy
+  sender?: {
+    _id: string;
+    displayName: string;
+    photoURL?: string;
+    firebaseUid?: string;
+  } | string; // Populated or ID
+  senderName?: string; // Legacy
+  senderPhotoURL?: string; // Legacy
   content: string;
-  type?: 'text' | 'image' | 'system';
+  type?: 'text' | 'image' | 'system' | 'file';
   reactions?: { [emoji: string]: string[] };
-  readBy?: { user: string; readAt: string | Date }[];
-  timestamp: Timestamp;
+  readBy?: { user: string | { _id: string, displayName?: string }; readAt: string | Date }[];
+  timestamp?: Timestamp;
+  createdAt?: string; // ISO string from REST
+  updatedAt?: string;
   edited?: boolean;
   editedAt?: Timestamp;
   roomId?: string;
+  pending?: boolean; // For optimistic UI
 }
 
 export interface Notification {
