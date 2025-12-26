@@ -25,6 +25,9 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { AdvancedSearch } from '@/components/ui/advanced-search';
 import { applicationAPI } from '@/lib/axios';
 import { TourReengagementBox } from '@/components/tour/TourReengagementBox';
+import CreateStartupModal from '@/components/CreateStartupModal';
+import { AnimatePresence } from 'framer-motion';
+import { Plus } from 'lucide-react';
 
 const formatDate = (dateString: any) => {
     if (!dateString) return '';
@@ -47,6 +50,8 @@ export default function DiscoverPage() {
     const [myApplications, setMyApplications] = useState<any[]>([]);
     const [loadingApplications, setLoadingApplications] = useState(true);
     const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
+    const [showCreateModal, setShowCreateModal] = useState(false);
+    const [showCreateDropdown, setShowCreateDropdown] = useState(false);
 
     // Fetch My Applications
     useEffect(() => {
@@ -101,7 +106,51 @@ export default function DiscoverPage() {
                         </div>
 
                         {/* Search Bar - Removed as per clean up */}
-                        <div className="hidden"></div>
+                        {/* Create Button & Dropdown */}
+                        <div className="relative">
+                            <motion.button
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                                onClick={() => setShowCreateDropdown(!showCreateDropdown)}
+                                className="h-10 w-10 md:h-12 md:w-12 bg-green-500 border-2 border-slate-900 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] hover:shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center text-white"
+                            >
+                                <Plus className="w-6 h-6 md:w-7 md:h-7 stroke-[3]" />
+                            </motion.button>
+
+                            <AnimatePresence>
+                                {showCreateDropdown && (
+                                    <motion.div
+                                        initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                                        exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                                        className="absolute right-0 top-full mt-2 w-56 bg-white border-2 border-slate-900 shadow-[6px_6px_0px_0px_rgba(15,23,42,1)] z-50 p-2"
+                                    >
+                                        <button
+                                            onClick={() => {
+                                                setShowCreateModal(true);
+                                                setShowCreateDropdown(false);
+                                            }}
+                                            className="w-full text-left px-4 py-3 bg-white hover:bg-green-50 text-slate-900 hover:text-green-700 font-black uppercase text-xs tracking-wide border-2 border-transparent hover:border-slate-900 transition-all flex items-center gap-3"
+                                        >
+                                            <div className="w-8 h-8 bg-green-100 border-2 border-slate-900 flex items-center justify-center text-green-700">
+                                                <Rocket className="w-4 h-4" />
+                                            </div>
+                                            New Opportunity
+                                        </button>
+
+                                        {/* Placeholder for future actions */}
+                                        {/* 
+                                        <button className="w-full text-left px-4 py-3 bg-white hover:bg-purple-50 text-slate-900 hover:text-purple-700 font-black uppercase text-xs tracking-wide border-2 border-transparent hover:border-slate-900 transition-all flex items-center gap-3 mt-1">
+                                            <div className="w-8 h-8 bg-purple-100 border-2 border-slate-900 flex items-center justify-center text-purple-700">
+                                                <Users className="w-4 h-4" />
+                                            </div>
+                                            New Circle
+                                        </button> 
+                                        */}
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -285,6 +334,16 @@ export default function DiscoverPage() {
             />
 
             <TourReengagementBox />
+
+            <CreateStartupModal
+                isOpen={showCreateModal}
+                onClose={() => setShowCreateModal(false)}
+                onSuccess={() => {
+                    // Ideally refresh feed, but for now just close
+                    setShowCreateModal(false);
+                    router.push('/startups?tab=posted'); // Redirect to see it
+                }}
+            />
         </div>
     );
 }
