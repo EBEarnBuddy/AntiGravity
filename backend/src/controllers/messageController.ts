@@ -207,3 +207,48 @@ export const markRoomAsRead = async (req: AuthRequest, res: Response) => {
         res.status(500).json({ error: 'Failed to mark as read' });
     }
 };
+// Typing Indicators (REST)
+export const startTyping = async (req: AuthRequest, res: Response) => {
+    try {
+        const { uid } = req.user!;
+        const { roomId } = req.params;
+        const user = await User.findOne({ firebaseUid: uid });
+
+        if (!user) {
+            res.status(404).json({ error: 'User not found' });
+            return;
+        }
+
+        // Emit socket event via Redis Adapter to all instances
+        const io = getIO();
+        io.to(roomId).emit('typing', {
+            roomId,
+            userId: uid,
+            userName: user.displayName
+        });
+
+        res.status(200).json({ success: true });
+    } catch (error) {
+        console.error('Typing error:', error);
+        res.status(500).json({ error: 'Failed to set typing state' });
+    }
+};
+
+export const stopTyping = async (req: AuthRequest, res: Response) => {
+    try {
+        const { uid } = req.user!;
+        const { roomId } = req.params;
+
+        // Emit socket event
+        const io = getIO();
+        io.to(roomId).emit('stop_typing', {
+            roomId,
+            userId: uid
+        });
+
+        res.status(200).json({ success: true });
+    } catch (error) {
+        console.error('Stop typing error:', error);
+        res.status(500).json({ error: 'Failed to stop typing' });
+    }
+};

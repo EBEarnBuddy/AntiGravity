@@ -58,6 +58,7 @@ const apiRoutes = [
     { path: '/opportunities', router: opportunityRoutes },
     { path: '/applications', router: applicationRoutes },
     { path: '/rooms', router: roomRoutes },
+    { path: '/circles', router: roomRoutes }, // Alias for REST stabilization
     { path: '/notifications', router: notificationRoutes },
     { path: '/collaborations', router: collaborationRoutes },
     { path: '/collab', router: collabRoutes },

@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { createRoom, getRooms, joinRoom, getMyRooms, getPendingRequests, updateMembershipStatus, updateRoom, deleteRoom, leaveRoom } from '../controllers/roomController.js';
+import { createRoom, getRooms, joinRoom, getMyRooms, getPendingRequests, updateMembershipStatus, updateRoom, deleteRoom, leaveRoom, getOnlineMembers } from '../controllers/roomController.js';
 import { verifyToken } from '../middlewares/auth.js';
 
 import messageRoutes from './messageRoutes.js';
@@ -22,5 +22,6 @@ router.post('/:roomId/approve/:userId', updateMembershipStatus);
 router.put('/:roomId', updateRoom);
 router.delete('/:roomId', deleteRoom);
 router.post('/:roomId/leave', leaveRoom);
+router.get('/:roomId/online', getOnlineMembers);
 
 export default router;

@@ -102,6 +102,7 @@ export const roomAPI = {
   updateRoom: (roomId: string, data: any) => api.put(`/rooms/${roomId}`, data),
   deleteRoom: (roomId: string) => api.delete(`/rooms/${roomId}`),
   leaveRoom: (roomId: string) => api.post(`/rooms/${roomId}/leave`),
+  getOnlineMembers: (roomId: string) => api.get(`/rooms/${roomId}/online`),
 };
 
 export const collaborationAPI = {
@@ -122,6 +123,8 @@ export const messageAPI = {
     api.post(`/rooms/${roomId}/messages`, { content, type }),
   getAll: (roomId: string) => api.get(`/rooms/${roomId}/messages`),
   markAsRead: (roomId: string) => api.post(`/rooms/${roomId}/messages/read`),
+  sendTyping: (roomId: string, isTyping: boolean) =>
+    api.post(`/rooms/${roomId}/typing/${isTyping ? 'start' : 'stop'}`),
 };
 
 export const communityPostsAPI = {

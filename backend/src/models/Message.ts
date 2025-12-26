@@ -21,4 +21,7 @@ const MessageSchema: Schema = new Schema({
     }],
 }, { timestamps: true });
 
+// Optimize sorting by creation time
+MessageSchema.index({ createdAt: 1 });
+
 export default mongoose.model<IMessage>('Message', MessageSchema);

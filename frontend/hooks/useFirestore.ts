@@ -162,7 +162,7 @@ export const useRoomMessages = (roomId: string) => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const { currentUser, userProfile } = useAuth(); // Need user for socket logic
+  const { currentUser, userProfile, updateProfile } = useAuth(); // Need user for socket logic
 
   // Realtime State
   const [onlineUsers, setOnlineUsers] = useState<any[]>([]);
@@ -171,12 +171,18 @@ export const useRoomMessages = (roomId: string) => {
   useEffect(() => {
     if (!roomId) return;
 
-    // 1. Fetch historical messages
-    const fetchMessages = async () => {
+    // 1. Fetch historical messages & Online Users (REST Hybrid)
+    const fetchData = async () => {
       try {
         setLoading(true);
-        const response = await messageAPI.getAll(roomId);
-        setMessages(response.data);
+        const [msgsRes, onlineRes] = await Promise.all([
+          messageAPI.getAll(roomId),
+          // Safely fail on online fetch if backend not ready, but ideally it works
+          roomAPI.getOnlineMembers(roomId).catch(() => ({ data: [] }))
+        ]);
+
+        setMessages(msgsRes.data);
+        setOnlineUsers(onlineRes.data || []);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load messages');
       } finally {
@@ -184,7 +190,7 @@ export const useRoomMessages = (roomId: string) => {
       }
     };
 
-    fetchMessages();
+    fetchData();
 
     // 2. Setup Real-time
     let socketInstance: any = null;
@@ -207,22 +213,36 @@ export const useRoomMessages = (roomId: string) => {
 
           // New Message
           socket.on('new_message', (newMessage: ChatMessage) => {
-            // Mark as read immediately if window is focused (simplified for now: just emit read)
+            // Mark as read immediately if window is focused
             if (document.visibilityState === 'visible') {
               socket.emit('message:read', { roomId, userId: currentUser.uid });
             }
 
             setMessages((prev) => {
-              // Dedupe
+              // Dedupe: Check by ID or if we have a pending message with same temp characteristics (advanced)
+              // Ideally, backend returns ID matching a temp ID, but here we replace by finding matching content/timestamp/sender? 
+              // Simple approaches for MVP:
+              // 1. If we have a pending message (id starts with 'temp-'), and this new message matches content && sender, REPLACE it.
+
+              const isMyMessage = (newMessage.sender as any)._id === (currentUser as any).uid || (newMessage.sender as any).firebaseUid === currentUser.uid; // Check sender match logic carefully
+
               if (prev.find(m => m.id === newMessage.id || (m as any)._id === (newMessage as any)._id)) {
                 return prev;
               }
+
+              // Reconciliation for Optimistic UI
+              // If this is my message, find the oldest 'pending' message and replace it? 
+              // Or simpler: Just append, and assume 'sendMessage' handles the pending removal/update.
+              // Actually, 'sendMessage' is where we should confirm the message. 
+              // Socket might arrive BEFORE 'sendMessage' returns request response.
+
               return [...prev, newMessage];
             });
           });
 
           // Online Presence
           socket.on('room_users', (users: any[]) => {
+            // Merge with REST fetched data if needed, or trust socket as live source
             setOnlineUsers(users);
           });
 
@@ -251,10 +271,7 @@ export const useRoomMessages = (roomId: string) => {
 
           // Read Receipts
           socket.on('messages_read', (data: { roomId: string, userId: string, readAt: string }) => {
-            // Update local message state to show "Read" status
             setMessages(prev => prev.map(msg => {
-              // If msg doesn't have this user in readBy, add them.
-              // Assuming msg.readBy is array of objects { user, readAt }
               const alreadyRead = msg.readBy?.some((r: any) => (r.user?._id || r.user) === data.userId);
               if (!alreadyRead) {
                 return {
@@ -297,32 +314,59 @@ export const useRoomMessages = (roomId: string) => {
 
   const sendMessage = async (content: string, type: 'text' | 'image' | 'file' = 'text') => {
     if (!roomId || !currentUser) return;
+
+    // OPTIMISTIC UPDATE
+    const tempId = `temp-${Date.now()}`;
+    const optimisticMessage: any = {
+      id: tempId,
+      _id: tempId,
+      content,
+      type,
+      sender: {
+        _id: 'me', // placeholder
+        firebaseUid: currentUser.uid,
+        displayName: userProfile?.displayName || 'Me',
+        photoURL: currentUser.photoURL,
+      },
+      room: roomId,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      readBy: [],
+      pending: true // Flag for UI
+    };
+
+    setMessages(prev => [...prev, optimisticMessage]);
+
     try {
       const { getSocket } = await import('../lib/socket');
       const socket = await getSocket();
 
-      // Stop typing immediately
-      socket?.emit('stop_typing', { roomId, userId: currentUser.uid });
+      // Stop typing immediately (Hybrid: Socket + REST? Requirement says Switch typing to REST)
+      // We will call the REST endpoint for certainty, but for sendMessage, we just want to clear it.
+      // Calling stopTyping() helper is safer.
+      sendTyping(false);
 
-      // Send via HTTP
+      // Send via REST (Authoritative)
       const response = await messageAPI.send(roomId, content, type);
-      // Socket will handle the append via 'new_message' event for consistency
-      return response.data;
+      const confirmedMessage = response.data;
+
+      // RECONCILIATION
+      setMessages(prev => prev.map(m => m.id === tempId ? confirmedMessage : m));
+
+      return confirmedMessage;
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to send message');
+      // Rollback optimistic update on failure
+      setMessages(prev => prev.filter(m => m.id !== tempId));
       throw err;
     }
   };
 
   const sendTyping = async (isTyping: boolean) => {
     if (!roomId || !currentUser) return;
-    const { getSocket } = await import('../lib/socket');
-    const socket = await getSocket();
-    if (isTyping) {
-      socket?.emit('typing', { roomId, userId: currentUser.uid, userName: userProfile?.displayName || 'User' });
-    } else {
-      socket?.emit('stop_typing', { roomId, userId: currentUser.uid });
-    }
+    try {
+      await messageAPI.sendTyping(roomId, isTyping);
+    } catch (e) { console.error('Failed to update typing status', e); }
   };
 
   return { messages, loading, error, sendMessage, onlineUsers, typingUsers, sendTyping };

@@ -314,6 +314,28 @@ export const getMyRooms = async (req: AuthRequest, res: Response) => {
     }
 };
 
+// Get Online Members (REST Wrapper for Socket Presence)
+export const getOnlineMembers = async (req: AuthRequest, res: Response) => {
+    try {
+        const { roomId } = req.params;
+        const io = getIO();
+
+        // Fetch all sockets in this room across all instances (via Redis adapter)
+        const sockets = await io.in(roomId).fetchSockets();
+
+        // Extract user details
+        const onlineUsers = sockets.map(s => s.data.userDetails).filter(u => u);
+
+        // Deduplicate by userId
+        const uniqueOnlineUsers = Array.from(new Map(onlineUsers.map(item => [item['userId'], item])).values());
+
+        res.status(200).json(uniqueOnlineUsers);
+    } catch (error) {
+        console.error('Error fetching online members:', error);
+        res.status(500).json({ error: 'Failed to fetch online members' });
+    }
+};
+
 // Get Pending Requests for a Room (Owner/Admin only)
 export const getPendingRequests = async (req: AuthRequest, res: Response) => {
     try {
