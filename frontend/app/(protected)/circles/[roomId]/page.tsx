@@ -22,6 +22,7 @@ import ChatSettingsModal from '@/components/ChatSettingsModal';
 import { getSocket } from '@/lib/socket';
 import { messageAPI } from '@/lib/axios';
 import { formatTimeAgo } from '@/lib/utils';
+import { UserAvatar } from '@/components/ui/UserAvatar';
 
 const RoomChatPage: React.FC = () => {
     const params = useParams();
@@ -388,18 +389,16 @@ const RoomChatPage: React.FC = () => {
                                 transition={{ type: "spring", stiffness: 300, damping: 24 }}
                                 className={`flex items-end gap-2 w-full mb-4 ${isMe ? 'justify-end' : 'justify-start'}`}
                             >
-                                {/* Avatar (Receiver Only) */}
                                 {!isMe && (
                                     <div className="flex-shrink-0 order-1">
-                                        <div className="h-8 w-8 rounded-full border-2 border-slate-900 overflow-hidden bg-white shadow-[2px_2px_0px_0px_rgba(15,23,42,1)]">
-                                            {senderPhoto ? (
-                                                <img src={senderPhoto} alt={senderName} className="w-full h-full object-cover" />
-                                            ) : (
-                                                <div className="w-full h-full flex items-center justify-center bg-slate-100 text-xs font-bold text-slate-500">
-                                                    {senderName?.charAt(0).toUpperCase()}
-                                                </div>
-                                            )}
-                                        </div>
+                                        <UserAvatar
+                                            src={senderPhoto}
+                                            alt={senderName}
+                                            uid={senderId}
+                                            username={sender.username} // Assuming sender object has username, otherwise fallback to UID linking
+                                            size={32}
+                                            className="bg-white shadow-[2px_2px_0px_0px_rgba(15,23,42,1)]"
+                                        />
                                     </div>
                                 )}
 

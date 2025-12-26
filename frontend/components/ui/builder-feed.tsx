@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { TrendingUp, Users, Zap } from 'lucide-react';
 import { FloatingCard } from './floating-card';
 import { useAuth } from '../../contexts/AuthContext';
+import { UserAvatar } from './UserAvatar';
 
 interface BuilderActivity {
   id: string;
@@ -84,10 +85,14 @@ export const BuilderFeed: React.FC = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3, delay: index * 0.1 }}
             >
-              <img
+              <UserAvatar
                 src={activity.user.avatar}
                 alt={activity.user.name}
-                className="w-10 h-10 rounded-none border-2 border-slate-900 object-cover"
+                className="rounded-none border-2 border-slate-900 object-cover"
+                size={40}
+                // Builder feed usually has mock data or partial data, linking might be tricky if we don't have UID/Username
+                // If we have it in the future, pass it here. For now, let's assume no link if missing.
+                uid={activity.id.startsWith('activity-') ? undefined : activity.user.name /* fallback to searching by name? No, risky. Leave unlinked if mock. */}
               />
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1">

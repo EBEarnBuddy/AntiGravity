@@ -122,7 +122,7 @@ const ProfilePage = () => {
                                     </button>
                                 </>
                             ) : (
-                                <button onClick={() => router.push('/settings')} className="flex-1 md:flex-none px-6 py-3 bg-slate-900 text-white font-black uppercase tracking-wide border-2 border-slate-900 hover:bg-white hover:text-slate-900 transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]">
+                                <button onClick={() => router.push('/profile')} className="flex-1 md:flex-none px-6 py-3 bg-slate-900 text-white font-black uppercase tracking-wide border-2 border-slate-900 hover:bg-white hover:text-slate-900 transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]">
                                     Edit Profile
                                 </button>
                             )}

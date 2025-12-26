@@ -391,6 +391,14 @@ export class FirestoreService {
     await uploadBytes(objectRef, file);
     return await getDownloadURL(objectRef);
   }
+
+  static async uploadUserAvatar(userId: string, file: File): Promise<string> {
+    if (!storage) throw new Error('Firebase storage is not initialized');
+    const safeName = `${Date.now()}_avatar`.replace(/\s+/g, '_');
+    const objectRef = ref(storage, `users/${userId}/avatar/${safeName}`);
+    await uploadBytes(objectRef, file);
+    return await getDownloadURL(objectRef);
+  }
   // User Profiles
   static async createUserProfile(profileData: Omit<UserProfile, 'id' | 'joinDate'>): Promise<void> {
     await setDoc(doc(db, 'users', profileData.uid), {

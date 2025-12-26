@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Check, XCircle, Users, RefreshCw } from 'lucide-react';
 import { useRooms } from '@/hooks/useFirestore';
 import { BrutalistSpinner } from './ui/BrutalistSpinner';
+import { UserAvatar } from './ui/UserAvatar';
 
 interface PendingRequest {
     _id: string;
@@ -136,16 +137,14 @@ const PendingRequestsModal: React.FC<PendingRequestsModalProps> = ({
                                         className="bg-white border-4 border-slate-900 p-4 flex items-center gap-4 hover:shadow-[8px_8px_0px_0px_rgba(15,23,42,1)] hover:-translate-y-1 transition-all"
                                     >
                                         {/* Avatar */}
-                                        <div className="w-12 h-12 border-2 border-slate-900 bg-green-200 flex items-center justify-center text-slate-900 font-black text-lg overflow-hidden flex-shrink-0 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)]">
-                                            {request.user.photoURL ? (
-                                                <img
-                                                    src={request.user.photoURL}
-                                                    alt={request.user.displayName}
-                                                    className="w-full h-full object-cover"
-                                                />
-                                            ) : (
-                                                request.user.displayName?.charAt(0).toUpperCase() || 'U'
-                                            )}
+                                        <div className="flex-shrink-0">
+                                            <UserAvatar
+                                                src={request.user.photoURL}
+                                                alt={request.user.displayName}
+                                                uid={request.user.firebaseUid}
+                                                size={48}
+                                                className="border-2 border-slate-900 bg-green-200 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)]"
+                                            />
                                         </div>
 
                                         {/* User Info */}
