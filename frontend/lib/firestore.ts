@@ -294,6 +294,14 @@ export interface UserProfile {
   interests: string[];
   location?: string;
   website?: string;
+  socialLinks?: {
+    github?: string;
+    linkedin?: string;
+    portfolio?: string;
+    twitter?: string;
+  };
+  availability?: 'open' | 'busy';
+  // Legacy or flat fields (keep for compatibility if needed)
   github?: string;
   linkedin?: string;
   twitter?: string;
