@@ -33,14 +33,15 @@ const RoomChatPage: React.FC = () => {
     const { rooms, myRooms } = useRooms();
     const room = rooms.find(r => r.id === roomId) || myRooms.find(r => r.id === roomId);
 
-    const { messages, loading, sendMessage } = useRoomMessages(roomId);
+    const { messages, loading, sendMessage, onlineUsers, typingUsers, sendTyping } = useRoomMessages(roomId);
     const [newMessage, setNewMessage] = useState('');
     const [showPendingModal, setShowPendingModal] = useState(false);
     const [showCollabModal, setShowCollabModal] = useState(false);
     const [showSettingsModal, setShowSettingsModal] = useState(false);
 
     const [showMenu, setShowMenu] = useState(false);
-    const [typingUsers, setTypingUsers] = useState<string[]>([]);
+
+    // Typing state handled by hook now
     const typingTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
 
     // Check membership status
@@ -52,8 +53,9 @@ const RoomChatPage: React.FC = () => {
         e?.preventDefault();
         if (!newMessage.trim() || !currentUser) return;
 
-        await sendMessage(newMessage, currentUser.uid, 'text');
+        await sendMessage(newMessage, 'text'); // Type inference fix
         setNewMessage('');
+        sendTyping(false); // Stop typing immediately on send
     };
 
     const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -86,53 +88,10 @@ const RoomChatPage: React.FC = () => {
             scrollToBottom();
         }
         if (currentUser && messages.length > 0) {
-            // Mark as read
+            // Mark as read handled by hook/socket now, but generic API call backup is fine
             messageAPI.markAsRead(roomId).catch(console.error);
         }
-    }, [messages, roomId, currentUser]); // Removed isNearBottom from deps to avoid loop
-
-    // Socket listeners for Typing and Read Receipts
-    useEffect(() => {
-        let socketInstance: any = null;
-        const setupSocket = async () => {
-            const socket = await getSocket();
-            if (!socket) return;
-            socketInstance = socket;
-
-            socket.on('typing', (data: { userId: string, userName: string, roomId: string }) => {
-                if (data.roomId === roomId && data.userId !== currentUser?.uid) {
-                    setTypingUsers(prev => {
-                        if (!prev.includes(data.userName)) return [...prev, data.userName];
-                        return prev;
-                    });
-                }
-            });
-
-            socket.on('stop_typing', (data: { userId: string, roomId: string }) => {
-                if (data.roomId === roomId) {
-                    setTypingUsers(prev => prev.filter(name => name !== data.userId)); // userId in stop_typing might need to be mapped or we use userName. 
-                    // To be safe, let's assume typing event sends userName and we store userName.
-                    // But stop_typing usually sends userId. 
-                    // Simplification: We clear ALL typing users after timeout if complex.
-                    // Let's rely on standard logic:
-                    // We need to map userId to name or just store userId and look up? 
-                    // Let's store objects: {id, name}
-                }
-            });
-
-            // For simplicity, we'll just listen to 'typing' and auto-clear with local timeout if stop isn't reliable, 
-            // OR assumes backend broadcasts userName in stop_typing too? 
-            // Let's adjust the listener to be more robust manually below.
-        };
-        setupSocket();
-
-        return () => {
-            if (socketInstance) {
-                socketInstance.off('typing');
-                socketInstance.off('stop_typing');
-            }
-        };
-    }, [roomId, currentUser]);
+    }, [messages, roomId, currentUser]);
 
     const lastTypingEmitRef = useRef<number>(0);
 
@@ -141,20 +100,14 @@ const RoomChatPage: React.FC = () => {
         const THROTTLE_DELAY = 2000; // 2 seconds
 
         if (now - lastTypingEmitRef.current > THROTTLE_DELAY) {
-            const socket = await getSocket();
-            if (socket && currentUser) {
-                socket.emit('typing', { roomId, userId: currentUser.uid, userName: currentUser.displayName });
-                lastTypingEmitRef.current = now;
-            }
+            sendTyping(true);
+            lastTypingEmitRef.current = now;
         }
 
         // Always reset the stop timer on every keystroke
         if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
         typingTimeoutRef.current = setTimeout(async () => {
-            const socket = await getSocket();
-            if (socket && currentUser) {
-                socket.emit('stop_typing', { roomId, userId: currentUser.uid });
-            }
+            sendTyping(false);
         }, 3000); // 3 seconds timeout to stop
     };
 
@@ -243,7 +196,7 @@ const RoomChatPage: React.FC = () => {
                         </h1>
                         <p className="text-[10px] text-slate-500 font-bold mt-0.5 flex items-center gap-1.5 uppercase tracking-wide">
                             <span className="w-1.5 h-1.5 rounded-full bg-green-500"></span>
-                            {room?.memberCount || 1} Online
+                            {onlineUsers.length > 0 ? onlineUsers.length : 1} Online
                         </p>
                     </div>
                 </div>
@@ -460,7 +413,7 @@ const RoomChatPage: React.FC = () => {
                                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
                                 <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
                             </span>
-                            {typingUsers.map(u => u.split(' ')[0]).join(', ')} {typingUsers.length === 1 ? 'IS' : 'ARE'} TYPING...
+                            {typingUsers.map((u: any) => u.userName?.split(' ')[0]).join(', ')} {typingUsers.length === 1 ? 'IS' : 'ARE'} TYPING...
                         </motion.div>
                     )}
                 </AnimatePresence>
