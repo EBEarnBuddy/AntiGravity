@@ -655,9 +655,12 @@ export const useNotifications = () => {
         const socket = await getSocket();
         if (socket) {
           socketInstance = socket;
-          socket.on('notification', (notif: Notification) => {
+          // Support both events for transition
+          const handleNotification = (notif: Notification) => {
             fetchNotifications(); // Reload list to get latest state
-          });
+          };
+          socket.on('notification', handleNotification);
+          socket.on('notification:new', handleNotification);
         }
       } catch (e) {
         console.error(e);
@@ -668,6 +671,7 @@ export const useNotifications = () => {
     return () => {
       if (socketInstance) {
         socketInstance.off('notification');
+        socketInstance.off('notification:new');
       }
     };
   }, [currentUser]);

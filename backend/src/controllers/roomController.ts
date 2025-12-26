@@ -5,6 +5,7 @@ import User from '../models/User.js';
 import Message from '../models/Message.js';
 import { AuthRequest } from '../middlewares/auth.js';
 import { getIO } from '../socket.js';
+import RedisService from '../services/RedisService.js';
 
 // Create a Room
 export const createRoom = async (req: AuthRequest, res: Response) => {
@@ -38,6 +39,10 @@ export const createRoom = async (req: AuthRequest, res: Response) => {
             role: 'admin',
             status: 'accepted',
         });
+
+        // Redis: Invalidate generic room lists because a new public room might appear
+        // Better: Only invalidate if !isPrivate. But simplistic approach for now:
+        await RedisService.delPattern('rooms:*');
 
         // Realtime: Emit event
         try {
@@ -107,6 +112,13 @@ export const joinRoom = async (req: AuthRequest, res: Response) => {
             status: 'pending',
         });
 
+        // Redis: Invalidate user's room list/metadata caches?
+        // Pending requests usually don't show on main list unless accepted.
+        // But let's be safe if we cache "my requests".
+        // For 'getRooms', we look up membership info, so new pending request changes that output.
+        // Cache key for getRooms includes UID. So invalidate THAT user's cache.
+        await RedisService.delPattern(`rooms:${uid}:*`);
+
         // Emit socket event for new request
         try {
             const io = getIO();
@@ -128,6 +140,14 @@ export const joinRoom = async (req: AuthRequest, res: Response) => {
                     `${user.displayName} wants to join ${room.name}`,
                     `/circles/${roomId}`
                 );
+
+                // Realtime Notification to owner
+                io.to(`user:${(roomOwner.user as any).firebaseUid}`).emit('notification:new', {
+                    title: 'New Join Request',
+                    body: `${user.displayName} wants to join ${room.name}`,
+                    link: `/circles/${roomId}`,
+                    type: 'join_request'
+                });
             }
 
         } catch (e) { console.error(e) }
@@ -144,8 +164,32 @@ export const getRooms = async (req: AuthRequest, res: Response) => {
         const { uid } = req.user!;
         const { type } = req.query; // Filter by type: community, collab, opportunity
 
-        console.log(`🔥 API HIT: GET /rooms (All) for UID: ${uid}, type: ${type || 'all'}`);
+        // console.log(`🔥 API HIT: GET /rooms (All) for UID: ${uid}, type: ${type || 'all'}`);
+
+        // Redis Cache Check
+        const cacheKey = `rooms:${uid}:${type || 'all'}`;
+        const cachedRooms = await RedisService.get(cacheKey);
+
+        if (cachedRooms) {
+            // console.log(`[Cache] Hit for ${cacheKey}`);
+            res.json(cachedRooms);
+            return;
+        }
+
         const user = await User.findOne({ firebaseUid: uid });
+        if (!user) {
+            // If for some reason user not found, just return empty?
+            // Fetch rooms based on filter without membership info fallback
+            const filter: any = { isPrivate: false };
+            if (type && ['community', 'collab', 'opportunity'].includes(type as string)) {
+                filter.type = type;
+            } else if (!type) {
+                filter.type = { $ne: 'opportunity' };
+            }
+            const roomsDocs = await Room.find(filter).sort({ lastMessageAt: -1, createdAt: -1 });
+            res.json(roomsDocs);
+            return;
+        }
 
         // Build query filter
         const filter: any = {
@@ -162,12 +206,6 @@ export const getRooms = async (req: AuthRequest, res: Response) => {
 
         // Fetch rooms based on filter
         const roomsDocs = await Room.find(filter).sort({ lastMessageAt: -1, createdAt: -1 });
-
-        if (!user) {
-            // If for some reason user not found, just return rooms without membership info
-            res.json(roomsDocs);
-            return;
-        }
 
         // Fetch all memberships for this user
         const memberships = await RoomMembership.find({ user: user._id });
@@ -189,6 +227,9 @@ export const getRooms = async (req: AuthRequest, res: Response) => {
                 memberCount: roomObj.membersCount || 0
             };
         });
+
+        // Set Cache (5 minutes)
+        await RedisService.set(cacheKey, roomsWithMembership, 300);
 
         res.json(roomsWithMembership);
     } catch (error) {

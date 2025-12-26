@@ -167,7 +167,7 @@ const RoomChatPage: React.FC = () => {
     }
 
     return (
-        <div className="fixed inset-0 flex flex-col bg-slate-50 font-sans overflow-hidden" style={{ top: '64px' }}>
+        <div className="fixed inset-0 flex flex-col bg-slate-50 font-sans overflow-hidden" style={{ top: '64px', height: 'calc(100dvh - 64px)' }}>
             {/* Room Header - Comicy Style */}
             <div className="bg-white border-b-2 border-slate-900 px-4 py-3 flex items-center justify-between flex-shrink-0 z-10 w-full min-h-[60px]">
                 <div className="flex items-center gap-3 flex-shrink-0">

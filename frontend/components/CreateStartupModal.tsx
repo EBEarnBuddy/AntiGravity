@@ -267,7 +267,7 @@ const CreateStartupModal: React.FC<CreateStartupModalProps> = ({ isOpen, onClose
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header - Fixed */}
-            <div className="flex-none px-8 py-6 border-b-4 border-slate-900 bg-white">
+            <div className="flex-none px-4 md:px-8 py-4 md:py-6 border-b-4 border-slate-900 bg-white">
               <div className="flex items-center justify-between mb-6">
                 <div>
                   <h2 className="text-2xl font-black text-slate-900 tracking-tight uppercase">List Your Startup</h2>
@@ -293,7 +293,7 @@ const CreateStartupModal: React.FC<CreateStartupModalProps> = ({ isOpen, onClose
             </div>
 
             {/* Scrollable Content */}
-            <div className="flex-1 overflow-y-auto px-8 py-6 custom-scrollbar">
+            <div className="flex-1 overflow-y-auto px-4 md:px-8 py-6 custom-scrollbar">
 
               {/* Step 1: Basic Information */}
               {currentStep === 1 && (
@@ -694,7 +694,7 @@ const CreateStartupModal: React.FC<CreateStartupModalProps> = ({ isOpen, onClose
             </div>
 
             {/* Footer - Fixed */}
-            <div className="flex-none px-8 py-6 border-t-4 border-slate-900 bg-slate-50 flex justify-between items-center">
+            <div className="flex-none px-4 md:px-8 py-4 md:py-6 border-t-4 border-slate-900 bg-slate-50 flex justify-between items-center">
               <motion.button
                 onClick={prevStep}
                 disabled={currentStep === 1}

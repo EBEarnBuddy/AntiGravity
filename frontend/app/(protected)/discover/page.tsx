@@ -97,8 +97,8 @@ export default function DiscoverPage() {
             {/* Header Section */}
             <div className="bg-white border-b border-slate-100 sticky top-0 z-30">
                 <div className="container mx-auto px-4 py-6">
-                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                        <div id="tour-dashboard-welcome">
+                    <div className="flex flex-row justify-between items-center gap-4">
+                        <div id="tour-dashboard-welcome" className="flex-1 min-w-0">
                             <h1 className="text-2xl font-black text-slate-900 tracking-tight uppercase">
                                 Welcome back, {userProfile?.displayName?.split(' ')[0] || 'Builder'}
                             </h1>

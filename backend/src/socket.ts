@@ -1,5 +1,7 @@
 import { Server, Socket } from 'socket.io';
 import { Server as HttpServer } from 'http';
+import { createAdapter } from '@socket.io/redis-adapter';
+import { Redis } from 'ioredis';
 import { auth } from './config/firebase.js';
 import RoomMembership from './models/RoomMembership.js';
 import User from './models/User.js';
@@ -11,6 +13,22 @@ export const initSocket = (httpServer: HttpServer) => {
             methods: ['GET', 'POST']
         }
     });
+
+    // Redis Adapter Setup
+    if (process.env.REDIS_URL) {
+        try {
+            console.log('🔌 [Socket] Initializing Redis Adapter...');
+            const pubClient = new Redis(process.env.REDIS_URL);
+            const subClient = pubClient.duplicate();
+
+            io.adapter(createAdapter(pubClient, subClient));
+            console.log('✅ [Socket] Redis Adapter attached successfully');
+        } catch (e) {
+            console.error('❌ [Socket] Failed to attach Redis adapter:', e);
+        }
+    } else {
+        console.warn('⚠️ [Socket] No REDIS_URL provided. Running in single-instance mode.');
+    }
 
     // Middleware for Auth
     io.use(async (socket, next) => {
@@ -33,6 +51,9 @@ export const initSocket = (httpServer: HttpServer) => {
         // console.log(`User connected: ${uid}`); // too noisy
 
         // Join personal room for notifications
+        // IMPORTANT: Join generic user room for multi-tab/device sync
+        socket.join(`user:${uid}`);
+        // Keep old format for backward compat if needed, but standardizing on user:{uid}
         socket.join(`user_${uid}`);
 
         socket.on('join_room', async (roomId: string) => {
@@ -86,6 +107,14 @@ export const initSocket = (httpServer: HttpServer) => {
             }
         });
 
+        // Listen to personal notification events if needed or just handle via rooms
+        socket.on('message:read', (data: { roomId: string, userId: string }) => {
+            // Handled by controller usually, but if client emits this, we can broadcast to room
+            // Ideally, server updates DB then broadcasts. 
+            // If client emits to server, server should handle DB update then broadcast.
+            // For now, let's allow relay for instant UI update, but backend controller is source of truth.
+        });
+
         // Typing Indicators
         socket.on('typing', (data: { roomId: string, userId: string, userName: string }) => {
             // Broadcast to everyone in the room except the sender
@@ -99,7 +128,7 @@ export const initSocket = (httpServer: HttpServer) => {
         socket.on('disconnecting', () => {
             // Notify all rooms this user is in
             for (const roomId of socket.rooms) {
-                if (roomId !== socket.id && !roomId.startsWith('user_')) {
+                if (roomId !== socket.id && !roomId.startsWith('user_') && !roomId.startsWith('user:')) {
                     socket.to(roomId).emit('member:offline', { userId: uid });
                 }
             }

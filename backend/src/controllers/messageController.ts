@@ -6,6 +6,7 @@ import RoomMembership from '../models/RoomMembership.js';
 import { AuthRequest } from '../middlewares/auth.js';
 import { getIO } from '../socket.js';
 import { createNotification } from './notificationController.js';
+import RedisService from '../services/RedisService.js';
 
 // Send Message
 export const sendMessage = async (req: AuthRequest, res: Response) => {
@@ -21,6 +22,7 @@ export const sendMessage = async (req: AuthRequest, res: Response) => {
         }
 
         // Check membership
+        // Optimization: Cache room membership check? For now, keep DB check for security.
         const roomDoc = await Room.findById(roomId);
         if (!roomDoc) {
             res.status(404).json({ error: 'Room not found' });
@@ -48,6 +50,9 @@ export const sendMessage = async (req: AuthRequest, res: Response) => {
         // Populate sender for immediate frontend display
         await message.populate('sender', 'displayName photoURL firebaseUid');
 
+        // Redis: Invalidate message cache for this room
+        await RedisService.del(`messages:${roomId}`);
+
         // Emit to room
         try {
             const io = getIO();
@@ -61,6 +66,7 @@ export const sendMessage = async (req: AuthRequest, res: Response) => {
             for (const member of memberships) {
                 const recipient = await User.findById(member.user);
                 if (recipient) {
+                    // Create Notification
                     // Provide a generic title or room name if possible
                     await createNotification(
                         recipient.firebaseUid,
@@ -68,8 +74,16 @@ export const sendMessage = async (req: AuthRequest, res: Response) => {
                         'new_message',
                         `New Message from ${user.displayName}`,
                         message.content.substring(0, 50) + (message.content.length > 50 ? '...' : ''),
-                        `/rooms/${roomId}`
+                        `/circles/${roomId}`
                     );
+
+                    // Realtime Notification: Emit to user's personal room
+                    io.to(`user:${recipient.firebaseUid}`).emit('notification:new', {
+                        title: `New Message from ${user.displayName}`,
+                        body: message.content.substring(0, 50) + (message.content.length > 50 ? '...' : ''),
+                        link: `/circles/${roomId}`,
+                        type: 'message'
+                    });
                 }
             }
         } catch (err) {
@@ -98,6 +112,12 @@ export const getMessages = async (req: AuthRequest, res: Response) => {
             return;
         }
 
+        // Redis: Check Cache
+        // Cache key: messages:{roomId}
+        // Note: Caching with limit logic is tricky. Simplest is to cache the default page (last 50).
+        const cacheKey = `messages:${roomId}`;
+        const cachedMessages = await RedisService.get<any[]>(cacheKey);
+
         const roomDoc = await Room.findById(roomId);
         if (!roomDoc) {
             res.status(404).json({ error: 'Room not found' });
@@ -112,10 +132,19 @@ export const getMessages = async (req: AuthRequest, res: Response) => {
             return;
         }
 
+        if (cachedMessages) {
+            // console.log(`[Cache] Hit for ${cacheKey}`);
+            res.json(cachedMessages);
+            return;
+        }
+
         const messages = await Message.find({ room: roomId })
             .sort({ createdAt: 1 }) // Check client needs. Usually ascending for chat log
             .limit(limit)
             .populate('sender', 'displayName photoURL firebaseUid');
+
+        // Cache for 1 hour (auto invalidates on new message)
+        await RedisService.set(cacheKey, messages, 3600);
 
         res.json(messages);
     } catch (error) {
