@@ -118,7 +118,7 @@ export const eventAPI = {
 };
 
 export const messageAPI = {
-  send: (roomId: string, content: string, type: 'text' | 'image' = 'text') =>
+  send: (roomId: string, content: string, type: 'text' | 'image' | 'file' = 'text') =>
     api.post(`/rooms/${roomId}/messages`, { content, type }),
   getAll: (roomId: string) => api.get(`/rooms/${roomId}/messages`),
   markAsRead: (roomId: string) => api.post(`/rooms/${roomId}/messages/read`),
