@@ -361,7 +361,7 @@ const RoomChatPage: React.FC = () => {
 
                                     {/* Bubble */}
                                     <div
-                                        className={`px-4 py-2 font-bold leading-relaxed shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] border-2 border-slate-900 relative group ${isMe
+                                        className={`px-4 py-2 font-bold leading-relaxed shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] border-2 border-slate-900 relative group whitespace-pre-wrap ${isMe
                                             ? 'bg-green-600 text-white'
                                             : 'bg-white text-slate-900'
                                             }`}
@@ -425,6 +425,13 @@ const RoomChatPage: React.FC = () => {
                                 <span className="w-1.5 h-1.5 bg-slate-900 rounded-full animate-bounce [animation-duration:0.6s] [animation-delay:0.2s]"></span>
                                 <span className="w-1.5 h-1.5 bg-slate-900 rounded-full animate-bounce [animation-duration:0.6s] [animation-delay:0.4s]"></span>
                             </div>
+
+                            {/* Requirement: Text Label */}
+                            <span className="ml-2 text-[10px] font-bold text-slate-500 animate-pulse">
+                                {typingUsers.length === 1
+                                    ? `${typingUsers[0].userName || 'Someone'} is typing...`
+                                    : 'Multiple people typing...'}
+                            </span>
                         </motion.div>
                     )}
                 </AnimatePresence>
