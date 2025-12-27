@@ -52,19 +52,6 @@ const NotificationDropdown = () => {
                     setNotifications(prev => [mappedNotif, ...prev]);
                     setUnreadCount(prev => prev + 1);
                 });
-                socketInstance.on('notification:new', (newNotif: any) => {
-                    // Handle logical 'new' notification structure, mapping to interface
-                    const mapped: INotification = {
-                        _id: Date.now().toString(),
-                        title: newNotif.title,
-                        message: newNotif.body,
-                        link: newNotif.link,
-                        isRead: false,
-                        createdAt: new Date().toISOString()
-                    };
-                    setNotifications(prev => [mapped, ...prev]);
-                    setUnreadCount(prev => prev + 1);
-                });
             }
         };
 

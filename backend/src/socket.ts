@@ -5,6 +5,8 @@ import { Redis } from 'ioredis';
 import { auth } from './config/firebase.js';
 import RoomMembership from './models/RoomMembership.js';
 import User from './models/User.js';
+import Room from './models/Room.js';
+import mongoose from 'mongoose';
 
 export const initSocket = (httpServer: HttpServer) => {
     const io = new Server(httpServer, {
@@ -56,10 +58,22 @@ export const initSocket = (httpServer: HttpServer) => {
         // Keep old format for backward compat if needed, but standardizing on user:{uid}
         socket.join(`user_${uid}`);
 
-        socket.on('join_room', async (roomId: string) => {
+        socket.on('join_room', async (roomIdOrSlug: string) => {
             try {
                 const user = await User.findOne({ firebaseUid: uid });
                 if (!user) return;
+
+                // Resolve Room ID from Slug if necessary
+                let roomId = roomIdOrSlug;
+                if (!mongoose.Types.ObjectId.isValid(roomIdOrSlug)) {
+                    const room = await Room.findOne({ slug: roomIdOrSlug });
+                    if (room) {
+                        roomId = room._id.toString();
+                    } else {
+                        socket.emit('error', 'Room not found');
+                        return;
+                    }
+                }
 
                 // Attach details to socket for easy access later
                 socket.data.userDetails = {
@@ -71,10 +85,8 @@ export const initSocket = (httpServer: HttpServer) => {
                 // Verify membership before allowing join
                 // Also allow creators
                 const roomDoc = await RoomMembership.findOne({ room: roomId, user: user._id });
-                // We also need to check if they are the creator if membership doc doesn't exist?
-                // For now, let's assume membership doc exists for creators too or strict check. 
-                // Previous logic just used exists().
-                const isMember = !!roomDoc || (await import('./models/Room.js')).default.exists({ _id: roomId, createdBy: user._id });
+
+                const isMember = !!roomDoc || (await Room.exists({ _id: roomId, createdBy: user._id }));
 
                 if (isMember) {
                     socket.join(roomId);

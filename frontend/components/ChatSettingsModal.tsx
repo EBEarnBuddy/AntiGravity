@@ -17,6 +17,7 @@ const ChatSettingsModal: React.FC<ChatSettingsModalProps> = ({ isOpen, onClose, 
     const [name, setName] = useState(room?.name || '');
     const [description, setDescription] = useState(room?.description || '');
     const [avatar, setAvatar] = useState(room?.avatar || '');
+    const [slug, setSlug] = useState(room?.slug || '');
     const [file, setFile] = useState<File | null>(null);
     const [loading, setLoading] = useState(false);
 
@@ -26,6 +27,7 @@ const ChatSettingsModal: React.FC<ChatSettingsModalProps> = ({ isOpen, onClose, 
             setName(room.name || '');
             setDescription(room.description || '');
             setAvatar(room.avatar || '');
+            setSlug(room.slug || '');
         }
     }, [room]);
 
@@ -46,17 +48,26 @@ const ChatSettingsModal: React.FC<ChatSettingsModalProps> = ({ isOpen, onClose, 
                 finalAvatar = await uploadImage(file, 'earnbuddy/circles');
             }
 
-            await roomAPI.updateRoom(room.id || room._id, {
+            const payload: any = {
                 name,
                 description,
-                avatar: finalAvatar
-            });
+                avatar: finalAvatar,
+            };
+            if (slug && slug !== room.slug) {
+                payload.slug = slug;
+            }
 
-            onUpdate({ ...room, name, description, avatar: finalAvatar });
+            await roomAPI.updateRoom(room.id || room._id, payload);
+
+            onUpdate({ ...room, name, description, avatar: finalAvatar, slug: payload.slug || room.slug });
             onClose();
-        } catch (error) {
+        } catch (error: any) {
             console.error('Failed to update room:', error);
-            alert('Failed to update settings');
+            if (error.response?.data?.error) {
+                alert(error.response.data.error);
+            } else {
+                alert('Failed to update settings');
+            }
         } finally {
             setLoading(false);
         }
@@ -132,6 +143,22 @@ const ChatSettingsModal: React.FC<ChatSettingsModalProps> = ({ isOpen, onClose, 
                                 className="w-full px-4 py-3 border-2 border-slate-900 outline-none font-bold text-slate-900 focus:shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] transition-all placeholder:text-slate-300"
                                 placeholder="ENTER CHAT NAME"
                             />
+                        </div>
+
+                        {/* Slug */}
+                        <div>
+                            <label className="text-sm font-black text-slate-900 uppercase mb-2 block tracking-wide">Custom Link ID (Slug)</label>
+                            <div className="relative">
+                                <span className="absolute left-4 top-3.5 text-slate-400 font-bold">/circles/</span>
+                                <input
+                                    type="text"
+                                    value={slug}
+                                    onChange={(e) => setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '-'))}
+                                    className="w-full pl-20 px-4 py-3 border-2 border-slate-900 outline-none font-bold text-slate-900 focus:shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] transition-all placeholder:text-slate-300"
+                                    placeholder="your-custom-slug"
+                                />
+                            </div>
+                            <p className="text-[10px] text-slate-500 font-bold mt-1 uppercase">Shareable Link: {window.location.origin}/circles/{slug || room.id}</p>
                         </div>
 
                         {/* Description */}

@@ -122,7 +122,7 @@ export const eventAPI = {
 export const messageAPI = {
   send: (roomId: string, content: string, type: 'text' | 'image' | 'file' = 'text') =>
     api.post(`/rooms/${roomId}/messages`, { content, type }),
-  getAll: (roomId: string) => api.get(`/rooms/${roomId}/messages`),
+  getAll: (roomId: string, limit?: number, before?: string) => api.get(`/rooms/${roomId}/messages`, { params: { limit, before } }),
   markAsRead: (roomId: string) => api.post(`/rooms/${roomId}/messages/read`),
   sendTyping: (roomId: string, isTyping: boolean) =>
     api.post(`/rooms/${roomId}/messages/typing/${isTyping ? 'start' : 'stop'}`),

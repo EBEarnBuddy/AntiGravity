@@ -2,6 +2,7 @@ import mongoose, { Schema, Document } from 'mongoose';
 
 export interface IRoom extends Document {
     name: string;
+    slug?: string;
     description?: string;
     createdBy: mongoose.Types.ObjectId;
     icon?: string;
@@ -25,6 +26,7 @@ const RoomSchema: Schema = new Schema({
     createdBy: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     isPrivate: { type: Boolean, default: false },
     avatar: { type: String },
+    slug: { type: String, unique: true, sparse: true, index: true },
     hasWhiteboard: { type: Boolean, default: false },
     hasVideoCall: { type: Boolean, default: false },
     membersCount: { type: Number, default: 0 },

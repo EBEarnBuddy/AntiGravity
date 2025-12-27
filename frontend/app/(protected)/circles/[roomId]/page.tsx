@@ -40,7 +40,7 @@ const RoomChatPage: React.FC = () => {
     const { rooms, myRooms } = useRooms();
     const room = rooms.find(r => r.id === roomId) || myRooms.find(r => r.id === roomId);
 
-    const { messages, loading, sendMessage, onlineUsers, typingUsers, notifyTyping } = useRoomMessages(roomId);
+    const { messages, loading, sendMessage, onlineUsers, typingUsers, notifyTyping, loadMore, hasMore, isLoadingMore } = useRoomMessages(roomId);
     const [newMessage, setNewMessage] = useState('');
     const [showPendingModal, setShowPendingModal] = useState(false);
     const [showCollabModal, setShowCollabModal] = useState(false);
@@ -48,6 +48,26 @@ const RoomChatPage: React.FC = () => {
 
     const [showMenu, setShowMenu] = useState(false);
     const [showInfo, setShowInfo] = useState(false);
+
+    // Scroll Management for Pagination
+    const previousScrollHeightRef = useRef<number>(0);
+
+    useEffect(() => {
+        if (isLoadingMore && scrollContainerRef.current) {
+            previousScrollHeightRef.current = scrollContainerRef.current.scrollHeight;
+        }
+    }, [isLoadingMore]);
+
+    useEffect(() => {
+        if (!isLoadingMore && previousScrollHeightRef.current > 0 && scrollContainerRef.current) {
+            const newScrollHeight = scrollContainerRef.current.scrollHeight;
+            const diff = newScrollHeight - previousScrollHeightRef.current;
+            if (diff > 0) {
+                scrollContainerRef.current.scrollTop = diff; // Restore relative position
+            }
+            previousScrollHeightRef.current = 0;
+        }
+    }, [messages, isLoadingMore]);
 
     // Context Menu State
     const [contextMenu, setContextMenu] = useState<{ x: number, y: number, message: any } | null>(null);
@@ -177,8 +197,35 @@ const RoomChatPage: React.FC = () => {
             const { scrollTop, scrollHeight, clientHeight } = scrollContainerRef.current;
             const scrollBottom = scrollHeight - scrollTop - clientHeight;
             setIsNearBottom(scrollBottom < 100);
+
+            if (scrollTop === 0 && hasMore && !isLoadingMore) {
+                loadMore();
+            }
         }
     };
+
+    const groupedMessages = React.useMemo(() => {
+        const groups: { [key: string]: any[] } = {};
+        messages.forEach(msg => {
+            const date = msg.timestamp?.seconds
+                ? new Date(msg.timestamp.seconds * 1000)
+                : new Date((msg as any).createdAt || Date.now());
+
+            let dateKey = date.toLocaleDateString();
+            const today = new Date().toLocaleDateString();
+            const yesterday = new Date(Date.now() - 86400000).toLocaleDateString();
+
+            if (dateKey === today) dateKey = 'Today';
+            else if (dateKey === yesterday) dateKey = 'Yesterday';
+            else {
+                dateKey = date.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+            }
+
+            if (!groups[dateKey]) groups[dateKey] = [];
+            groups[dateKey].push(msg);
+        });
+        return groups;
+    }, [messages]);
 
     useEffect(() => {
         // Only auto-scroll if user was already near bottom or it's the first load
@@ -429,117 +476,152 @@ const RoomChatPage: React.FC = () => {
                         </div>
                     )}
 
-                    {messages.map((msg, index) => {
-                        // Handle both old schema (senderId string) and new schema (sender object)
-                        const sender = (msg as any).sender;
-                        const senderId = sender?.firebaseUid || msg.senderId;
-                        const senderName = sender?.displayName || msg.senderName;
-                        const senderPhoto = sender?.photoURL || msg.senderPhotoURL;
+                    {isLoadingMore && (
+                        <div className="flex justify-center py-4">
+                            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-slate-900"></div>
+                        </div>
+                    )}
 
-                        const isMe = senderId === currentUser?.uid;
+                    {Object.entries(groupedMessages).map(([dateLabel, groupMsgs]) => (
+                        <div key={dateLabel}>
+                            {/* Date Divider */}
+                            <div className="flex justify-center mb-6 sticky top-0 z-10">
+                                <span className="bg-slate-200 text-slate-500 text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest shadow-sm border border-slate-300">
+                                    {dateLabel}
+                                </span>
+                            </div>
 
-                        if ((msg as any).type === 'system') {
-                            const content = msg.content;
-                            const urlRegex = /(https?:\/\/[^\s]+)/g;
-                            const parts = content.split(urlRegex);
+                            {groupMsgs.map((msg, index) => {
+                                // Handle both old schema (senderId string) and new schema (sender object)
+                                const sender = (msg as any).sender;
+                                const senderId = sender?.firebaseUid || msg.senderId;
+                                const senderName = sender?.displayName || msg.senderName;
+                                const senderPhoto = sender?.photoURL || msg.senderPhotoURL;
 
-                            return (
-                                <motion.div
-                                    key={msg.id || index}
-                                    initial={{ opacity: 0, y: 10 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    className="flex justify-center w-full mb-4 px-8"
-                                >
-                                    <div className="bg-purple-600 border-2 border-slate-900 text-white text-xs font-bold px-4 py-2 text-center shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-                                        {parts.map((part: string, i: number) =>
-                                            urlRegex.test(part) ? (
-                                                <a
-                                                    key={i}
-                                                    href={part}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    className="text-yellow-300 hover:text-yellow-200 underline mx-1"
-                                                >
-                                                    {part}
-                                                </a>
-                                            ) : (
-                                                <span key={i}>{part}</span>
-                                            )
+                                const isMe = senderId === currentUser?.uid;
+
+                                if ((msg as any).type === 'system') {
+                                    const content = msg.content;
+                                    const urlRegex = /(https?:\/\/[^\s]+)/g;
+                                    const parts = content.split(urlRegex);
+
+                                    return (
+                                        <motion.div
+                                            key={msg.id || `${dateLabel}-${index}`}
+                                            initial={{ opacity: 0, y: 10 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            className="flex justify-center w-full mb-4 px-8 relative z-0"
+                                        >
+                                            <div className="bg-purple-600 border-2 border-slate-900 text-white text-xs font-bold px-4 py-2 text-center shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                                                {parts.map((part: string, i: number) =>
+                                                    urlRegex.test(part) ? (
+                                                        <a
+                                                            key={i}
+                                                            href={part}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            className="text-yellow-300 hover:text-yellow-200 underline mx-1"
+                                                        >
+                                                            {part}
+                                                        </a>
+                                                    ) : (
+                                                        <span key={i}>{part}</span>
+                                                    )
+                                                )}
+                                                <div className="text-[9px] text-purple-200 mt-1 font-normal opacity-80">
+                                                    {formatTimeAgo(msg.timestamp?.seconds ? new Date(msg.timestamp.seconds * 1000) : (msg as any).createdAt)}
+                                                </div>
+                                            </div>
+                                        </motion.div>
+                                    );
+                                }
+
+                                return (
+                                    <motion.div
+                                        key={msg.id || `${dateLabel}-${index}`}
+                                        initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                                        transition={{ type: "spring", stiffness: 300, damping: 24 }}
+                                        className={`flex items-end gap-2 w-full mb-4 ${isMe ? 'justify-end' : 'justify-start'}`}
+                                    >
+                                        {!isMe && (
+                                            <div className="flex-shrink-0 order-1">
+                                                <UserAvatar
+                                                    src={senderPhoto}
+                                                    alt={senderName}
+                                                    uid={senderId}
+                                                    username={sender.username} // Assuming sender object has username, otherwise fallback to UID linking
+                                                    size={32}
+                                                    className="bg-white shadow-[2px_2px_0px_0px_rgba(15,23,42,1)]"
+                                                />
+                                            </div>
                                         )}
-                                        <div className="text-[9px] text-purple-200 mt-1 font-normal opacity-80">
-                                            {formatTimeAgo(msg.timestamp?.seconds ? new Date(msg.timestamp.seconds * 1000) : (msg as any).createdAt)}
-                                        </div>
-                                    </div>
-                                </motion.div>
-                            );
-                        }
 
-                        return (
-                            <motion.div
-                                key={msg.id || index}
-                                initial={{ opacity: 0, scale: 0.95, y: 20 }}
-                                animate={{ opacity: 1, scale: 1, y: 0 }}
-                                transition={{ type: "spring", stiffness: 300, damping: 24 }}
-                                className={`flex items-end gap-2 w-full mb-4 ${isMe ? 'justify-end' : 'justify-start'}`}
-                            >
-                                {!isMe && (
-                                    <div className="flex-shrink-0 order-1">
-                                        <UserAvatar
-                                            src={senderPhoto}
-                                            alt={senderName}
-                                            uid={senderId}
-                                            username={sender.username} // Assuming sender object has username, otherwise fallback to UID linking
-                                            size={32}
-                                            className="bg-white shadow-[2px_2px_0px_0px_rgba(15,23,42,1)]"
-                                        />
-                                    </div>
-                                )}
-
-                                {/* Message Bubble */}
-                                <div className={`flex flex-col max-w-[70%] order-2 ${isMe ? 'items-end' : 'items-start'}`}>
-                                    {/* Name (Top) */}
-                                    <span
-                                        className={`text-[10px] font-bold mb-1 px-1 ${isMe ? 'hidden' : 'text-purple-600'
-                                            }`}
-                                    >
-                                        {senderName}
-                                    </span>
-
-                                    {/* Bubble */}
-                                    <div
-                                        className={`px-4 py-2 font-bold leading-relaxed shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] border-2 border-slate-900 relative group whitespace-pre-wrap break-all break-words ${isMe
-                                            ? 'bg-green-600 text-white'
-                                            : 'bg-white text-slate-900'
-                                            }`}
-                                    >
-                                        {msg.content.split(/(@\w+)/g).map((part, i) => {
-                                            if (part.match(/^@\w+$/)) {
-                                                return <span key={i} className={`${isMe ? 'text-white underline' : 'text-purple-600'} font-black`}>{part}</span>;
-                                            }
-                                            return part;
-                                        })}
-                                    </div>
-
-                                    {/* Timestamp (Bottom) */}
-                                    <span className={`text-[10px] font-medium text-slate-400 mt-1 px-1 flex items-center gap-1`}>
-                                        {formatTimeAgo(msg.timestamp?.seconds ? new Date(msg.timestamp.seconds * 1000) : (msg as any).createdAt)}
-                                        {isMe && msg.readBy && msg.readBy.length > 0 && (
-                                            <span className="text-green-600 ml-1">
-                                                Read {(() => {
-                                                    // Find the latest read time
-                                                    const latestRead = msg.readBy.reduce((latest: any, current: any) => {
-                                                        const currentDate = new Date(current.readAt || Date.now());
-                                                        return !latest || currentDate > new Date(latest) ? current.readAt : latest;
-                                                    }, null);
-                                                    return latestRead ? formatTimeAgo(latestRead) : '';
-                                                })()}
+                                        {/* Message Bubble */}
+                                        <div className={`flex flex-col max-w-[70%] order-2 ${isMe ? 'items-end' : 'items-start'}`}>
+                                            {/* Name (Top) */}
+                                            <span
+                                                className={`text-[10px] font-bold mb-1 px-1 ${isMe ? 'hidden' : 'text-purple-600'
+                                                    }`}
+                                            >
+                                                {senderName}
                                             </span>
-                                        )}
-                                    </span>
-                                </div>
-                            </motion.div>
-                        );
-                    })}
+
+                                            {/* Bubble */}
+                                            <div
+                                                className={`px-4 py-2 font-bold leading-relaxed shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] border-2 border-slate-900 relative group whitespace-pre-wrap break-all break-words ${isMe
+                                                    ? 'bg-green-600 text-white'
+                                                    : 'bg-white text-slate-900'
+                                                    }`}
+                                                onContextMenu={(e) => {
+                                                    e.preventDefault();
+                                                    setContextMenu({ x: e.clientX, y: e.clientY, message: { ...msg, isMe } });
+                                                }}
+                                            >
+                                                {msg.content.split(/(@\w+)/g).map((part, i) => {
+                                                    if (part.match(/^@\w+$/)) {
+                                                        const username = part.substring(1);
+                                                        // Handle @all separately
+                                                        if (username.toLowerCase() === 'all') {
+                                                            return <span key={i} className="text-purple-600 font-black">{part}</span>;
+                                                        }
+                                                        return (
+                                                            <button
+                                                                key={i}
+                                                                onClick={() => router.push(`/u/${username}`)} // Adjust route as needed
+                                                                className={`${isMe ? 'text-white underline' : 'text-purple-600'} font-black hover:opacity-80 transition`}
+                                                            >
+                                                                {part}
+                                                            </button>
+                                                        );
+                                                    }
+                                                    return part;
+                                                })}
+                                            </div>
+
+                                            {/* Timestamp (Bottom) */}
+                                            <span className={`text-[10px] font-medium text-slate-400 mt-1 px-1 flex items-center gap-1`}>
+                                                {formatTimeAgo(msg.timestamp?.seconds ? new Date(msg.timestamp.seconds * 1000) : (msg as any).createdAt)}
+                                                {isMe && msg.readBy && msg.readBy.length > 0 && (
+                                                    <span className="text-green-600 ml-1">
+                                                        Read {(() => {
+                                                            // Find the latest read time
+                                                            const latestRead = msg.readBy.reduce((latest: any, current: any) => {
+                                                                const currentDate = new Date(current.readAt || Date.now());
+                                                                return !latest || currentDate > new Date(latest) ? current.readAt : latest;
+                                                            }, null);
+                                                            return latestRead ? formatTimeAgo(latestRead) : '';
+                                                        })()}
+                                                    </span>
+                                                )}
+                                            </span>
+                                        </div>
+                                    </motion.div>
+                                );
+                            })
+                            }
+                        </div>
+                    ))}
                     <div ref={messagesEndRef} />
                 </div>
             </div>

@@ -12,7 +12,7 @@ import RedisService from '../services/RedisService.js';
 export const sendMessage = async (req: AuthRequest, res: Response) => {
     try {
         const { uid } = req.user!;
-        const { roomId } = req.params;
+        let { roomId } = req.params;
         const { content, type } = req.body;
 
         const user = await User.findOne({ firebaseUid: uid });
@@ -21,16 +21,25 @@ export const sendMessage = async (req: AuthRequest, res: Response) => {
             return;
         }
 
-        // Check membership
-        // Optimization: Cache room membership check? For now, keep DB check for security.
-        const roomDoc = await Room.findById(roomId);
+        // Resolve Room ID (Handle Slug)
+        const mongoose = await import('mongoose');
+        let roomDoc = null;
+        if (mongoose.isValidObjectId(roomId)) {
+            roomDoc = await Room.findById(roomId);
+        }
+        if (!roomDoc) {
+            roomDoc = await Room.findOne({ slug: roomId });
+        }
+
         if (!roomDoc) {
             res.status(404).json({ error: 'Room not found' });
             return;
         }
+        const realRoomId = roomDoc._id.toString();
 
+        // Check Local Membership
         const isCreator = roomDoc.createdBy.equals(user._id);
-        const isMember = await RoomMembership.exists({ room: roomId, user: user._id });
+        const isMember = await RoomMembership.exists({ room: realRoomId, user: user._id });
 
         if (!isMember && !isCreator) {
             res.status(403).json({ error: 'Not a member of this room' });
@@ -38,28 +47,28 @@ export const sendMessage = async (req: AuthRequest, res: Response) => {
         }
 
         const message = await Message.create({
-            room: roomId,
+            room: realRoomId,
             sender: user._id,
             content,
             type: type || 'text',
         });
 
         // Update room's last activity
-        await Room.findByIdAndUpdate(roomId, { lastMessageAt: new Date() });
+        await Room.findByIdAndUpdate(realRoomId, { lastMessageAt: new Date() });
 
         // Populate sender for immediate frontend display
-        await message.populate('sender', 'displayName photoURL firebaseUid');
+        await message.populate('sender', 'displayName photoURL firebaseUid username');
 
         // Redis: Invalidate message cache for this room
-        await RedisService.del(`messages:${roomId}`);
+        await RedisService.del(`messages:${realRoomId}`);
 
         // Emit to room
         try {
             const io = getIO();
-            io.to(roomId).emit('new_message', message);
+            io.to(realRoomId).emit('new_message', message);
 
             // Notify offline / inactive members
-            const memberships = await RoomMembership.find({ room: roomId, user: { $ne: user._id } });
+            const memberships = await RoomMembership.find({ room: realRoomId, user: { $ne: user._id } });
 
             // Mention Logic
             const mentionedUserIds = new Set<string>();
@@ -70,7 +79,6 @@ export const sendMessage = async (req: AuthRequest, res: Response) => {
                 memberships.forEach(m => mentionedUserIds.add(m.user.toString()));
             } else {
                 // 2. Check for specific @username
-                // Regex to find @username (alphanumeric + underscores usually)
                 const mentionRegex = /@(\w+)/g;
                 let match;
                 const potentialUsernames: string[] = [];
@@ -81,9 +89,6 @@ export const sendMessage = async (req: AuthRequest, res: Response) => {
                 if (potentialUsernames.length > 0) {
                     const foundUsers = await User.find({ username: { $in: potentialUsernames } });
                     foundUsers.forEach(u => {
-                        // verify they are actually in the room?
-                        // For a closed circle, yes. For public, maybe not strictly needed but good practice.
-                        // Let's filtered by existing memberships to be safe and avoid notifying non-members.
                         const isMember = memberships.some(m => m.user.toString() === u._id.toString());
                         if (isMember) {
                             mentionedUserIds.add(u._id.toString());
@@ -100,7 +105,9 @@ export const sendMessage = async (req: AuthRequest, res: Response) => {
                     const notifType = isMentioned ? 'mention' : 'new_message';
                     const notifTitle = isMentioned
                         ? `${user.displayName} mentioned you in ${roomDoc.name}`
-                        : `New Message from ${user.displayName}`; // This title might be overwritten by aggregation logic for 'new_message'
+                        : `New Message from ${user.displayName}`;
+
+                    const linkId = roomDoc.slug || realRoomId;
 
                     await createNotification(
                         recipient.firebaseUid,
@@ -108,10 +115,8 @@ export const sendMessage = async (req: AuthRequest, res: Response) => {
                         notifType,
                         notifTitle,
                         message.content.substring(0, 50) + (message.content.length > 50 ? '...' : ''),
-                        `/circles/${roomId}`
+                        `/circles/${linkId}`
                     );
-
-                    // Note: createNotification handles the socket emit internally now
                 }
             }
         } catch (err) {
@@ -128,8 +133,8 @@ export const sendMessage = async (req: AuthRequest, res: Response) => {
 export const getMessages = async (req: AuthRequest, res: Response) => {
     try {
         const { roomId } = req.params;
-        // Pagination (simple setup)
-        const limit = 50;
+        const limit = parseInt(req.query.limit as string) || 50;
+        const before = req.query.before as string; // Timestamp ISO string
 
         // Enforce membership check for viewing messages
         const { uid } = req.user!;
@@ -140,12 +145,7 @@ export const getMessages = async (req: AuthRequest, res: Response) => {
             return;
         }
 
-        // Redis: Check Cache
-        // Cache key: messages:{roomId}
-        // Note: Caching with limit logic is tricky. Simplest is to cache the default page (last 50).
-        const cacheKey = `messages:${roomId}`;
-        const cachedMessages = await RedisService.get<any[]>(cacheKey);
-
+        // Validate Room
         const roomDoc = await Room.findById(roomId);
         if (!roomDoc) {
             res.status(404).json({ error: 'Room not found' });
@@ -160,22 +160,39 @@ export const getMessages = async (req: AuthRequest, res: Response) => {
             return;
         }
 
-        if (cachedMessages) {
-            // console.log(`[Cache] Hit for ${cacheKey}`);
-            res.json(cachedMessages);
-            return;
+        // Cache Logic (Only for initial fetch i.e. no 'before' cursor)
+        const cacheKey = `messages:${roomId}`;
+        if (!before) {
+            const cachedMessages = await RedisService.get<any[]>(cacheKey);
+            if (cachedMessages) {
+                res.json(cachedMessages);
+                return;
+            }
         }
 
-        const messages = await Message.find({ room: roomId })
-            .sort({ createdAt: 1 }) // Check client needs. Usually ascending for chat log
+        // Build Query
+        const query: any = { room: roomId };
+        if (before) {
+            query.createdAt = { $lt: new Date(before) };
+        }
+
+        const messages = await Message.find(query)
+            .sort({ createdAt: -1 }) // Get newest first (or newest before cursor)
             .limit(limit)
-            .populate('sender', 'displayName photoURL firebaseUid');
+            .populate('sender', 'displayName photoURL firebaseUid username') // Include username for mentions
+            .populate('readBy.user', 'displayName photoURL username'); // Include reader details
 
-        // Cache for 1 hour (auto invalidates on new message)
-        await RedisService.set(cacheKey, messages, 3600);
+        // Reorder to ASC for frontend display
+        const orderedMessages = messages.reverse();
 
-        res.json(messages);
+        // Cache only the latest chunk (no cursor)
+        if (!before) {
+            await RedisService.set(cacheKey, orderedMessages, 3600);
+        }
+
+        res.json(orderedMessages);
     } catch (error) {
+        console.error('Fetch messages failed:', error);
         res.status(500).json({ error: 'Fetch failed' });
     }
 };
@@ -192,14 +209,24 @@ export const markRoomAsRead = async (req: AuthRequest, res: Response) => {
             return;
         }
 
-        // Validate membership or ownership
-        const roomDoc = await Room.findById(roomId);
+        // Resolve slug to real ID
+        let realRoomId = roomId;
+        if (!mongoose.Types.ObjectId.isValid(roomId)) {
+            const r = await Room.findOne({ slug: roomId });
+            if (!r) {
+                return res.status(404).json({ error: 'Room not found' });
+            }
+            realRoomId = r._id.toString();
+        }
+
+        // Validate membership or ownership using realRoomId
+        const roomDoc = await Room.findById(realRoomId);
         if (!roomDoc) {
             res.status(404).json({ error: 'Room not found' });
             return;
         }
         const isCreator = roomDoc.createdBy.equals(user._id);
-        const isMember = await RoomMembership.exists({ room: roomId, user: user._id });
+        const isMember = await RoomMembership.exists({ room: realRoomId, user: user._id });
         if (!isMember && !isCreator) {
             res.status(403).json({ error: 'Not authorized' });
             return;
@@ -209,7 +236,7 @@ export const markRoomAsRead = async (req: AuthRequest, res: Response) => {
 
         // Update messages where user is NOT in readBy
         await Message.updateMany(
-            { room: roomId, 'readBy.user': { $ne: user._id } },
+            { room: realRoomId, 'readBy.user': { $ne: user._id } },
             {
                 $addToSet: {
                     readBy: { user: user._id, readAt: now }
@@ -220,8 +247,8 @@ export const markRoomAsRead = async (req: AuthRequest, res: Response) => {
         // Emit event
         try {
             const io = getIO();
-            io.to(roomId).emit('messages_read', {
-                roomId,
+            io.to(realRoomId).emit('messages_read', {
+                roomId: realRoomId,
                 userId: uid,
                 readAt: now
             });
@@ -247,10 +274,17 @@ export const startTyping = async (req: AuthRequest, res: Response) => {
             return;
         }
 
+        // Resolve slug to real ID for socket room
+        let realRoomId = roomId;
+        if (!mongoose.Types.ObjectId.isValid(roomId)) {
+            const r = await Room.findOne({ slug: roomId });
+            if (r) realRoomId = r._id.toString();
+        }
+
         // Emit socket event via Redis Adapter to all instances
         const io = getIO();
-        io.to(roomId).emit('typing', {
-            roomId,
+        io.to(realRoomId).emit('typing', {
+            roomId: realRoomId,
             userId: uid,
             userName: user.displayName
         });
@@ -267,10 +301,17 @@ export const stopTyping = async (req: AuthRequest, res: Response) => {
         const { uid } = req.user!;
         const { roomId } = req.params;
 
+        // Resolve slug to real ID for socket room
+        let realRoomId = roomId;
+        if (!mongoose.Types.ObjectId.isValid(roomId)) {
+            const r = await Room.findOne({ slug: roomId });
+            if (r) realRoomId = r._id.toString();
+        }
+
         // Emit socket event
         const io = getIO();
-        io.to(roomId).emit('stop_typing', {
-            roomId,
+        io.to(realRoomId).emit('stop_typing', {
+            roomId: realRoomId,
             userId: uid
         });
 

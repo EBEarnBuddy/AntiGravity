@@ -162,7 +162,11 @@ export const useRoomMessages = (roomId: string) => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const { currentUser, userProfile, updateProfile } = useAuth(); // Need user for socket logic
+  const { currentUser, userProfile } = useAuth(); // Need user for socket logic
+
+  // Pagination State
+  const [hasMore, setHasMore] = useState(true);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
 
   // Realtime State
   const [onlineUsers, setOnlineUsers] = useState<any[]>([]);
@@ -178,12 +182,13 @@ export const useRoomMessages = (roomId: string) => {
       try {
         setLoading(true);
         const [msgsRes, onlineRes] = await Promise.all([
-          messageAPI.getAll(roomId),
+          messageAPI.getAll(roomId, 50),
           // Safely fail on online fetch if backend not ready, but ideally it works
           roomAPI.getOnlineMembers(roomId).catch(() => ({ data: [] }))
         ]);
 
         setMessages(msgsRes.data);
+        setHasMore(msgsRes.data.length >= 50);
         setOnlineUsers(onlineRes.data || []);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load messages');
@@ -227,12 +232,9 @@ export const useRoomMessages = (roomId: string) => {
               const isMe = (newMessage.sender as any)?._id === currentUser.uid || (newMessage.sender as any)?.firebaseUid === currentUser.uid || newMessage.senderId === currentUser.uid;
 
               if (isMe) {
-                // 2. Strict Reconciliation: Match optimistic message by content AND ensuring it's recent (pending)
-                // We must preserve the 'id' transition carefully or use the NEW id but ensure React sees it as an update if possible,
-                // OR just swap it out. To avoid flicker, we just map it.
+                // 2. Strict Reconciliation
                 const pendingIdx = prev.findIndex(m => m.pending && m.content === newMessage.content);
                 if (pendingIdx !== -1) {
-                  // Replace pending with confirmed socket message IN PLACE
                   const newArr = [...prev];
                   newArr[pendingIdx] = { ...newMessage, pending: false };
                   return newArr;
@@ -250,7 +252,6 @@ export const useRoomMessages = (roomId: string) => {
 
           // Online Presence
           socket.on('room_users', (users: any[]) => {
-            // Merge with REST fetched data if needed, or trust socket as live source
             setOnlineUsers(users);
           });
 
@@ -319,6 +320,25 @@ export const useRoomMessages = (roomId: string) => {
       }
     };
   }, [roomId, currentUser]);
+
+  const loadMore = async () => {
+    if (isLoadingMore || !hasMore || messages.length === 0) return;
+    setIsLoadingMore(true);
+    try {
+      const oldestMsg = messages[0];
+      const before = oldestMsg.createdAt || (oldestMsg as any).timestamp;
+
+      const res = await messageAPI.getAll(roomId, 50, before); // Limit 50
+      if (res.data.length < 50) setHasMore(false);
+      if (res.data.length > 0) {
+        setMessages(prev => [...res.data, ...prev]);
+      }
+    } catch (e) {
+      console.error("Load more failed", e);
+    } finally {
+      setIsLoadingMore(false);
+    }
+  };
 
   const sendMessage = async (content: string, type: 'text' | 'image' | 'file' = 'text') => {
     if (!roomId || !currentUser) return;
@@ -391,7 +411,7 @@ export const useRoomMessages = (roomId: string) => {
     }, 3000);
   };
 
-  return { messages, loading, error, sendMessage, onlineUsers, typingUsers, notifyTyping };
+  return { messages, loading, error, sendMessage, onlineUsers, typingUsers, notifyTyping, loadMore, hasMore, isLoadingMore };
 };
 
 export const useRoomChatMessages = useRoomMessages;

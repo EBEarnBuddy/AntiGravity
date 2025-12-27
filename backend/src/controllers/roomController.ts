@@ -7,6 +7,14 @@ import { AuthRequest } from '../middlewares/auth.js';
 import { getIO } from '../socket.js';
 import RedisService from '../services/RedisService.js';
 
+// Helper to generate slug
+const generateSlug = (name: string) => {
+    return name
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-') // Replace non-alphanumeric with hyphens
+        .replace(/^-+|-+$/g, ''); // Trim hyphens
+};
+
 // Create a Room
 export const createRoom = async (req: AuthRequest, res: Response) => {
     try {
@@ -17,10 +25,21 @@ export const createRoom = async (req: AuthRequest, res: Response) => {
             return;
         }
 
-        const { name, description, isPrivate, icon, avatar } = req.body;
+        const { name, description, isPrivate, icon, avatar, slug } = req.body;
+
+        let finalSlug = slug || generateSlug(name);
+        // Ensure uniqueness roughly (in production, we'd loop or catch error, here we'll append random if not provided or just let mongo error if provided)
+        // Simple collision avoidance for auto-generated
+        if (!slug) {
+            const existing = await Room.findOne({ slug: finalSlug });
+            if (existing) {
+                finalSlug = `${finalSlug}-${Date.now().toString().slice(-4)}`;
+            }
+        }
 
         const room = await Room.create({
             name,
+            slug: finalSlug,
             description,
             isPrivate: !!isPrivate,
             avatar: avatar || icon, // Map to schema's avatar field
@@ -54,6 +73,10 @@ export const createRoom = async (req: AuthRequest, res: Response) => {
 
         res.status(201).json(room);
     } catch (error) {
+        if ((error as any).code === 11000) { // Duplicate key
+            res.status(400).json({ error: 'Circle Link ID (Slug) already exists. Please choose another.' });
+            return;
+        }
         res.status(500).json({ error: 'Failed to create room' });
     }
 };
@@ -498,7 +521,7 @@ export const updateRoom = async (req: AuthRequest, res: Response) => {
     try {
         const { uid } = req.user!;
         const { roomId } = req.params;
-        const { name, description, avatar } = req.body;
+        const { name, description, avatar, slug } = req.body;
 
         const user = await User.findOne({ firebaseUid: uid });
         if (!user) {
@@ -529,11 +552,16 @@ export const updateRoom = async (req: AuthRequest, res: Response) => {
         if (name) room.name = name;
         if (description) room.description = description;
         if (avatar) room.avatar = avatar;
+        if (slug) room.slug = slug;
 
         await room.save();
 
         res.json(room);
     } catch (error) {
+        if ((error as any).code === 11000) { // Duplicate key
+            res.status(400).json({ error: 'Circle Link ID (Slug) already exists.' });
+            return;
+        }
         res.status(500).json({ error: 'Failed to update room' });
     }
 };
