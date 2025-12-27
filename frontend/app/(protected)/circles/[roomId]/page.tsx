@@ -40,7 +40,7 @@ const RoomChatPage: React.FC = () => {
     const { rooms, myRooms } = useRooms();
     const room = rooms.find(r => r.id === roomId) || myRooms.find(r => r.id === roomId);
 
-    const { messages, loading, sendMessage, onlineUsers, typingUsers, notifyTyping, loadMore, hasMore, isLoadingMore } = useRoomMessages(roomId);
+    const { messages, loading, sendMessage, onlineUsers, typingUsers, notifyTyping, loadMore, hasMore, isLoadingMore, deleteMessage, updateMessage } = useRoomMessages(roomId);
     const [newMessage, setNewMessage] = useState('');
     const [showPendingModal, setShowPendingModal] = useState(false);
     const [showCollabModal, setShowCollabModal] = useState(false);
@@ -48,6 +48,11 @@ const RoomChatPage: React.FC = () => {
 
     const [showMenu, setShowMenu] = useState(false);
     const [showInfo, setShowInfo] = useState(false);
+
+    // Editing State
+    const [editingMessage, setEditingMessage] = useState<{ id: string, content: string } | null>(null);
+
+    // ... (Scroll refs/effects - keep existing)
 
     // Scroll Management for Pagination
     const previousScrollHeightRef = useRef<number>(0);
@@ -71,7 +76,9 @@ const RoomChatPage: React.FC = () => {
 
     // Context Menu State
     const [contextMenu, setContextMenu] = useState<{ x: number, y: number, message: any } | null>(null);
-    const [readInfoMessage, setReadInfoMessage] = useState<any>(null); // For Read Info Modal
+    // Removed readInfoMessage state
+
+    // ... (Refs - keep existing)
     const contextMenuRef = useRef<HTMLDivElement>(null);
     useOnClickOutside(contextMenuRef, () => setContextMenu(null));
 
@@ -81,24 +88,19 @@ const RoomChatPage: React.FC = () => {
     useOnClickOutside(menuRef, () => setShowMenu(false));
     useOnClickOutside(infoRef, () => setShowInfo(false));
 
-    // Mention State
+    // ... (Mention logic - keep existing)
     const [mentionQuery, setMentionQuery] = useState<string | null>(null);
     const [mentionIndex, setMentionIndex] = useState<number>(-1);
     const [mentionCandidates, setMentionCandidates] = useState<any[]>([]);
 
     useEffect(() => {
         if (mentionQuery !== null) {
-            // Build candidates list from online users and message history to get a decent list without full member fetch
             const candidates = new Map();
-
-            // Add online users
             onlineUsers.forEach((u: any) => {
                 if (u.userId !== currentUser?.uid) {
                     candidates.set(u.userId, { uid: u.userId, username: u.userName, avatar: u.userAvatar });
                 }
             });
-
-            // Add from messages
             messages.forEach((msg: any) => {
                 const s = msg.sender;
                 const uid = s?.firebaseUid || msg.senderId;
@@ -109,7 +111,6 @@ const RoomChatPage: React.FC = () => {
                     }
                 }
             });
-
             const filtered = Array.from(candidates.values()).filter((c: any) =>
                 c.username?.toLowerCase().includes(mentionQuery.toLowerCase())
             );
@@ -124,14 +125,12 @@ const RoomChatPage: React.FC = () => {
         setNewMessage(val);
         notifyTyping();
 
-        // Check for @
         const cursorInfo = e.target.selectionStart;
         const textBeforeBox = val.substring(0, cursorInfo);
         const lastAt = textBeforeBox.lastIndexOf('@');
 
         if (lastAt !== -1) {
             const query = textBeforeBox.substring(lastAt + 1);
-            // Verify no spaces (simple mention logic)
             if (!query.includes(' ')) {
                 setMentionQuery(query);
                 setMentionIndex(lastAt);
@@ -155,7 +154,26 @@ const RoomChatPage: React.FC = () => {
     // Check membership status
     const isMember = currentUser && room?.members?.includes(currentUser.uid);
     const isPending = currentUser && room?.pendingMembers?.includes(currentUser.uid);
-    const isAdmin = isMember;
+
+    // Admin Check: Owner OR (todo: fetch explicit admin role) - For now restricting to Owner/Creator as "Admin" for settings
+    const isOwner = currentUser && room && (room.createdBy === currentUser.uid || (room as any).createdBy?._id === currentUser.uid || (room as any).createdByUid === currentUser.uid);
+    const isAdmin = isOwner; // Temporarily equates admin to owner until role fetch is added
+
+    const handleSaveEdit = async () => {
+        if (editingMessage && editingMessage.content.trim()) {
+            await updateMessage(editingMessage.id, editingMessage.content);
+            setEditingMessage(null);
+        }
+    };
+
+    const handleEditKeyPress = (e: React.KeyboardEvent) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            handleSaveEdit();
+        } else if (e.key === 'Escape') {
+            setEditingMessage(null);
+        }
+    };
 
     const handleSend = async (e?: React.FormEvent) => {
         e?.preventDefault();
@@ -568,50 +586,75 @@ const RoomChatPage: React.FC = () => {
                                             </span>
 
                                             {/* Bubble */}
-                                            <div
-                                                className={`px-4 py-2 font-bold leading-relaxed shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] border-2 border-slate-900 relative group whitespace-pre-wrap break-all break-words ${isMe
-                                                    ? 'bg-green-600 text-white'
-                                                    : 'bg-white text-slate-900'
-                                                    }`}
-                                                onContextMenu={(e) => {
-                                                    e.preventDefault();
-                                                    setContextMenu({ x: e.clientX, y: e.clientY, message: { ...msg, isMe } });
-                                                }}
-                                            >
-                                                {msg.content.split(/(@\w+)/g).map((part: string, i: number) => {
-                                                    if (part.match(/^@\w+$/)) {
-                                                        const username = part.substring(1);
-                                                        // Handle @all separately
-                                                        if (username.toLowerCase() === 'all') {
-                                                            return <span key={i} className="text-purple-600 font-black">{part}</span>;
+                                            {editingMessage && editingMessage.id === msg.id ? (
+                                                <div className="flex flex-col items-end gap-2 w-full max-w-[400px]">
+                                                    <textarea
+                                                        value={editingMessage.content}
+                                                        onChange={(e) => setEditingMessage({ ...editingMessage, content: e.target.value })}
+                                                        onKeyDown={handleEditKeyPress}
+                                                        autoFocus
+                                                        className="w-full px-4 py-3 bg-white border-2 border-slate-900 rounded-lg shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:outline-none focus:translate-x-[2px] focus:translate-y-[2px] focus:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all resize-none text-sm font-medium"
+                                                        rows={3}
+                                                    />
+                                                    <div className="flex gap-2 text-[10px] font-black uppercase">
+                                                        <button
+                                                            onClick={handleSaveEdit}
+                                                            className="px-3 py-1 bg-green-500 text-white border-2 border-slate-900 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:bg-green-600 active:translate-y-[2px] active:shadow-none transition-all"
+                                                        >
+                                                            Save
+                                                        </button>
+                                                        <button
+                                                            onClick={() => setEditingMessage(null)}
+                                                            className="px-3 py-1 bg-slate-200 text-slate-600 border-2 border-slate-900 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:bg-slate-300 active:translate-y-[2px] active:shadow-none transition-all"
+                                                        >
+                                                            Cancel
+                                                        </button>
+                                                    </div>
+                                                    <span className="text-[10px] text-slate-400">Esc to cancel • Enter to save</span>
+                                                </div>
+                                            ) : (
+                                                <div
+                                                    className={`px-4 py-2 font-bold leading-relaxed shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] border-2 border-slate-900 relative group whitespace-pre-wrap break-all break-words ${isMe
+                                                        ? 'bg-green-600 text-white'
+                                                        : 'bg-white text-slate-900'
+                                                        }`}
+                                                    onContextMenu={(e) => {
+                                                        e.preventDefault();
+                                                        setContextMenu({ x: e.clientX, y: e.clientY, message: { ...msg, isMe } });
+                                                    }}
+                                                >
+                                                    {msg.content.split(/(@\w+)/g).map((part: string, i: number) => {
+                                                        if (part.match(/^@\w+$/)) {
+                                                            const username = part.substring(1);
+                                                            // Handle @all separately
+                                                            if (username.toLowerCase() === 'all') {
+                                                                return <span key={i} className="text-purple-600 font-black">{part}</span>;
+                                                            }
+                                                            return (
+                                                                <button
+                                                                    key={i}
+                                                                    onClick={() => router.push(`/u/${username}`)} // Adjust route as needed
+                                                                    className={`${isMe ? 'text-white underline' : 'text-purple-600'} font-black hover:opacity-80 transition`}
+                                                                >
+                                                                    {part}
+                                                                </button>
+                                                            );
                                                         }
-                                                        return (
-                                                            <button
-                                                                key={i}
-                                                                onClick={() => router.push(`/u/${username}`)} // Adjust route as needed
-                                                                className={`${isMe ? 'text-white underline' : 'text-purple-600'} font-black hover:opacity-80 transition`}
-                                                            >
-                                                                {part}
-                                                            </button>
-                                                        );
-                                                    }
-                                                    return part;
-                                                })}
-                                            </div>
+                                                        return part;
+                                                    })}
+                                                </div>
+                                            )}
 
-                                            {/* Timestamp (Bottom) */}
-                                            <span className={`text-[10px] font-medium text-slate-400 mt-1 px-1 flex items-center gap-1`}>
-                                                {formatTimeAgo(msg.timestamp?.seconds ? new Date(msg.timestamp.seconds * 1000) : (msg as any).createdAt)}
+                                            {/* Timestamp & Read Status (Bottom) */}
+                                            <span className={`text-[10px] font-medium text-slate-400 mt-1 px-1 flex items-center flex-wrap gap-1 ${isMe ? 'justify-end' : ''}`}>
+                                                <span>{formatTimeAgo(msg.timestamp?.seconds ? new Date(msg.timestamp.seconds * 1000) : (msg as any).createdAt)}</span>
+                                                {(msg as any).updatedAt && (msg as any).updatedAt !== (msg as any).createdAt && (
+                                                    <span className="text-xs italic">(edited)</span>
+                                                )}
                                                 {isMe && msg.readBy && msg.readBy.length > 0 && (
-                                                    <span className="text-green-600 ml-1">
-                                                        Read {(() => {
-                                                            // Find the latest read time
-                                                            const latestRead = msg.readBy.reduce((latest: any, current: any) => {
-                                                                const currentDate = new Date(current.readAt || Date.now());
-                                                                return !latest || currentDate > new Date(latest) ? current.readAt : latest;
-                                                            }, null);
-                                                            return latestRead ? formatTimeAgo(latestRead) : '';
-                                                        })()}
+                                                    <span className="text-green-600 font-bold ml-1 flex items-center gap-1">
+                                                        <Eye className="w-3 h-3" />
+                                                        Read by {msg.readBy.length}
                                                     </span>
                                                 )}
                                             </span>
@@ -739,97 +782,45 @@ const RoomChatPage: React.FC = () => {
                 >
                     <button
                         onClick={() => {
-                            if (window.confirm('Copy message text?')) { // Simply copying as basic action
-                                navigator.clipboard.writeText(contextMenu.message.content);
-                            }
+                            navigator.clipboard.writeText(contextMenu.message.content);
                             setContextMenu(null);
                         }}
                         className="w-full text-left px-4 py-2 text-xs font-black uppercase hover:bg-slate-100 flex items-center gap-2"
                     >
                         <Copy className="w-3 h-3" /> Copy Text
                     </button>
+
                     {contextMenu.message.isMe && (
-                        <button
-                            onClick={() => {
-                                if (window.confirm('Delete this message?')) {
-                                    // TODO: Implement delete API
-                                    console.log('Delete message:', contextMenu.message._id);
-                                    // Optimistic delete or API call
-                                    // messageAPI.delete(contextMenu.message._id);
-                                    alert('Delete functionality coming soon to backend.');
-                                }
-                                setContextMenu(null);
-                            }}
-                            className="w-full text-left px-4 py-2 text-xs font-black uppercase hover:bg-red-50 text-red-600 flex items-center gap-2"
-                        >
-                            <Trash className="w-3 h-3" /> Delete
-                        </button>
-                    )}
-                    {contextMenu.message.isMe && (
-                        <button
-                            onClick={() => {
-                                setReadInfoMessage(contextMenu.message);
-                                setContextMenu(null);
-                            }}
-                            className="w-full text-left px-4 py-2 text-xs font-black uppercase hover:bg-purple-50 text-purple-600 flex items-center gap-2"
-                        >
-                            <Eye className="w-3 h-3" /> Read Info
-                        </button>
+                        <>
+                            <button
+                                onClick={() => {
+                                    setEditingMessage({ id: contextMenu.message.id || contextMenu.message._id, content: contextMenu.message.content });
+                                    setContextMenu(null);
+                                }}
+                                className="w-full text-left px-4 py-2 text-xs font-black uppercase hover:bg-purple-50 text-slate-900 flex items-center gap-2"
+                            >
+                                <Edit className="w-3 h-3" /> Edit
+                            </button>
+                            <button
+                                onClick={() => {
+                                    if (window.confirm('Delete this message?')) {
+                                        deleteMessage(contextMenu.message.id || contextMenu.message._id);
+                                    }
+                                    setContextMenu(null);
+                                }}
+                                className="w-full text-left px-4 py-2 text-xs font-black uppercase hover:bg-red-50 text-red-600 flex items-center gap-2"
+                            >
+                                <Trash className="w-3 h-3" /> Delete
+                            </button>
+                        </>
                     )}
                 </div>
             )}
 
-            {/* Read Info Modal */}
-            <AnimatePresence>
-                {readInfoMessage && (
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4"
-                        onClick={() => setReadInfoMessage(null)}
-                    >
-                        <motion.div
-                            initial={{ scale: 0.9, opacity: 0 }}
-                            animate={{ scale: 1, opacity: 1 }}
-                            exit={{ scale: 0.9, opacity: 0 }}
-                            className="bg-white border-4 border-slate-900 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] w-full max-w-sm overflow-hidden"
-                            onClick={e => e.stopPropagation()}
-                        >
-                            <div className="bg-slate-50 border-b-4 border-slate-900 px-4 py-3 flex justify-between items-center">
-                                <h3 className="font-black uppercase text-slate-900">Message Read By</h3>
-                                <button onClick={() => setReadInfoMessage(null)} className="hover:bg-slate-200 p-1 rounded">
-                                    <X className="w-5 h-5" />
-                                </button>
-                            </div>
-                            <div className="max-h-80 overflow-y-auto p-4 custom-scrollbar space-y-3">
-                                {!readInfoMessage.readBy || readInfoMessage.readBy.length === 0 ? (
-                                    <p className="text-center text-slate-400 font-bold text-sm py-4">No one has read this yet.</p>
-                                ) : (
-                                    readInfoMessage.readBy.map((reader: any, idx: number) => (
-                                        <div key={idx} className="flex items-center gap-3">
-                                            <UserAvatar
-                                                uid={reader.user?._id || reader.user} // Handle populated or ID
-                                                src={reader.user?.photoURL}
-                                                alt={reader.user?.displayName || 'User'}
-                                                size={32}
-                                                className="bg-green-100"
-                                            />
-                                            <div>
-                                                <p className="text-sm font-bold text-slate-900">{reader.user?.displayName || 'Unknown User'}</p>
-                                                <p className="text-[10px] font-bold text-slate-400 uppercase">{formatTimeAgo(reader.readAt)}</p>
-                                            </div>
-                                        </div>
-                                    ))
-                                )}
-                            </div>
-                        </motion.div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
+
 
             {/* Pending Requests Modal */}
-            <PendingRequestsModal
+            < PendingRequestsModal
                 isOpen={showPendingModal}
                 onClose={() => setShowPendingModal(false)}
                 roomId={roomId}
@@ -842,15 +833,21 @@ const RoomChatPage: React.FC = () => {
                 onClose={() => setShowCollabModal(false)}
             />
 
-            {/* Cog6ToothIcon Modal */}
+            {/* Chat Settings Modal */}
             <ChatSettingsModal
                 isOpen={showSettingsModal}
                 onClose={() => setShowSettingsModal(false)}
                 room={room}
-                onUpdate={(updated) => {/* Room hook handles live updates via socket usually, but strict update here is fine too */ }}
+                onUpdate={(updatedRoom) => {
+                    // Check if slug changed and we are currently viewing it
+                    if (updatedRoom.slug && updatedRoom.slug !== roomId) {
+                        // Redirect to new slug
+                        router.replace(`/circles/${updatedRoom.slug}`);
+                    }
+                }}
                 onDelete={() => router.push('/circles')}
             />
-        </div>
+        </div >
     );
 };
 

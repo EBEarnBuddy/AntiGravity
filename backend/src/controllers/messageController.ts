@@ -1,4 +1,5 @@
 import { Response } from 'express';
+import mongoose from 'mongoose';
 import Message from '../models/Message.js';
 import Room from '../models/Room.js';
 import User from '../models/User.js';
@@ -335,5 +336,93 @@ export const stopTyping = async (req: AuthRequest, res: Response) => {
     } catch (error) {
         console.error('Stop typing error:', error);
         res.status(500).json({ error: 'Failed to stop typing' });
+    }
+};
+
+export const updateMessage = async (req: AuthRequest, res: Response) => {
+    try {
+        const { uid } = req.user!;
+        const { messageId } = req.params;
+        const { content } = req.body;
+
+        const user = await User.findOne({ firebaseUid: uid });
+        if (!user) {
+            res.status(404).json({ error: 'User not found' });
+            return;
+        }
+
+        const message = await Message.findById(messageId);
+        if (!message) {
+            res.status(404).json({ error: 'Message not found' });
+            return;
+        }
+
+        // Only sender can edit
+        if (message.sender.toString() !== user._id.toString()) {
+            res.status(403).json({ error: 'Not authorized to edit this message' });
+            return;
+        }
+
+        message.content = content;
+        // Optionally mark as edited: message.isEdited = true;
+        await message.save();
+
+        // Emit update
+        try {
+            // Populate sender for consistency in frontend updates
+            await message.populate('sender', 'displayName photoURL firebaseUid username');
+            const io = getIO();
+            io.to(message.room.toString()).emit('message_updated', message);
+
+            // Redis: Invalidate message cache for this room
+            await RedisService.del(`messages:${message.room.toString()}`);
+        } catch (e) { console.error('Socket emit failed:', e); }
+
+        res.json(message);
+    } catch (error) {
+        console.error('Update message error:', error);
+        res.status(500).json({ error: 'Failed to update message' });
+    }
+};
+
+export const deleteMessage = async (req: AuthRequest, res: Response) => {
+    try {
+        const { uid } = req.user!;
+        const { messageId } = req.params;
+
+        const user = await User.findOne({ firebaseUid: uid });
+        if (!user) {
+            res.status(404).json({ error: 'User not found' });
+            return;
+        }
+
+        const message = await Message.findById(messageId);
+        if (!message) {
+            res.status(404).json({ error: 'Message not found' });
+            return;
+        }
+
+        // Only sender can delete (for now)
+        if (message.sender.toString() !== user._id.toString()) {
+            res.status(403).json({ error: 'Not authorized to delete this message' });
+            return;
+        }
+
+        const roomId = message.room.toString();
+        await Message.deleteOne({ _id: messageId });
+
+        // Emit delete
+        try {
+            const io = getIO();
+            io.to(roomId).emit('message_deleted', { messageId, roomId });
+
+            // Redis: Invalidate message cache
+            await RedisService.del(`messages:${roomId}`);
+        } catch (e) { console.error('Socket emit failed:', e); }
+
+        res.json({ message: 'Message deleted' });
+    } catch (error) {
+        console.error('Delete message error:', error);
+        res.status(500).json({ error: 'Failed to delete message' });
     }
 };

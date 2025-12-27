@@ -245,6 +245,25 @@ export const useRoomMessages = (roomId: string) => {
             });
           });
 
+          // Message Updated
+          socket.on('message_updated', (updatedMsg: ChatMessage) => {
+            setMessages(prev => prev.map(m => {
+              // Match by ID or _id
+              const mId = m.id || (m as any)._id;
+              const uId = updatedMsg.id || (updatedMsg as any)._id;
+              return mId === uId ? updatedMsg : m;
+            }));
+          });
+
+          // Message Deleted
+          socket.on('message_deleted', (data: { messageId: string, roomId: string }) => {
+            if (data.roomId !== roomId) return;
+            setMessages(prev => prev.filter(m => {
+              const mId = m.id || (m as any)._id;
+              return mId !== data.messageId;
+            }));
+          });
+
           // Join Room (Once listeners are ready)
           console.log(`Joining Room: ${roomId}`);
           socket.emit('join_room', roomId);
@@ -316,6 +335,8 @@ export const useRoomMessages = (roomId: string) => {
         socketInstance.off('typing');
         socketInstance.off('stop_typing');
         socketInstance.off('messages_read');
+        socketInstance.off('message_updated');
+        socketInstance.off('message_deleted');
         socketInstance.off('error');
       }
     };
@@ -405,13 +426,24 @@ export const useRoomMessages = (roomId: string) => {
       lastTypingEmitRef.current = now;
     }
 
-    if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
     typingTimeoutRef.current = setTimeout(() => {
       sendTyping(false);
     }, 3000);
   };
 
-  return { messages, loading, error, sendMessage, onlineUsers, typingUsers, notifyTyping, loadMore, hasMore, isLoadingMore };
+  const deleteMessage = async (messageId: string) => {
+    try {
+      await messageAPI.delete(roomId, messageId);
+    } catch (e) { console.error('Failed to delete message', e); }
+  };
+
+  const updateMessage = async (messageId: string, content: string) => {
+    try {
+      await messageAPI.update(roomId, messageId, content);
+    } catch (e) { console.error('Failed to update message', e); }
+  };
+
+  return { messages, loading, error, sendMessage, onlineUsers, typingUsers, notifyTyping, loadMore, hasMore, isLoadingMore, deleteMessage, updateMessage };
 };
 
 export const useRoomChatMessages = useRoomMessages;

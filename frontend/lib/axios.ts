@@ -123,6 +123,8 @@ export const messageAPI = {
   send: (roomId: string, content: string, type: 'text' | 'image' | 'file' = 'text') =>
     api.post(`/rooms/${roomId}/messages`, { content, type }),
   getAll: (roomId: string, limit?: number, before?: string) => api.get(`/rooms/${roomId}/messages`, { params: { limit, before } }),
+  update: (roomId: string, messageId: string, content: string) => api.put(`/rooms/${roomId}/messages/${messageId}`, { content }),
+  delete: (roomId: string, messageId: string) => api.delete(`/rooms/${roomId}/messages/${messageId}`),
   markAsRead: (roomId: string) => api.post(`/rooms/${roomId}/messages/read`),
   sendTyping: (roomId: string, isTyping: boolean) =>
     api.post(`/rooms/${roomId}/messages/typing/${isTyping ? 'start' : 'stop'}`),
@@ -138,7 +140,8 @@ export const communityPostsAPI = {
 
 export const notificationAPI = {
   getMyNotifications: () => api.get('/notifications'),
-  markAsRead: (id: string) => api.patch(`/notifications/${id}/read`),
+  markAsRead: (id: string) => api.put(`/notifications/${id}/read`),
+  markAllAsRead: () => api.put('/notifications/read-all'),
 };
 
 export const uploadAPI = {

@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { sendMessage, getMessages, markRoomAsRead, startTyping, stopTyping } from '../controllers/messageController.js';
+import { sendMessage, getMessages, markRoomAsRead, startTyping, stopTyping, updateMessage, deleteMessage } from '../controllers/messageController.js';
 import { verifyToken } from '../middlewares/auth.js';
 
 const router = Router({ mergeParams: true }); // Enable access to :roomId from parent router
@@ -11,5 +11,9 @@ router.post('/', sendMessage);
 router.post('/read', markRoomAsRead);
 router.post('/typing/start', startTyping);
 router.post('/typing/stop', stopTyping);
+
+// Message Actions
+router.put('/:messageId', updateMessage);
+router.delete('/:messageId', deleteMessage);
 
 export default router;

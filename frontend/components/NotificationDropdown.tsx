@@ -3,7 +3,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { getSocket } from '../lib/socket';
-import api from '../lib/axios'; // Or create notificationAPI
+import { notificationAPI } from '../lib/axios';
 import { Bell } from 'lucide-react';
 import Link from 'next/link';
 import useOnClickOutside from '../hooks/useOnClickOutside';
@@ -28,7 +28,7 @@ const NotificationDropdown = () => {
 
     const fetchNotifications = async () => {
         try {
-            const res = await api.get('/notifications');
+            const res = await notificationAPI.getMyNotifications();
             // Filter out read notifications to simulate "auto-delete on view" behavior for the list
             const unread = res.data.filter((n: INotification) => !n.isRead);
             setNotifications(unread);
@@ -73,7 +73,7 @@ const NotificationDropdown = () => {
 
         if (!currentlyRead && id) {
             try {
-                await api.put(`/notifications/${id}/read`);
+                await notificationAPI.markAsRead(id);
             } catch (err) {
                 console.error('Failed to mark read', err);
             }
@@ -84,9 +84,11 @@ const NotificationDropdown = () => {
         setNotifications([]);
         setUnreadCount(0);
         try {
-            await api.put('/notifications/read-all');
+            await notificationAPI.markAllAsRead();
         } catch (err) {
             console.error('Failed to clear all', err);
+            // Optionally revert state or show error
+            fetchNotifications(); // Sync back if failed
         }
     };
 
