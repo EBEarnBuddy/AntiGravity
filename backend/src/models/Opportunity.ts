@@ -48,8 +48,9 @@ export interface IOpportunity extends Document {
     equity?: string;
     founderId?: string; // Firebase UID of founder (for quick lookups)
     founderName?: string;
+    slug?: string; // Custom URL identifier
     founderAvatar?: string;
-    startupStatus?: 'active' | 'paused' | 'closed';
+    startupStatus?: 'active' | 'acquired' | 'closed';
     roles?: IStartupRole[];
     totalApplicants?: number;
     contact?: {

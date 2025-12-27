@@ -14,7 +14,12 @@ import {
     UserPlus,
     Settings,
     LogOut,
-    Info
+    Info,
+    Copy,
+    Trash,
+    Edit,
+    Eye,
+    X
 } from 'lucide-react';
 import useOnClickOutside from '@/hooks/useOnClickOutside';
 import { roomAPI } from '@/lib/axios'; // Import API for leaving
@@ -43,6 +48,12 @@ const RoomChatPage: React.FC = () => {
 
     const [showMenu, setShowMenu] = useState(false);
     const [showInfo, setShowInfo] = useState(false);
+
+    // Context Menu State
+    const [contextMenu, setContextMenu] = useState<{ x: number, y: number, message: any } | null>(null);
+    const [readInfoMessage, setReadInfoMessage] = useState<any>(null); // For Read Info Modal
+    const contextMenuRef = useRef<HTMLDivElement>(null);
+    useOnClickOutside(contextMenuRef, () => setContextMenu(null));
 
     const menuRef = useRef<HTMLDivElement>(null);
     const infoRef = useRef<HTMLDivElement>(null);
@@ -236,7 +247,18 @@ const RoomChatPage: React.FC = () => {
                                             <p className="text-xs font-bold text-slate-400 uppercase">Members</p>
                                             <p className="text-sm font-black text-green-600">{room?.members?.length || 0} Members</p>
                                         </div>
-                                        <div className="pt-2">
+                                        <div className="pt-2 flex flex-col gap-2">
+                                            <button
+                                                onClick={() => {
+                                                    navigator.clipboard.writeText(window.location.href);
+                                                    alert('Circle link copied to clipboard!');
+                                                    setShowInfo(false);
+                                                }}
+                                                className="w-full py-2 bg-green-100 text-green-700 text-xs font-black uppercase rounded-lg hover:bg-green-200 transition flex items-center justify-center gap-2"
+                                            >
+                                                <Copy className="w-3 h-3" />
+                                                Copy Invite Link
+                                            </button>
                                             <button
                                                 onClick={() => setShowInfo(false)}
                                                 className="w-full py-2 bg-slate-100 text-slate-400 text-xs font-black uppercase rounded-lg cursor-not-allowed"
@@ -531,6 +553,104 @@ const RoomChatPage: React.FC = () => {
                     </div>
                 </form>
             </div>
+
+            {/* Context Menu */}
+            {contextMenu && (
+                <div
+                    ref={contextMenuRef}
+                    className="fixed z-50 bg-white border-2 border-slate-900 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] rounded-lg py-1 min-w-[160px] animate-in fade-in zoom-in-95 duration-100"
+                    style={{ top: contextMenu.y, left: Math.min(contextMenu.x, window.innerWidth - 180) }}
+                >
+                    <button
+                        onClick={() => {
+                            if (window.confirm('Copy message text?')) { // Simply copying as basic action
+                                navigator.clipboard.writeText(contextMenu.message.content);
+                            }
+                            setContextMenu(null);
+                        }}
+                        className="w-full text-left px-4 py-2 text-xs font-black uppercase hover:bg-slate-100 flex items-center gap-2"
+                    >
+                        <Copy className="w-3 h-3" /> Copy Text
+                    </button>
+                    {contextMenu.message.isMe && (
+                        <button
+                            onClick={() => {
+                                if (window.confirm('Delete this message?')) {
+                                    // TODO: Implement delete API
+                                    console.log('Delete message:', contextMenu.message._id);
+                                    // Optimistic delete or API call
+                                    // messageAPI.delete(contextMenu.message._id);
+                                    alert('Delete functionality coming soon to backend.');
+                                }
+                                setContextMenu(null);
+                            }}
+                            className="w-full text-left px-4 py-2 text-xs font-black uppercase hover:bg-red-50 text-red-600 flex items-center gap-2"
+                        >
+                            <Trash className="w-3 h-3" /> Delete
+                        </button>
+                    )}
+                    {contextMenu.message.isMe && (
+                        <button
+                            onClick={() => {
+                                setReadInfoMessage(contextMenu.message);
+                                setContextMenu(null);
+                            }}
+                            className="w-full text-left px-4 py-2 text-xs font-black uppercase hover:bg-purple-50 text-purple-600 flex items-center gap-2"
+                        >
+                            <Eye className="w-3 h-3" /> Read Info
+                        </button>
+                    )}
+                </div>
+            )}
+
+            {/* Read Info Modal */}
+            <AnimatePresence>
+                {readInfoMessage && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4"
+                        onClick={() => setReadInfoMessage(null)}
+                    >
+                        <motion.div
+                            initial={{ scale: 0.9, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0.9, opacity: 0 }}
+                            className="bg-white border-4 border-slate-900 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] w-full max-w-sm overflow-hidden"
+                            onClick={e => e.stopPropagation()}
+                        >
+                            <div className="bg-slate-50 border-b-4 border-slate-900 px-4 py-3 flex justify-between items-center">
+                                <h3 className="font-black uppercase text-slate-900">Message Read By</h3>
+                                <button onClick={() => setReadInfoMessage(null)} className="hover:bg-slate-200 p-1 rounded">
+                                    <X className="w-5 h-5" />
+                                </button>
+                            </div>
+                            <div className="max-h-80 overflow-y-auto p-4 custom-scrollbar space-y-3">
+                                {!readInfoMessage.readBy || readInfoMessage.readBy.length === 0 ? (
+                                    <p className="text-center text-slate-400 font-bold text-sm py-4">No one has read this yet.</p>
+                                ) : (
+                                    readInfoMessage.readBy.map((reader: any, idx: number) => (
+                                        <div key={idx} className="flex items-center gap-3">
+                                            <UserAvatar
+                                                uid={reader.user?._id || reader.user} // Handle populated or ID
+                                                src={reader.user?.photoURL}
+                                                alt={reader.user?.displayName || 'User'}
+                                                size={32}
+                                                className="bg-green-100"
+                                            />
+                                            <div>
+                                                <p className="text-sm font-bold text-slate-900">{reader.user?.displayName || 'Unknown User'}</p>
+                                                <p className="text-[10px] font-bold text-slate-400 uppercase">{formatTimeAgo(reader.readAt)}</p>
+                                            </div>
+                                        </div>
+                                    ))
+                                )}
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
             {/* Pending Requests Modal */}
             <PendingRequestsModal

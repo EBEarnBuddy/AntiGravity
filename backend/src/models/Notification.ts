@@ -19,6 +19,7 @@ const NotificationSchema: Schema = new Schema({
     message: { type: String, required: true },
     link: { type: String },
     isRead: { type: Boolean, default: false },
+    isHidden: { type: Boolean, default: false }, // Soft delete for "Clear All"
 }, { timestamps: true });
 
 export default mongoose.model<INotification>('Notification', NotificationSchema);

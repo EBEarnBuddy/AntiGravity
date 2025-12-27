@@ -55,6 +55,7 @@ export const createOpportunity = async (req: AuthRequest, res: Response) => {
             founderName: payload.founderName || user.displayName,
             founderAvatar: payload.founderAvatar || user.photoURL,
             image: payload.image || payload.logo, // Support image field
+            slug: payload.slug // Optional custom slug
         });
         await opportunity.save();
 
@@ -174,8 +175,16 @@ export const getOpportunities = async (req: Request, res: Response) => {
 // Get Single Opportunity
 export const getOpportunityById = async (req: Request, res: Response) => {
     try {
-        const opportunity = await Opportunity.findById(req.params.id)
-            .populate('postedBy', 'displayName photoURL role');
+        const { id } = req.params;
+        let opportunity;
+
+        // Check if id is a valid ObjectId
+        if (id.match(/^[0-9a-fA-F]{24}$/)) {
+            opportunity = await Opportunity.findById(id).populate('postedBy', 'displayName photoURL role');
+        } else {
+            // Treat as slug
+            opportunity = await Opportunity.findOne({ slug: id }).populate('postedBy', 'displayName photoURL role');
+        }
 
         if (!opportunity) {
             res.status(404).json({ error: 'Not found' });

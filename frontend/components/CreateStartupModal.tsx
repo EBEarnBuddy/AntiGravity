@@ -39,6 +39,7 @@ const CreateStartupModal: React.FC<CreateStartupModalProps> = ({ isOpen, onClose
   const [formData, setFormData] = useState({
     name: '',
     description: '',
+    slug: '', // Custom URL
     industry: '',
     stage: 'pre-seed',
     location: '',
@@ -59,6 +60,7 @@ const CreateStartupModal: React.FC<CreateStartupModalProps> = ({ isOpen, onClose
     if (isOpen && isEditing && initialData) {
       setFormData({
         name: initialData.name || '',
+        slug: initialData.slug || '',
         description: initialData.description || '',
         industry: initialData.industry || '',
         stage: initialData.stage || 'pre-seed',
@@ -78,6 +80,7 @@ const CreateStartupModal: React.FC<CreateStartupModalProps> = ({ isOpen, onClose
       // Reset if opening in create mode
       setFormData({
         name: '',
+        slug: '',
         description: '',
         industry: '',
         stage: 'pre-seed',
@@ -243,6 +246,7 @@ const CreateStartupModal: React.FC<CreateStartupModalProps> = ({ isOpen, onClose
 
       const startupData = {
         name: formData.name,
+        slug: formData.slug || undefined, // Send undefined if empty to avoid unique index conflict with empty string? Or backend checks sparse? Sparse handles null/undefined usually. Empty string is a unique value. I should send undefined if empty.
         description: formData.description,
         industry: formData.industry,
         stage: formData.stage,
@@ -357,6 +361,22 @@ const CreateStartupModal: React.FC<CreateStartupModalProps> = ({ isOpen, onClose
                         className="w-full px-4 py-3 border-2 border-slate-900 bg-white text-slate-900 focus:outline-none focus:bg-slate-50 transition-all font-bold placeholder:text-slate-400 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] focus:shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] focus:translate-x-[2px] focus:translate-y-[2px]"
                         placeholder="Enter your startup name"
                       />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-bold text-slate-700 uppercase mb-2">
+                        Custom Link ID (Optional)
+                      </label>
+                      <div className="flex items-center">
+                        <span className="bg-slate-100 border-2 border-r-0 border-slate-900 px-3 py-3 text-slate-500 font-mono text-sm">/startups/</span>
+                        <input
+                          type="text"
+                          value={formData.slug}
+                          onChange={(e) => handleInputChange('slug', e.target.value.replace(/[^a-zA-Z0-9-]/g, '').toLowerCase())}
+                          className="w-full px-4 py-3 border-2 border-slate-900 bg-white text-slate-900 focus:outline-none focus:bg-slate-50 transition-all font-bold placeholder:text-slate-400 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] focus:shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] focus:translate-x-[2px] focus:translate-y-[2px]"
+                          placeholder="my-startup"
+                        />
+                      </div>
                     </div>
 
                     <div>

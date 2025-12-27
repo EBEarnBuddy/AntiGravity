@@ -135,7 +135,8 @@ const StartupsPage: React.FC = () => {
         return app?.status;
     };
 
-    const handleCopyLink = (id: string) => {
+    const handleCopyLink = (startup: any) => {
+        const id = startup.slug || startup.id || startup._id;
         navigator.clipboard.writeText(`${window.location.origin}/startups/${id}`);
         alert('Link copied to clipboard!');
         setActionMenuOpen(null);
@@ -330,11 +331,11 @@ const StartupsPage: React.FC = () => {
                                                     >
                                                         Manage ({startup.totalApplicants || 0})
                                                     </button>
-                                                    <button onClick={() => router.push(`/startups/${startup.id || startup._id}`)} className="px-3 border-2 border-slate-900 hover:bg-slate-100"><ArrowRight className="w-4 h-4" /></button>
+                                                    <button onClick={() => router.push(`/startups/${startup.slug || startup.id || startup._id}`)} className="px-3 border-2 border-slate-900 hover:bg-slate-100"><ArrowRight className="w-4 h-4" /></button>
                                                 </div>
                                             ) : (
                                                 <button
-                                                    onClick={() => router.push(`/startups/${startup.id || startup._id}`)}
+                                                    onClick={() => router.push(`/startups/${startup.slug || startup.id || startup._id}`)}
                                                     className="w-full py-3 bg-white border-4 border-slate-900 text-slate-900 text-xs font-black uppercase hover:bg-slate-900 hover:text-white transition-all shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] flex items-center justify-center gap-2"
                                                 >
                                                     View Opportunity <ArrowRight className="w-3 h-3" />
@@ -396,7 +397,7 @@ const StartupsPage: React.FC = () => {
                         setSelectedStartup(null);
                     }}
                     title={selectedStartup.name || selectedStartup.title}
-                    url={typeof window !== 'undefined' ? `${window.location.origin}/startups/${selectedStartup.id || selectedStartup._id}` : ''}
+                    url={typeof window !== 'undefined' ? `${window.location.origin}/startups/${selectedStartup.slug || selectedStartup.id || selectedStartup._id}` : ''}
                     description={selectedStartup.description}
                 />
             )}
