@@ -8,7 +8,9 @@ export interface INotification extends Document {
     message: string; // Short preview
     link?: string; // Where to redirect (e.g., /circles/123)
     isRead: boolean;
+    isHidden?: boolean;
     createdAt: Date;
+    updatedAt: Date;
 }
 
 const NotificationSchema: Schema = new Schema({
