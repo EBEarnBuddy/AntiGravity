@@ -28,6 +28,7 @@ export const syncUser = async (req: AuthRequest, res: Response) => {
                     skills: [],
                     isNewUser: true,
                     hasCompletedTour: false,
+                    hasCompletedOnboarding: false,
                     hasSkippedOnboarding: false
                 }
             },

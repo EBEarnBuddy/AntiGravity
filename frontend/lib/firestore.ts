@@ -320,6 +320,7 @@ export interface UserProfile {
   hasCompletedTour?: boolean;
   isNewUser?: boolean;
   hasSkippedOnboarding?: boolean;
+  hasCompletedOnboarding?: boolean;
   onboardingData?: OnboardingData;
   joinedPods: string[];
   joinedRooms: string[];

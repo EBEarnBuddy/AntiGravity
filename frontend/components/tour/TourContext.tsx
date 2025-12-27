@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { FirestoreService } from '@/lib/firestore';
+import { userAPI } from '@/lib/axios';
 import { usePathname, useRouter } from 'next/navigation';
 
 export interface TourStep {
@@ -132,8 +132,9 @@ export const TourProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Check if tour should start
     useEffect(() => {
         if (currentUser && userProfile) {
-            // Logic: Is new user AND hasn't completed AND hasn't skipped (unless we decide to force new users regardless of skip)
-            const shouldStart = userProfile.isNewUser && !userProfile.hasCompletedTour && !userProfile.hasSkippedOnboarding;
+            // Logic: Must have completed onboarding AND NOT completed tour
+            // We can treat isNewUser as optional extra check or just rely on tour flag
+            const shouldStart = userProfile.hasCompletedOnboarding && !userProfile.hasCompletedTour;
 
             if (shouldStart && !isActive && !hasCompletedThisSession && !isSkipped) {
                 // Determine if we are on the right page
@@ -158,8 +159,9 @@ export const TourProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         if (currentUser && userProfile && !userProfile.hasCompletedTour) {
             try {
+                // Mark tour as done and isNewUser as false (fully graduated from onboarding)
                 await updateProfile({ hasCompletedTour: true, isNewUser: false });
-                await FirestoreService.updateUserProfile(currentUser.uid, { hasCompletedTour: true, isNewUser: false });
+                await userAPI.updateMe({ hasCompletedTour: true, isNewUser: false });
             } catch (error) {
                 console.error("Failed to mark tour as completed:", error);
             }
@@ -176,8 +178,10 @@ export const TourProvider: React.FC<{ children: React.ReactNode }> = ({ children
         // Persist skip
         if (currentUser && userProfile) {
             try {
-                await updateProfile({ hasSkippedOnboarding: true });
-                await FirestoreService.updateUserProfile(currentUser.uid, { hasSkippedOnboarding: true });
+                // If skipped, we still mark onboarding as skipped, but maybe keep isNewUser?
+                // Or just mark tour done to stop pestering? Let's assume skipping means "no tour"
+                await updateProfile({ hasCompletedTour: true });
+                await userAPI.updateMe({ hasCompletedTour: true });
             } catch (error) {
                 console.error("Failed to mark tour as skipped:", error);
             }

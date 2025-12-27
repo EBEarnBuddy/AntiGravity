@@ -11,15 +11,19 @@ import { TourProvider } from "@/components/tour/TourContext";
 import { ProductTour } from "@/components/tour/ProductTour";
 
 function ProtectedShell({ children }: { children: React.ReactNode }) {
-    const { currentUser, loading } = useAuth();
+    const { currentUser, userProfile, loading } = useAuth();
     const router = useRouter();
     const pathname = usePathname();
 
     useEffect(() => {
-        if (!loading && !currentUser) {
-            router.push('/auth');
+        if (!loading) {
+            if (!currentUser) {
+                router.push('/auth');
+            } else if (userProfile && !userProfile.hasCompletedOnboarding) {
+                router.push('/onboarding');
+            }
         }
-    }, [currentUser, loading, router]);
+    }, [currentUser, userProfile, loading, router]);
 
     if (loading) {
         return (

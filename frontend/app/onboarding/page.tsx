@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
-import { FirestoreService } from '@/lib/firestore';
+import { userAPI } from '@/lib/axios';
 import { Check, ArrowRight, User, Rocket, Heart, Code } from 'lucide-react';
 
 const INTERESTS = [
@@ -45,11 +45,14 @@ export default function OnboardingPage() {
         if (!currentUser) return;
         setLoading(true);
         try {
-            await FirestoreService.saveOnboardingResponse({
-                userId: currentUser.uid,
-                ...formData
+            // Save onboarding data and mark as completed
+            await userAPI.updateMe({
+                onboardingData: formData,
+                hasCompletedOnboarding: true,
+                // Ensure isNewUser stays true until tour is done, or handle it in tour
             });
-            // Force reload or redirect to discover
+
+            // Force reload to pick up new profile state or redirect
             window.location.href = '/discover';
         } catch (error) {
             console.error("Onboarding error:", error);
