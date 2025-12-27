@@ -80,6 +80,7 @@ export const opportunityAPI = {
   getAll: (type?: string) => api.get('/opportunities', { params: { type } }),
   getById: (id: string) => api.get(`/opportunities/${id}`),
   create: (data: Record<string, unknown>) => api.post('/opportunities', data),
+  update: (id: string, data: Record<string, unknown>) => api.put(`/opportunities/${id}`, data),
   delete: (id: string) => api.delete(`/opportunities/${id}`),
   updateStatus: (id: string, status: string) => api.patch(`/opportunities/${id}/status`, { status }),
 };

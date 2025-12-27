@@ -27,11 +27,13 @@ interface CreateStartupModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess: () => void;
+  initialData?: any;
+  isEditing?: boolean;
 }
 
-const CreateStartupModal: React.FC<CreateStartupModalProps> = ({ isOpen, onClose, onSuccess }) => {
+const CreateStartupModal: React.FC<CreateStartupModalProps> = ({ isOpen, onClose, onSuccess, initialData, isEditing = false }) => {
   const { currentUser } = useAuth();
-  const { createStartup } = useStartups();
+  const { createStartup, updateStartup } = useStartups(); // You'll need to add updateStartup to your hook
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState({
@@ -52,6 +54,49 @@ const CreateStartupModal: React.FC<CreateStartupModalProps> = ({ isOpen, onClose
     additionalInfo: ''
   });
 
+  // Populate form on open/edit
+  React.useEffect(() => {
+    if (isOpen && isEditing && initialData) {
+      setFormData({
+        name: initialData.name || '',
+        description: initialData.description || '',
+        industry: initialData.industry || '',
+        stage: initialData.stage || 'pre-seed',
+        location: initialData.location || '',
+        funding: initialData.funding || '',
+        equity: initialData.equity || '',
+        requirements: initialData.requirements || [],
+        roles: initialData.roles || [],
+        contact: {
+          email: initialData.contact?.email || '',
+          website: initialData.contact?.website || '',
+          linkedin: initialData.contact?.linkedin || ''
+        },
+        additionalInfo: initialData.additionalInfo || ''
+      });
+    } else if (isOpen && !isEditing) {
+      // Reset if opening in create mode
+      setFormData({
+        name: '',
+        description: '',
+        industry: '',
+        stage: 'pre-seed',
+        location: '',
+        funding: '',
+        equity: '',
+        requirements: [],
+        roles: [],
+        contact: {
+          email: '',
+          website: '',
+          linkedin: ''
+        },
+        additionalInfo: ''
+      });
+    }
+  }, [isOpen, isEditing, initialData]);
+
+  // ... (State hooks for newRequirement, newRole, newRoleRequirement remain same)
   const [newRequirement, setNewRequirement] = useState('');
   const [newRole, setNewRole] = useState({
     title: '',
@@ -64,6 +109,7 @@ const CreateStartupModal: React.FC<CreateStartupModalProps> = ({ isOpen, onClose
   });
   const [newRoleRequirement, setNewRoleRequirement] = useState('');
 
+  // ... (Constants industries, stages remain same)
   const industries = [
     { id: 'healthcare', name: 'Healthcare', icon: Heart },
     { id: 'fintech', name: 'FinTech', icon: DollarSign },
@@ -90,6 +136,7 @@ const CreateStartupModal: React.FC<CreateStartupModalProps> = ({ isOpen, onClose
     }));
   };
 
+  // ... (Helper functions handleNestedChange through validateStep remain same)
   const handleNestedChange = (parent: string, field: string, value: any) => {
     if (parent === 'contact') {
       setFormData(prev => ({
@@ -139,7 +186,13 @@ const CreateStartupModal: React.FC<CreateStartupModalProps> = ({ isOpen, onClose
   const addRole = () => {
     if (newRole.title && newRole.description && newRole.requirements.length > 0) {
       const roleData = {
-        ...newRole,
+        title: newRole.title,
+        description: newRole.description,
+        requirements: newRole.requirements,
+        salary: newRole.salary,
+        equity: newRole.equity,
+        type: newRole.type,
+        location: newRole.location,
         id: Date.now().toString(), // Simple ID generation
         applicants: []
       };
@@ -172,11 +225,11 @@ const CreateStartupModal: React.FC<CreateStartupModalProps> = ({ isOpen, onClose
   const validateStep = (step: number) => {
     switch (step) {
       case 1:
-        return formData.name && formData.description && formData.industry;
+        return !!(formData.name && formData.description && formData.industry);
       case 2:
-        return formData.location && formData.funding && formData.equity;
+        return !!(formData.location && formData.funding && formData.equity);
       case 3:
-        return formData.roles.length > 0 && formData.contact.email;
+        return formData.roles.length > 0 && !!formData.contact.email;
       default:
         return true;
     }
@@ -203,37 +256,24 @@ const CreateStartupModal: React.FC<CreateStartupModalProps> = ({ isOpen, onClose
         founderId: currentUser.uid,
         founderName: currentUser.displayName || 'Anonymous',
         founderAvatar: currentUser.photoURL || '',
-        // status: 'active' as const, // REMOVED: Conflicts with generic 'status' (open/closed)
-        totalApplicants: 0
+        totalApplicants: initialData?.totalApplicants || 0
       };
 
-      console.log('Submitting Startup Data:', startupData); // DEBUG log
+      console.log('Submitting Startup Data:', startupData);
 
-      await createStartup(startupData);
+      if (isEditing && initialData && (initialData.id || initialData._id)) {
+        await updateStartup(initialData.id || initialData._id, startupData);
+      } else {
+        await createStartup(startupData);
+      }
+
       onSuccess();
       onClose();
 
-      // Reset form
-      setFormData({
-        name: '',
-        description: '',
-        industry: '',
-        stage: 'pre-seed',
-        location: '',
-        funding: '',
-        equity: '',
-        requirements: [],
-        roles: [],
-        contact: {
-          email: '',
-          website: '',
-          linkedin: ''
-        },
-        additionalInfo: ''
-      });
+      // Reset form handled by useEffect on next reopen
       setCurrentStep(1);
     } catch (error) {
-      console.error('Error creating startup:', error);
+      console.error('Error saving startup:', error);
     } finally {
       setIsSubmitting(false);
     }
@@ -270,7 +310,7 @@ const CreateStartupModal: React.FC<CreateStartupModalProps> = ({ isOpen, onClose
             <div className="flex-none px-4 md:px-8 py-4 md:py-6 border-b-4 border-slate-900 bg-white">
               <div className="flex items-center justify-between mb-6">
                 <div>
-                  <h2 className="text-2xl font-black text-slate-900 tracking-tight uppercase">List Your Startup</h2>
+                  <h2 className="text-2xl font-black text-slate-900 tracking-tight uppercase">{isEditing ? 'Edit Opportunity' : 'List Your Startup'}</h2>
                   <p className="text-slate-500 font-bold">Step {currentStep} of 3</p>
                 </div>
                 <button
@@ -732,7 +772,7 @@ const CreateStartupModal: React.FC<CreateStartupModalProps> = ({ isOpen, onClose
                   whileHover={{ scale: isSubmitting || !validateStep(currentStep) ? 1 : 1.02 }}
                   whileTap={{ scale: isSubmitting || !validateStep(currentStep) ? 1 : 0.98 }}
                 >
-                  {isSubmitting ? 'Creating...' : 'Launch Startup'}
+                  {isSubmitting ? (isEditing ? 'Updating...' : 'Creating...') : (isEditing ? 'Update Opportunity' : 'Launch Startup')}
                 </motion.button>
               )}
             </div>

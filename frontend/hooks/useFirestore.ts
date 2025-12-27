@@ -224,15 +224,17 @@ export const useRoomMessages = (roomId: string) => {
               const exists = prev.find(m => (m.id && m.id === newMessage.id) || (m._id && m._id === (newMessage as any)._id));
               if (exists) return prev;
 
-              // 2. Reconciliation: Do we have a pending message that matches this?
               const isMe = (newMessage.sender as any)?._id === currentUser.uid || (newMessage.sender as any)?.firebaseUid === currentUser.uid || newMessage.senderId === currentUser.uid;
 
               if (isMe) {
+                // 2. Strict Reconciliation: Match optimistic message by content AND ensuring it's recent (pending)
+                // We must preserve the 'id' transition carefully or use the NEW id but ensure React sees it as an update if possible,
+                // OR just swap it out. To avoid flicker, we just map it.
                 const pendingIdx = prev.findIndex(m => m.pending && m.content === newMessage.content);
                 if (pendingIdx !== -1) {
-                  // Replace pending with confirmed socket message
+                  // Replace pending with confirmed socket message IN PLACE
                   const newArr = [...prev];
-                  newArr[pendingIdx] = newMessage;
+                  newArr[pendingIdx] = { ...newMessage, pending: false };
                   return newArr;
                 }
               }
@@ -450,11 +452,25 @@ export const useStartups = () => {
   const createStartup = async (startupData: any) => {
     try {
       await opportunityAPI.create({ ...startupData, type: 'startup' });
+      // Optimistic or Fetch? Fetch for now.
       const response = await opportunityAPI.getAll('startup');
       const data = response.data.map((item: any) => ({ ...item, id: item._id }));
       setStartups(data);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to create startup');
+      throw err;
+    }
+  };
+
+  const updateStartup = async (id: string, startupData: any) => {
+    try {
+      await opportunityAPI.update(id, startupData);
+      const response = await opportunityAPI.getAll('startup');
+      const data = response.data.map((item: any) => ({ ...item, id: item._id }));
+      setStartups(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to update startup');
+      throw err;
     }
   };
 
@@ -502,21 +518,19 @@ export const useStartups = () => {
   };
 
   const updateStartupStatus = async (startupId: string, status: string) => {
-    // Assuming backend endpoint exists for this or generic update
-    // We didn't explicitly check generic update, but we have opportunityAPI.update?
-    // Let's assume we need to add it or use a generic update if available.
-    // Checking opportunityAPI in axios.ts might be needed, but I'll write the logic assuming it exists or I'll add it.
-    // For now, let's look at axios.ts later to confirm.
     try {
-      // Using a generic update if available, or just error out if not found? 
-      // I'll assume opportunityAPI.update exists.
-      // actually, let's verify axios.ts first or just stub it.
-      // I recall deleteRoom/updateRoom, but opportunity?
-      // Let's stub it for now and I will verify axios next.
-    } catch (e) { }
+      await opportunityAPI.updateStatus(startupId, status);
+      const response = await opportunityAPI.getAll('startup');
+      const data = response.data.map((item: any) => ({ ...item, id: item._id }));
+      setStartups(data);
+    } catch (e) {
+      console.error('Failed to update startup status:', e);
+      setError(e instanceof Error ? e.message : 'Failed to update status');
+      throw e;
+    }
   };
 
-  return { startups, loading, error, createStartup, applyToStartup, bookmarkStartup, unbookmarkStartup, getApplicants, updateApplicationStatus, deleteStartup, updateStartupStatus };
+  return { startups, loading, error, createStartup, updateStartup, applyToStartup, bookmarkStartup, unbookmarkStartup, getApplicants, updateApplicationStatus, deleteStartup, updateStartupStatus };
 };
 
 export const useMyApplications = () => {

@@ -138,12 +138,12 @@ const CirclesPage: React.FC = () => {
         return (
             <>
                 {/* Header */}
-                <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4">
+                <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-4 md:mb-8 gap-4">
                     <div>
-                        <h1 className="text-3xl md:text-4xl font-black text-slate-900 mb-2 uppercase tracking-tighter transform -rotate-1">
+                        <h1 className="text-2xl md:text-4xl font-black text-slate-900 mb-2 uppercase tracking-tighter transform -rotate-1">
                             {activeCircleType === 'community' ? 'Community' : activeCircleType === 'opportunity' ? 'Opportunity' : 'Collab'} Circles
                         </h1>
-                        <p className="text-slate-500 font-bold uppercase tracking-wide text-sm">
+                        <p className="text-slate-500 font-bold uppercase tracking-wide text-xs md:text-sm">
                             {activeCircleType === 'community'
                                 ? 'Connect with verified builders'
                                 : activeCircleType === 'opportunity'
@@ -159,6 +159,23 @@ const CirclesPage: React.FC = () => {
                         <Plus className="w-4 h-4" />
                         Create Circle
                     </button>
+                </div>
+
+                {/* Mobile Tabs for Circle Types */}
+                <div className="md:hidden flex overflow-x-auto gap-2 mb-6 pb-2 -mx-4 px-4 scrollbar-hide">
+                    {sidebarLinks.map((link) => (
+                        <button
+                            key={link.type}
+                            onClick={() => setActiveCircleType(link.type)}
+                            className={`flex items-center gap-2 px-4 py-2 border-2 border-slate-900 rounded-lg whitespace-nowrap text-xs font-black uppercase transition-all ${activeCircleType === link.type
+                                ? 'bg-slate-900 text-white shadow-[2px_2px_0px_0px_rgba(22,163,74,1)]'
+                                : 'bg-white text-slate-500'
+                                }`}
+                        >
+                            {link.icon}
+                            {link.label.replace(' Circles', '')}
+                        </button>
+                    ))}
                 </div>
 
                 {/* MagnifyingGlassIcon Bar */}
@@ -329,34 +346,37 @@ const CirclesPage: React.FC = () => {
 
     return (
         <div className="fixed inset-0 bg-slate-50 flex overflow-hidden" style={{ top: '64px' }}>
-            <Sidebar open={sidebarOpen} setOpen={setSidebarOpen}>
-                <SidebarBody className="justify-center gap-10">
-                    <div className="flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
-                        <div className="mb-8 overflow-hidden">
-                            <motion.div animate={{ opacity: sidebarOpen ? 1 : 0, height: sidebarOpen ? 'auto' : 0 }}>
-                                <h2 id="tour-circles-sidebar" className="text-xl font-black text-slate-900 whitespace-nowrap uppercase">Circle Types</h2>
-                            </motion.div>
+            {/* Desktop Sidebar - Hidden on Mobile */}
+            <div className="hidden md:block h-full">
+                <Sidebar open={sidebarOpen} setOpen={setSidebarOpen}>
+                    <SidebarBody className="justify-center gap-10">
+                        <div className="flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
+                            <div className="mb-8 overflow-hidden">
+                                <motion.div animate={{ opacity: sidebarOpen ? 1 : 0, height: sidebarOpen ? 'auto' : 0 }}>
+                                    <h2 id="tour-circles-sidebar" className="text-xl font-black text-slate-900 whitespace-nowrap uppercase">Circle Types</h2>
+                                </motion.div>
+                            </div>
+                            <div className="flex flex-col gap-4">
+                                {sidebarLinks.map((link, idx) => (
+                                    <div
+                                        key={idx}
+                                        onClick={() => setActiveCircleType(link.type)}
+                                        className="cursor-pointer"
+                                    >
+                                        <SidebarLink
+                                            link={link}
+                                            isActive={activeCircleType === link.type}
+                                        />
+                                    </div>
+                                ))}
+                            </div>
                         </div>
-                        <div className="flex flex-col gap-4">
-                            {sidebarLinks.map((link, idx) => (
-                                <div
-                                    key={idx}
-                                    onClick={() => setActiveCircleType(link.type)}
-                                    className="cursor-pointer"
-                                >
-                                    <SidebarLink
-                                        link={link}
-                                        isActive={activeCircleType === link.type}
-                                    />
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                </SidebarBody>
-            </Sidebar>
+                    </SidebarBody>
+                </Sidebar>
+            </div>
 
             {/* Main Content */}
-            <div className={`flex-1 overflow-y-auto ${sidebarOpen ? 'hidden md:block' : 'block'}`}>
+            <div className="flex-1 overflow-y-auto w-full">
                 <div className="max-w-7xl mx-auto p-4 md:p-8">
                     {/* Mobile Toggle for Sidebar (if needed, but usually Sidebar handles it) */}
                     {renderContent()}

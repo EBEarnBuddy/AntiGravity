@@ -29,6 +29,7 @@ import StartupApplicationModal from '@/components/StartupApplicationModal';
 import ApplicantsModal from '@/components/ApplicantsModal';
 import CollaborationRequestModal from '@/components/CollaborationRequestModal';
 import BrutalistLoader from '@/components/ui/BrutalistLoader';
+import ShareModal from '@/components/ShareModal';
 
 const StartupsPage: React.FC = () => {
     const { currentUser } = useAuth();
@@ -62,6 +63,9 @@ const StartupsPage: React.FC = () => {
 
     // Modals
     const [showCreateModal, setShowCreateModal] = useState(false);
+    const [showEditModal, setShowEditModal] = useState(false);
+    const [showShareModal, setShowShareModal] = useState(false);
+
     const [showApplicationModal, setShowApplicationModal] = useState(false);
     const [showApplicantsModal, setShowApplicantsModal] = useState(false);
     const [showCollabModal, setShowCollabModal] = useState(false);
@@ -107,6 +111,18 @@ const StartupsPage: React.FC = () => {
         setShowApplicantsModal(true);
     };
 
+    const handleEdit = (startup: any) => {
+        setSelectedStartup(startup);
+        setShowEditModal(true);
+        setActionMenuOpen(null);
+    };
+
+    const handleShare = (startup: any) => {
+        setSelectedStartup(startup);
+        setShowShareModal(true);
+        setActionMenuOpen(null);
+    };
+
     const getAppStatus = (startupId: string) => {
         const app = applications.find(a => {
             const oppId = a.opportunityId && typeof a.opportunityId === 'object' ? (a.opportunityId as any)._id : a.opportunityId;
@@ -121,6 +137,14 @@ const StartupsPage: React.FC = () => {
         setActionMenuOpen(null);
     };
 
+    const handleCloseOpportunity = async (id: string) => {
+        if (confirm('Are you sure you want to close this opportunity? It will be hidden from the Discover feed.')) {
+            await updateStartupStatus(id, 'closed');
+            setActionMenuOpen(null);
+        }
+    };
+
+    // Kept for admin or specific cases if needed, but UI uses Close mostly now
     const handleDelete = async (id: string) => {
         if (confirm('Are you sure you want to delete this opportunity? This cannot be undone.')) {
             await deleteStartup(id);
@@ -128,16 +152,9 @@ const StartupsPage: React.FC = () => {
         }
     };
 
-    const handleCloseOpportunity = async (id: string) => {
-        if (confirm('Stop accepting new applications?')) {
-            await updateStartupStatus(id, 'closed');
-            setActionMenuOpen(null);
-        }
-    };
-
     return (
         <div className="min-h-screen bg-slate-50 font-sans text-slate-900 pb-20">
-            {/* Header Spacing */}
+            {/* ... (Hero, Search - No Changes) ... */}
             <div className="h-12"></div>
 
             {/* Main Content */}
@@ -197,7 +214,7 @@ const StartupsPage: React.FC = () => {
                                     layout
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={{ opacity: 1, y: 0 }}
-                                    className="bg-white border-4 border-slate-900 p-0 hover:shadow-[12px_12px_0px_0px_rgba(22,163,74,1)] transition-all duration-300 group flex flex-col relative"
+                                    className={`bg-white border-4 border-slate-900 p-0 hover:shadow-[12px_12px_0px_0px_rgba(22,163,74,1)] transition-all duration-300 group flex flex-col relative ${startup.status === 'closed' ? 'opacity-75 grayscale' : ''}`}
                                 >
                                     {/* Image / Header */}
                                     <div className="aspect-[4/3] bg-slate-100 relative border-b-4 border-slate-900 overflow-hidden">
@@ -218,6 +235,12 @@ const StartupsPage: React.FC = () => {
                                                     status === 'rejected' ? 'bg-red-500 text-white' :
                                                         'bg-yellow-300 text-slate-900'}`}>
                                                 {status}
+                                            </div>
+                                        )}
+
+                                        {startup.status === 'closed' && (
+                                            <div className="absolute top-4 left-4 px-3 py-1 bg-slate-300 text-slate-900 text-xs font-black uppercase border-2 border-slate-900">
+                                                Closed
                                             </div>
                                         )}
 
@@ -273,8 +296,11 @@ const StartupsPage: React.FC = () => {
                                                                     exit={{ opacity: 0, scale: 0.9, y: 5 }}
                                                                     className="absolute right-0 top-full mt-1 w-48 bg-white border-2 border-slate-900 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] z-10"
                                                                 >
-                                                                    <button onClick={(e) => { e.stopPropagation(); setActionMenuOpen(null); handleDelete(startup.id || startup._id); }} className="w-full text-left px-4 py-3 text-xs font-black uppercase hover:bg-red-50 text-red-600 flex gap-2"><Trash className="w-3 h-3" /> Delete</button>
-                                                                    <button onClick={(e) => { e.stopPropagation(); setActionMenuOpen(null); handleCopyLink(startup.id || startup._id); }} className="w-full text-left px-4 py-3 text-xs font-black uppercase hover:bg-slate-50 text-slate-900 flex gap-2"><Share className="w-3 h-3" /> Share</button>
+                                                                    <button onClick={(e) => { e.stopPropagation(); handleEdit(startup); }} className="w-full text-left px-4 py-3 text-xs font-black uppercase hover:bg-slate-50 text-slate-900 flex gap-2"><Edit className="w-3 h-3" /> Edit Opportunity</button>
+                                                                    {startup.status !== 'closed' && (
+                                                                        <button onClick={(e) => { e.stopPropagation(); handleCloseOpportunity(startup.id || startup._id); }} className="w-full text-left px-4 py-3 text-xs font-black uppercase hover:bg-red-50 text-red-600 flex gap-2"><CloseIcon className="w-3 h-3" /> Close Opportunity</button>
+                                                                    )}
+                                                                    <button onClick={(e) => { e.stopPropagation(); handleShare(startup); }} className="w-full text-left px-4 py-3 text-xs font-black uppercase hover:bg-slate-50 text-slate-900 flex gap-2"><Share className="w-3 h-3" /> Share Opportunity</button>
                                                                 </motion.div>
                                                             )}
                                                         </AnimatePresence>
@@ -334,7 +360,6 @@ const StartupsPage: React.FC = () => {
                 Earnbuddy Pvt. Ltd. © 2024
             </footer>
 
-            {/* Modals */}
             <CreateStartupModal
                 isOpen={showCreateModal}
                 onClose={() => setShowCreateModal(false)}
@@ -344,6 +369,32 @@ const StartupsPage: React.FC = () => {
                     setActiveTab('posted');
                 }}
             />
+
+            {/* Edit Modal */}
+            <CreateStartupModal
+                isOpen={showEditModal}
+                onClose={() => setShowEditModal(false)}
+                onSuccess={() => {
+                    setShowEditModal(false);
+                    setSelectedStartup(null);
+                }}
+                isEditing={true}
+                initialData={selectedStartup}
+            />
+
+            {/* Share Modal */}
+            {selectedStartup && (
+                <ShareModal
+                    isOpen={showShareModal}
+                    onClose={() => {
+                        setShowShareModal(false);
+                        setSelectedStartup(null);
+                    }}
+                    title={selectedStartup.name || selectedStartup.title}
+                    url={typeof window !== 'undefined' ? `${window.location.origin}/startups/${selectedStartup.id || selectedStartup._id}` : ''}
+                    description={selectedStartup.description}
+                />
+            )}
 
             <StartupApplicationModal
                 isOpen={showApplicationModal}

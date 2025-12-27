@@ -426,12 +426,7 @@ const RoomChatPage: React.FC = () => {
                                 <span className="w-1.5 h-1.5 bg-slate-900 rounded-full animate-bounce [animation-duration:0.6s] [animation-delay:0.4s]"></span>
                             </div>
 
-                            {/* Requirement: Text Label */}
-                            <span className="ml-2 text-[10px] font-bold text-slate-500 animate-pulse">
-                                {typingUsers.length === 1
-                                    ? `${typingUsers[0].userName || 'Someone'} is typing...`
-                                    : 'Multiple people typing...'}
-                            </span>
+
                         </motion.div>
                     )}
                 </AnimatePresence>

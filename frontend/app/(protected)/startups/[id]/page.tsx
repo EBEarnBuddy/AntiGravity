@@ -24,6 +24,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import { opportunityAPI } from '@/lib/axios';
 import { formatTimeAgo } from '@/lib/utils';
 import StartupApplicationModal from '@/components/StartupApplicationModal';
+import ShareModal from '@/components/ShareModal';
+import CreateStartupModal from '@/components/CreateStartupModal';
 import BrutalistLoader from '@/components/ui/BrutalistLoader';
 
 const StartupDetailPage: React.FC = () => {
@@ -31,6 +33,7 @@ const StartupDetailPage: React.FC = () => {
     const router = useRouter();
     const startupId = params?.id as string;
     const { currentUser } = useAuth();
+    const { updateStartupStatus } = useStartups();
 
     const [startup, setStartup] = useState<any>(null);
     const [loading, setLoading] = useState(true);
@@ -40,6 +43,8 @@ const StartupDetailPage: React.FC = () => {
     const { toggleBookmark, isBookmarked } = useBookmarks();
 
     const [showApplicationModal, setShowApplicationModal] = useState(false);
+    const [showEditModal, setShowEditModal] = useState(false);
+    const [showShareModal, setShowShareModal] = useState(false);
     const [selectedRole, setSelectedRole] = useState<string | null>(null);
 
     useEffect(() => {
@@ -79,9 +84,16 @@ const StartupDetailPage: React.FC = () => {
         setShowApplicationModal(true);
     };
 
-    const handleCopyLink = () => {
-        navigator.clipboard.writeText(window.location.href);
-        alert('Link copied to clipboard!');
+    const handleCloseOpportunity = async () => {
+        if (confirm('Are you sure you want to close this opportunity? It will no longer be visible in the main feed.')) {
+            try {
+                await updateStartupStatus(startup.id, 'closed');
+                setStartup((prev: any) => ({ ...prev, status: 'closed' })); // Optimistic update
+                alert('Opportunity closed successfully.');
+            } catch (error) {
+                alert('Failed to close opportunity.');
+            }
+        }
     };
 
     if (loading) {
@@ -123,7 +135,7 @@ const StartupDetailPage: React.FC = () => {
                     </button>
                     <div className="flex items-center gap-3">
                         <button
-                            onClick={handleCopyLink}
+                            onClick={() => setShowShareModal(true)}
                             className="p-2 border-2 border-slate-200 hover:border-slate-900 hover:shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] transition-all text-slate-500 hover:text-slate-900 bg-white"
                         >
                             <Share className="w-5 h-5" />
@@ -163,6 +175,11 @@ const StartupDetailPage: React.FC = () => {
                                     status === 'rejected' ? 'bg-red-400 text-white' :
                                         'bg-yellow-300 text-slate-900'}`}>
                                 {status}
+                            </div>
+                        )}
+                        {startup.status === 'closed' && !status && (
+                            <div className="absolute bottom-6 right-6 px-4 py-2 text-xs font-black uppercase tracking-widest border-2 border-slate-900 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-slate-300 text-slate-600">
+                                Closed
                             </div>
                         )}
                     </div>
@@ -228,7 +245,7 @@ const StartupDetailPage: React.FC = () => {
                                         </div>
                                     </div>
 
-                                    {!isOwner && !status && (
+                                    {!isOwner && !status && startup.status !== 'closed' && (
                                         <button
                                             onClick={() => handleApply()}
                                             className="w-full mt-8 py-4 bg-green-500 text-slate-900 font-black uppercase tracking-widest border-2 border-slate-900 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] hover:shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] hover:translate-y-[2px] hover:translate-x-[2px] transition-all"
@@ -237,12 +254,26 @@ const StartupDetailPage: React.FC = () => {
                                         </button>
                                     )}
                                     {isOwner && (
-                                        <button
-                                            onClick={() => alert('Manage flow coming soon')}
-                                            className="w-full mt-8 py-4 bg-slate-900 text-white font-black uppercase tracking-widest border-2 border-slate-900 hover:bg-white hover:text-slate-900 transition-all"
-                                        >
-                                            Manage
-                                        </button>
+                                        <div className="mt-8 grid grid-cols-1 gap-3">
+                                            <button
+                                                onClick={() => setShowEditModal(true)}
+                                                className="w-full py-3 bg-slate-100 text-slate-900 font-black uppercase tracking-widest border-2 border-slate-900 hover:bg-white hover:shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] transition-all"
+                                            >
+                                                Edit Opportunity
+                                            </button>
+                                            {startup.status !== 'closed' ? (
+                                                <button
+                                                    onClick={handleCloseOpportunity}
+                                                    className="w-full py-3 bg-red-100 text-red-900 font-black uppercase tracking-widest border-2 border-slate-900 hover:bg-red-200 hover:shadow-[2px_2px_0px_0px_rgba(185,28,28,1)] transition-all"
+                                                >
+                                                    Close Opportunity
+                                                </button>
+                                            ) : (
+                                                <div className="w-full py-3 bg-slate-200 text-slate-500 font-black uppercase tracking-widest border-2 border-slate-300 text-center">
+                                                    Closed
+                                                </div>
+                                            )}
+                                        </div>
                                     )}
                                 </div>
 
@@ -313,7 +344,7 @@ const StartupDetailPage: React.FC = () => {
                                             <p className="text-slate-700 text-lg font-medium leading-relaxed max-w-3xl">{role.description}</p>
                                         </div>
 
-                                        {!isOwner && (
+                                        {!isOwner && startup.status !== 'closed' && (
                                             <button
                                                 onClick={() => handleApply(role.id)}
                                                 className="px-8 py-3 bg-white border-4 border-slate-900 text-slate-900 font-black uppercase tracking-widest hover:bg-slate-900 hover:text-white transition-all whitespace-nowrap shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]"
@@ -380,6 +411,31 @@ const StartupDetailPage: React.FC = () => {
                     setShowApplicationModal(false);
                     router.refresh(); // Or optimistically update status
                 }}
+            />
+
+            {/* Edit Modal */}
+            <CreateStartupModal
+                isOpen={showEditModal}
+                onClose={() => setShowEditModal(false)}
+                onSuccess={() => {
+                    // Refetch startup data to show changes
+                    const fetchStartup = async () => {
+                        const response = await opportunityAPI.getById(startupId);
+                        setStartup({ ...response.data, id: response.data._id });
+                    };
+                    fetchStartup();
+                }}
+                isEditing={true}
+                initialData={startup}
+            />
+
+            {/* Share Modal */}
+            <ShareModal
+                isOpen={showShareModal}
+                onClose={() => setShowShareModal(false)}
+                title={startup.name || startup.title}
+                url={typeof window !== 'undefined' ? window.location.href : ''}
+                description={startup.description}
             />
         </div>
     );
