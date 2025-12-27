@@ -578,7 +578,7 @@ const RoomChatPage: React.FC = () => {
                                                     setContextMenu({ x: e.clientX, y: e.clientY, message: { ...msg, isMe } });
                                                 }}
                                             >
-                                                {msg.content.split(/(@\w+)/g).map((part, i) => {
+                                                {msg.content.split(/(@\w+)/g).map((part: string, i: number) => {
                                                     if (part.match(/^@\w+$/)) {
                                                         const username = part.substring(1);
                                                         // Handle @all separately
