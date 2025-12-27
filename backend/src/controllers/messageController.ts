@@ -59,31 +59,59 @@ export const sendMessage = async (req: AuthRequest, res: Response) => {
             io.to(roomId).emit('new_message', message);
 
             // Notify offline / inactive members
-            // For MVP, we notify all OTHER members. 
-            // In a real app, we'd check if they are currently connected to the socket room.
             const memberships = await RoomMembership.find({ room: roomId, user: { $ne: user._id } });
+
+            // Mention Logic
+            const mentionedUserIds = new Set<string>();
+            const contentLower = content.toLowerCase();
+
+            // 1. Check for @all
+            if (contentLower.includes('@all')) {
+                memberships.forEach(m => mentionedUserIds.add(m.user.toString()));
+            } else {
+                // 2. Check for specific @username
+                // Regex to find @username (alphanumeric + underscores usually)
+                const mentionRegex = /@(\w+)/g;
+                let match;
+                const potentialUsernames: string[] = [];
+                while ((match = mentionRegex.exec(content)) !== null) {
+                    potentialUsernames.push(match[1]);
+                }
+
+                if (potentialUsernames.length > 0) {
+                    const foundUsers = await User.find({ username: { $in: potentialUsernames } });
+                    foundUsers.forEach(u => {
+                        // verify they are actually in the room?
+                        // For a closed circle, yes. For public, maybe not strictly needed but good practice.
+                        // Let's filtered by existing memberships to be safe and avoid notifying non-members.
+                        const isMember = memberships.some(m => m.user.toString() === u._id.toString());
+                        if (isMember) {
+                            mentionedUserIds.add(u._id.toString());
+                        }
+                    });
+                }
+            }
 
             for (const member of memberships) {
                 const recipient = await User.findById(member.user);
                 if (recipient) {
-                    // Create Notification
-                    // Provide a generic title or room name if possible
+                    const isMentioned = mentionedUserIds.has(member.user.toString());
+
+                    const notifType = isMentioned ? 'mention' : 'new_message';
+                    const notifTitle = isMentioned
+                        ? `${user.displayName} mentioned you in ${roomDoc.name}`
+                        : `New Message from ${user.displayName}`; // This title might be overwritten by aggregation logic for 'new_message'
+
                     await createNotification(
                         recipient.firebaseUid,
                         user.firebaseUid,
-                        'new_message',
-                        `New Message from ${user.displayName}`,
+                        notifType,
+                        notifTitle,
                         message.content.substring(0, 50) + (message.content.length > 50 ? '...' : ''),
                         `/circles/${roomId}`
                     );
 
-                    // Realtime Notification: Emit to user's personal room
-                    io.to(`user:${recipient.firebaseUid}`).emit('notification:new', {
-                        title: `New Message from ${user.displayName}`,
-                        body: message.content.substring(0, 50) + (message.content.length > 50 ? '...' : ''),
-                        link: `/circles/${roomId}`,
-                        type: 'message'
-                    });
+                    // Note: createNotification handles the socket emit internally now
                 }
             }
         } catch (err) {

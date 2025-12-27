@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { getSocket } from '../lib/socket';
 import api from '../lib/axios'; // Or create notificationAPI
 import { Bell } from 'lucide-react';
 import Link from 'next/link';
+import useOnClickOutside from '../hooks/useOnClickOutside';
 
 interface INotification {
     _id: string;
@@ -22,11 +23,16 @@ const NotificationDropdown = () => {
     const [unreadCount, setUnreadCount] = useState(0);
     const [isOpen, setIsOpen] = useState(false);
 
+    const wrapperRef = useRef<HTMLDivElement>(null);
+    useOnClickOutside(wrapperRef, () => setIsOpen(false));
+
     const fetchNotifications = async () => {
         try {
             const res = await api.get('/notifications');
-            setNotifications(res.data);
-            setUnreadCount(res.data.filter((n: INotification) => !n.isRead).length);
+            // Filter out read notifications to simulate "auto-delete on view" behavior for the list
+            const unread = res.data.filter((n: INotification) => !n.isRead);
+            setNotifications(unread);
+            setUnreadCount(unread.length);
         } catch (error) {
             console.error('Failed to fetch notifications', error);
         }
@@ -42,7 +48,21 @@ const NotificationDropdown = () => {
             socketInstance = await getSocket();
             if (socketInstance) {
                 socketInstance.on('notification', (newNotif: INotification) => {
-                    setNotifications(prev => [newNotif, ...prev]);
+                    const mappedNotif = { ...newNotif, _id: newNotif._id || Date.now().toString() };
+                    setNotifications(prev => [mappedNotif, ...prev]);
+                    setUnreadCount(prev => prev + 1);
+                });
+                socketInstance.on('notification:new', (newNotif: any) => {
+                    // Handle logical 'new' notification structure, mapping to interface
+                    const mapped: INotification = {
+                        _id: Date.now().toString(),
+                        title: newNotif.title,
+                        message: newNotif.body,
+                        link: newNotif.link,
+                        isRead: false,
+                        createdAt: new Date().toISOString()
+                    };
+                    setNotifications(prev => [mapped, ...prev]);
                     setUnreadCount(prev => prev + 1);
                 });
             }
@@ -53,25 +73,28 @@ const NotificationDropdown = () => {
         return () => {
             if (socketInstance) {
                 socketInstance.off('notification');
+                socketInstance.off('notification:new');
             }
         };
     }, [currentUser]);
 
-    const markAsRead = async (id: string, currentlyRead: boolean) => {
-        if (currentlyRead) return;
-        try {
-            await api.put(`/notifications/${id}/read`);
-            setNotifications(prev =>
-                prev.map(n => n._id === id ? { ...n, isRead: true } : n)
-            );
-            setUnreadCount(prev => Math.max(0, prev - 1));
-        } catch (err) {
-            console.error('Failed to mark read', err);
+    const handleNotificationClick = async (id: string, currentlyRead: boolean) => {
+        // Optimistic update: Remove from list (Auto-delete behavior)
+        setNotifications(prev => prev.filter(n => n._id !== id));
+        setUnreadCount(prev => Math.max(0, prev - 1));
+        setIsOpen(false);
+
+        if (!currentlyRead && id) {
+            try {
+                await api.put(`/notifications/${id}/read`);
+            } catch (err) {
+                console.error('Failed to mark read', err);
+            }
         }
     };
 
     return (
-        <div className="relative">
+        <div className="relative" ref={wrapperRef}>
             <button
                 onClick={() => setIsOpen(!isOpen)}
                 className="relative p-2 text-white hover:text-green-100 transition-all hover:scale-110"
@@ -79,7 +102,7 @@ const NotificationDropdown = () => {
                 <Bell className="w-6 h-6 text-white" />
                 {unreadCount > 0 && (
                     <span className="absolute -top-2 -right-2 inline-flex items-center justify-center w-5 h-5 text-xs font-black text-white bg-red-600 border-2 border-white rounded-none">
-                        {unreadCount}
+                        {unreadCount > 5 ? '5+' : unreadCount}
                     </span>
                 )}
             </button>
@@ -92,18 +115,20 @@ const NotificationDropdown = () => {
                     </div>
                     <div className="max-h-96 overflow-y-auto">
                         {notifications.length === 0 ? (
-                            <div className="p-4 text-center text-slate-500 text-sm font-bold">No notifications</div>
+                            <div className="p-4 text-center text-slate-500 text-sm font-bold">No new notifications</div>
                         ) : (
                             notifications.map(notif => (
                                 <div
                                     key={notif._id}
-                                    className={`p-3 border-b-2 border-slate-100 hover:bg-green-50 transition-colors cursor-pointer ${!notif.isRead ? 'bg-green-50/50' : ''}`}
-                                    onClick={() => markAsRead(notif._id, notif.isRead)}
+                                    className={`p-3 border-b-2 border-slate-100 hover:bg-green-50 transition-colors cursor-pointer bg-white`}
+                                    onClick={() => handleNotificationClick(notif._id, notif.isRead)}
                                 >
-                                    <Link href={notif.link || '#'} className="block" onClick={() => setIsOpen(false)}>
+                                    <Link href={notif.link || '#'} className="block">
                                         <p className="text-sm font-bold text-slate-900">{notif.title}</p>
                                         <p className="text-xs text-slate-600 mt-1 line-clamp-2 font-medium">{notif.message}</p>
-                                        <p className="text-[10px] text-slate-400 mt-2 font-mono">{new Date(notif.createdAt).toLocaleDateString()}</p>
+                                        <p className="text-[10px] text-slate-400 mt-2 font-mono h-4">
+                                            {notif.createdAt ? new Date(notif.createdAt).toLocaleDateString() : 'Just now'}
+                                        </p>
                                     </Link>
                                 </div>
                             ))

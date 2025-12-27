@@ -6,6 +6,7 @@ import Room from '../models/Room.js';
 import RoomMembership from '../models/RoomMembership.js';
 import Message from '../models/Message.js';
 import { getIO } from '../socket.js';
+import { createNotification } from './notificationController.js';
 
 // Create Opportunity
 // For startup opportunities this will also auto-create a private Room
@@ -67,7 +68,7 @@ export const createOpportunity = async (req: AuthRequest, res: Response) => {
 
             // We can process this asynchronously without blocking the response
             Promise.all(memberships.map(async (membership) => {
-                // Skip the circle just created for this opportunity (optional, but maybe redundant to announce there)
+                // Skip the circle just created for this opportunity
                 if (membership.room.toString() === room._id.toString()) return;
 
                 const siteUrl = process.env.CLIENT_URL?.split(',')[0] || process.env.FRONTEND_URL || 'http://localhost:3000';
@@ -93,6 +94,23 @@ export const createOpportunity = async (req: AuthRequest, res: Response) => {
                         firebaseUid: user.firebaseUid
                     }
                 });
+
+                // Send Notification to all members of this circle (except poster)
+                const roomMembers = await RoomMembership.find({ room: membership.room, user: { $ne: user._id } });
+                for (const member of roomMembers) {
+                    const recipient = await User.findById(member.user);
+                    if (recipient) {
+                        await createNotification(
+                            recipient.firebaseUid,
+                            user.firebaseUid,
+                            'opportunity', // Type
+                            `${user.displayName} posted an opportunity`,
+                            `New Opportunity: ${opportunity.title}`,
+                            `/startups?id=${opportunity._id}`
+                        );
+                    }
+                }
+
             })).catch(err => console.error('Error broadcasting system messages:', err));
 
         } catch (err) {
@@ -206,6 +224,25 @@ export const updateOpportunityStatus = async (req: AuthRequest, res: Response) =
         }
 
         await opportunity.save();
+
+        // Notify members of the opportunity circle
+        if (opportunity.room) {
+            const roomMembers = await RoomMembership.find({ room: opportunity.room, user: { $ne: user._id } });
+            for (const member of roomMembers) {
+                const recipient = await User.findById(member.user);
+                if (recipient) {
+                    await createNotification(
+                        recipient.firebaseUid,
+                        user.firebaseUid,
+                        'opportunity',
+                        `${user.displayName} updated an opportunity`,
+                        `${opportunity.title} is now ${opportunity.startupStatus || opportunity.status}`,
+                        `/startups?id=${opportunity._id}`
+                    );
+                }
+            }
+        }
+
         res.json(opportunity);
     } catch (error) {
         console.error('Error updating status:', error);

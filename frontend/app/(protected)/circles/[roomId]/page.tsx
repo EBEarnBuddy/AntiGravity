@@ -422,7 +422,12 @@ const RoomChatPage: React.FC = () => {
                                             : 'bg-white text-slate-900'
                                             }`}
                                     >
-                                        {msg.content}
+                                        {msg.content.split(/(@\w+)/g).map((part, i) => {
+                                            if (part.match(/^@\w+$/)) {
+                                                return <span key={i} className={`${isMe ? 'text-white underline' : 'text-purple-600'} font-black`}>{part}</span>;
+                                            }
+                                            return part;
+                                        })}
                                     </div>
 
                                     {/* Timestamp (Bottom) */}
