@@ -40,82 +40,100 @@ export const markAsRead = async (req: AuthRequest, res: Response) => {
     } catch (error) {
         res.status(500).json({ error: 'Failed to mark as read' });
     }
-    type: string, // 'new_message' | 'mention' | 'opportunity'
+    // Mark All as Read (Clear All from view: Soft Delete)
+    export const markAllAsRead = async (req: AuthRequest, res: Response) => {
+        try {
+            const { uid } = req.user!;
+            await Notification.updateMany(
+                { recipient: uid, isHidden: { $ne: true } },
+                { isRead: true, isHidden: true }
+            );
+            res.json({ success: true });
+        } catch (error) {
+            res.status(500).json({ error: 'Failed to mark all as read' });
+        }
+    };
+
+    // Helper to Create & Emit Notification (Internal Use)
+    export const createNotification = async (
+        recipientUid: string,
+        actorUid: string,
+        type: string, // 'new_message' | 'mention' | 'opportunity'
         title: string,
-            message: string,
-                link ?: string
+        message: string,
+        link?: string
     ) => {
-    try {
-        if (recipientUid === actorUid) return; // Don't notify self
+        try {
+            if (recipientUid === actorUid) return; // Don't notify self
 
-        let notification;
-        let isUpdate = false;
+            let notification;
+            let isUpdate = false;
 
-        // Aggregation Logic for generic messages
-        if (type === 'new_message' && link) {
-            // Check for existing unread message notification from this room/context
-            // We use 'link' as the unique grouper for a room (e.g. /circles/123)
-            const existing = await Notification.findOne({
-                recipient: recipientUid,
-                type: 'new_message',
-                link: link,
-                isRead: false
-            });
+            // Aggregation Logic for generic messages
+            if (type === 'new_message' && link) {
+                // Check for existing unread message notification from this room/context
+                // We use 'link' as the unique grouper for a room (e.g. /circles/123)
+                const existing = await Notification.findOne({
+                    recipient: recipientUid,
+                    type: 'new_message',
+                    link: link,
+                    isRead: false
+                });
 
-            if (existing) {
-                isUpdate = true;
-                // Parse existing count if possible, or just increment?
-                // Parsing generic titles is brittle. Let's try a simpler approach:
-                // If title already starts with a number, increment it. Else start at 2.
-                let count = 2;
-                const match = existing.title.match(/^(\d+) unread messages/);
-                if (match) {
-                    count = parseInt(match[1]) + 1;
+                if (existing) {
+                    isUpdate = true;
+                    // Parse existing count if possible, or just increment?
+                    // Parsing generic titles is brittle. Let's try a simpler approach:
+                    // If title already starts with a number, increment it. Else start at 2.
+                    let count = 2;
+                    const match = existing.title.match(/^(\d+) unread messages/);
+                    if (match) {
+                        count = parseInt(match[1]) + 1;
+                    }
+
+                    // Update existing
+                    existing.title = `${count} unread messages in circle`; // Simplified title as per request logic "x unread messages in circle: Y"
+                    // But we need "Y" (Circle Name). 
+                    // The incoming 'title' often has "New Message from User".
+                    // Ideally, 'createNotification' should accept 'contextName' (Circle Name).
+                    // For now, we'll append the latest message snippet.
+
+                    // If the original title was "New Message from Bob", we might lose "Bob".
+                    // But the requirement says: 'x unread messages in circle: Y'.
+                    // We'll optimistically update the message body to show latest snippet.
+                    existing.message = `Latest: ${message}`;
+                    existing.updatedAt = new Date(); // Bump to top
+                    notification = await existing.save();
                 }
-
-                // Update existing
-                existing.title = `${count} unread messages in circle`; // Simplified title as per request logic "x unread messages in circle: Y"
-                // But we need "Y" (Circle Name). 
-                // The incoming 'title' often has "New Message from User".
-                // Ideally, 'createNotification' should accept 'contextName' (Circle Name).
-                // For now, we'll append the latest message snippet.
-
-                // If the original title was "New Message from Bob", we might lose "Bob".
-                // But the requirement says: 'x unread messages in circle: Y'.
-                // We'll optimistically update the message body to show latest snippet.
-                existing.message = `Latest: ${message}`;
-                existing.updatedAt = new Date(); // Bump to top
-                notification = await existing.save();
             }
-        }
 
-        if (!isUpdate) {
-            notification = await Notification.create({
-                recipient: recipientUid,
-                actor: actorUid,
-                type,
-                title,
-                message,
-                link
-            });
-        }
+            if (!isUpdate) {
+                notification = await Notification.create({
+                    recipient: recipientUid,
+                    actor: actorUid,
+                    type,
+                    title,
+                    message,
+                    link
+                });
+            }
 
-        // Emit via Socket.io
-        const io = getIO();
-        if (io && notification) {
-            // Emit to recipient's room (e.g. "user_UID")
-            io.to(`user:${recipientUid}`).emit('notification', notification);
-            // Also emit the notification:new event for the navbar hook if completely new or critically updated
-            io.to(`user:${recipientUid}`).emit('notification:new', {
-                title: notification.title,
-                body: notification.message,
-                link: notification.link,
-                type: notification.type
-            });
-        }
+            // Emit via Socket.io
+            const io = getIO();
+            if (io && notification) {
+                // Emit to recipient's room (e.g. "user_UID")
+                io.to(`user:${recipientUid}`).emit('notification', notification);
+                // Also emit the notification:new event for the navbar hook if completely new or critically updated
+                io.to(`user:${recipientUid}`).emit('notification:new', {
+                    title: notification.title,
+                    body: notification.message,
+                    link: notification.link,
+                    type: notification.type
+                });
+            }
 
-        return notification;
-    } catch (error) {
-        console.error('Error creating notification:', error);
-    }
-};
+            return notification;
+        } catch (error) {
+            console.error('Error creating notification:', error);
+        }
+    };

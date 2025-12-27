@@ -61,7 +61,75 @@ const RoomChatPage: React.FC = () => {
     useOnClickOutside(menuRef, () => setShowMenu(false));
     useOnClickOutside(infoRef, () => setShowInfo(false));
 
-    // Typing state handled by hook now
+    // Mention State
+    const [mentionQuery, setMentionQuery] = useState<string | null>(null);
+    const [mentionIndex, setMentionIndex] = useState<number>(-1);
+    const [mentionCandidates, setMentionCandidates] = useState<any[]>([]);
+
+    useEffect(() => {
+        if (mentionQuery !== null) {
+            // Build candidates list from online users and message history to get a decent list without full member fetch
+            const candidates = new Map();
+
+            // Add online users
+            onlineUsers.forEach((u: any) => {
+                if (u.userId !== currentUser?.uid) {
+                    candidates.set(u.userId, { uid: u.userId, username: u.userName, avatar: u.userAvatar });
+                }
+            });
+
+            // Add from messages
+            messages.forEach((msg: any) => {
+                const s = msg.sender;
+                const uid = s?.firebaseUid || msg.senderId;
+                if (uid && uid !== currentUser?.uid) {
+                    const username = s?.username || s?.displayName || msg.senderName;
+                    if (username) {
+                        candidates.set(uid, { uid, username, avatar: s?.photoURL || msg.senderPhotoURL });
+                    }
+                }
+            });
+
+            const filtered = Array.from(candidates.values()).filter((c: any) =>
+                c.username?.toLowerCase().includes(mentionQuery.toLowerCase())
+            );
+            setMentionCandidates(filtered.slice(0, 5));
+        } else {
+            setMentionCandidates([]);
+        }
+    }, [mentionQuery, onlineUsers, messages, currentUser]);
+
+    const handleInputParams = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+        const val = e.target.value;
+        setNewMessage(val);
+        notifyTyping();
+
+        // Check for @
+        const cursorInfo = e.target.selectionStart;
+        const textBeforeBox = val.substring(0, cursorInfo);
+        const lastAt = textBeforeBox.lastIndexOf('@');
+
+        if (lastAt !== -1) {
+            const query = textBeforeBox.substring(lastAt + 1);
+            // Verify no spaces (simple mention logic)
+            if (!query.includes(' ')) {
+                setMentionQuery(query);
+                setMentionIndex(lastAt);
+                return;
+            }
+        }
+        setMentionQuery(null);
+        setMentionIndex(-1);
+    };
+
+    const insertMention = (username: string) => {
+        if (mentionIndex === -1) return;
+        const before = newMessage.substring(0, mentionIndex);
+        const after = newMessage.substring(mentionIndex + (mentionQuery?.length || 0) + 1);
+        setNewMessage(`${before}@${username.replace(/\s+/g, '')} ${after}`);
+        setMentionQuery(null);
+        setMentionIndex(-1);
+    };
 
 
     // Check membership status
@@ -382,7 +450,7 @@ const RoomChatPage: React.FC = () => {
                                     animate={{ opacity: 1, y: 0 }}
                                     className="flex justify-center w-full mb-4 px-8"
                                 >
-                                    <div className="bg-slate-100 border border-slate-200 text-slate-500 text-xs font-bold px-4 py-2 rounded-full text-center shadow-sm">
+                                    <div className="bg-purple-600 border-2 border-slate-900 text-white text-xs font-bold px-4 py-2 text-center shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
                                         {parts.map((part: string, i: number) =>
                                             urlRegex.test(part) ? (
                                                 <a
@@ -390,7 +458,7 @@ const RoomChatPage: React.FC = () => {
                                                     href={part}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
-                                                    className="text-blue-600 hover:underline mx-1"
+                                                    className="text-yellow-300 hover:text-yellow-200 underline mx-1"
                                                 >
                                                     {part}
                                                 </a>
@@ -398,7 +466,7 @@ const RoomChatPage: React.FC = () => {
                                                 <span key={i}>{part}</span>
                                             )
                                         )}
-                                        <div className="text-[9px] text-slate-400 mt-1 font-normal opacity-70">
+                                        <div className="text-[9px] text-purple-200 mt-1 font-normal opacity-80">
                                             {formatTimeAgo(msg.timestamp?.seconds ? new Date(msg.timestamp.seconds * 1000) : (msg as any).createdAt)}
                                         </div>
                                     </div>
@@ -479,6 +547,35 @@ const RoomChatPage: React.FC = () => {
             {/* Input Area - Comicy Style */}
             <div className="bg-slate-50 p-4 shrink-0 border-t-2 border-slate-900 w-full relative">
                 <AnimatePresence>
+                    {mentionCandidates.length > 0 && mentionQuery !== null && (
+                        <motion.div
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: 10 }}
+                            className="absolute bottom-full left-4 mb-2 bg-white border-2 border-slate-900 rounded-xl shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] z-30 min-w-[200px] overflow-hidden"
+                        >
+                            <div className="bg-slate-100 px-3 py-2 text-[10px] uppercase font-black text-slate-500 border-b-2 border-slate-900">
+                                Mention Someone
+                            </div>
+                            {mentionCandidates.map((c, idx) => (
+                                <button
+                                    key={c.uid || idx}
+                                    onClick={() => insertMention(c.username)}
+                                    className="w-full text-left px-4 py-3 hover:bg-purple-50 hover:text-purple-700 transition flex items-center gap-3 border-b border-slate-100 last:border-0"
+                                >
+                                    <UserAvatar
+                                        src={c.avatar}
+                                        alt={c.username}
+                                        uid={c.uid}
+                                        size={24}
+                                        className="bg-purple-100"
+                                    />
+                                    <span className="font-bold text-sm w-full truncate">{c.username}</span>
+                                </button>
+                            ))}
+                        </motion.div>
+                    )}
+
                     {typingUsers.length > 0 && (
                         <motion.div
                             initial={{ opacity: 0, y: 10 }}
@@ -519,10 +616,7 @@ const RoomChatPage: React.FC = () => {
                 >
                     <textarea
                         value={newMessage}
-                        onChange={(e) => {
-                            setNewMessage(e.target.value);
-                            notifyTyping();
-                        }}
+                        onChange={handleInputParams}
                         onKeyDown={handleKeyPress}
                         placeholder="Type your message..."
                         className="w-full min-h-12 max-h-32 resize-none bg-white px-4 py-3 text-sm font-medium focus:outline-none placeholder:text-slate-400"
