@@ -93,6 +93,16 @@ const NotificationDropdown = () => {
         }
     };
 
+    const handleClearAll = async () => {
+        setNotifications([]);
+        setUnreadCount(0);
+        try {
+            await api.put('/notifications/read-all');
+        } catch (err) {
+            console.error('Failed to clear all', err);
+        }
+    };
+
     return (
         <div className="relative" ref={wrapperRef}>
             <button
@@ -109,9 +119,12 @@ const NotificationDropdown = () => {
 
             {isOpen && (
                 <div className="absolute right-0 mt-2 w-80 bg-white border-2 border-slate-900 rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-                    <div className="p-3 border-b-2 border-slate-900 bg-slate-50 flex justify-between items-center">
-                        <h3 className="font-black text-slate-900 uppercase tracking-wide">Notifications</h3>
-                        <button onClick={fetchNotifications} className="text-xs font-bold text-green-600 hover:text-green-800 uppercase tracking-wide">Refresh</button>
+                    <div className="p-3 border-b-2 border-slate-900 bg-slate-50 flex justify-between items-center bg-slate-100">
+                        <h3 className="font-black text-slate-900 uppercase tracking-wide text-xs">Notifications</h3>
+                        <div className="flex gap-3">
+                            <button onClick={handleClearAll} className="text-[10px] font-bold text-red-600 hover:text-red-800 uppercase tracking-wide">Clear All</button>
+                            <button onClick={fetchNotifications} className="text-[10px] font-bold text-green-600 hover:text-green-800 uppercase tracking-wide">Refresh</button>
+                        </div>
                     </div>
                     <div className="max-h-96 overflow-y-auto">
                         {notifications.length === 0 ? (
