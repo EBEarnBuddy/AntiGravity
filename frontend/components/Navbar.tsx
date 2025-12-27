@@ -6,6 +6,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { Bell, Globe, User, LogOut, LayoutGrid, Settings, Menu } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import NotificationDropdown from './NotificationDropdown';
+import useOnClickOutside from '@/hooks/useOnClickOutside';
 
 const Navbar: React.FC = () => {
     const pathname = usePathname();
@@ -23,15 +24,7 @@ const Navbar: React.FC = () => {
     };
 
     // Close dropdown when clicking outside
-    useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
-            if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-                setIsProfileOpen(false);
-            }
-        };
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, []);
+    useOnClickOutside(dropdownRef, () => setIsProfileOpen(false));
 
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 

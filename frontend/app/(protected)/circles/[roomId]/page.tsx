@@ -13,8 +13,10 @@ import {
     Users,
     UserPlus,
     Settings,
-    LogOut
+    LogOut,
+    Info
 } from 'lucide-react';
+import useOnClickOutside from '@/hooks/useOnClickOutside';
 import { roomAPI } from '@/lib/axios'; // Import API for leaving
 import PendingRequestsModal from '@/components/PendingRequestsModal';
 import CollaborationRequestsModal from '@/components/CollaborationRequestsModal';
@@ -40,6 +42,13 @@ const RoomChatPage: React.FC = () => {
     const [showSettingsModal, setShowSettingsModal] = useState(false);
 
     const [showMenu, setShowMenu] = useState(false);
+    const [showInfo, setShowInfo] = useState(false);
+
+    const menuRef = useRef<HTMLDivElement>(null);
+    const infoRef = useRef<HTMLDivElement>(null);
+
+    useOnClickOutside(menuRef, () => setShowMenu(false));
+    useOnClickOutside(infoRef, () => setShowInfo(false));
 
     // Typing state handled by hook now
 
@@ -196,74 +205,121 @@ const RoomChatPage: React.FC = () => {
                 </div>
 
                 <div className="flex items-center gap-2 relative flex-shrink-0">
-                    <button
-                        onClick={() => setShowMenu(!showMenu)}
-                        className="p-2 hover:bg-slate-100 rounded-full text-slate-400 hover:text-slate-900 transition"
-                    >
-                        <MoreVertical className="w-5 h-5" />
-                    </button>
+                    <div className="relative" ref={infoRef}>
+                        <button
+                            onClick={() => setShowInfo(!showInfo)}
+                            className="p-2 hover:bg-slate-100 rounded-full text-slate-400 hover:text-slate-900 transition"
+                        >
+                            <Info className="w-5 h-5" />
+                        </button>
+                        <AnimatePresence>
+                            {showInfo && (
+                                <motion.div
+                                    initial={{ opacity: 0, scale: 0.9, y: 5 }}
+                                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                                    exit={{ opacity: 0, scale: 0.9, y: 5 }}
+                                    className="absolute right-0 top-12 bg-white border-2 border-slate-900 rounded-xl shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] z-20 w-64 p-4"
+                                >
+                                    <h3 className="font-black text-lg text-slate-900 mb-2 uppercase border-b-2 border-slate-100 pb-2">Circle Info</h3>
+                                    <div className="space-y-3">
+                                        <div>
+                                            <p className="text-xs font-bold text-slate-400 uppercase">Name</p>
+                                            <p className="font-bold text-slate-900">{room?.name}</p>
+                                        </div>
+                                        {room?.description && (
+                                            <div>
+                                                <p className="text-xs font-bold text-slate-400 uppercase">Description</p>
+                                                <p className="text-sm font-medium text-slate-700">{room.description}</p>
+                                            </div>
+                                        )}
+                                        <div>
+                                            <p className="text-xs font-bold text-slate-400 uppercase">Members</p>
+                                            <p className="text-sm font-black text-green-600">{room?.members?.length || 0} Members</p>
+                                        </div>
+                                        <div className="pt-2">
+                                            <button
+                                                onClick={() => setShowInfo(false)}
+                                                className="w-full py-2 bg-slate-100 text-slate-400 text-xs font-black uppercase rounded-lg cursor-not-allowed"
+                                            >
+                                                Members (View Only)
+                                            </button>
+                                        </div>
+                                    </div>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+                    </div>
 
-                    {/* Dropdown Menu */}
-                    {showMenu && (
-                        <div className="absolute right-0 top-12 bg-white border-2 border-slate-900 rounded-xl shadow-xl z-20 min-w-[220px]">
-                            {isAdmin && (
-                                <button
-                                    onClick={() => {
-                                        setShowPendingModal(true);
-                                        setShowMenu(false);
-                                    }}
-                                    className="w-full px-4 py-3 text-left text-sm font-bold text-slate-900 hover:bg-green-50 hover:text-green-700 transition flex items-center gap-2 border-b border-slate-200"
-                                >
-                                    <UserPlus className="w-4 h-4" />
-                                    Manage Requests
-                                </button>
-                            )}
-                            {isAdmin && (
-                                <button
-                                    onClick={() => {
-                                        setShowCollabModal(true);
-                                        setShowMenu(false);
-                                    }}
-                                    className="w-full px-4 py-3 text-left text-sm font-bold text-slate-900 hover:bg-purple-50 hover:text-purple-700 transition flex items-center gap-2"
-                                >
-                                    <Users className="w-4 h-4" />
-                                    Collaboration Requests
-                                </button>
-                            )}
-                            {isAdmin && (
-                                <button
-                                    onClick={() => {
-                                        setShowSettingsModal(true);
-                                        setShowMenu(false);
-                                    }}
-                                    className="w-full px-4 py-3 text-left text-sm font-bold text-slate-900 hover:bg-slate-50 transition flex items-center gap-2 rounded-b-xl border-t border-slate-200"
-                                >
-                                    <Settings className="w-4 h-4" />
-                                    Chat Settings
-                                </button>
-                            )}
-                            {!isAdmin && (
-                                <button
-                                    onClick={async () => {
-                                        if (confirm('Are you sure you want to leave this circle?')) {
-                                            try {
-                                                await roomAPI.leaveRoom(roomId);
-                                                router.push('/circles');
-                                            } catch (e) {
-                                                console.error('Failed to leave:', e);
-                                                alert('Failed to leave circle');
+                    <div className="relative" ref={menuRef}>
+                        <button
+                            onClick={() => setShowMenu(!showMenu)}
+                            className="p-2 hover:bg-slate-100 rounded-full text-slate-400 hover:text-slate-900 transition"
+                        >
+                            <MoreVertical className="w-5 h-5" />
+                        </button>
+
+                        {/* Dropdown Menu */}
+                        {showMenu && (
+                            <div className="absolute right-0 top-12 bg-white border-2 border-slate-900 rounded-xl shadow-xl z-20 min-w-[220px]">
+                                {isAdmin && (
+                                    <button
+                                        onClick={() => {
+                                            setShowPendingModal(true);
+                                            setShowMenu(false);
+                                        }}
+                                        className="w-full px-4 py-3 text-left text-sm font-bold text-slate-900 hover:bg-green-50 hover:text-green-700 transition flex items-center gap-2 border-b border-slate-200"
+                                    >
+                                        <UserPlus className="w-4 h-4" />
+                                        Manage Requests
+                                    </button>
+                                )}
+                                {isAdmin && (
+                                    <button
+                                        onClick={() => {
+                                            setShowCollabModal(true);
+                                            setShowMenu(false);
+                                        }}
+                                        className="w-full px-4 py-3 text-left text-sm font-bold text-slate-900 hover:bg-purple-50 hover:text-purple-700 transition flex items-center gap-2"
+                                    >
+                                        <Users className="w-4 h-4" />
+                                        Collaboration Requests
+                                    </button>
+                                )}
+                                {isAdmin && (
+                                    <button
+                                        onClick={() => {
+                                            setShowSettingsModal(true);
+                                            setShowMenu(false);
+                                        }}
+                                        className="w-full px-4 py-3 text-left text-sm font-bold text-slate-900 hover:bg-slate-50 transition flex items-center gap-2 rounded-b-xl border-t border-slate-200"
+                                    >
+                                        <Settings className="w-4 h-4" />
+                                        Chat Settings
+                                    </button>
+                                )}
+                                {!isAdmin && (
+                                    <button
+                                        onClick={async () => {
+                                            if (confirm('Are you sure you want to leave this circle?')) {
+                                                try {
+                                                    await roomAPI.leaveRoom(roomId);
+                                                    router.push('/circles');
+                                                } catch (e) {
+                                                    console.error('Failed to leave:', e);
+                                                    alert('Failed to leave circle');
+                                                }
                                             }
-                                        }
-                                        setShowMenu(false);
-                                    }}
-                                    className="w-full px-4 py-3 text-left text-sm font-bold text-red-600 hover:bg-red-50 transition flex items-center gap-2 rounded-b-xl border-t border-slate-200"
-                                >
-                                    <LogOut className="w-4 h-4" />
-                                    Leave Circle
-                                </button>
-                            )}
-                        </div>
-                    )}
+                                            setShowMenu(false);
+                                        }}
+                                        className="w-full px-4 py-3 text-left text-sm font-bold text-red-600 hover:bg-red-50 transition flex items-center gap-2 rounded-b-xl border-t border-slate-200"
+                                    >
+                                        <LogOut className="w-4 h-4" />
+                                        Leave Circle
+                                    </button>
+                                )}
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>
 
@@ -361,7 +417,7 @@ const RoomChatPage: React.FC = () => {
 
                                     {/* Bubble */}
                                     <div
-                                        className={`px-4 py-2 font-bold leading-relaxed shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] border-2 border-slate-900 relative group whitespace-pre-wrap ${isMe
+                                        className={`px-4 py-2 font-bold leading-relaxed shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] border-2 border-slate-900 relative group whitespace-pre-wrap break-all break-words ${isMe
                                             ? 'bg-green-600 text-white'
                                             : 'bg-white text-slate-900'
                                             }`}

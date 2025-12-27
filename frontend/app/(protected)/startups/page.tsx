@@ -30,6 +30,7 @@ import ApplicantsModal from '@/components/ApplicantsModal';
 import CollaborationRequestModal from '@/components/CollaborationRequestModal';
 import BrutalistLoader from '@/components/ui/BrutalistLoader';
 import ShareModal from '@/components/ShareModal';
+import useOnClickOutside from '@/hooks/useOnClickOutside';
 
 const StartupsPage: React.FC = () => {
     const { currentUser } = useAuth();
@@ -72,6 +73,9 @@ const StartupsPage: React.FC = () => {
     const [selectedStartup, setSelectedStartup] = useState<any>(null);
     const [selectedTargetStartup, setSelectedTargetStartup] = useState<any>(null);
     const [actionMenuOpen, setActionMenuOpen] = useState<string | null>(null);
+
+    const activeMenuRef = React.useRef<HTMLDivElement>(null);
+    useOnClickOutside(activeMenuRef, () => setActionMenuOpen(null));
 
     // Derived Data
     const myPostedStartups = startups.filter(s => (typeof s.postedBy === 'object' && s.postedBy !== null && s.postedBy.firebaseUid === currentUser?.uid) || (s as any).founderId === currentUser?.uid);
@@ -295,6 +299,7 @@ const StartupsPage: React.FC = () => {
                                                                     animate={{ opacity: 1, scale: 1, y: 0 }}
                                                                     exit={{ opacity: 0, scale: 0.9, y: 5 }}
                                                                     className="absolute right-0 top-full mt-1 w-48 bg-white border-2 border-slate-900 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] z-10"
+                                                                    ref={activeMenuRef}
                                                                 >
                                                                     <button onClick={(e) => { e.stopPropagation(); handleEdit(startup); }} className="w-full text-left px-4 py-3 text-xs font-black uppercase hover:bg-slate-50 text-slate-900 flex gap-2"><Edit className="w-3 h-3" /> Edit Opportunity</button>
                                                                     {startup.status !== 'closed' && (

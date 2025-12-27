@@ -125,7 +125,7 @@ export const messageAPI = {
   getAll: (roomId: string) => api.get(`/rooms/${roomId}/messages`),
   markAsRead: (roomId: string) => api.post(`/rooms/${roomId}/messages/read`),
   sendTyping: (roomId: string, isTyping: boolean) =>
-    api.post(`/rooms/${roomId}/typing/${isTyping ? 'start' : 'stop'}`),
+    api.post(`/rooms/${roomId}/messages/typing/${isTyping ? 'start' : 'stop'}`),
 };
 
 export const communityPostsAPI = {
