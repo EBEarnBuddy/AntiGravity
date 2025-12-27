@@ -145,23 +145,39 @@ export const getMessages = async (req: AuthRequest, res: Response) => {
             return;
         }
 
-        // Validate Room
-        const roomDoc = await Room.findById(roomId);
+        // Resolve Room ID (Handle Slug, ensuring cache key is always ID)
+        const mongoose = await import('mongoose');
+        let realRoomId = roomId;
+
+        if (!mongoose.isValidObjectId(roomId)) {
+            const r = await Room.findOne({ slug: roomId });
+            if (!r) {
+                return res.status(404).json({ error: 'Room not found' });
+            }
+            realRoomId = r._id.toString();
+        }
+
+        // Validate membership
+        const roomDoc = await Room.findById(realRoomId);
         if (!roomDoc) {
             res.status(404).json({ error: 'Room not found' });
             return;
         }
 
         const isCreator = roomDoc.createdBy.equals(user._id);
-        const isMember = await RoomMembership.exists({ room: roomId, user: user._id });
+        const isMember = await RoomMembership.exists({ room: realRoomId, user: user._id });
 
         if (!isMember && !isCreator) {
             res.status(403).json({ error: 'Not authorized to view messages in this room' });
             return;
         }
 
-        // Cache Logic (Only for initial fetch i.e. no 'before' cursor)
-        const cacheKey = `messages:${roomId}`;
+        // Cache Logic (Use realRoomId)
+        const cacheKey = `messages:${realRoomId}`;
+        /* 
+           Ideally, we might want to cache by query params too if 'limit' changes often, 
+           but usually the "latest chunk" is standard. 
+        */
         if (!before) {
             const cachedMessages = await RedisService.get<any[]>(cacheKey);
             if (cachedMessages) {
@@ -171,7 +187,7 @@ export const getMessages = async (req: AuthRequest, res: Response) => {
         }
 
         // Build Query
-        const query: any = { room: roomId };
+        const query: any = { room: realRoomId };
         if (before) {
             query.createdAt = { $lt: new Date(before) };
         }
