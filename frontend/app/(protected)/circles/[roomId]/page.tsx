@@ -33,7 +33,7 @@ const RoomChatPage: React.FC = () => {
     const { rooms, myRooms } = useRooms();
     const room = rooms.find(r => r.id === roomId) || myRooms.find(r => r.id === roomId);
 
-    const { messages, loading, sendMessage, onlineUsers, typingUsers, sendTyping } = useRoomMessages(roomId);
+    const { messages, loading, sendMessage, onlineUsers, typingUsers, notifyTyping } = useRoomMessages(roomId);
     const [newMessage, setNewMessage] = useState('');
     const [showPendingModal, setShowPendingModal] = useState(false);
     const [showCollabModal, setShowCollabModal] = useState(false);
@@ -42,7 +42,7 @@ const RoomChatPage: React.FC = () => {
     const [showMenu, setShowMenu] = useState(false);
 
     // Typing state handled by hook now
-    const typingTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
+
 
     // Check membership status
     const isMember = currentUser && room?.members?.includes(currentUser.uid);
@@ -51,18 +51,28 @@ const RoomChatPage: React.FC = () => {
 
     const handleSend = async (e?: React.FormEvent) => {
         e?.preventDefault();
-        if (!newMessage.trim() || !currentUser) return;
+        const msgToSend = newMessage; // Capture value
+        if (!msgToSend.trim() || !currentUser) return;
 
-        await sendMessage(newMessage, 'text'); // Type inference fix
-        setNewMessage('');
-        sendTyping(false); // Stop typing immediately on send
+        setNewMessage(''); // Clear immediately for UX
+        // Hook handles clearing typing state on sendMessage trigger
+
+
+        try {
+            await sendMessage(msgToSend, 'text');
+        } catch (err) {
+            // Optional: Restore message on failure if critical, but for chat UI usually we show a 'failed' state on the message bubble instead. 
+            // For now, simpler is better as per instructions.
+            console.error(err);
+        }
     };
 
     const handleKeyPress = (e: React.KeyboardEvent) => {
         if (e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault();
+            e.preventDefault(); // Prevent new line
             handleSend();
         }
+        // Shift+Enter will naturally insert new line (default behavior of textarea)
     };
 
     const [isNearBottom, setIsNearBottom] = useState(true);
@@ -93,23 +103,7 @@ const RoomChatPage: React.FC = () => {
         }
     }, [messages, roomId, currentUser]);
 
-    const lastTypingEmitRef = useRef<number>(0);
 
-    const handleTyping = async () => {
-        const now = Date.now();
-        const THROTTLE_DELAY = 2000; // 2 seconds
-
-        if (now - lastTypingEmitRef.current > THROTTLE_DELAY) {
-            sendTyping(true);
-            lastTypingEmitRef.current = now;
-        }
-
-        // Always reset the stop timer on every keystroke
-        if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
-        typingTimeoutRef.current = setTimeout(async () => {
-            sendTyping(false);
-        }, 3000); // 3 seconds timeout to stop
-    };
 
     // Access control
     if (isPending) {
@@ -442,7 +436,7 @@ const RoomChatPage: React.FC = () => {
                         value={newMessage}
                         onChange={(e) => {
                             setNewMessage(e.target.value);
-                            handleTyping();
+                            notifyTyping();
                         }}
                         onKeyDown={handleKeyPress}
                         placeholder="Type your message..."
