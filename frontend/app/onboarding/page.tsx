@@ -7,7 +7,7 @@ import { userAPI } from '@/lib/axios';
 import { Check, ArrowRight, User, Rocket, Heart, Code, Target, Clock, MapPin } from 'lucide-react';
 
 // --- CONFIGURATION ---
-const STEPS = 6;
+const STEPS = 7;
 
 const ROLES = [
     { id: 'freelancer', label: 'Freelancer', icon: Code, desc: 'I want to find works & gigs' },
@@ -46,6 +46,11 @@ export default function OnboardingPage() {
     const [step, setStep] = useState(1);
     const [loading, setLoading] = useState(false);
 
+    // Username State
+    const [username, setUsername] = useState('');
+    const [usernameAvailable, setUsernameAvailable] = useState<boolean | null>(null);
+    const [checkingUsername, setCheckingUsername] = useState(false);
+
     const [formData, setFormData] = useState({
         role: '',
         skills: [] as string[],
@@ -54,6 +59,44 @@ export default function OnboardingPage() {
         availability: '',
         wantsTour: null as boolean | null
     });
+
+    const checkUsername = async (val: string) => {
+        if (!val || val.length < 3) {
+            setUsernameAvailable(null);
+            return;
+        }
+        setCheckingUsername(true);
+        try {
+            // Assuming userAPI.getByUsername exists and returns 404 if not found
+            // Or returns data if found.
+            // Adjust logic based on actual API response
+            const res = await userAPI.getByUsername(val);
+            // If we get data, it means taken
+            if (res.data) {
+                setUsernameAvailable(false);
+            } else {
+                setUsernameAvailable(true);
+            }
+        } catch (err: any) {
+            // If 404, it implies available
+            if (err.response && err.response.status === 404) {
+                setUsernameAvailable(true);
+            } else {
+                console.error("Error checking username", err);
+                setUsernameAvailable(null); // Unknown state
+            }
+        } finally {
+            setCheckingUsername(false);
+        }
+    };
+
+    // Debounce username check
+    React.useEffect(() => {
+        const timeout = setTimeout(() => {
+            if (username) checkUsername(username);
+        }, 500);
+        return () => clearTimeout(timeout);
+    }, [username]);
 
     const handleMultiSelect = (field: 'skills' | 'goals', value: string) => {
         setFormData(prev => ({
@@ -71,10 +114,8 @@ export default function OnboardingPage() {
             // Determine tour status based on user choice
             const wantsTour = formData.wantsTour === true;
 
-            // If they want a tour, we need: hasCompletedOnboarding=true, hasCompletedTour=false
-            // If they DO NOT want a tour, we need: hasCompletedOnboarding=true, hasCompletedTour=true (skipped)
-
             await userAPI.updateMe({
+                username: username, // Save Username
                 onboardingData: {
                     role: formData.role,
                     skills: formData.skills,
@@ -83,19 +124,14 @@ export default function OnboardingPage() {
                     availability: formData.availability
                 },
                 hasCompletedOnboarding: true,
-                hasCompletedTour: !wantsTour, // Mark tour as completed if they said NO
-                isNewUser: wantsTour // Keep isNewUser true only if they take the tour, essentially? 
-                // Actually isNewUser logic in TourContext clears it after tour. 
-                // If they skip tour, we probably want to clear isNewUser too?
-                // Let's stick to simple: If they skip tour (hasCompletedTour: true), they are done.
+                hasCompletedTour: !wantsTour,
+                isNewUser: wantsTour
             });
 
-            // Also explicitly clear isNewUser if they declined the tour
             if (!wantsTour) {
                 await userAPI.updateMe({ isNewUser: false });
             }
 
-            // Force reload to pick up new profile state or redirect
             window.location.href = '/discover';
         } catch (error) {
             console.error("Onboarding error:", error);
@@ -141,8 +177,46 @@ export default function OnboardingPage() {
                         {/* Header Animation Wrapper */}
                         <div className="animate-in fade-in slide-in-from-top-4 duration-500 flex-1">
 
-                            {/* --- STEP 1: ROLE --- */}
+                            {/* --- STEP 1: USERNAME --- */}
                             {step === 1 && (
+                                <div className="space-y-8">
+                                    <div className="text-center space-y-4">
+                                        <h1 className="text-4xl font-black text-slate-900 uppercase tracking-tighter">Claim Your Spot</h1>
+                                        <p className="text-slate-600 font-bold text-lg">Choose a unique username for your profile URL.</p>
+                                    </div>
+                                    <div className="max-w-md mx-auto">
+                                        <div className="relative">
+                                            <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
+                                                <span className="text-slate-400 font-bold">earnbuddy.com/u/</span>
+                                            </div>
+                                            <input
+                                                type="text"
+                                                value={username}
+                                                onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, ''))}
+                                                className={`w-full pl-[150px] pr-12 py-4 bg-white border-4 font-black text-xl outline-none transition-all uppercase tracking-wide
+                                                ${usernameAvailable === false ? 'border-red-500 text-red-500' :
+                                                        usernameAvailable === true ? 'border-green-500 text-green-600 shadow-[4px_4px_0px_0px_rgba(22,163,74,1)]' :
+                                                            'border-slate-900 text-slate-900 focus:shadow-[4px_4px_0px_0px_rgba(15,23,42,1)]'}`}
+                                                placeholder="username"
+                                                autoFocus
+                                            />
+                                            <div className="absolute inset-y-0 right-0 flex items-center pr-4">
+                                                {checkingUsername && <div className="w-5 h-5 border-2 border-slate-900 border-t-transparent rounded-full animate-spin" />}
+                                                {!checkingUsername && usernameAvailable === true && <Check className="w-6 h-6 text-green-600" />}
+                                                {!checkingUsername && usernameAvailable === false && <p className="text-xs font-black text-red-500">TAKEN</p>}
+                                            </div>
+                                        </div>
+                                        <p className="mt-4 text-center text-sm font-bold text-slate-400">
+                                            {usernameAvailable === true ? "Looking good! This username is available." :
+                                                usernameAvailable === false ? "Sorry, this username is already taken." :
+                                                    "Use letters, numbers, and dashes."}
+                                        </p>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* --- STEP 2: ROLE --- */}
+                            {step === 2 && (
                                 <div className="space-y-8">
                                     <div className="text-center space-y-4">
                                         <h1 className="text-4xl font-black text-slate-900 uppercase tracking-tighter">Who are you?</h1>
@@ -173,8 +247,8 @@ export default function OnboardingPage() {
                                 </div>
                             )}
 
-                            {/* --- STEP 2: SKILLS --- */}
-                            {step === 2 && (
+                            {/* --- STEP 3: SKILLS --- */}
+                            {step === 3 && (
                                 <div className="space-y-8">
                                     <div className="text-center space-y-4">
                                         <h1 className="text-4xl font-black text-slate-900 uppercase tracking-tighter">Your Skills</h1>
@@ -198,8 +272,8 @@ export default function OnboardingPage() {
                                 </div>
                             )}
 
-                            {/* --- STEP 3: GOALS --- */}
-                            {step === 3 && (
+                            {/* --- STEP 4: GOALS --- */}
+                            {step === 4 && (
                                 <div className="space-y-8">
                                     <div className="text-center space-y-4">
                                         <h1 className="text-4xl font-black text-slate-900 uppercase tracking-tighter">Your Goals</h1>
@@ -223,8 +297,8 @@ export default function OnboardingPage() {
                                 </div>
                             )}
 
-                            {/* --- STEP 4: EXPERIENCE --- */}
-                            {step === 4 && (
+                            {/* --- STEP 5: EXPERIENCE --- */}
+                            {step === 5 && (
                                 <div className="space-y-8">
                                     <div className="text-center space-y-4">
                                         <h1 className="text-4xl font-black text-slate-900 uppercase tracking-tighter">Experience Level</h1>
@@ -249,8 +323,8 @@ export default function OnboardingPage() {
                                 </div>
                             )}
 
-                            {/* --- STEP 5: AVAILABILITY --- */}
-                            {step === 5 && (
+                            {/* --- STEP 6: AVAILABILITY --- */}
+                            {step === 6 && (
                                 <div className="space-y-8">
                                     <div className="text-center space-y-4">
                                         <h1 className="text-4xl font-black text-slate-900 uppercase tracking-tighter">Availability</h1>
@@ -275,8 +349,8 @@ export default function OnboardingPage() {
                                 </div>
                             )}
 
-                            {/* --- STEP 6: TOUR OPT-IN --- */}
-                            {step === 6 && (
+                            {/* --- STEP 7: TOUR OPT-IN --- */}
+                            {step === 7 && (
                                 <div className="space-y-8">
                                     <div className="text-center space-y-4">
                                         <h1 className="text-4xl font-black text-slate-900 uppercase tracking-tighter">App Tour</h1>

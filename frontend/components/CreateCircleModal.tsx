@@ -8,9 +8,10 @@ interface CreateCircleModalProps {
     isOpen: boolean;
     onClose: () => void;
     onSuccess: () => void;
+    initialType?: 'community' | 'collab' | 'opportunity';
 }
 
-const CreateCircleModal: React.FC<CreateCircleModalProps> = ({ isOpen, onClose, onSuccess }) => {
+const CreateCircleModal: React.FC<CreateCircleModalProps> = ({ isOpen, onClose, onSuccess, initialType = 'community' }) => {
     const { currentUser } = useAuth();
     const { createRoom } = useRooms();
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -19,7 +20,8 @@ const CreateCircleModal: React.FC<CreateCircleModalProps> = ({ isOpen, onClose, 
         description: '',
         isPrivate: false,
         icon: 'users',
-        avatar: ''
+        avatar: '',
+        type: initialType
     });
 
     const icons = [
@@ -30,6 +32,13 @@ const CreateCircleModal: React.FC<CreateCircleModalProps> = ({ isOpen, onClose, 
         { id: 'heart', icon: Heart, label: 'Health' },
         { id: 'zap', icon: Zap, label: 'Innovation' }
     ];
+
+    // Effect to reset type when initialType changes
+    React.useEffect(() => {
+        if (isOpen) {
+            setFormData(prev => ({ ...prev, type: initialType }));
+        }
+    }, [isOpen, initialType]);
 
     const handleSubmit = async () => {
         if (!formData.name || !formData.description) return;
@@ -42,11 +51,12 @@ const CreateCircleModal: React.FC<CreateCircleModalProps> = ({ isOpen, onClose, 
                 description: formData.description,
                 isPrivate: formData.isPrivate,
                 icon: formData.icon,
-                avatar: formData.avatar
+                avatar: formData.avatar,
+                type: formData.type
             } as any); // Use as any to bypass type check for now if avatar is missing in type
             onSuccess();
             onClose();
-            setFormData({ name: '', description: '', isPrivate: false, icon: 'users', avatar: '' });
+            setFormData({ name: '', description: '', isPrivate: false, icon: 'users', avatar: '', type: initialType });
         } catch (error) {
             console.error('Failed to create circle:', error);
         } finally {

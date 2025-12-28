@@ -26,6 +26,7 @@ import { formatTimeAgo } from '@/lib/utils';
 import StartupApplicationModal from '@/components/StartupApplicationModal';
 import ShareModal from '@/components/ShareModal';
 import CreateStartupModal from '@/components/CreateStartupModal';
+import RequestCollaborationModal from '@/components/RequestCollaborationModal';
 import BrutalistLoader from '@/components/ui/BrutalistLoader';
 
 const StartupDetailPage: React.FC = () => {
@@ -45,6 +46,7 @@ const StartupDetailPage: React.FC = () => {
     const [showApplicationModal, setShowApplicationModal] = useState(false);
     const [showEditModal, setShowEditModal] = useState(false);
     const [showShareModal, setShowShareModal] = useState(false);
+    const [showCollabModal, setShowCollabModal] = useState(false);
     const [selectedRole, setSelectedRole] = useState<string | null>(null);
 
     useEffect(() => {
@@ -246,12 +248,20 @@ const StartupDetailPage: React.FC = () => {
                                     </div>
 
                                     {!isOwner && !status && startup.status !== 'closed' && (
-                                        <button
-                                            onClick={() => handleApply()}
-                                            className="w-full mt-8 py-4 bg-green-500 text-slate-900 font-black uppercase tracking-widest border-2 border-slate-900 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] hover:shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] hover:translate-y-[2px] hover:translate-x-[2px] transition-all"
-                                        >
-                                            Apply Now
-                                        </button>
+                                        <>
+                                            <button
+                                                onClick={() => handleApply()}
+                                                className="w-full mt-8 py-4 bg-green-500 text-slate-900 font-black uppercase tracking-widest border-2 border-slate-900 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] hover:shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] hover:translate-y-[2px] hover:translate-x-[2px] transition-all"
+                                            >
+                                                Apply Now
+                                            </button>
+                                            <button
+                                                onClick={() => setShowCollabModal(true)}
+                                                className="w-full mt-3 py-3 bg-purple-50 text-purple-700 font-black uppercase tracking-widest border-2 border-purple-200 hover:border-slate-900 hover:bg-purple-100 transition-all flex items-center justify-center gap-2"
+                                            >
+                                                <Users className="w-5 h-5" /> Request Collaboration
+                                            </button>
+                                        </>
                                     )}
                                     {isOwner && (
                                         <div className="mt-8 grid grid-cols-1 gap-3">
@@ -429,6 +439,14 @@ const StartupDetailPage: React.FC = () => {
                 initialData={startup}
             />
 
+            {/* Collab Modal */}
+            <RequestCollaborationModal
+                isOpen={showCollabModal}
+                onClose={() => setShowCollabModal(false)}
+                targetCircleId={startup?.circleId || startup?.circle?.id || startup?._id}
+                targetName={startup?.name}
+            />
+
             {/* Share Modal */}
             <ShareModal
                 isOpen={showShareModal}
@@ -437,7 +455,7 @@ const StartupDetailPage: React.FC = () => {
                 url={typeof window !== 'undefined' ? window.location.href : ''}
                 description={startup.description}
             />
-        </div>
+        </div >
     );
 };
 

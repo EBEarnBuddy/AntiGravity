@@ -164,13 +164,15 @@ const CirclesPage: React.FC = () => {
                                     : 'Your project teams'}
                         </p>
                     </div>
+                    {/* Dynamic Create Button */}
                     <button
                         id="tour-circles-create"
                         onClick={() => setIsCreateModalOpen(true)}
                         className="px-5 py-2.5 bg-green-600 text-white font-black uppercase tracking-widest border-4 border-slate-900 hover:bg-green-500 hover:shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] transition-all flex items-center gap-2 text-xs"
                     >
-                        <Plus className="w-4 h-4" />
-                        Create Circle
+                        {activeCircleType === 'community' && <><Plus className="w-4 h-4" /> Create Circle</>}
+                        {activeCircleType === 'collab' && <><Users className="w-4 h-4" /> Request a Collaboration</>}
+                        {activeCircleType === 'opportunity' && <><Sparkles className="w-4 h-4" /> Create an Opportunity</>}
                     </button>
                 </div>
 
@@ -420,6 +422,7 @@ const CirclesPage: React.FC = () => {
             <CreateRoomModal
                 isOpen={isCreateModalOpen}
                 onClose={() => setIsCreateModalOpen(false)}
+                initialType={activeCircleType}
                 onSuccess={() => {
                     setIsCreateModalOpen(false);
                     notify('Circle created successfully!', 'success');

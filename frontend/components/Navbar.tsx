@@ -12,7 +12,7 @@ import useOnClickOutside from '@/hooks/useOnClickOutside';
 const Navbar: React.FC = () => {
     const pathname = usePathname();
     const router = useRouter();
-    const { currentUser, logout } = useAuth();
+    const { currentUser, userProfile, logout } = useAuth();
     const [isProfileOpen, setIsProfileOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -84,8 +84,8 @@ const Navbar: React.FC = () => {
                     {isProfileOpen && (
                         <div className="absolute right-0 mt-2 min-w-[12rem] w-auto max-w-[16rem] bg-white rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] py-1 border-2 border-slate-900 animate-in fade-in zoom-in-95 duration-200 origin-top-right">
                             <div className="px-4 py-3 border-b-2 border-slate-900 bg-slate-50">
-                                <p className="text-sm font-black text-slate-900 truncate uppercase">{currentUser?.displayName || 'User'}</p>
-                                <p className="text-xs text-slate-500 truncate font-mono">{currentUser?.email}</p>
+                                <p className="text-sm font-black text-slate-900 truncate uppercase">{userProfile?.displayName || currentUser?.displayName || 'User'}</p>
+                                <p className="text-xs text-slate-500 truncate font-mono">{userProfile?.username ? `@${userProfile.username}` : (userProfile?.email || currentUser?.email)}</p>
                             </div>
                             <Link href="/profile" className="flex items-center gap-2 px-4 py-2 text-sm text-slate-700 hover:bg-green-50 hover:text-green-600 font-bold uppercase" onClick={() => setIsProfileOpen(false)}><User className="w-4 h-4" /> Profile</Link>
                             <Link href="/support" className="flex items-center gap-2 px-4 py-2 text-sm text-slate-700 hover:bg-green-50 hover:text-green-600 font-bold uppercase" onClick={() => setIsProfileOpen(false)}><LayoutGrid className="w-4 h-4" /> Support</Link>

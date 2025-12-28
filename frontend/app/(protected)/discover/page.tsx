@@ -140,15 +140,18 @@ export default function DiscoverPage() {
                                             Post Startup Role
                                         </button>
 
-                                        <button
-                                            onClick={() => { alert("Projects Coming Soon!"); setShowCreateDropdown(false); }}
-                                            className="w-full text-left px-4 py-3 bg-white hover:bg-blue-50 text-slate-900 hover:text-blue-700 font-black uppercase text-xs tracking-wide border-2 border-transparent hover:border-slate-900 transition-all flex items-center gap-3 mt-1"
-                                        >
-                                            <div className="w-8 h-8 bg-blue-100 border-2 border-slate-900 flex items-center justify-center text-blue-700">
-                                                <Briefcase className="w-4 h-4" />
-                                            </div>
-                                            Post Project
-                                        </button>
+                                        <div className="relative opacity-60 cursor-not-allowed">
+                                            <button
+                                                disabled
+                                                className="w-full text-left px-4 py-3 bg-white text-slate-400 font-black uppercase text-xs tracking-wide border-2 border-transparent flex items-center gap-3 mt-1 cursor-not-allowed"
+                                            >
+                                                <div className="w-8 h-8 bg-blue-50 border-2 border-slate-200 flex items-center justify-center text-blue-300">
+                                                    <Briefcase className="w-4 h-4" />
+                                                </div>
+                                                Post Project
+                                            </button>
+                                            <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-black uppercase bg-slate-900 text-white px-2 py-0.5">Coming Soon</span>
+                                        </div>
 
                                         <button
                                             onClick={() => { setShowCircleModal(true); setShowCreateDropdown(false); }}
@@ -160,15 +163,18 @@ export default function DiscoverPage() {
                                             Create Circle
                                         </button>
 
-                                        <button
-                                            onClick={() => { alert("Events Coming Soon!"); setShowCreateDropdown(false); }}
-                                            className="w-full text-left px-4 py-3 bg-white hover:bg-orange-50 text-slate-900 hover:text-orange-700 font-black uppercase text-xs tracking-wide border-2 border-transparent hover:border-slate-900 transition-all flex items-center gap-3 mt-1"
-                                        >
-                                            <div className="w-8 h-8 bg-orange-100 border-2 border-slate-900 flex items-center justify-center text-orange-700">
-                                                <Calendar className="w-4 h-4" />
-                                            </div>
-                                            Host Event
-                                        </button>
+                                        <div className="relative opacity-60 cursor-not-allowed">
+                                            <button
+                                                disabled
+                                                className="w-full text-left px-4 py-3 bg-white text-slate-400 font-black uppercase text-xs tracking-wide border-2 border-transparent flex items-center gap-3 mt-1 cursor-not-allowed"
+                                            >
+                                                <div className="w-8 h-8 bg-orange-50 border-2 border-slate-200 flex items-center justify-center text-orange-300">
+                                                    <Calendar className="w-4 h-4" />
+                                                </div>
+                                                Host Event
+                                            </button>
+                                            <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-black uppercase bg-slate-900 text-white px-2 py-0.5">Coming Soon</span>
+                                        </div>
                                     </motion.div>
                                 )}
                             </AnimatePresence>

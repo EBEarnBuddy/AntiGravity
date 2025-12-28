@@ -297,6 +297,7 @@ export interface Notification {
 
 export interface UserProfile {
   uid: string;
+  username?: string;
   displayName: string;
   email: string;
   photoURL?: string;

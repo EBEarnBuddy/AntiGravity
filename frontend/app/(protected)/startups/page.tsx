@@ -198,6 +198,39 @@ const StartupsPage: React.FC = () => {
                 </div>
 
                 {/* Tabs */}
+                <div className="sticky top-[64px] z-10 bg-slate-50 pt-2 pb-4 mb-6">
+                    <div className="flex overflow-x-auto gap-3 pb-2 scrollbar-hide">
+                        <button
+                            onClick={() => setActiveTab('discover')}
+                            className={`px-6 py-2.5 font-black uppercase tracking-widest border-4 border-slate-900 transition-all text-xs whitespace-nowrap ${activeTab === 'discover'
+                                ? 'bg-slate-900 text-white shadow-[4px_4px_0px_0px_rgba(22,163,74,1)]'
+                                : 'bg-white text-slate-500 hover:bg-slate-100'
+                                }`}
+                        >
+                            Explore Startups
+                        </button>
+                        <button
+                            onClick={() => setActiveTab('posted')}
+                            className={`px-6 py-2.5 font-black uppercase tracking-widest border-4 border-slate-900 transition-all text-xs whitespace-nowrap ${activeTab === 'posted'
+                                ? 'bg-slate-900 text-white shadow-[4px_4px_0px_0px_rgba(22,163,74,1)]'
+                                : 'bg-white text-slate-500 hover:bg-slate-100'
+                                }`}
+                        >
+                            My Startups
+                        </button>
+                        <button
+                            onClick={() => setActiveTab('applied')}
+                            className={`px-6 py-2.5 font-black uppercase tracking-widest border-4 border-slate-900 transition-all text-xs whitespace-nowrap ${activeTab === 'applied'
+                                ? 'bg-slate-900 text-white shadow-[4px_4px_0px_0px_rgba(22,163,74,1)]'
+                                : 'bg-white text-slate-500 hover:bg-slate-100'
+                                }`}
+                        >
+                            My Applications
+                        </button>
+                    </div>
+                </div>
+
+                {/* Tabs */}
                 {isLoading ? (
                     <div className="flex justify-center py-20">
                         <BrutalistLoader />
