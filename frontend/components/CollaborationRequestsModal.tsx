@@ -32,11 +32,13 @@ interface CollabRequest {
 interface CollaborationRequestsModalProps {
     isOpen: boolean;
     onClose: () => void;
+    roomId?: string;
 }
 
 const CollaborationRequestsModal: React.FC<CollaborationRequestsModalProps> = ({
     isOpen,
-    onClose
+    onClose,
+    roomId
 }) => {
     const [requests, setRequests] = useState<CollabRequest[]>([]);
     const [loading, setLoading] = useState(true);
@@ -52,7 +54,14 @@ const CollaborationRequestsModal: React.FC<CollaborationRequestsModalProps> = ({
         try {
             setLoading(true);
             const response = await collaborationAPI.getPendingRequests();
-            setRequests(response.data);
+            let data = response.data;
+
+            // Filter by room if provided
+            if (roomId) {
+                data = data.filter((r: CollabRequest) => r.toCircle._id === roomId);
+            }
+
+            setRequests(data);
         } catch (error) {
             console.error('Failed to fetch collaboration requests:', error);
         } finally {

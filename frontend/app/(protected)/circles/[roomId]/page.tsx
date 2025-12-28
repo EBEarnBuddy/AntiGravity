@@ -846,10 +846,10 @@ const RoomChatPage: React.FC = () => {
 
 
             {/* Pending Requests Modal */}
-            < PendingRequestsModal
+            <PendingRequestsModal
                 isOpen={showPendingModal}
                 onClose={() => setShowPendingModal(false)}
-                roomId={roomId}
+                roomId={activeRoomId}
                 roomName={room?.name || ''}
             />
 
@@ -857,6 +857,7 @@ const RoomChatPage: React.FC = () => {
             <CollaborationRequestsModal
                 isOpen={showCollabModal}
                 onClose={() => setShowCollabModal(false)}
+                roomId={activeRoomId}
             />
 
             {/* Chat Settings Modal */}
@@ -866,7 +867,7 @@ const RoomChatPage: React.FC = () => {
                 room={room}
                 onUpdate={(updatedRoom) => {
                     // Check if slug changed and we are currently viewing it
-                    if (updatedRoom.slug && updatedRoom.slug !== roomId) {
+                    if (updatedRoom.slug && updatedRoom.slug !== paramRoomId) {
                         // Redirect to new slug
                         router.replace(`/circles/${updatedRoom.slug}`);
                     }
