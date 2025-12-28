@@ -10,6 +10,8 @@ import Navbar from '@/components/Navbar';
 import { TourProvider } from "@/components/tour/TourContext";
 import { ProductTour } from "@/components/tour/ProductTour";
 
+import { NotificationProvider } from '@/contexts/NotificationContext';
+
 function ProtectedShell({ children }: { children: React.ReactNode }) {
     const { currentUser, userProfile, loading } = useAuth();
     const router = useRouter();
@@ -39,15 +41,17 @@ function ProtectedShell({ children }: { children: React.ReactNode }) {
     const isCirclesPage = pathname === '/circles';
 
     return (
-        <TourProvider>
-            <div className="flex flex-col min-h-screen bg-slate-50 font-sans text-slate-600">
-                <Navbar />
-                <main className={isCirclesPage ? "flex-1 w-full" : "flex-1 w-full max-w-7xl mx-auto p-8 pt-8"}>
-                    {children}
-                </main>
-                <ProductTour />
-            </div>
-        </TourProvider>
+        <NotificationProvider>
+            <TourProvider>
+                <div className="flex flex-col min-h-screen bg-slate-50 font-sans text-slate-600">
+                    <Navbar />
+                    <main className={isCirclesPage ? "flex-1 w-full" : "flex-1 w-full max-w-7xl mx-auto p-8 pt-8"}>
+                        {children}
+                    </main>
+                    <ProductTour />
+                </div>
+            </TourProvider>
+        </NotificationProvider>
     );
 }
 

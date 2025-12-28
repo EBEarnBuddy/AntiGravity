@@ -4,6 +4,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { Bell, Globe, User, LogOut, LayoutGrid, Settings, Menu } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { useAuth } from '@/contexts/AuthContext';
 import NotificationDropdown from './NotificationDropdown';
 import useOnClickOutside from '@/hooks/useOnClickOutside';
@@ -36,11 +37,30 @@ const Navbar: React.FC = () => {
             </Link>
 
             {/* Desktop Center Links */}
-            <div className="hidden md:flex items-center gap-8">
-                <Link href="/discover" className={`text-sm font-bold uppercase tracking-wide hover:text-green-100 transition-colors ${isActive('/discover') ? 'text-white border-b-4 border-white' : 'text-green-100/80 hover:border-b-2 hover:border-white'}`}>Home</Link>
-                <Link id="tour-startups-link" href="/startups" className={`text-sm font-bold uppercase tracking-wide hover:text-green-100 transition-colors ${isActive('/startups') ? 'text-white border-b-4 border-white' : 'text-green-100/80 hover:border-b-2 hover:border-white'}`}>Startup</Link>
-                <Link id="tour-freelance-link" href="/freelance" className={`text-sm font-bold uppercase tracking-wide hover:text-green-100 transition-colors ${isActive('/freelance') ? 'text-white border-b-4 border-white' : 'text-green-100/80 hover:border-b-2 hover:border-white'}`}>CoLancing</Link>
-                <Link id="tour-circles-link" href="/circles" className={`text-sm font-bold uppercase tracking-wide hover:text-green-100 transition-colors ${isActive('/circles') ? 'text-white border-b-4 border-white' : 'text-green-100/80 hover:border-b-2 hover:border-white'}`}>Circles</Link>
+            <div className="hidden md:flex items-center gap-8 relative">
+                {[
+                    { name: 'Home', path: '/discover', id: 'tour-dashboard-link' },
+                    { name: 'Startups', path: '/startups', id: 'tour-startups-link' },
+                    { name: 'CoLancing', path: '/freelance', id: 'tour-freelance-link' },
+                    { name: 'Circles', path: '/circles', id: 'tour-circles-link' },
+                    { name: 'Events', path: '/events', id: 'tour-events-link' }, // Added Events link to nav as well?
+                ].map((link) => (
+                    <Link
+                        key={link.path}
+                        id={link.id}
+                        href={link.path}
+                        className={`relative text-sm font-bold uppercase tracking-wide transition-colors py-1 ${isActive(link.path) ? 'text-white' : 'text-green-100/80 hover:text-white'}`}
+                    >
+                        {link.name}
+                        {isActive(link.path) && (
+                            <motion.div
+                                layoutId="navbar-underline"
+                                className="absolute left-0 right-0 -bottom-1 h-1 bg-white"
+                                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                            />
+                        )}
+                    </Link>
+                ))}
             </div>
 
             {/* Right Icons */}
@@ -62,14 +82,13 @@ const Navbar: React.FC = () => {
                     </button>
 
                     {isProfileOpen && (
-                        <div className="absolute right-0 mt-2 w-48 bg-white rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] py-1 border-2 border-slate-900 animate-in fade-in zoom-in-95 duration-200 origin-top-right">
+                        <div className="absolute right-0 mt-2 min-w-[12rem] w-auto max-w-[16rem] bg-white rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] py-1 border-2 border-slate-900 animate-in fade-in zoom-in-95 duration-200 origin-top-right">
                             <div className="px-4 py-3 border-b-2 border-slate-900 bg-slate-50">
                                 <p className="text-sm font-black text-slate-900 truncate uppercase">{currentUser?.displayName || 'User'}</p>
                                 <p className="text-xs text-slate-500 truncate font-mono">{currentUser?.email}</p>
                             </div>
                             <Link href="/profile" className="flex items-center gap-2 px-4 py-2 text-sm text-slate-700 hover:bg-green-50 hover:text-green-600 font-bold uppercase" onClick={() => setIsProfileOpen(false)}><User className="w-4 h-4" /> Profile</Link>
-                            <Link href="/dashboard" className="flex items-center gap-2 px-4 py-2 text-sm text-slate-700 hover:bg-green-50 hover:text-green-600 font-bold uppercase" onClick={() => setIsProfileOpen(false)}><LayoutGrid className="w-4 h-4" /> Dashboard</Link>
-                            <Link href="/settings" className="flex items-center gap-2 px-4 py-2 text-sm text-slate-700 hover:bg-green-50 hover:text-green-600 font-bold uppercase" onClick={() => setIsProfileOpen(false)}><Settings className="w-4 h-4" /> Settings</Link>
+                            <Link href="/support" className="flex items-center gap-2 px-4 py-2 text-sm text-slate-700 hover:bg-green-50 hover:text-green-600 font-bold uppercase" onClick={() => setIsProfileOpen(false)}><LayoutGrid className="w-4 h-4" /> Support</Link>
                             <div className="border-t-2 border-slate-900 mt-1">
                                 <button onClick={handleLogout} className="w-full text-left flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 font-bold uppercase"><LogOut className="w-4 h-4" /> Logout</button>
                             </div>
@@ -92,7 +111,8 @@ const Navbar: React.FC = () => {
                     <Link href="/discover" className="text-white font-black text-lg py-2 border-b-2 border-green-500 uppercase tracking-widest" onClick={() => setIsMobileMenuOpen(false)}>Home</Link>
                     <Link href="/startups" className="text-white font-black text-lg py-2 border-b-2 border-green-500 uppercase tracking-widest" onClick={() => setIsMobileMenuOpen(false)}>Startup</Link>
                     <Link href="/freelance" className="text-white font-black text-lg py-2 border-b-2 border-green-500 uppercase tracking-widest" onClick={() => setIsMobileMenuOpen(false)}>CoLancing</Link>
-                    <Link href="/circles" className="text-white font-black text-lg py-2 uppercase tracking-widest" onClick={() => setIsMobileMenuOpen(false)}>Circles</Link>
+                    <Link href="/circles" className="text-white font-black text-lg py-2 border-b-2 border-green-500 uppercase tracking-widest" onClick={() => setIsMobileMenuOpen(false)}>Circles</Link>
+                    <Link href="/events" className="text-white font-black text-lg py-2 uppercase tracking-widest" onClick={() => setIsMobileMenuOpen(false)}>Events</Link>
                 </div>
             )}
         </nav>

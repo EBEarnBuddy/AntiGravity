@@ -31,17 +31,25 @@ import { getSocket } from '@/lib/socket';
 import { messageAPI } from '@/lib/axios';
 import { formatTimeAgo } from '@/lib/utils';
 import { UserAvatar } from '@/components/ui/UserAvatar';
+import { Linkify } from '@/components/ui/linkify';
 
 const RoomChatPage: React.FC = () => {
     const params = useParams();
     const router = useRouter();
-    const roomId = params?.roomId as string;
+    const paramRoomId = params?.roomId as string;
     const { currentUser } = useAuth();
 
     const { rooms, myRooms } = useRooms();
-    const room = rooms.find(r => r.id === roomId) || myRooms.find(r => r.id === roomId);
 
-    const { messages, loading, sendMessage, onlineUsers, typingUsers, notifyTyping, loadMore, hasMore, isLoadingMore, deleteMessage, updateMessage } = useRoomMessages(roomId);
+    // Resolve Room: Check both ID and Slug
+    const room = rooms.find(r => r.id === paramRoomId || r.slug === paramRoomId)
+        || myRooms.find(r => r.id === paramRoomId || r.slug === paramRoomId);
+
+    // Use resolved ID if available, otherwise fallback to param (which might be an ID even if room not found yet)
+    // If param is a slug but room not found, this might fail API call until room loads, which is acceptable
+    const activeRoomId = room?.id || paramRoomId;
+
+    const { messages, loading, sendMessage, onlineUsers, typingUsers, notifyTyping, loadMore, hasMore, isLoadingMore, deleteMessage, updateMessage } = useRoomMessages(activeRoomId);
     const [newMessage, setNewMessage] = useState('');
     const [showPendingModal, setShowPendingModal] = useState(false);
     const [showCollabModal, setShowCollabModal] = useState(false);
@@ -253,9 +261,9 @@ const RoomChatPage: React.FC = () => {
         }
         if (currentUser && messages.length > 0) {
             // Mark as read handled by hook/socket now, but generic API call backup is fine
-            messageAPI.markAsRead(roomId).catch(console.error);
+            messageAPI.markAsRead(activeRoomId).catch(console.error);
         }
-    }, [messages, roomId, currentUser]);
+    }, [messages, activeRoomId, currentUser]);
 
 
 
@@ -458,7 +466,7 @@ const RoomChatPage: React.FC = () => {
                                         onClick={async () => {
                                             if (confirm('Are you sure you want to leave this circle?')) {
                                                 try {
-                                                    await roomAPI.leaveRoom(roomId);
+                                                    await roomAPI.leaveRoom(activeRoomId);
                                                     router.push('/circles');
                                                 } catch (e) {
                                                     console.error('Failed to leave:', e);
@@ -641,7 +649,7 @@ const RoomChatPage: React.FC = () => {
                                                                 </button>
                                                             );
                                                         }
-                                                        return part;
+                                                        return <Linkify key={i}>{part}</Linkify>;
                                                     })}
                                                 </div>
                                             )}

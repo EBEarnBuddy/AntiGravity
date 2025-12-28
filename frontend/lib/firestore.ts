@@ -236,6 +236,7 @@ export interface Application {
 export interface ChatRoom {
   id?: string;
   name: string;
+  slug?: string;
   description: string;
   category?: string;
   members: string[];

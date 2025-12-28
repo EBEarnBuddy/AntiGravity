@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, Suspense } from 'react';
+import { useEffect, Suspense, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import {
@@ -15,7 +15,8 @@ import {
     ArrowRight,
     Mail,
     Link as LinkIconLucide,
-    Camera
+    Camera,
+    Calendar
 } from "lucide-react";
 
 import Link from "next/link";
@@ -26,11 +27,13 @@ import { StaggerTestimonials } from "@/components/ui/stagger-testimonials";
 import { CreativePricing, type PricingTier } from "@/components/ui/creative-pricing";
 import { SquishyOffers, BGComponent1, BGComponent2, BGComponent3 } from "@/components/ui/squishy-offers";
 import { CircularGallery, type GalleryItem } from "@/components/ui/circular-gallery";
+import { VideoModal } from "@/components/ui/video-modal";
 
 function LanderContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const { logout, currentUser } = useAuth();
+    const [isVideoOpen, setIsVideoOpen] = useState(false);
 
     useEffect(() => {
         const performLogout = async () => {
@@ -47,47 +50,10 @@ function LanderContent() {
         performLogout();
     }, [searchParams, logout, currentUser, router]);
 
-    const testimonials = [
-        {
-            id: 1,
-            name: "Jay Agarwal",
-            role: "Student and Founder",
-            avatar: "/testimonies/Jay.png", // Corrected path to absolute from public root
-            content: "As a founder, I'm excited by EarnBuddy's vision for building the right team and would love early access.",
-            rating: 5,
-            company: "Ganges"
-        },
-        {
-            id: 2,
-            name: "Mrinal",
-            role: "Student and Freelancer",
-            avatar: "/testimonies/mrinal.png",
-            content: "As a freelancer and hackathon enthusiast, I'm genuinely wish to transform my solo project struggles into powerful teamwork.",
-            rating: 5,
-            company: "Independent"
-        },
-        {
-            id: 3,
-            name: "Elvis Osano",
-            role: "Freelancer and Founder",
-            avatar: "/testimonies/elvis.jpg",
-            content: "As a freelancer, I'm genuinely excited about EarnBuddy's potential to connect me with like-minded builders and mentors who truly care about shared projects.",
-            rating: 5,
-            company: "Upshift Ecommerce"
-        },
-        {
-            id: 4,
-            name: "Aditi Bansal",
-            role: "Student and Full-stack Developer",
-            avatar: "/testimonies/aditi.jpg",
-            content: "EarnBuddy solved a problem I faced, and I'm genuinely excited to be a part of the journey as we build it together.",
-            rating: 5,
-            company: "EarnBuddy"
-        }
-    ];
-
     return (
         <div className="min-h-screen bg-background font-sans text-slate-900">
+            <VideoModal isOpen={isVideoOpen} onClose={() => setIsVideoOpen(false)} />
+
             {/* Navbar - Green Background, White Text */}
             <nav className="fixed top-0 w-full z-50 bg-primary/95 backdrop-blur-md border-b border-green-600">
                 <div className="container mx-auto px-6 h-20 flex items-center justify-between">
@@ -146,7 +112,10 @@ function LanderContent() {
                                 <Link href="/auth" className="bg-white text-slate-900 px-8 py-4 rounded-none border-2 border-slate-900 text-xl font-black uppercase tracking-wide shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition flex items-center gap-2">
                                     Find a Team
                                 </Link>
-                                <button className="px-6 py-4 rounded-none border-2 border-white text-xl font-black uppercase tracking-wide text-white hover:bg-white/10 transition flex items-center gap-2 shadow-[6px_6px_0px_0px_rgba(255,255,255,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]">
+                                <button
+                                    onClick={() => setIsVideoOpen(true)}
+                                    className="px-6 py-4 rounded-none border-2 border-white text-xl font-black uppercase tracking-wide text-white hover:bg-white/10 transition flex items-center gap-2 shadow-[6px_6px_0px_0px_rgba(255,255,255,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]"
+                                >
                                     <Play className="w-6 h-6 fill-current" /> Watch Video
                                 </button>
                             </div>
@@ -156,24 +125,98 @@ function LanderContent() {
                         <div className="flex-1 relative translate-x-4 md:translate-x-0 translate-y-10 md:translate-y-20">
                             <div className="relative z-10">
                                 <div className="bg-white rounded-none shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] overflow-hidden border-4 border-slate-900">
-                                    <div className="bg-gray-100 h-8 flex items-center px-4 gap-2 border-b">
+                                    <div className="bg-gray-100 h-8 flex items-center px-4 gap-2 border-b border-gray-200">
                                         <div className="flex gap-1.5">
                                             <div className="w-2.5 h-2.5 rounded-full bg-red-400"></div>
                                             <div className="w-2.5 h-2.5 rounded-full bg-yellow-400"></div>
                                             <div className="w-2.5 h-2.5 rounded-full bg-green-400"></div>
                                         </div>
-                                        <div className="bg-white text-[10px] text-gray-400 px-2 py-0.5 rounded flex-1 text-center mx-4">earnbuddy.tech</div>
+                                        <div className="bg-white text-[10px] text-gray-400 px-2 py-0.5 rounded flex-1 text-center mx-4 font-mono">earnbuddy.tech</div>
                                     </div>
-                                    {/* Content Simulation */}
-                                    <div className="bg-white p-1 h-64 lg:h-80 relative overflow-hidden">
-                                        <div className="grid grid-cols-12 gap-2 p-4 h-full">
-                                            <div className="col-span-3 bg-slate-100 rounded h-full"></div>
-                                            <div className="col-span-9 space-y-2">
-                                                <div className="h-32 bg-slate-50 rounded w-full"></div>
-                                                <div className="grid grid-cols-3 gap-2">
-                                                    <div className="h-24 bg-slate-50 rounded"></div>
-                                                    <div className="h-24 bg-slate-50 rounded"></div>
-                                                    <div className="h-24 bg-slate-50 rounded"></div>
+                                    {/* Content Simulation - Realistic Dashboard Mockup */}
+                                    <div className="bg-slate-50 relative aspect-[16/10] overflow-hidden group">
+                                        {/* Sidebar */}
+                                        <div className="absolute left-0 top-0 bottom-0 w-16 bg-white border-r border-slate-200 flex flex-col items-center py-4 gap-4 z-20">
+                                            <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center text-green-600">
+                                                <Zap className="w-4 h-4 fill-current" />
+                                            </div>
+                                            <div className="w-8 h-8 hover:bg-slate-100 rounded-lg flex items-center justify-center text-slate-400">
+                                                <Users className="w-4 h-4" />
+                                            </div>
+                                            <div className="w-8 h-8 hover:bg-slate-100 rounded-lg flex items-center justify-center text-slate-400">
+                                                <Globe className="w-4 h-4" />
+                                            </div>
+                                        </div>
+
+                                        {/* Header */}
+                                        <div className="absolute top-0 left-16 right-0 h-14 bg-white border-b border-slate-200 flex items-center justify-between px-6 z-10">
+                                            <div className="flex items-center gap-2">
+                                                <div className="h-4 w-24 bg-slate-200 rounded animate-pulse"></div>
+                                            </div>
+                                            <div className="flex gap-2">
+                                                <div className="h-8 w-8 bg-slate-100 rounded-full"></div>
+                                                <div className="h-8 w-24 bg-black rounded flex items-center justify-center text-white text-[10px] font-bold uppercase">Post Role</div>
+                                            </div>
+                                        </div>
+
+                                        {/* Main Content Grid */}
+                                        <div className="absolute top-14 left-16 right-0 bottom-0 p-6 overflow-hidden">
+                                            <div className="grid grid-cols-2 gap-4">
+                                                {/* Card 1 */}
+                                                <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-3">
+                                                    <div className="flex items-center justify-between">
+                                                        <div className="flex items-center gap-2">
+                                                            <div className="w-8 h-8 bg-purple-100 rounded-full"></div>
+                                                            <div>
+                                                                <div className="h-3 w-20 bg-slate-200 rounded mb-1"></div>
+                                                                <div className="h-2 w-16 bg-slate-100 rounded"></div>
+                                                            </div>
+                                                        </div>
+                                                        <div className="h-5 w-16 bg-green-100 rounded-full"></div>
+                                                    </div>
+                                                    <div className="h-2 w-full bg-slate-100 rounded"></div>
+                                                    <div className="h-2 w-3/4 bg-slate-100 rounded"></div>
+                                                </div>
+                                                {/* Card 2 */}
+                                                <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-3">
+                                                    <div className="flex items-center justify-between">
+                                                        <div className="flex items-center gap-2">
+                                                            <div className="w-8 h-8 bg-blue-100 rounded-full"></div>
+                                                            <div>
+                                                                <div className="h-3 w-16 bg-slate-200 rounded mb-1"></div>
+                                                                <div className="h-2 w-24 bg-slate-100 rounded"></div>
+                                                            </div>
+                                                        </div>
+                                                        <div className="h-5 w-16 bg-green-100 rounded-full"></div>
+                                                    </div>
+                                                    <div className="h-2 w-full bg-slate-100 rounded"></div>
+                                                    <div className="h-2 w-2/3 bg-slate-100 rounded"></div>
+                                                </div>
+                                                {/* Card 3 */}
+                                                <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-3">
+                                                    <div className="flex items-center justify-between">
+                                                        <div className="flex items-center gap-2">
+                                                            <div className="w-8 h-8 bg-yellow-100 rounded-full"></div>
+                                                            <div>
+                                                                <div className="h-3 w-24 bg-slate-200 rounded mb-1"></div>
+                                                                <div className="h-2 w-14 bg-slate-100 rounded"></div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div className="h-2 w-full bg-slate-100 rounded"></div>
+                                                </div>
+                                                {/* Card 4 */}
+                                                <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-3">
+                                                    <div className="flex items-center justify-between">
+                                                        <div className="flex items-center gap-2">
+                                                            <div className="w-8 h-8 bg-red-100 rounded-full"></div>
+                                                            <div>
+                                                                <div className="h-3 w-20 bg-slate-200 rounded mb-1"></div>
+                                                            </div>
+                                                        </div>
+                                                        <div className="h-5 w-12 bg-slate-100 rounded-full"></div>
+                                                    </div>
+                                                    <div className="h-2 w-full bg-slate-100 rounded"></div>
                                                 </div>
                                             </div>
                                         </div>
@@ -186,10 +229,9 @@ function LanderContent() {
                     </div>
                 </div>
 
-                {/* Wave separator - Filled with Black to transition to What EarnBuddy Offers Section */}
+                {/* Wave separator - Filled with Black */}
                 <div className="absolute bottom-0 left-0 w-full overflow-hidden leading-none rotate-180">
                     <svg className="relative block w-[calc(100%+1.3px)] h-[60px]" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none">
-                        {/* Changed fill to #000000 (Pure Black) */}
                         <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z" fill="#000000"></path>
                     </svg>
                 </div>
@@ -198,68 +240,91 @@ function LanderContent() {
 
             {/* What EarnBuddy Offers - Black Background with Squishy Cards */}
             <section id="how-it-works" className="py-24 bg-black text-white relative overflow-hidden">
+                {/* Subtle Texture */}
+                <div className="absolute inset-0 z-0 opacity-10 bg-[linear-gradient(45deg,#333_25%,transparent_25%,transparent_75%,#333_75%,#333),linear-gradient(45deg,#333_25%,transparent_25%,transparent_75%,#333_75%,#333)] [background-size:20px_20px] [background-position:0_0,10px_10px]"></div>
+
                 <div className="container mx-auto px-6 relative z-10 pt-10">
-                    <div className="text-center max-w-3xl mx-auto mb-12">
+                    <div className="text-center max-w-3xl mx-auto mb-16">
                         <h2 className="text-4xl md:text-6xl font-black mb-6 uppercase tracking-tighter text-white">
-                            What EarnBuddy Offers
+                            What Everybody Offers
                         </h2>
                         <p className="text-lg text-gray-300 font-bold">
-                            Three powerful ways to connect, collaborate, and grow
+                            Everything you need to build, launch, and grow.
                         </p>
                     </div>
 
-                    {/* Squishy Offer Cards */}
-                    <SquishyOffers
-                        offers={[
-                            {
-                                label: "For Founders",
-                                title: "Startups",
-                                description: "Post roles, find co-founders, and build your team",
-                                features: [
-                                    "Post unlimited startup roles",
-                                    "Find technical & non-technical co-founders",
-                                    "Create private Opportunity Circles",
-                                    "Real-time collaboration tools",
-                                    "Applicant matching & insights"
-                                ],
-                                cta: "Explore Startups",
-                                BGComponent: BGComponent1
-                            },
-                            {
-                                label: "For Freelancers",
-                                title: "Colancing",
-                                description: "Offer services, find projects, get paid",
-                                features: [
-                                    "Post freelance projects",
-                                    "Browse skilled professionals",
-                                    "Secure payment processing",
-                                    "Project-based Circles",
-                                    "Portfolio & reputation system"
-                                ],
-                                cta: "Start Colancing",
-                                BGComponent: BGComponent2
-                            },
-                            {
-                                label: "For Communities",
-                                title: "Circles",
-                                description: "Build communities, host events, collaborate",
-                                features: [
-                                    "Create public/private communities",
-                                    "Host virtual & in-person events",
-                                    "Cross-community collaborations",
-                                    "Discussion forums & chat",
-                                    "Community analytics"
-                                ],
-                                cta: "Join Circles",
-                                BGComponent: BGComponent3
-                            }
-                        ]}
-                    />
+                    {/* Squishy Offer Cards - 4 Columns */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                        <div className="group relative">
+                            <SquishyOffers
+                                offers={[
+                                    {
+                                        label: "For Founders",
+                                        title: "Startups",
+                                        description: "Post roles, find co-founders, and build your team",
+                                        features: ["Post unlimited roles", "Find co-founders", "Private Circles"],
+                                        cta: "Explore Startups",
+                                        BGComponent: BGComponent1
+                                    }
+                                ]}
+                            />
+                        </div>
+                        <div className="group relative">
+                            <SquishyOffers
+                                offers={[
+                                    {
+                                        label: "For Communities",
+                                        title: "Circles",
+                                        description: "Build communities, host events, collaborate",
+                                        features: ["Create communities", "Group Chat", "Analytics"],
+                                        cta: "Join Circles",
+                                        BGComponent: BGComponent3
+                                    }
+                                ]}
+                            />
+                        </div>
+                        <div className="group relative opacity-90">
+                            {/* Overlay for Coming Soon */}
+                            <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-sm rounded-xl">
+                                <span className="text-xl font-black text-white uppercase tracking-widest border-2 border-white px-4 py-2 bg-black">Coming Soon</span>
+                            </div>
+                            <SquishyOffers
+                                offers={[
+                                    {
+                                        label: "For Freelancers",
+                                        title: "Colancing",
+                                        description: "Offer services, find projects, team up for gigs",
+                                        features: ["Post projects", "Secure payments", "Reputation System"],
+                                        cta: "Coming Soon", // Changed CTA
+                                        BGComponent: BGComponent2
+                                    }
+                                ]}
+                            />
+                        </div>
+                        <div className="group relative opacity-90">
+                            {/* Overlay for Coming Soon */}
+                            <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-sm rounded-xl">
+                                <span className="text-xl font-black text-white uppercase tracking-widest border-2 border-white px-4 py-2 bg-black">Coming Soon</span>
+                            </div>
+                            <SquishyOffers
+                                offers={[
+                                    {
+                                        label: "For Everyone",
+                                        title: "Events",
+                                        description: "Discover hackathons, meetups, and workshops",
+                                        features: ["Host events", "Register attendees", "Networking"],
+                                        cta: "Coming Soon",
+                                        BGComponent: BGComponent1 // Reusing BG1 for visual consistency
+                                    }
+                                ]}
+                            />
+                        </div>
+                    </div>
                 </div>
             </section>
 
             {/* Verified Partners Section */}
-            <section className="py-24 bg-white relative overflow-hidden">
+            <section id="partners" className="py-24 bg-white relative overflow-hidden">
                 {/* Subtle background pattern */}
                 <div className="absolute inset-0 z-0 opacity-20"
                     style={{ backgroundImage: 'radial-gradient(#10b981 1px, transparent 1px)', backgroundSize: '24px 24px' }}>
@@ -272,21 +337,23 @@ function LanderContent() {
                             Partnering with <span className="text-primary">India's Top Institutions</span>
                         </h2>
                         <p className="text-lg text-slate-500 max-w-2xl mx-auto">
-                            Trusted by leading entrepreneurship cells across India's premier institutions
+                            Trusted by leading entrepreneurship cells and colleges
                         </p>
                     </div>
 
-                    {/* Circular Gallery with IIT Logos */}
-                    <div className="h-[600px] w-full">
+                    {/* Circular Gallery with Logos */}
+                    <div className="h-[500px] w-full">
                         <CircularGallery
                             items={[
+                                { image: "/partners/esil.png", text: "ESIL" },
                                 { image: "/partners/iit-bhu.png", text: "IIT BHU" },
                                 { image: "/partners/iit-mandi.png", text: "IIT Mandi" },
                                 { image: "/partners/iit-bhilai.png", text: "IIT Bhilai" },
-                                { image: "/partners/iit-bhubaneshwar.png", text: "IIT Bhubaneshwar" }
+                                { image: "/partners/bli.png", text: "BLI" },
+                                { image: "/partners/iit-bhubaneshwar.png", text: "IIT BS" }
                             ]}
-                            bend={3}
-                            borderRadius={0.5}
+                            bend={1}
+                            borderRadius={0.05} // sharper corners for logos
                             scrollEase={0.05}
                             scrollSpeed={2}
                         />
@@ -294,11 +361,11 @@ function LanderContent() {
                 </div>
             </section>
 
-            {/* Explaining Our Ecosystem Section */}
+            {/* Explaining Our Ecosystem Section - Simplified */}
             <EcosystemExplainer />
 
             {/* Plans & Pricing Section */}
-            <section className="py-24 bg-black relative overflow-hidden">
+            <section id="pricing" className="py-24 bg-black relative overflow-hidden">
                 <div className="container mx-auto px-6 max-w-6xl mb-16">
                     <div className="text-center">
                         <h2 className="text-3xl md:text-5xl font-bold text-white mb-4">
@@ -306,6 +373,7 @@ function LanderContent() {
                         </h2>
                     </div>
                 </div>
+                {/* Removed Green Rectangle Background Effect via prop if available, or just relied on black bg */}
                 <CreativePricing
                     tag=""
                     title=""
@@ -318,83 +386,66 @@ function LanderContent() {
                             description: "For exploring and getting started",
                             color: "green",
                             features: [
-                                "Unlimited applications to Startups, Colancing projects, and Circles",
-                                "View all public opportunities",
-                                "Join Community Circles (approval required)",
-                                "Participate in Opportunity Circles if accepted",
-                                "Real-time chat and collaboration inside circles"
+                                "Unlimited applications",
+                                "View all opportunities",
+                                "Join Community Circles",
+                                "Real-time chat"
                             ],
                             limits: [
                                 "1 Startup post",
-                                "3 Colancing posts (lifetime)",
                                 "Cannot create Circles"
                             ],
-                            bestFor: "Individuals exploring EarnBuddy and joining collaborations."
+                            bestFor: "Individuals exploring EarnBuddy."
                         },
                         {
                             name: "Creator",
                             icon: <Star className="w-6 h-6 text-amber-500" />,
                             price: 29,
-                            description: "For founders & freelancers who want to create",
+                            description: "For founders & freelancers",
                             color: "amber",
                             popular: true,
                             features: [
-                                "Everything in Free, plus:",
-                                "Up to 5 active Startup posts",
-                                "Up to 10 active Colancing projects",
+                                "5 active Startup posts",
                                 "Create 1 Community Circle",
-                                "Request collaborations with other Circles",
-                                "Host small events (up to 50 participants)",
-                                "1 featured opportunity per week",
-                                "Basic applicant insights (skill match score)"
+                                "Host small events",
+                                "Basic insights"
                             ],
-                            bestFor: "Solo founders, freelancers, and early creators."
+                            bestFor: "Solo founders and early creators."
                         },
                         {
                             name: "Builder",
                             icon: <Briefcase className="w-6 h-6 text-blue-500" />,
                             price: 79,
-                            description: "For serious builders, teams, and agencies",
+                            description: "For serious builders & teams",
                             color: "blue",
                             features: [
-                                "Everything in Creator, plus:",
-                                "Unlimited Startup & Colancing posts",
-                                "Priority applicant recommendations",
-                                "Advanced applicant insights (portfolio, history, match %, badges)",
-                                "Create up to 5 Community Circles",
-                                "Initiate Circle collaborations",
-                                "Host large community events",
-                                "Custom roles inside Opportunity Circles",
-                                "Team analytics dashboard"
+                                "Unlimited posts",
+                                "Priority recommendations",
+                                "Create 5 Circles",
+                                "Team analytics"
                             ],
-                            bestFor: "Growing startups, agencies, and active community leaders."
+                            bestFor: "Growing startups and agencies."
                         },
                         {
                             name: "Organization",
                             icon: <Globe className="w-6 h-6 text-purple-500" />,
                             price: 199,
-                            description: "For large teams, incubators, and institutions",
+                            description: "For large teams & incubators",
                             color: "purple",
                             features: [
-                                "Everything in Builder, plus:",
-                                "Unlimited posts and Circles",
-                                "Branded opportunities and events",
-                                "Recruiter & admin access for teams",
-                                "Multi-circle events (500+ participants)",
-                                "Workflow automation (auto‑shortlisting)",
-                                "Organization-wide analytics",
-                                "Internal/private Circles",
-                                "Talent pools",
-                                "Dedicated support & early feature access"
+                                "Unlimited everything",
+                                "Branded pages",
+                                "Organization analytics",
+                                "Private Circles"
                             ],
-                            bestFor: "Accelerators, incubators, enterprises, universities."
+                            bestFor: "Accelerators and enterprises."
                         }
                     ]}
                 />
             </section>
 
-            {/* Stories from our Community - Stagger Testimonials */}
-            <section className="py-24 bg-black">
+            {/* Stories from our Community */}
+            <section id="community" className="py-24 bg-black border-t border-white/10">
                 <div className="container mx-auto px-6 max-w-6xl">
                     <h2 className="text-3xl md:text-5xl font-bold mb-16 text-center text-white">
                         Stories from our <span className="text-primary">community</span>
@@ -404,12 +455,14 @@ function LanderContent() {
             </section>
 
             {/* FAQ Section */}
-            <Faq5 />
+            <section id="faq">
+                <Faq5 />
+            </section>
 
             {/* White Separator */}
             <div className="border-t-4 border-white"></div>
 
-            {/* Footer - Green Background, White Text, Increased Spacing */}
+            {/* Footer */}
             <footer className="bg-primary text-white py-24">
                 <div className="container mx-auto px-6 max-w-6xl">
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-20 mb-20">
@@ -440,10 +493,10 @@ function LanderContent() {
                         <div>
                             <h4 className="font-bold text-lg mb-6">Quick Links</h4>
                             <ul className="space-y-4 text-green-50">
-                                <li><a href="#" className="hover:text-white transition">For Students</a></li>
-                                <li><a href="#" className="hover:text-white transition">For Startups</a></li>
-                                <li><a href="#" className="hover:text-white transition">For Freelancers</a></li>
-                                <li><a href="#" className="hover:text-white transition">Communities</a></li>
+                                <li><Link href="#" className="hover:text-white transition">For Students</Link></li>
+                                <li><Link href="#" className="hover:text-white transition">For Startups</Link></li>
+                                <li><Link href="#" className="hover:text-white transition">For Freelancers</Link></li>
+                                <li><Link href="#" className="hover:text-white transition">Communities</Link></li>
                             </ul>
                         </div>
 
@@ -460,8 +513,8 @@ function LanderContent() {
                     <div className="border-t border-green-500/30 pt-8 flex flex-col md:flex-row justify-between items-center text-xs text-green-100">
                         <p>&copy; 2025 EarnBuddy. All rights reserved.</p>
                         <div className="flex gap-6 mt-4 md:mt-0">
-                            <a href="#" className="hover:text-white">Privacy Policy</a>
-                            <a href="#" className="hover:text-white">Terms of Service</a>
+                            <Link href="#" className="hover:text-white">Privacy Policy</Link>
+                            <Link href="#" className="hover:text-white">Terms of Service</Link>
                         </div>
                     </div>
 

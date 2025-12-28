@@ -26,6 +26,7 @@ import { AdvancedSearch } from '@/components/ui/advanced-search';
 import { applicationAPI } from '@/lib/axios';
 import { TourReengagementBox } from '@/components/tour/TourReengagementBox';
 import CreateStartupModal from '@/components/CreateStartupModal';
+import CreateCircleModal from '@/components/CreateCircleModal';
 import { AnimatePresence } from 'framer-motion';
 import { Plus } from 'lucide-react';
 
@@ -51,6 +52,7 @@ export default function DiscoverPage() {
     const [loadingApplications, setLoadingApplications] = useState(true);
     const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
     const [showCreateModal, setShowCreateModal] = useState(false);
+    const [showCircleModal, setShowCircleModal] = useState(false);
     const [showCreateDropdown, setShowCreateDropdown] = useState(false);
 
     // Fetch My Applications
@@ -85,10 +87,10 @@ export default function DiscoverPage() {
         .slice(0, 10);
 
     const quickActions = [
-        { title: 'Find Work', icon: Briefcase, path: '/freelance', color: 'bg-emerald-500' },
-        { title: 'Join a Circle', icon: Users, path: '/circles', color: 'bg-blue-500' },
+        { title: 'Find Projects', icon: Briefcase, path: '/freelance', color: 'bg-emerald-500', badge: 'Coming Soon' },
+        { title: 'Trending Circles', icon: Users, path: '/circles', color: 'bg-blue-500', badge: 'Hot' },
         { title: 'Browse Startups', icon: Rocket, path: '/startups', color: 'bg-purple-500' },
-        { title: 'Events', icon: Calendar, path: '#events', color: 'bg-orange-500' },
+        { title: 'Events', icon: Calendar, path: '/events', color: 'bg-orange-500', badge: 'New' },
     ];
 
 
@@ -123,7 +125,7 @@ export default function DiscoverPage() {
                                         initial={{ opacity: 0, y: 10, scale: 0.95 }}
                                         animate={{ opacity: 1, y: 0, scale: 1 }}
                                         exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                                        className="absolute right-0 top-full mt-2 w-56 bg-white border-2 border-slate-900 shadow-[6px_6px_0px_0px_rgba(15,23,42,1)] z-50 p-2"
+                                        className="absolute right-0 top-full mt-2 w-64 bg-white border-2 border-slate-900 shadow-[6px_6px_0px_0px_rgba(15,23,42,1)] z-50 p-2"
                                     >
                                         <button
                                             onClick={() => {
@@ -135,18 +137,38 @@ export default function DiscoverPage() {
                                             <div className="w-8 h-8 bg-green-100 border-2 border-slate-900 flex items-center justify-center text-green-700">
                                                 <Rocket className="w-4 h-4" />
                                             </div>
-                                            New Opportunity
+                                            Post Startup Role
                                         </button>
 
-                                        {/* Placeholder for future actions */}
-                                        {/* 
-                                        <button className="w-full text-left px-4 py-3 bg-white hover:bg-purple-50 text-slate-900 hover:text-purple-700 font-black uppercase text-xs tracking-wide border-2 border-transparent hover:border-slate-900 transition-all flex items-center gap-3 mt-1">
+                                        <button
+                                            onClick={() => { alert("Projects Coming Soon!"); setShowCreateDropdown(false); }}
+                                            className="w-full text-left px-4 py-3 bg-white hover:bg-blue-50 text-slate-900 hover:text-blue-700 font-black uppercase text-xs tracking-wide border-2 border-transparent hover:border-slate-900 transition-all flex items-center gap-3 mt-1"
+                                        >
+                                            <div className="w-8 h-8 bg-blue-100 border-2 border-slate-900 flex items-center justify-center text-blue-700">
+                                                <Briefcase className="w-4 h-4" />
+                                            </div>
+                                            Post Project
+                                        </button>
+
+                                        <button
+                                            onClick={() => { setShowCircleModal(true); setShowCreateDropdown(false); }}
+                                            className="w-full text-left px-4 py-3 bg-white hover:bg-purple-50 text-slate-900 hover:text-purple-700 font-black uppercase text-xs tracking-wide border-2 border-transparent hover:border-slate-900 transition-all flex items-center gap-3 mt-1"
+                                        >
                                             <div className="w-8 h-8 bg-purple-100 border-2 border-slate-900 flex items-center justify-center text-purple-700">
                                                 <Users className="w-4 h-4" />
                                             </div>
-                                            New Circle
-                                        </button> 
-                                        */}
+                                            Create Circle
+                                        </button>
+
+                                        <button
+                                            onClick={() => { alert("Events Coming Soon!"); setShowCreateDropdown(false); }}
+                                            className="w-full text-left px-4 py-3 bg-white hover:bg-orange-50 text-slate-900 hover:text-orange-700 font-black uppercase text-xs tracking-wide border-2 border-transparent hover:border-slate-900 transition-all flex items-center gap-3 mt-1"
+                                        >
+                                            <div className="w-8 h-8 bg-orange-100 border-2 border-slate-900 flex items-center justify-center text-orange-700">
+                                                <Calendar className="w-4 h-4" />
+                                            </div>
+                                            Host Event
+                                        </button>
                                     </motion.div>
                                 )}
                             </AnimatePresence>
@@ -169,9 +191,14 @@ export default function DiscoverPage() {
                                 <motion.div
                                     key={idx}
                                     whileHover={{ y: -2, x: -2 }}
-                                    className="bg-white p-4 border-2 border-slate-900 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] hover:shadow-[6px_6px_0px_0px_rgba(15,23,42,1)] transition-all cursor-pointer group"
+                                    className="bg-white p-4 border-2 border-slate-900 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] hover:shadow-[6px_6px_0px_0px_rgba(15,23,42,1)] transition-all cursor-pointer group relative overflow-hidden"
                                     onClick={() => action.path.startsWith('#') ? {} : router.push(action.path)}
                                 >
+                                    {action.badge && (
+                                        <div className="absolute top-2 right-2 px-2 py-0.5 bg-slate-900 text-white text-[10px] uppercase font-black tracking-wider">
+                                            {action.badge}
+                                        </div>
+                                    )}
                                     <div className={`${action.color} w-10 h-10 border-2 border-slate-900 flex items-center justify-center mb-3 text-white shadow-sm group-hover:scale-110 transition-transform`}>
                                         <action.icon className="w-5 h-5" />
                                     </div>
@@ -342,6 +369,15 @@ export default function DiscoverPage() {
                     // Ideally refresh feed, but for now just close
                     setShowCreateModal(false);
                     router.push('/startups?tab=posted'); // Redirect to see it
+                }}
+            />
+
+            <CreateCircleModal
+                isOpen={showCircleModal}
+                onClose={() => setShowCircleModal(false)}
+                onSuccess={() => {
+                    setShowCircleModal(false);
+                    router.push('/circles?tab=my_circles');
                 }}
             />
         </div>

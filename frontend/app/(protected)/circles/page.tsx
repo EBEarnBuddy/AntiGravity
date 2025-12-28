@@ -19,11 +19,15 @@ import CreateRoomModal from '@/components/CreateCircleModal';
 import CollaborationRequestModal from '@/components/CollaborationRequestModal';
 import { Sidebar, SidebarBody, SidebarLink } from '@/components/ui/sidebar';
 import BrutalistLoader from '@/components/ui/BrutalistLoader';
+import { Linkify } from '@/components/ui/linkify';
+import ShareModal from '@/components/ui/ShareModal';
+import { useNotification } from '@/contexts/NotificationContext';
 
 const CirclesPage: React.FC = () => {
     const { currentUser } = useAuth();
     const router = useRouter();
     const { rooms, myRooms, loading, joinRoom, requestJoin } = useRooms();
+    const { notify } = useNotification();
     const [searchTerm, setSearchTerm] = useState('');
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [activeTab, setActiveTab] = useState<'explore' | 'my-circles'>('explore');
@@ -33,6 +37,10 @@ const CirclesPage: React.FC = () => {
     const [collabModalOpen, setCollabModalOpen] = useState(false);
     const [selectedTargetCircle, setSelectedTargetCircle] = useState<any>(null);
     const [userOwnedCircles, setUserOwnedCircles] = useState<string[]>([]);
+
+    // Sharing
+    const [shareModalOpen, setShareModalOpen] = useState(false);
+    const [shareUrl, setShareUrl] = useState('');
 
     // Sidebar links
     const sidebarLinks = [
@@ -80,7 +88,7 @@ const CirclesPage: React.FC = () => {
         // Rooms will refresh via real-time listeners
     };
 
-    const handleRoomAction = (room: any) => {
+    const handleRoomAction = async (room: any) => {
         if (!currentUser) return router.push('/auth');
 
         // For collab and opportunity circles, users are already members - navigate directly
@@ -102,7 +110,12 @@ const CirclesPage: React.FC = () => {
         if (isMember) {
             router.push(`/circles/${room.id}`);
         } else if (!isPending) {
-            joinRoom(room.id);
+            try {
+                await joinRoom(room.id);
+                notify('Joined circle successfully!', 'success');
+            } catch (error) {
+                notify('Failed to join circle.', 'error');
+            }
         }
     };
 
@@ -270,6 +283,27 @@ const CirclesPage: React.FC = () => {
                                                 {showMenuForCircle === room.id && (
                                                     <div className="absolute left-0 top-10 bg-white border-4 border-slate-900 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] z-30 min-w-[200px]">
                                                         <button
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                notify("Detailed stats coming soon!", 'info');
+                                                                setShowMenuForCircle(null);
+                                                            }}
+                                                            className="w-full px-4 py-3 text-left text-xs font-black uppercase text-slate-900 hover:bg-green-50 transition border-b-2 border-slate-100"
+                                                        >
+                                                            Info
+                                                        </button>
+                                                        <button
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                setShareUrl(`${window.location.origin}/circles/${room.id}`);
+                                                                setShareModalOpen(true);
+                                                                setShowMenuForCircle(null);
+                                                            }}
+                                                            className="w-full px-4 py-3 text-left text-xs font-black uppercase text-slate-900 hover:bg-green-50 transition border-b-2 border-slate-100"
+                                                        >
+                                                            Share
+                                                        </button>
+                                                        <button
                                                             onClick={() => handleCollaborationRequest(room)}
                                                             className="w-full px-4 py-3 text-left text-xs font-black uppercase text-slate-900 hover:bg-green-50 transition"
                                                         >
@@ -298,9 +332,9 @@ const CirclesPage: React.FC = () => {
                                             <h3 className="text-xl font-black text-slate-900 leading-tight group-hover:text-green-600 transition-colors uppercase mb-2">
                                                 {room.name}
                                             </h3>
-                                            <p className="text-xs text-slate-500 line-clamp-2 font-bold uppercase mb-4">
-                                                {room.description || 'No description provided.'}
-                                            </p>
+                                            <div className="text-xs text-slate-500 line-clamp-3 font-bold uppercase mb-4 break-words">
+                                                <Linkify>{room.description || 'No description provided.'}</Linkify>
+                                            </div>
 
                                             {/* Stats */}
                                             <div className="flex items-center justify-center gap-2 mb-6 text-xs text-slate-500 font-black uppercase">
@@ -321,9 +355,9 @@ const CirclesPage: React.FC = () => {
                                                         }`}
                                                 >
                                                     {(activeCircleType as string) === 'collab' || (activeCircleType as string) === 'opportunity' ? (
-                                                        'Enter Circle'
+                                                        'View Circle'
                                                     ) : activeTab === 'my-circles' ? (
-                                                        <>Enter Circle <ArrowRight className="w-3 h-3" /></>
+                                                        <>Open Circle <ArrowRight className="w-3 h-3" /></>
                                                     ) : isPending ? (
                                                         'Requested'
                                                     ) : isMember ? (
@@ -388,7 +422,7 @@ const CirclesPage: React.FC = () => {
                 onClose={() => setIsCreateModalOpen(false)}
                 onSuccess={() => {
                     setIsCreateModalOpen(false);
-                    // Rooms will auto-refresh via useRooms hook
+                    notify('Circle created successfully!', 'success');
                 }}
             />
 
@@ -401,9 +435,19 @@ const CirclesPage: React.FC = () => {
                         setSelectedTargetCircle(null);
                     }}
                     targetCircle={selectedTargetCircle}
-                    onSuccess={handleCollabSuccess}
+                    onSuccess={() => {
+                        handleCollabSuccess();
+                        notify('Collaboration requested!', 'success');
+                    }}
                 />
             )}
+
+            <ShareModal
+                isOpen={shareModalOpen}
+                onClose={() => setShareModalOpen(false)}
+                url={shareUrl}
+                title="Share Circle"
+            />
         </div>
     );
 };
