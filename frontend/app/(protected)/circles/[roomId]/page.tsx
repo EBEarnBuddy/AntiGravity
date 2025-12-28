@@ -666,6 +666,7 @@ const RoomChatPage: React.FC = () => {
                             }
                         </div>
                     ))}
+                    {/* Invisible div to scroll to bottom */}
                     <div ref={messagesEndRef} />
                 </div>
 
