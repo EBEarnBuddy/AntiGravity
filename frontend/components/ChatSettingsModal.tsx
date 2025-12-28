@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Settings, Trash, Check, CloudUpload } from 'lucide-react';
 import { uploadImage } from '../lib/cloudinary';
-import { roomAPI } from '../lib/axios';
+import { FirestoreService } from '../lib/firestore';
 import { BrutalistSpinner } from '@/components/ui/BrutalistSpinner';
 
 interface ChatSettingsModalProps {
@@ -57,7 +57,7 @@ const ChatSettingsModal: React.FC<ChatSettingsModalProps> = ({ isOpen, onClose, 
                 payload.slug = slug;
             }
 
-            await roomAPI.updateRoom(room.id || room._id, payload);
+            await FirestoreService.updateRoom(room.id || room._id, payload);
 
             onUpdate({ ...room, name, description, avatar: finalAvatar, slug: payload.slug || room.slug });
             onClose();
@@ -77,7 +77,7 @@ const ChatSettingsModal: React.FC<ChatSettingsModalProps> = ({ isOpen, onClose, 
         if (confirm('Are you sure you want to delete this circle? This action cannot be undone.')) {
             setLoading(true);
             try {
-                await roomAPI.deleteRoom(room.id || room._id);
+                await FirestoreService.deleteRoom(room.id || room._id);
                 onDelete();
             } catch (error) {
                 console.error('Failed to delete room:', error);

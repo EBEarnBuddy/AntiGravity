@@ -21,7 +21,7 @@ import {
 } from 'lucide-react';
 import { useStartups, useMyApplications, useBookmarks } from '@/hooks/useFirestore';
 import { useAuth } from '@/contexts/AuthContext';
-import { opportunityAPI } from '@/lib/axios';
+import { FirestoreService } from '@/lib/firestore';
 import { formatTimeAgo } from '@/lib/utils';
 import StartupApplicationModal from '@/components/StartupApplicationModal';
 import ShareModal from '@/components/ShareModal';
@@ -53,8 +53,9 @@ const StartupDetailPage: React.FC = () => {
         const fetchStartup = async () => {
             try {
                 setLoading(true);
-                const response = await opportunityAPI.getById(startupId);
-                setStartup({ ...response.data, id: response.data._id });
+                const data = await FirestoreService.getOpportunityById(startupId);
+                if (!data) throw new Error("Opportunity not found");
+                setStartup(data);
             } catch (err: any) {
                 console.error('Failed to fetch startup details:', err);
                 setError(err.message || 'Failed to load opportunity');
@@ -430,8 +431,8 @@ const StartupDetailPage: React.FC = () => {
                 onSuccess={() => {
                     // Refetch startup data to show changes
                     const fetchStartup = async () => {
-                        const response = await opportunityAPI.getById(startupId);
-                        setStartup({ ...response.data, id: response.data._id });
+                        const data = await FirestoreService.getOpportunityById(startupId);
+                        if (data) setStartup(data);
                     };
                     fetchStartup();
                 }}

@@ -3,31 +3,11 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Check, XCircle, Users, RefreshCw } from 'lucide-react';
-import { collaborationAPI } from '@/lib/axios';
+import { FirestoreService, CollaborationRequest } from '@/lib/firestore';
 import { BrutalistSpinner } from '@/components/ui/BrutalistSpinner';
 
-interface CollabRequest {
-    _id: string;
-    fromCircle: {
-        _id: string;
-        name: string;
-        description?: string;
-    };
-    toCircle: {
-        _id: string;
-        name: string;
-    };
-    fromOwner: {
-        _id: string;
-        firebaseUid: string;
-        displayName: string;
-        email: string;
-        photoURL?: string;
-    };
-    message?: string;
-    status: string;
-    createdAt: Date;
-}
+// Use Firestore type directly or extend if needed
+type CollabRequest = CollaborationRequest;
 
 interface CollaborationRequestsModalProps {
     isOpen: boolean;
@@ -51,16 +31,10 @@ const CollaborationRequestsModal: React.FC<CollaborationRequestsModalProps> = ({
     }, [isOpen]);
 
     const fetchRequests = async () => {
+        if (!roomId) return;
         try {
             setLoading(true);
-            const response = await collaborationAPI.getPendingRequests();
-            let data = response.data;
-
-            // Filter by room if provided
-            if (roomId) {
-                data = data.filter((r: CollabRequest) => r.toCircle._id === roomId);
-            }
-
+            const data = await FirestoreService.getCollaborationRequests(roomId);
             setRequests(data);
         } catch (error) {
             console.error('Failed to fetch collaboration requests:', error);
@@ -72,9 +46,9 @@ const CollaborationRequestsModal: React.FC<CollaborationRequestsModalProps> = ({
     const handleAccept = async (requestId: string) => {
         try {
             setProcessingId(requestId);
-            await collaborationAPI.acceptRequest(requestId);
+            await FirestoreService.updateCollaborationRequest(requestId, 'accepted');
             // Remove from list
-            setRequests(prev => prev.filter(r => r._id !== requestId));
+            setRequests(prev => prev.filter(r => r.id !== requestId));
         } catch (error) {
             console.error('Failed to accept request:', error);
         } finally {
@@ -85,9 +59,9 @@ const CollaborationRequestsModal: React.FC<CollaborationRequestsModalProps> = ({
     const handleReject = async (requestId: string) => {
         try {
             setProcessingId(requestId);
-            await collaborationAPI.rejectRequest(requestId);
+            await FirestoreService.updateCollaborationRequest(requestId, 'rejected');
             // Remove from list
-            setRequests(prev => prev.filter(r => r._id !== requestId));
+            setRequests(prev => prev.filter(r => r.id !== requestId));
         } catch (error) {
             console.error('Failed to reject request:', error);
         } finally {
@@ -139,7 +113,7 @@ const CollaborationRequestsModal: React.FC<CollaborationRequestsModalProps> = ({
                             <div className="space-y-4">
                                 {requests.map((request) => (
                                     <motion.div
-                                        key={request._id}
+                                        key={request.id}
                                         layout
                                         initial={{ opacity: 0, y: 20 }}
                                         animate={{ opacity: 1, y: 0 }}
@@ -148,26 +122,18 @@ const CollaborationRequestsModal: React.FC<CollaborationRequestsModalProps> = ({
                                     >
                                         {/* Request Info */}
                                         <div className="flex items-start gap-4 mb-4">
-                                            {/* Avatar */}
+                                            {/* Avatar Placeholder - Firestore store user info needs fetch or redundant store? Assumed redundant. */}
                                             <div className="w-12 h-12 border-2 border-slate-900 bg-purple-100 flex items-center justify-center text-purple-700 font-black text-lg overflow-hidden flex-shrink-0">
-                                                {request.fromOwner.photoURL ? (
-                                                    <img
-                                                        src={request.fromOwner.photoURL}
-                                                        alt={request.fromOwner.displayName}
-                                                        className="w-full h-full object-cover"
-                                                    />
-                                                ) : (
-                                                    request.fromOwner.displayName?.charAt(0).toUpperCase() || 'U'
-                                                )}
+                                                {'U'}
                                             </div>
 
                                             {/* Details */}
                                             <div className="flex-1 min-w-0">
                                                 <h4 className="font-black text-slate-900 mb-1 uppercase text-lg">
-                                                    {request.fromOwner.displayName || 'Anonymous User'}
+                                                    Request from {request.fromCircleName}
                                                 </h4>
                                                 <p className="text-sm text-slate-600 mb-3 font-medium">
-                                                    Wants to collaborate <span className="font-black text-purple-700 bg-purple-100 px-1 border border-purple-200">{request.fromCircle.name}</span> with your circle <span className="font-black text-purple-700 bg-purple-100 px-1 border border-purple-200">{request.toCircle.name}</span>
+                                                    Wants to collaborate <span className="font-black text-purple-700 bg-purple-100 px-1 border border-purple-200">{request.fromCircleName}</span> with your circle <span className="font-black text-purple-700 bg-purple-100 px-1 border border-purple-200">{request.toCircleName}</span>
                                                 </p>
                                                 {request.message && (
                                                     <div className="bg-slate-100 border-l-4 border-slate-900 p-3 text-sm text-slate-700 font-medium italic">
@@ -180,11 +146,11 @@ const CollaborationRequestsModal: React.FC<CollaborationRequestsModalProps> = ({
                                         {/* Actions */}
                                         <div className="flex gap-4">
                                             <button
-                                                onClick={() => handleAccept(request._id)}
-                                                disabled={processingId === request._id}
+                                                onClick={() => handleAccept(request.id!)}
+                                                disabled={processingId === request.id!}
                                                 className="flex-1 px-4 py-3 bg-green-500 text-white border-2 border-slate-900 font-black uppercase tracking-wider hover:bg-green-600 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                                             >
-                                                {processingId === request._id ? (
+                                                {processingId === request.id! ? (
                                                     <BrutalistSpinner size={16} className="text-white border-white" />
                                                 ) : (
                                                     <Check className="w-5 h-5" strokeWidth={3} />
@@ -192,11 +158,11 @@ const CollaborationRequestsModal: React.FC<CollaborationRequestsModalProps> = ({
                                                 Accept
                                             </button>
                                             <button
-                                                onClick={() => handleReject(request._id)}
-                                                disabled={processingId === request._id}
+                                                onClick={() => handleReject(request.id!)}
+                                                disabled={processingId === request.id!}
                                                 className="flex-1 px-4 py-3 bg-red-500 text-white border-2 border-slate-900 font-black uppercase tracking-wider hover:bg-red-600 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                                             >
-                                                {processingId === request._id ? (
+                                                {processingId === request.id! ? (
                                                     <BrutalistSpinner size={16} className="text-white border-white" />
                                                 ) : (
                                                     <XCircle className="w-5 h-5" strokeWidth={3} />

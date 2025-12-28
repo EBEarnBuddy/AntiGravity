@@ -89,6 +89,7 @@ export interface PodComment {
 
 export interface Gig {
   id?: string;
+  type?: 'project';
   title: string;
   description: string;
   company: string;
@@ -158,6 +159,7 @@ export interface GigApplication {
 
 export interface Startup {
   id?: string;
+  type?: 'startup';
   name: string;
   description: string;
   industry: string;
@@ -295,6 +297,19 @@ export interface Notification {
   readAt?: Timestamp;
 }
 
+export interface CollaborationRequest {
+  id?: string;
+  fromCircleId: string;
+  toCircleId: string;
+  fromCircleName?: string;
+  toCircleName?: string;
+  requestedBy: string; // UserId
+  message?: string;
+  status: 'pending' | 'accepted' | 'rejected';
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+}
+
 export interface UserProfile {
   uid: string;
   username?: string;
@@ -382,7 +397,46 @@ export interface Recommendation {
 
 // Firestore Service Class
 export class FirestoreService {
-  // ---------- Helpers ----------
+  // ---------- Applications ----------
+  static async getUserApplications(userId: string): Promise<any[]> {
+    const userProfile = await this.getUserProfile(userId);
+    if (!userProfile) return [];
+
+    const applications: any[] = [];
+
+    // Startups
+    if (userProfile.appliedStartups && userProfile.appliedStartups.length > 0) {
+      for (const startupId of userProfile.appliedStartups) {
+        const startup = await this.getOpportunityById(startupId);
+        if (startup && startup.type === 'startup') {
+          // Find application status
+          let status = 'pending';
+          const s = startup as Startup;
+          if (s.roles) {
+            for (const role of s.roles) {
+              const app = role.applicants.find(a => a.userId === userId);
+              if (app) {
+                status = app.status;
+                break;
+              }
+            }
+          }
+          applications.push({
+            _id: startup.id,
+            opportunityId: { title: s.name, name: s.name, description: s.description, type: 'startup' },
+            status,
+            type: 'startup'
+          });
+        }
+      }
+    }
+
+    // Add Gigs logic if needed
+
+    return applications;
+  }
+
+  // ---------- Notifications ----------
   private static formatBytes(bytes: number): string {
     if (!bytes || bytes <= 0) return '0 Bytes';
     const k = 1024;
@@ -433,6 +487,14 @@ export class FirestoreService {
   static async getUserProfile(userId: string): Promise<UserProfile | null> {
     const docSnap = await getDoc(doc(db, 'users', userId));
     return docSnap.exists() ? { id: docSnap.id, ...docSnap.data() } as unknown as UserProfile : null;
+  }
+
+  static async getUserByUsername(username: string): Promise<UserProfile | null> {
+    const q = query(collection(db, 'users'), where('username', '==', username), limit(1));
+    const snapshot = await getDocs(q);
+    if (snapshot.empty) return null;
+    const docSnap = snapshot.docs[0];
+    return { id: docSnap.id, ...docSnap.data() } as unknown as UserProfile;
   }
 
   static async updateUserProfile(userId: string, updates: Partial<UserProfile>): Promise<void> {
@@ -524,6 +586,35 @@ export class FirestoreService {
     });
   }
 
+  // Collaborations
+  static async createCollaborationRequest(data: Omit<CollaborationRequest, 'id' | 'createdAt' | 'updatedAt' | 'status'>): Promise<string> {
+    const docRef = await addDoc(collection(db, 'collaborationRequests'), {
+      ...data,
+      status: 'pending',
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp()
+    });
+    return docRef.id;
+  }
+
+  static async getCollaborationRequests(circleId: string): Promise<CollaborationRequest[]> {
+    // Incoming requests
+    const q = query(
+      collection(db, 'collaborationRequests'),
+      where('toCircleId', '==', circleId),
+      orderBy('createdAt', 'desc')
+    );
+    const snapshot = await getDocs(q);
+    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as CollaborationRequest));
+  }
+
+  static async updateCollaborationRequest(requestId: string, status: 'accepted' | 'rejected'): Promise<void> {
+    await updateDoc(doc(db, 'collaborationRequests', requestId), {
+      status,
+      updatedAt: serverTimestamp()
+    });
+  }
+
   // Pod Posts
   static async createPodPost(podId: string, userId: string, content: string, imageUrl?: string): Promise<string> {
     // Get user profile for name and avatar
@@ -604,7 +695,7 @@ export class FirestoreService {
         updatedAt: serverTimestamp()
       };
 
-      const docRef = await addDoc(collection(db, 'communityPosts'), post);
+      const docRef = await addDoc(collection(db, 'podPosts'), post);
 
       // If posting to a specific pod, update pod's post count
       if (postData.selectedPod) {
@@ -626,7 +717,7 @@ export class FirestoreService {
     try {
       const querySnapshot = await getDocs(
         query(
-          collection(db, 'communityPosts'),
+          collection(db, 'podPosts'),
           orderBy('createdAt', 'desc')
         )
       );
@@ -976,6 +1067,109 @@ export class FirestoreService {
     });
   }
 
+  static async leaveRoom(roomId: string, userId: string): Promise<void> {
+    const roomRef = doc(db, 'rooms', roomId);
+    const userRef = doc(db, 'users', userId);
+    const batch = writeBatch(db);
+    batch.update(roomRef, {
+      members: arrayRemove(userId),
+      updatedAt: serverTimestamp()
+    });
+    batch.update(userRef, {
+      joinedRooms: arrayRemove(roomId),
+      updatedAt: serverTimestamp()
+    });
+    await batch.commit();
+  }
+
+  static async markMessagesAsRead(roomId: string, userId: string): Promise<void> {
+    // No-op for now
+  }
+
+  static async getOnlineMembers(roomId: string): Promise<any[]> {
+    const room = await getDoc(doc(db, 'rooms', roomId));
+    if (!room.exists()) return [];
+    const memberIds = room.data().members || [];
+    const members = [];
+    for (const uid of memberIds) {
+      const p = await this.getUserProfile(uid);
+      if (p) members.push({ userId: uid, userName: p.displayName, userAvatar: p.photoURL });
+    }
+    return members;
+  }
+
+  static async getRoomMessages(roomId: string, limitCount = 50): Promise<ChatMessage[]> {
+    const q = query(
+      collection(db, 'chatMessages'),
+      where('roomId', '==', roomId),
+      orderBy('timestamp', 'asc'),
+      limit(limitCount)
+    );
+    const snap = await getDocs(q);
+    return snap.docs.map(doc => ({ id: doc.id, ...doc.data() } as ChatMessage));
+  }
+
+  static async getPendingMemberProfiles(roomId: string): Promise<any[]> {
+    const roomDoc = await getDoc(doc(db, 'rooms', roomId));
+    if (!roomDoc.exists()) return [];
+    const pendingIds = roomDoc.data().pendingMembers || [];
+    const profiles = [];
+    for (const uid of pendingIds) {
+      const p = await this.getUserProfile(uid);
+      if (p) profiles.push({ userId: uid, ...p });
+    }
+    return profiles;
+  }
+
+  static async approveMembership(roomId: string, userId: string, status: 'accepted' | 'rejected'): Promise<void> {
+    const roomRef = doc(db, 'rooms', roomId);
+    const userRef = doc(db, 'users', userId);
+    const batch = writeBatch(db);
+
+    if (status === 'accepted') {
+      batch.update(roomRef, {
+        pendingMembers: arrayRemove(userId),
+        members: arrayUnion(userId),
+        updatedAt: serverTimestamp()
+      });
+      batch.update(userRef, {
+        joinedRooms: arrayUnion(roomId),
+        updatedAt: serverTimestamp()
+      });
+    } else {
+      batch.update(roomRef, {
+        pendingMembers: arrayRemove(userId),
+        updatedAt: serverTimestamp()
+      });
+    }
+    await batch.commit();
+  }
+
+  static async deleteMessage(roomId: string, messageId: string): Promise<void> {
+    // In real backend, we might just mark as deleted
+    await deleteDoc(doc(db, 'chatMessages', messageId));
+  }
+
+  static async updateMessage(roomId: string, messageId: string, content: string): Promise<void> {
+    await updateDoc(doc(db, 'chatMessages', messageId), {
+      content,
+      edited: true,
+      updatedAt: serverTimestamp()
+    });
+  }
+
+  static async updateRoom(roomId: string, data: Partial<ChatRoom>): Promise<void> {
+    const roomRef = doc(db, 'rooms', roomId);
+    await updateDoc(roomRef, {
+      ...data,
+      updatedAt: serverTimestamp()
+    });
+  }
+
+  static async deleteRoom(roomId: string): Promise<void> {
+    await deleteDoc(doc(db, 'rooms', roomId));
+  }
+
   // Messages
   static async sendChatMessage(messageData: Omit<ChatMessage, 'id' | 'timestamp'>): Promise<string> {
     const docRef = await addDoc(collection(db, 'chatMessages'), {
@@ -1202,6 +1396,20 @@ export class FirestoreService {
     return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Startup));
   }
 
+  static async getOpportunityById(id: string): Promise<(Startup | Gig) | null> {
+    // Try startup first
+    const startupDoc = await getDoc(doc(db, 'startups', id));
+    if (startupDoc.exists()) {
+      return { id: startupDoc.id, ...startupDoc.data(), type: 'startup' } as unknown as Startup;
+    }
+    // Try project (gig)
+    const gigDoc = await getDoc(doc(db, 'gigs', id));
+    if (gigDoc.exists()) {
+      return { id: gigDoc.id, ...gigDoc.data(), type: 'project' } as unknown as Gig;
+    }
+    return null;
+  }
+
   static async applyToStartup(startupId: string, roleId: string, userId: string, applicationData: {
     coverLetter: string;
     portfolio?: string;
@@ -1294,6 +1502,13 @@ export class FirestoreService {
     }
   }
 
+  static async updateStartupStatus(startupId: string, status: string): Promise<void> {
+    await updateDoc(doc(db, 'startups', startupId), {
+      status,
+      updatedAt: serverTimestamp()
+    });
+  }
+
   // Onboarding
   static async saveOnboardingResponse(onboardingData: any): Promise<void> {
     await updateDoc(doc(db, 'users', onboardingData.userId), {
@@ -1318,5 +1533,77 @@ export class FirestoreService {
   static async getPersonalizedRecommendations(userId: string): Promise<Recommendation | null> {
     const docSnap = await getDoc(doc(db, 'recommendations', userId));
     return docSnap.exists() ? { ...docSnap.data() } as Recommendation : null;
+  }
+
+  static async getEvents(limitCount = 20): Promise<any[]> {
+    try {
+      const q = query(
+        collection(db, 'events'),
+        orderBy('date', 'asc'),
+        limit(limitCount)
+      );
+      const snapshot = await getDocs(q);
+      return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    } catch (e) {
+      console.error('Failed to get events', e);
+      return [];
+    }
+  }
+
+  static async toggleBookmark(opportunityId: string, userId: string): Promise<void> {
+    const opp = await this.getOpportunityById(opportunityId);
+    if (!opp) return;
+    const user = await this.getUserProfile(userId);
+    if (!user) return;
+
+    if ((opp as any).type === 'startup') {
+      if (user.bookmarkedStartups?.includes(opportunityId)) {
+        await this.unbookmarkStartup(opportunityId, userId);
+      } else {
+        await this.bookmarkStartup(opportunityId, userId);
+      }
+    } else {
+      if (user.bookmarkedGigs?.includes(opportunityId)) {
+        await this.unbookmarkProject(opportunityId, userId);
+      } else {
+        await this.bookmarkProject(opportunityId, userId);
+      }
+    }
+  }
+
+  // Notifications
+  static async getNotifications(userId: string, limitCount = 20): Promise<Notification[]> {
+    const q = query(
+      collection(db, 'notifications'),
+      where('userId', '==', userId),
+      orderBy('createdAt', 'desc'),
+      limit(limitCount)
+    );
+    const snapshot = await getDocs(q);
+    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Notification));
+  }
+
+  static async markNotificationRead(notificationId: string): Promise<void> {
+    await updateDoc(doc(db, 'notifications', notificationId), {
+      isRead: true,
+      readAt: serverTimestamp()
+    });
+  }
+
+  static subscribeToNotifications(userId: string, callback: (notifications: Notification[]) => void): () => void {
+    const q = query(
+      collection(db, 'notifications'),
+      where('userId', '==', userId),
+      orderBy('createdAt', 'desc'),
+      limit(50)
+    );
+
+    return onSnapshot(q, (snapshot) => {
+      const notifications = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      } as Notification));
+      callback(notifications);
+    });
   }
 }

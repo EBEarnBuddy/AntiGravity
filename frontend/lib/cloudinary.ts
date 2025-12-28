@@ -1,5 +1,3 @@
-import { uploadAPI } from './axios';
-
 interface CloudinaryResponse {
     secure_url: string;
     [key: string]: any;
@@ -7,9 +5,18 @@ interface CloudinaryResponse {
 
 export const uploadImage = async (file: File, folder: string): Promise<string> => {
     try {
-        // 1. Get signature from backend
-        const { data } = await uploadAPI.getSignature(folder);
-        const { signature, timestamp, apiKey, cloudName } = data;
+        // 1. Get signature from Next.js API route
+        const signatureResponse = await fetch('/api/upload/signature', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ folder }),
+        });
+
+        if (!signatureResponse.ok) {
+            throw new Error('Failed to get upload signature');
+        }
+
+        const { signature, timestamp, apiKey, cloudName } = await signatureResponse.json();
 
         // 2. Prepare upload payload
         const formData = new FormData();
@@ -20,17 +27,17 @@ export const uploadImage = async (file: File, folder: string): Promise<string> =
         formData.append('folder', folder);
 
         // 3. Upload to Cloudinary
-        const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+        const uploadResponse = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
             method: 'POST',
             body: formData,
         });
 
-        if (!response.ok) {
-            const error = await response.json();
+        if (!uploadResponse.ok) {
+            const error = await uploadResponse.json();
             throw new Error(error.error?.message || 'Failed to upload image');
         }
 
-        const result: CloudinaryResponse = await response.json();
+        const result: CloudinaryResponse = await uploadResponse.json();
         return result.secure_url;
 
     } catch (error) {

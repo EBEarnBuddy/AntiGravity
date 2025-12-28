@@ -4,7 +4,7 @@ import { X, Send, Image, FileText, Smile, Paperclip, Video, Music, MapPin, Calen
 import { useAuth } from '../contexts/AuthContext';
 import { usePods } from '../hooks/useFirestore';
 import { FirestoreService } from '../lib/firestore';
-import { communityPostsAPI } from '../lib/axios';
+
 import { BrutalistSpinner } from '@/components/ui/BrutalistSpinner';
 
 interface CommunityPostModalProps {
@@ -195,7 +195,7 @@ const CommunityPostModal: React.FC<CommunityPostModalProps> = ({
 
       // Try backend API as well (but don't fail if it doesn't work)
       try {
-        await communityPostsAPI.createPost({
+        await FirestoreService.createCommunityPost({
           content: postData.content,
           selectedPod: postData.selectedPod,
           images: imageUrls,

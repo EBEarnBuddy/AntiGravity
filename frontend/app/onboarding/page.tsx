@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
-import { userAPI } from '@/lib/axios';
+import { FirestoreService } from '@/lib/firestore';
 import { Check, ArrowRight, User, Rocket, Heart, Code, Target, Clock, MapPin } from 'lucide-react';
 
 // --- CONFIGURATION ---
@@ -42,7 +42,7 @@ const AVAILABILITY = [
 
 export default function OnboardingPage() {
     const router = useRouter();
-    const { currentUser } = useAuth();
+    const { currentUser, updateProfile } = useAuth();
     const [step, setStep] = useState(1);
     const [loading, setLoading] = useState(false);
 
@@ -67,24 +67,15 @@ export default function OnboardingPage() {
         }
         setCheckingUsername(true);
         try {
-            // Assuming userAPI.getByUsername exists and returns 404 if not found
-            // Or returns data if found.
-            // Adjust logic based on actual API response
-            const res = await userAPI.getByUsername(val);
-            // If we get data, it means taken
-            if (res.data) {
+            const user = await FirestoreService.getUserByUsername(val);
+            if (user) {
                 setUsernameAvailable(false);
             } else {
                 setUsernameAvailable(true);
             }
         } catch (err: any) {
-            // If 404, it implies available
-            if (err.response && err.response.status === 404) {
-                setUsernameAvailable(true);
-            } else {
-                console.error("Error checking username", err);
-                setUsernameAvailable(null); // Unknown state
-            }
+            console.error("Error checking username", err);
+            setUsernameAvailable(null);
         } finally {
             setCheckingUsername(false);
         }
@@ -114,14 +105,16 @@ export default function OnboardingPage() {
             // Determine tour status based on user choice
             const wantsTour = formData.wantsTour === true;
 
-            await userAPI.updateMe({
-                username: username, // Save Username
+            await updateProfile({
+                username: username,
                 onboardingData: {
-                    role: formData.role,
+                    role: formData.role as any,
                     skills: formData.skills,
                     goals: formData.goals,
-                    experience: formData.experience,
-                    availability: formData.availability
+                    experience: formData.experience as any,
+                    availability: formData.availability as any,
+                    remote: false, // Default
+                    interests: [] // Added to satisfy type definition
                 },
                 hasCompletedOnboarding: true,
                 hasCompletedTour: !wantsTour,
@@ -129,7 +122,7 @@ export default function OnboardingPage() {
             });
 
             if (!wantsTour) {
-                await userAPI.updateMe({ isNewUser: false });
+                await updateProfile({ isNewUser: false });
             }
 
             window.location.href = '/discover';
@@ -185,15 +178,15 @@ export default function OnboardingPage() {
                                         <p className="text-slate-600 font-bold text-lg">Choose a unique username for your profile URL.</p>
                                     </div>
                                     <div className="max-w-md mx-auto">
-                                        <div className="relative">
-                                            <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
-                                                <span className="text-slate-400 font-bold">earnbuddy.com/u/</span>
+                                        <div className="relative flex flex-col md:block">
+                                            <div className="md:absolute md:inset-y-0 md:left-0 flex items-center md:pl-4 pointer-events-none mb-2 md:mb-0">
+                                                <span className="text-slate-400 font-bold text-sm md:text-base">earnbuddy.com/u/</span>
                                             </div>
                                             <input
                                                 type="text"
                                                 value={username}
                                                 onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, ''))}
-                                                className={`w-full pl-[150px] pr-12 py-4 bg-white border-4 font-black text-xl outline-none transition-all uppercase tracking-wide
+                                                className={`w-full md:pl-[160px] pl-4 pr-12 py-4 bg-white border-4 font-black text-xl outline-none transition-all uppercase tracking-wide
                                                 ${usernameAvailable === false ? 'border-red-500 text-red-500' :
                                                         usernameAvailable === true ? 'border-green-500 text-green-600 shadow-[4px_4px_0px_0px_rgba(22,163,74,1)]' :
                                                             'border-slate-900 text-slate-900 focus:shadow-[4px_4px_0px_0px_rgba(15,23,42,1)]'}`}
@@ -394,11 +387,12 @@ export default function OnboardingPage() {
                                     onClick={nextStep}
                                     // Validation for each step
                                     disabled={
-                                        (step === 1 && !formData.role) ||
-                                        (step === 2 && formData.skills.length === 0) ||
-                                        (step === 3 && formData.goals.length === 0) ||
-                                        (step === 4 && !formData.experience) ||
-                                        (step === 5 && !formData.availability)
+                                        (step === 1 && (!username || !usernameAvailable)) ||
+                                        (step === 2 && !formData.role) ||
+                                        (step === 3 && formData.skills.length === 0) ||
+                                        (step === 4 && formData.goals.length === 0) ||
+                                        (step === 5 && !formData.experience) ||
+                                        (step === 6 && !formData.availability)
                                     }
                                     className="flex-[2] py-4 bg-slate-900 text-white font-black uppercase tracking-wide border-2 border-slate-900 hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] flex items-center justify-center gap-2"
                                 >

@@ -38,6 +38,7 @@ const CreateStartupModal: React.FC<CreateStartupModalProps> = ({ isOpen, onClose
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState({
     name: '',
+    logo: '',
     description: '',
     slug: '', // Custom URL
     industry: '',
@@ -60,6 +61,7 @@ const CreateStartupModal: React.FC<CreateStartupModalProps> = ({ isOpen, onClose
     if (isOpen && isEditing && initialData) {
       setFormData({
         name: initialData.name || '',
+        logo: initialData.logo || initialData.image || '',
         slug: initialData.slug || '',
         description: initialData.description || '',
         industry: initialData.industry || '',
@@ -80,6 +82,7 @@ const CreateStartupModal: React.FC<CreateStartupModalProps> = ({ isOpen, onClose
       // Reset if opening in create mode
       setFormData({
         name: '',
+        logo: '',
         slug: '',
         description: '',
         industry: '',
@@ -137,6 +140,17 @@ const CreateStartupModal: React.FC<CreateStartupModalProps> = ({ isOpen, onClose
       ...prev,
       [field]: value
     }));
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFormData(prev => ({ ...prev, logo: reader.result as string }));
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   // ... (Helper functions handleNestedChange through validateStep remain same)
@@ -364,6 +378,23 @@ const CreateStartupModal: React.FC<CreateStartupModalProps> = ({ isOpen, onClose
                     </div>
 
                     <div>
+                      <label className="block text-sm font-black text-slate-900 uppercase mb-2">
+                        Logo / Image
+                      </label>
+                      <div className="flex items-center gap-4">
+                        {formData.logo && (
+                          <img src={formData.logo} alt="Logo Preview" className="w-16 h-16 object-cover border-2 border-slate-900 bg-slate-100" />
+                        )}
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleFileChange}
+                          className="w-full px-4 py-3 border-2 border-slate-900 bg-white text-slate-900 focus:outline-none focus:bg-slate-50 transition-all font-bold file:mr-4 file:py-2 file:px-4 file:border-0 file:text-sm file:font-black file:bg-slate-900 file:text-white hover:file:bg-slate-700 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] focus:shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] focus:translate-x-[2px] focus:translate-y-[2px]"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
                       <label className="block text-sm font-bold text-slate-700 uppercase mb-2">
                         Custom Link ID (Optional)
                       </label>
@@ -460,7 +491,7 @@ const CreateStartupModal: React.FC<CreateStartupModalProps> = ({ isOpen, onClose
                         type="text"
                         value={formData.location}
                         onChange={(e) => handleInputChange('location', e.target.value)}
-                        className="w-full px-4 py-3 border border-slate-200 rounded-xl bg-white text-slate-900 focus:ring-2 focus:ring-green-600 focus:border-transparent transition-all outline-none font-medium placeholder:text-slate-400"
+                        className="w-full px-4 py-3 border-2 border-slate-900 bg-white text-slate-900 focus:outline-none focus:bg-slate-50 transition-all font-bold placeholder:text-slate-400 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] focus:shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] focus:translate-x-[2px] focus:translate-y-[2px]"
                         placeholder="City, Country"
                       />
                     </div>
@@ -473,7 +504,7 @@ const CreateStartupModal: React.FC<CreateStartupModalProps> = ({ isOpen, onClose
                         type="text"
                         value={formData.funding}
                         onChange={(e) => handleInputChange('funding', e.target.value)}
-                        className="w-full px-4 py-3 border border-slate-200 rounded-xl bg-white text-slate-900 focus:ring-2 focus:ring-green-600 focus:border-transparent transition-all outline-none font-medium placeholder:text-slate-400"
+                        className="w-full px-4 py-3 border-2 border-slate-900 bg-white text-slate-900 focus:outline-none focus:bg-slate-50 transition-all font-bold placeholder:text-slate-400 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] focus:shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] focus:translate-x-[2px] focus:translate-y-[2px]"
                         placeholder="e.g., $500K raised, Seeking $250K, etc."
                       />
                     </div>
@@ -486,7 +517,7 @@ const CreateStartupModal: React.FC<CreateStartupModalProps> = ({ isOpen, onClose
                         type="text"
                         value={formData.equity}
                         onChange={(e) => handleInputChange('equity', e.target.value)}
-                        className="w-full px-4 py-3 border border-slate-200 rounded-xl bg-white text-slate-900 focus:ring-2 focus:ring-green-600 focus:border-transparent transition-all outline-none font-medium placeholder:text-slate-400"
+                        className="w-full px-4 py-3 border-2 border-slate-900 bg-white text-slate-900 focus:outline-none focus:bg-slate-50 transition-all font-bold placeholder:text-slate-400 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] focus:shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] focus:translate-x-[2px] focus:translate-y-[2px]"
                         placeholder="e.g., 2-5%, 5-10%, etc."
                       />
                     </div>
@@ -506,7 +537,7 @@ const CreateStartupModal: React.FC<CreateStartupModalProps> = ({ isOpen, onClose
 
                   <div className="space-y-6">
                     {/* Add New Role */}
-                    <div className="bg-slate-50 border border-slate-200 rounded-xl p-6">
+                    <div className="bg-slate-50 border-4 border-slate-900 p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
                       <h4 className="text-lg font-bold text-slate-900 mb-4">Add New Position</h4>
 
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
@@ -518,7 +549,7 @@ const CreateStartupModal: React.FC<CreateStartupModalProps> = ({ isOpen, onClose
                             type="text"
                             value={newRole.title}
                             onChange={(e) => setNewRole(prev => ({ ...prev, title: e.target.value }))}
-                            className="w-full px-4 py-3 border border-slate-200 rounded-xl bg-white text-slate-900 focus:ring-2 focus:ring-green-600 focus:border-transparent transition-all outline-none font-medium"
+                            className="w-full px-4 py-3 border-2 border-slate-900 bg-white text-slate-900 focus:outline-none focus:bg-slate-50 transition-all font-bold shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] focus:shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] focus:translate-x-[2px] focus:translate-y-[2px]"
                             placeholder="e.g., Senior Frontend Developer"
                           />
                         </div>
@@ -530,7 +561,7 @@ const CreateStartupModal: React.FC<CreateStartupModalProps> = ({ isOpen, onClose
                           <select
                             value={newRole.type}
                             onChange={(e) => setNewRole(prev => ({ ...prev, type: e.target.value as any }))}
-                            className="w-full px-4 py-3 border border-slate-200 rounded-xl bg-white text-slate-900 focus:ring-2 focus:ring-green-600 focus:border-transparent transition-all outline-none font-medium"
+                            className="w-full px-4 py-3 border-2 border-slate-900 bg-white text-slate-900 focus:outline-none focus:bg-slate-50 transition-all font-bold shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] focus:shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] focus:translate-x-[2px] focus:translate-y-[2px]"
                           >
                             <option value="full-time">Full-time</option>
                             <option value="part-time">Part-time</option>
@@ -548,7 +579,7 @@ const CreateStartupModal: React.FC<CreateStartupModalProps> = ({ isOpen, onClose
                           <select
                             value={newRole.location}
                             onChange={(e) => setNewRole(prev => ({ ...prev, location: e.target.value as any }))}
-                            className="w-full px-4 py-3 border border-slate-200 rounded-xl bg-white text-slate-900 focus:ring-2 focus:ring-green-600 focus:border-transparent transition-all outline-none font-medium"
+                            className="w-full px-4 py-3 border-2 border-slate-900 bg-white text-slate-900 focus:outline-none focus:bg-slate-50 transition-all font-bold shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] focus:shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] focus:translate-x-[2px] focus:translate-y-[2px]"
                           >
                             <option value="remote">Remote</option>
                             <option value="hybrid">Hybrid</option>
@@ -564,7 +595,7 @@ const CreateStartupModal: React.FC<CreateStartupModalProps> = ({ isOpen, onClose
                             type="text"
                             value={newRole.salary}
                             onChange={(e) => setNewRole(prev => ({ ...prev, salary: e.target.value }))}
-                            className="w-full px-4 py-3 border border-slate-200 rounded-xl bg-white text-slate-900 focus:ring-2 focus:ring-green-600 focus:border-transparent transition-all outline-none font-medium"
+                            className="w-full px-4 py-3 border-2 border-slate-900 bg-white text-slate-900 focus:outline-none focus:bg-slate-50 transition-all font-bold shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] focus:shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] focus:translate-x-[2px] focus:translate-y-[2px]"
                             placeholder="e.g., $80K-120K"
                           />
                         </div>
@@ -578,7 +609,7 @@ const CreateStartupModal: React.FC<CreateStartupModalProps> = ({ isOpen, onClose
                           value={newRole.description}
                           onChange={(e) => setNewRole(prev => ({ ...prev, description: e.target.value }))}
                           rows={3}
-                          className="w-full px-4 py-3 border border-slate-200 rounded-xl bg-white text-slate-900 focus:ring-2 focus:ring-green-600 focus:border-transparent transition-all outline-none font-medium resize-none"
+                          className="w-full px-4 py-3 border-2 border-slate-900 bg-white text-slate-900 focus:outline-none focus:bg-slate-50 transition-all font-bold resize-none shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] focus:shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] focus:translate-x-[2px] focus:translate-y-[2px]"
                           placeholder="Describe the role responsibilities..."
                         />
                       </div>
@@ -593,7 +624,7 @@ const CreateStartupModal: React.FC<CreateStartupModalProps> = ({ isOpen, onClose
                             value={newRoleRequirement}
                             onChange={(e) => setNewRoleRequirement(e.target.value)}
                             onKeyPress={(e) => e.key === 'Enter' && addRoleRequirement()}
-                            className="flex-1 px-4 py-3 border border-slate-200 rounded-xl bg-white text-slate-900 focus:ring-2 focus:ring-green-600 focus:border-transparent transition-all outline-none font-medium"
+                            className="flex-1 px-4 py-3 border-2 border-slate-900 bg-white text-slate-900 focus:outline-none focus:bg-slate-50 transition-all font-bold shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] focus:shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] focus:translate-x-[2px] focus:translate-y-[2px]"
                             placeholder="Add a requirement"
                           />
                           <motion.button
@@ -635,7 +666,7 @@ const CreateStartupModal: React.FC<CreateStartupModalProps> = ({ isOpen, onClose
                           type="text"
                           value={newRole.equity}
                           onChange={(e) => setNewRole(prev => ({ ...prev, equity: e.target.value }))}
-                          className="w-full px-4 py-3 border border-slate-200 rounded-xl bg-white text-slate-900 focus:ring-2 focus:ring-green-600 focus:border-transparent transition-all outline-none font-medium"
+                          className="w-full px-4 py-3 border-2 border-slate-900 bg-white text-slate-900 focus:outline-none focus:bg-slate-50 transition-all font-bold shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] focus:shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] focus:translate-x-[2px] focus:translate-y-[2px]"
                           placeholder="e.g., 0.5-1%"
                         />
                       </div>
@@ -705,7 +736,7 @@ const CreateStartupModal: React.FC<CreateStartupModalProps> = ({ isOpen, onClose
                         type="email"
                         value={formData.contact.email}
                         onChange={(e) => handleNestedChange('contact', 'email', e.target.value)}
-                        className="w-full px-4 py-3 border border-slate-200 rounded-xl bg-white text-slate-900 focus:ring-2 focus:ring-green-600 focus:border-transparent transition-all outline-none font-medium"
+                        className="w-full px-4 py-3 border-2 border-slate-900 bg-white text-slate-900 focus:outline-none focus:bg-slate-50 transition-all font-bold shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] focus:shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] focus:translate-x-[2px] focus:translate-y-[2px]"
                         placeholder="your@email.com"
                       />
                     </div>
@@ -718,7 +749,7 @@ const CreateStartupModal: React.FC<CreateStartupModalProps> = ({ isOpen, onClose
                         type="url"
                         value={formData.contact.website}
                         onChange={(e) => handleNestedChange('contact', 'website', e.target.value)}
-                        className="w-full px-4 py-3 border border-slate-200 rounded-xl bg-white text-slate-900 focus:ring-2 focus:ring-green-600 focus:border-transparent transition-all outline-none font-medium"
+                        className="w-full px-4 py-3 border-2 border-slate-900 bg-white text-slate-900 focus:outline-none focus:bg-slate-50 transition-all font-bold shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] focus:shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] focus:translate-x-[2px] focus:translate-y-[2px]"
                         placeholder="https://yourstartup.com"
                       />
                     </div>
@@ -731,7 +762,7 @@ const CreateStartupModal: React.FC<CreateStartupModalProps> = ({ isOpen, onClose
                         type="url"
                         value={formData.contact.linkedin}
                         onChange={(e) => handleNestedChange('contact', 'linkedin', e.target.value)}
-                        className="w-full px-4 py-3 border border-slate-200 rounded-xl bg-white text-slate-900 focus:ring-2 focus:ring-green-600 focus:border-transparent transition-all outline-none font-medium"
+                        className="w-full px-4 py-3 border-2 border-slate-900 bg-white text-slate-900 focus:outline-none focus:bg-slate-50 transition-all font-bold shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] focus:shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] focus:translate-x-[2px] focus:translate-y-[2px]"
                         placeholder="https://linkedin.com/company/yourstartup"
                       />
                     </div>
@@ -744,7 +775,7 @@ const CreateStartupModal: React.FC<CreateStartupModalProps> = ({ isOpen, onClose
                         value={formData.additionalInfo}
                         onChange={(e) => handleInputChange('additionalInfo', e.target.value)}
                         rows={3}
-                        className="w-full px-4 py-3 border border-slate-200 rounded-xl bg-white text-slate-900 focus:ring-2 focus:ring-green-600 focus:border-transparent transition-all outline-none font-medium resize-none"
+                        className="w-full px-4 py-3 border-2 border-slate-900 bg-white text-slate-900 focus:outline-none focus:bg-slate-50 transition-all font-bold resize-none shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] focus:shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] focus:translate-x-[2px] focus:translate-y-[2px]"
                         placeholder="Any additional information about your startup..."
                       />
                     </div>

@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Send } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRooms } from '@/hooks/useFirestore';
-import { collaborationAPI } from '@/lib/axios';
+import { FirestoreService } from '@/lib/firestore';
 import { BrutalistSpinner } from '@/components/ui/BrutalistSpinner';
 
 interface CollaborationRequestModalProps {
@@ -60,7 +60,17 @@ const CollaborationRequestModal: React.FC<CollaborationRequestModalProps> = ({
         setError('');
 
         try {
-            await collaborationAPI.sendRequest(selectedCircleId, targetCircle.id, message);
+            if (!currentUser) throw new Error("You must be logged in.");
+            const selectedRoom = ownedCircles.find(r => r.id === selectedCircleId);
+
+            await FirestoreService.createCollaborationRequest({
+                fromCircleId: selectedCircleId,
+                toCircleId: targetCircle.id,
+                fromCircleName: selectedRoom?.name || 'Unknown Circle',
+                toCircleName: targetCircle.name,
+                requestedBy: currentUser.uid,
+                message
+            });
             onSuccess?.();
             onClose();
             // Reset form

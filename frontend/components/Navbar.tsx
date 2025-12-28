@@ -87,7 +87,7 @@ const Navbar: React.FC = () => {
                                 <p className="text-sm font-black text-slate-900 truncate uppercase">{userProfile?.displayName || currentUser?.displayName || 'User'}</p>
                                 <p className="text-xs text-slate-500 truncate font-mono">{userProfile?.username ? `@${userProfile.username}` : (userProfile?.email || currentUser?.email)}</p>
                             </div>
-                            <Link href="/profile" className="flex items-center gap-2 px-4 py-2 text-sm text-slate-700 hover:bg-green-50 hover:text-green-600 font-bold uppercase" onClick={() => setIsProfileOpen(false)}><User className="w-4 h-4" /> Profile</Link>
+                            <Link href={userProfile?.username ? `/u/${userProfile.username}` : '/profile'} className="flex items-center gap-2 px-4 py-2 text-sm text-slate-700 hover:bg-green-50 hover:text-green-600 font-bold uppercase" onClick={() => setIsProfileOpen(false)}><User className="w-4 h-4" /> Profile</Link>
                             <Link href="/support" className="flex items-center gap-2 px-4 py-2 text-sm text-slate-700 hover:bg-green-50 hover:text-green-600 font-bold uppercase" onClick={() => setIsProfileOpen(false)}><LayoutGrid className="w-4 h-4" /> Support</Link>
                             <div className="border-t-2 border-slate-900 mt-1">
                                 <button onClick={handleLogout} className="w-full text-left flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 font-bold uppercase"><LogOut className="w-4 h-4" /> Logout</button>

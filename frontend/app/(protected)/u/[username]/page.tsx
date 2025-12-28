@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
-import { userAPI } from '@/lib/axios';
+import { FirestoreService } from '@/lib/firestore';
 import {
     User,
     MapPin,
@@ -31,12 +31,19 @@ const ProfilePage = () => {
         const fetchProfile = async () => {
             try {
                 setLoading(true);
-                // username param might be user ID or actual username
-                const res = await userAPI.getByUsername(username);
-                setProfile(res.data);
+                let user = await FirestoreService.getUserByUsername(username);
+                if (!user) {
+                    // Fallback to checking by ID
+                    user = await FirestoreService.getUserProfile(username);
+                }
+
+                if (!user) {
+                    throw new Error("User not found");
+                }
+                setProfile(user);
             } catch (err: any) {
                 console.error("Profile fetch error:", err);
-                setError(err.response?.data?.error || "User not found");
+                setError(err.message || "User not found");
             } finally {
                 setLoading(false);
             }

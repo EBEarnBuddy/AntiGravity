@@ -22,14 +22,7 @@ export default function SupportPage() {
                         <a href="mailto:support@earnbuddy.tech" className="text-green-600 font-black hover:underline decoration-2 underline-offset-4">support@earnbuddy.tech</a>
                     </div>
 
-                    <div className="bg-white p-8 border-2 border-slate-900 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] hover:shadow-[6px_6px_0px_0px_rgba(15,23,42,1)] hover:-translate-y-1 transition-all">
-                        <div className="w-12 h-12 bg-blue-100 border-2 border-slate-900 flex items-center justify-center mb-4 text-blue-700">
-                            <MessageSquare className="w-6 h-6" />
-                        </div>
-                        <h3 className="font-black text-xl text-slate-900 mb-2 uppercase">Community</h3>
-                        <p className="text-slate-500 font-medium mb-4">Ask questions in our support circle.</p>
-                        <a href="/circles/support-circle" className="text-blue-600 font-black hover:underline decoration-2 underline-offset-4">Join EB Support Circle</a>
-                    </div>
+
                 </div>
 
                 <div className="pt-8 border-t-2 border-slate-200">

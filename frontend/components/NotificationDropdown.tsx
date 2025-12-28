@@ -2,79 +2,42 @@
 
 import React, { useEffect, useState, useRef } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { getSocket } from '../lib/socket';
-import { notificationAPI } from '../lib/axios';
+import { FirestoreService, Notification } from '../lib/firestore';
 import { Bell } from 'lucide-react';
 import Link from 'next/link';
 import useOnClickOutside from '../hooks/useOnClickOutside';
 import { motion } from 'framer-motion';
 
-interface INotification {
-    _id: string;
-    title: string;
-    message: string;
-    link?: string;
-    isRead: boolean;
-    createdAt: string;
-}
+
 
 const NotificationDropdown = () => {
     const { currentUser } = useAuth();
-    const [notifications, setNotifications] = useState<INotification[]>([]);
+    const [notifications, setNotifications] = useState<Notification[]>([]);
     const [unreadCount, setUnreadCount] = useState(0);
     const [isOpen, setIsOpen] = useState(false);
 
     const wrapperRef = useRef<HTMLDivElement>(null);
     useOnClickOutside(wrapperRef, () => setIsOpen(false));
 
-    const fetchNotifications = async () => {
-        try {
-            const res = await notificationAPI.getMyNotifications();
-            // Filter out read notifications to simulate "auto-delete on view" behavior for the list
-            const unread = res.data.filter((n: INotification) => !n.isRead);
-            setNotifications(unread);
-            setUnreadCount(unread.length);
-        } catch (error) {
-            console.error('Failed to fetch notifications', error);
-        }
-    };
-
     useEffect(() => {
         if (!currentUser) return;
 
-        fetchNotifications();
+        const unsubscribe = FirestoreService.subscribeToNotifications(currentUser.uid, (notifs) => {
+            const unread = notifs.filter(n => !n.isRead);
+            setNotifications(unread);
+            setUnreadCount(unread.length);
+        });
 
-        let socketInstance: any;
-        const initSocket = async () => {
-            socketInstance = await getSocket();
-            if (socketInstance) {
-                socketInstance.on('notification', (newNotif: INotification) => {
-                    const mappedNotif = { ...newNotif, _id: newNotif._id || Date.now().toString() };
-                    setNotifications(prev => [mappedNotif, ...prev]);
-                    setUnreadCount(prev => prev + 1);
-                });
-            }
-        };
-
-        initSocket();
-
-        return () => {
-            if (socketInstance) {
-                socketInstance.off('notification');
-                socketInstance.off('notification:new');
-            }
-        };
+        return () => unsubscribe();
     }, [currentUser]);
 
     const handleNotificationClick = async (id: string, currentlyRead: boolean) => {
-        // Optimistic update: Remove from list (Auto-delete behavior)
-        setNotifications(prev => prev.filter(n => n._id !== id));
-        setUnreadCount(prev => Math.max(0, prev - 1));
+        if (!id) return; // Should remove from list optimistically?
         setIsOpen(false);
 
-        if (!currentlyRead && id) {
+        if (!currentlyRead) {
             try {
-                await notificationAPI.markAsRead(id);
+                await FirestoreService.markNotificationRead(id);
             } catch (err) {
                 console.error('Failed to mark read', err);
             }
@@ -82,15 +45,12 @@ const NotificationDropdown = () => {
     };
 
     const handleClearAll = async () => {
+        // Not implemented in FirestoreService yet for batch
         setNotifications([]);
-        setUnreadCount(0);
-        try {
-            await notificationAPI.markAllAsRead();
-        } catch (err) {
-            console.error('Failed to clear all', err);
-            // Optionally revert state or show error
-            fetchNotifications(); // Sync back if failed
-        }
+        // Could loop over current notifications and mark read
+        notifications.forEach(async (n) => {
+            if (!n.isRead) await FirestoreService.markNotificationRead(n.id);
+        });
     };
 
     return (
@@ -115,7 +75,6 @@ const NotificationDropdown = () => {
                         <h3 className="font-black text-slate-900 uppercase tracking-wide text-xs">Notifications</h3>
                         <div className="flex gap-3">
                             <button onClick={handleClearAll} className="text-[10px] font-bold text-red-600 hover:text-red-800 uppercase tracking-wide">Clear All</button>
-                            <button onClick={fetchNotifications} className="text-[10px] font-bold text-green-600 hover:text-green-800 uppercase tracking-wide">Refresh</button>
                         </div>
                     </div>
                     <div className="max-h-96 overflow-y-auto">
@@ -124,15 +83,15 @@ const NotificationDropdown = () => {
                         ) : (
                             notifications.map(notif => (
                                 <div
-                                    key={notif._id}
+                                    key={notif.id}
                                     className={`p-3 border-b-2 border-slate-100 hover:bg-green-50 transition-colors cursor-pointer bg-white`}
-                                    onClick={() => handleNotificationClick(notif._id, notif.isRead)}
+                                    onClick={() => handleNotificationClick(notif.id, notif.isRead)}
                                 >
-                                    <Link href={notif.link || '#'} className="block">
+                                    <Link href={notif.actionUrl || '#'} className="block">
                                         <p className="text-sm font-bold text-slate-900">{notif.title}</p>
                                         <p className="text-xs text-slate-600 mt-1 line-clamp-2 font-medium">{notif.message}</p>
                                         <p className="text-[10px] text-slate-400 mt-2 font-mono h-4">
-                                            {notif.createdAt ? new Date(notif.createdAt).toLocaleDateString() : 'Just now'}
+                                            {notif.createdAt ? new Date(notif.createdAt.seconds * 1000).toLocaleDateString() : 'Just now'}
                                         </p>
                                     </Link>
                                 </div>

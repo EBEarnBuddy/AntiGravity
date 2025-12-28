@@ -8,8 +8,7 @@ import {
   signInWithEmailAndPassword
 } from 'firebase/auth';
 import { auth, googleProvider, isFirebaseConfigured } from '../lib/firebase';
-import { UserProfile } from '../lib/firestore'; // Keep type for now or replace
-import { userAPI } from '../lib/axios';
+import { UserProfile, FirestoreService } from '../lib/firestore';
 
 
 interface AuthContextType {
@@ -44,24 +43,45 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const createUserProfile = async (user: User, additionalData?: any) => {
     if (!user) return;
 
-    let retries = 3;
-    while (retries > 0) {
-      try {
-        // Sync with backend (creates or retrieves user)
-        const response = await userAPI.sync();
-        setUserProfile(response.data);
-        return; // Success, exit
-      } catch (error) {
-        console.error(`Error syncing user profile (attempts left: ${retries - 1}):`, error);
-        retries--;
-        if (retries === 0) {
-          // Final attempt failed, maybe set a global error state or just log
-          console.error("Critical: Failed to sync user profile after multiple attempts.");
-        } else {
-          // Wait a bit before retrying (exponential backoff could be better but simple 1s delay is fine)
-          await new Promise(resolve => setTimeout(resolve, 1000));
-        }
+    try {
+      // Check if profile exists
+      const existingProfile = await FirestoreService.getUserProfile(user.uid);
+      if (existingProfile) {
+        setUserProfile(existingProfile);
+        return;
       }
+
+      // Create new profile
+      const newProfile: Omit<UserProfile, 'id' | 'joinDate'> = {
+        uid: user.uid,
+        email: user.email || '',
+        displayName: additionalData?.displayName || user.displayName || 'User',
+        photoURL: user.photoURL || '',
+        skills: [],
+        interests: [],
+        joinedPods: [],
+        joinedRooms: [],
+        postedStartups: [],
+        postedGigs: [],
+        appliedGigs: [],
+        appliedStartups: [],
+        bookmarkedGigs: [],
+        bookmarkedStartups: [],
+        bookmarks: [],
+        activityLog: [],
+        rating: 0,
+        completedProjects: 0,
+        totalEarnings: '0',
+        onboardingCompleted: false,
+        createdAt: undefined as any, // FirestoreService handles this
+        updatedAt: undefined as any  // FirestoreService handles this
+      };
+
+      await FirestoreService.createUserProfile(newProfile);
+      const created = await FirestoreService.getUserProfile(user.uid);
+      setUserProfile(created);
+    } catch (error) {
+      console.error('Error syncing user profile:', error);
     }
   };
 
@@ -69,8 +89,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (!currentUser) return;
 
     try {
-      const response = await userAPI.updateMe(updates);
-      setUserProfile(response.data);
+      await FirestoreService.updateUserProfile(currentUser.uid, updates);
+      // Optimistic update locally or fetch again
+      setUserProfile(prev => prev ? { ...prev, ...updates } : null);
     } catch (error) {
       console.error('Error updating profile:', error);
       throw error;

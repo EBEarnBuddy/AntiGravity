@@ -23,7 +23,7 @@ import { usePods, useProjects, useStartups, useEvents, useBookmarks, useRooms } 
 import { FloatingCard } from '@/components/ui/floating-card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AdvancedSearch } from '@/components/ui/advanced-search';
-import { applicationAPI } from '@/lib/axios';
+import { FirestoreService } from '@/lib/firestore';
 import { TourReengagementBox } from '@/components/tour/TourReengagementBox';
 import CreateStartupModal from '@/components/CreateStartupModal';
 import CreateCircleModal from '@/components/CreateCircleModal';
@@ -60,9 +60,8 @@ export default function DiscoverPage() {
         const fetchApplications = async () => {
             if (!currentUser) return;
             try {
-                // Assuming this endpoint returns applications with populated opportunity details
-                const res = await applicationAPI.getMyApplications();
-                setMyApplications(res.data || []);
+                const apps = await FirestoreService.getUserApplications(currentUser.uid);
+                setMyApplications(apps);
             } catch (err) {
                 console.error("Failed to fetch applications", err);
             } finally {

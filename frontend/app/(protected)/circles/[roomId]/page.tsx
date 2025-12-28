@@ -23,12 +23,10 @@ import {
     X
 } from 'lucide-react';
 import useOnClickOutside from '@/hooks/useOnClickOutside';
-import { roomAPI } from '@/lib/axios'; // Import API for leaving
+import { FirestoreService } from '@/lib/firestore';
 import PendingRequestsModal from '@/components/PendingRequestsModal';
 import CollaborationRequestsModal from '@/components/CollaborationRequestsModal';
 import ChatSettingsModal from '@/components/ChatSettingsModal';
-import { getSocket } from '@/lib/socket';
-import { messageAPI } from '@/lib/axios';
 import { formatTimeAgo } from '@/lib/utils';
 import { UserAvatar } from '@/components/ui/UserAvatar';
 import { Linkify } from '@/components/ui/linkify';
@@ -261,7 +259,7 @@ const RoomChatPage: React.FC = () => {
         }
         if (currentUser && messages.length > 0) {
             // Mark as read handled by hook/socket now, but generic API call backup is fine
-            messageAPI.markAsRead(activeRoomId).catch(console.error);
+            FirestoreService.markMessagesAsRead(activeRoomId, currentUser.uid).catch(console.error);
         }
     }, [messages, activeRoomId, currentUser]);
 
@@ -464,9 +462,10 @@ const RoomChatPage: React.FC = () => {
                                 {!isAdmin && (
                                     <button
                                         onClick={async () => {
+                                            if (!currentUser) return;
                                             if (confirm('Are you sure you want to leave this circle?')) {
                                                 try {
-                                                    await roomAPI.leaveRoom(activeRoomId);
+                                                    await FirestoreService.leaveRoom(activeRoomId, currentUser.uid);
                                                     router.push('/circles');
                                                 } catch (e) {
                                                     console.error('Failed to leave:', e);

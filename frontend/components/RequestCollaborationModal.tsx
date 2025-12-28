@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Users, MessageSquare, Check, AlertTriangle } from 'lucide-react';
 import { useRooms } from '@/hooks/useFirestore';
-import { collaborationAPI } from '@/lib/axios';
+import { FirestoreService } from '@/lib/firestore';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface RequestCollaborationModalProps {
     isOpen: boolean;
@@ -14,6 +15,7 @@ interface RequestCollaborationModalProps {
 
 const RequestCollaborationModal: React.FC<RequestCollaborationModalProps> = ({ isOpen, onClose, targetCircleId, targetName, onSuccess }) => {
     const { myRooms, loading: loadingRooms } = useRooms();
+    const { currentUser } = useAuth();
     const [selectedCircleId, setSelectedCircleId] = useState<string>('');
     const [message, setMessage] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -40,7 +42,17 @@ const RequestCollaborationModal: React.FC<RequestCollaborationModalProps> = ({ i
         setError(null);
 
         try {
-            await collaborationAPI.sendRequest(selectedCircleId, targetCircleId, message);
+            if (!currentUser) throw new Error("You must be logged in.");
+            const selectedRoom = myRooms.find(r => r.id === selectedCircleId);
+
+            await FirestoreService.createCollaborationRequest({
+                fromCircleId: selectedCircleId,
+                toCircleId: targetCircleId,
+                fromCircleName: selectedRoom?.name || 'Unknown Circle',
+                toCircleName: targetName,
+                requestedBy: currentUser.uid,
+                message
+            });
             if (onSuccess) onSuccess();
             onClose();
             alert("Collaboration request sent successfully!");

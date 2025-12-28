@@ -348,6 +348,7 @@ const StartupsPage: React.FC = () => {
                                                                     {startup.status !== 'closed' && (
                                                                         <button onClick={(e) => { e.stopPropagation(); handleCloseOpportunity(startup.id || startup._id); }} className="w-full text-left px-4 py-3 text-xs font-black uppercase hover:bg-red-50 text-red-600 flex gap-2"><CloseIcon className="w-3 h-3" /> Close Opportunity</button>
                                                                     )}
+                                                                    <button onClick={(e) => { e.stopPropagation(); setShowCollabModal(true); setSelectedTargetStartup(startup); }} className="w-full text-left px-4 py-3 text-xs font-black uppercase hover:bg-purple-50 text-purple-700 flex gap-2"><Users className="w-3 h-3" /> Request Collaboration</button>
                                                                     <button onClick={(e) => { e.stopPropagation(); handleShare(startup); }} className="w-full text-left px-4 py-3 text-xs font-black uppercase hover:bg-slate-50 text-slate-900 flex gap-2"><Share className="w-3 h-3" /> Share Opportunity</button>
                                                                 </motion.div>
                                                             )}
@@ -389,18 +390,21 @@ const StartupsPage: React.FC = () => {
                             );
                         })}
                     </div>
-                )}
+                )
+                }
 
                 {/* Empty State */}
-                {!isLoading && activeTab !== 'discover' && displayItems.length === 0 && applications.length === 0 && (
-                    <div className="text-center py-20 border-4 border-dashed border-slate-300">
-                        <h3 className="text-2xl font-black text-slate-300 uppercase">No {activeTab} opportunities.</h3>
-                        <button onClick={() => setActiveTab('discover')} className="mt-4 text-green-600 font-bold hover:underline uppercase tracking-wide">
-                            Browse all opportunities
-                        </button>
-                    </div>
-                )}
-            </div>
+                {
+                    !isLoading && activeTab !== 'discover' && displayItems.length === 0 && applications.length === 0 && (
+                        <div className="text-center py-20 border-4 border-dashed border-slate-300">
+                            <h3 className="text-2xl font-black text-slate-300 uppercase">No {activeTab} opportunities.</h3>
+                            <button onClick={() => setActiveTab('discover')} className="mt-4 text-green-600 font-bold hover:underline uppercase tracking-wide">
+                                Browse all opportunities
+                            </button>
+                        </div>
+                    )
+                }
+            </div >
 
             {/* Footer */}
             {/* Footer */}
@@ -431,18 +435,20 @@ const StartupsPage: React.FC = () => {
             />
 
             {/* Share Modal */}
-            {selectedStartup && (
-                <ShareModal
-                    isOpen={showShareModal}
-                    onClose={() => {
-                        setShowShareModal(false);
-                        setSelectedStartup(null);
-                    }}
-                    title={selectedStartup.name || selectedStartup.title}
-                    url={typeof window !== 'undefined' ? `${window.location.origin}/startups/${selectedStartup.slug || selectedStartup.id || selectedStartup._id}` : ''}
-                    description={selectedStartup.description}
-                />
-            )}
+            {
+                selectedStartup && (
+                    <ShareModal
+                        isOpen={showShareModal}
+                        onClose={() => {
+                            setShowShareModal(false);
+                            setSelectedStartup(null);
+                        }}
+                        title={selectedStartup.name || selectedStartup.title}
+                        url={typeof window !== 'undefined' ? `${window.location.origin}/startups/${selectedStartup.slug || selectedStartup.id || selectedStartup._id}` : ''}
+                        description={selectedStartup.description}
+                    />
+                )
+            }
 
             <StartupApplicationModal
                 isOpen={showApplicationModal}
@@ -479,7 +485,7 @@ const StartupsPage: React.FC = () => {
                     setSelectedTargetStartup(null);
                 }}
             />
-        </div>
+        </div >
     );
 };
 
