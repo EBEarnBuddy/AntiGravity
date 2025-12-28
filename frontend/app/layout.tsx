@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Inter, League_Spartan } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
-import BackendHealthCheck from "@/components/BackendHealthCheck";
+
 
 const inter = Inter({
   subsets: ["latin"],
@@ -31,7 +31,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${inter.variable} ${leagueSpartan.variable} antialiased`}>
         <Providers>
-          <BackendHealthCheck />
+
           {children}
         </Providers>
       </body>
