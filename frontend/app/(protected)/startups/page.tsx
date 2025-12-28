@@ -199,7 +199,7 @@ const StartupsPage: React.FC = () => {
 
                 {/* Tabs */}
                 <div className="sticky top-[64px] z-10 bg-slate-50 pt-2 pb-4 mb-6">
-                    <div className="flex overflow-x-auto gap-3 pb-2 scrollbar-hide">
+                    <div className="flex overflow-x-auto gap-3 pb-2 scrollbar-hide md:justify-center">
                         <button
                             onClick={() => setActiveTab('discover')}
                             className={`px-6 py-2.5 font-black uppercase tracking-widest border-4 border-slate-900 transition-all text-xs whitespace-nowrap ${activeTab === 'discover'
@@ -306,6 +306,15 @@ const StartupsPage: React.FC = () => {
 
                                             {/* Actions (Bookmark/Share) */}
                                             <div className="flex gap-1 shrink-0">
+                                                <button
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        handleShare(startup);
+                                                    }}
+                                                    className="p-1.5 border-2 border-transparent hover:border-slate-900 hover:bg-slate-100 transition-all text-slate-400 hover:text-slate-900"
+                                                >
+                                                    <Share className="w-5 h-5" />
+                                                </button>
                                                 <button
                                                     onClick={() => {
                                                         if (startup.id || startup._id) toggleBookmark(startup.id || startup._id);
