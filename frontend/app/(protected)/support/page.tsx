@@ -27,8 +27,8 @@ export default function SupportPage() {
                             <MessageSquare className="w-6 h-6" />
                         </div>
                         <h3 className="font-black text-xl text-slate-900 mb-2 uppercase">Community</h3>
-                        <p className="text-slate-500 font-medium mb-4">Ask questions in our community discord.</p>
-                        <a href="#" className="text-blue-600 font-black hover:underline decoration-2 underline-offset-4">Join Discord</a>
+                        <p className="text-slate-500 font-medium mb-4">Ask questions in our support circle.</p>
+                        <a href="/circles/support-circle" className="text-blue-600 font-black hover:underline decoration-2 underline-offset-4">Join EB Support Circle</a>
                     </div>
                 </div>
 

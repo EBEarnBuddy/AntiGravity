@@ -116,228 +116,237 @@ export default function OnboardingPage() {
     const prevStep = () => setStep(prev => Math.max(prev - 1, 1));
 
     return (
-        <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-4 font-sans text-slate-800">
-            <div className="w-full max-w-2xl bg-white rounded-3xl shadow-xl overflow-hidden border border-slate-100 flex flex-col min-h-[600px]">
-                {/* Progress Bar */}
-                <div className="h-2 bg-slate-100 w-full">
-                    <div
-                        className="h-full bg-green-500 transition-all duration-500"
-                        style={{ width: `${(step / STEPS) * 100}%` }}
-                    />
-                </div>
-
-                <div className="p-8 md:p-12 flex-1 flex flex-col">
-                    {/* Header Animation Wrapper */}
-                    <div className="animate-in fade-in slide-in-from-top-4 duration-500 flex-1">
-
-                        {/* --- STEP 1: ROLE --- */}
-                        {step === 1 && (
-                            <div className="space-y-8">
-                                <div className="text-center space-y-2">
-                                    <h1 className="text-3xl font-black text-slate-900">Welcome to EarnBuddy! 🌿</h1>
-                                    <p className="text-slate-500 font-medium">Let's personalize your experience. Who are you?</p>
-                                </div>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    {ROLES.map((role) => {
-                                        const Icon = role.icon;
-                                        const isSelected = formData.role === role.id;
-                                        return (
-                                            <button
-                                                key={role.id}
-                                                onClick={() => setFormData({ ...formData, role: role.id })}
-                                                className={`p-6 rounded-xl border-2 text-left transition-all duration-200 flex flex-col gap-3 group
-                                                ${isSelected ? 'border-green-500 bg-green-50' : 'border-slate-200 hover:border-green-300 hover:bg-slate-50'}`}
-                                            >
-                                                <div className={`p-3 rounded-full w-fit ${isSelected ? 'bg-green-100 text-green-600' : 'bg-slate-100 text-slate-500'}`}>
-                                                    <Icon className="w-6 h-6" />
-                                                </div>
-                                                <div>
-                                                    <h3 className={`font-bold text-lg ${isSelected ? 'text-green-700' : 'text-slate-800'}`}>{role.label}</h3>
-                                                    <p className="text-sm text-slate-400 font-medium leading-tight">{role.desc}</p>
-                                                </div>
-                                            </button>
-                                        );
-                                    })}
-                                </div>
-                            </div>
-                        )}
-
-                        {/* --- STEP 2: SKILLS --- */}
-                        {step === 2 && (
-                            <div className="space-y-8">
-                                <div className="text-center space-y-2">
-                                    <h1 className="text-3xl font-black text-slate-900">What are your skills? 🛠️</h1>
-                                    <p className="text-slate-500 font-medium">Select skills you want to showcase.</p>
-                                </div>
-                                <div className="flex flex-wrap justify-center gap-3">
-                                    {SKILLS.map((item) => {
-                                        const isSelected = formData.skills.includes(item);
-                                        return (
-                                            <button
-                                                key={item}
-                                                onClick={() => handleMultiSelect('skills', item)}
-                                                className={`px-6 py-3 rounded-full font-bold text-sm border-2 transition-all
-                                                ${isSelected ? 'bg-green-600 border-green-600 text-white shadow-md transform scale-105' : 'bg-white border-slate-200 text-slate-600 hover:border-green-400 hover:text-green-600'}`}
-                                            >
-                                                {item}
-                                            </button>
-                                        );
-                                    })}
-                                </div>
-                            </div>
-                        )}
-
-                        {/* --- STEP 3: GOALS --- */}
-                        {step === 3 && (
-                            <div className="space-y-8">
-                                <div className="text-center space-y-2">
-                                    <h1 className="text-3xl font-black text-slate-900">What brings you here? 🎯</h1>
-                                    <p className="text-slate-500 font-medium">Select your primary goals.</p>
-                                </div>
-                                <div className="grid grid-cols-2 gap-4">
-                                    {GOALS.map((item) => {
-                                        const isSelected = formData.goals.includes(item.id);
-                                        return (
-                                            <button
-                                                key={item.id}
-                                                onClick={() => handleMultiSelect('goals', item.id)}
-                                                className={`p-6 rounded-xl border-2 text-center transition-all duration-200 group
-                                                ${isSelected ? 'border-green-500 bg-green-50' : 'border-slate-200 hover:border-green-300'}`}
-                                            >
-                                                <div className="text-4xl mb-3">{item.icon}</div>
-                                                <div className={`font-bold ${isSelected ? 'text-green-700' : 'text-slate-700'}`}>{item.label}</div>
-                                            </button>
-                                        );
-                                    })}
-                                </div>
-                            </div>
-                        )}
-
-                        {/* --- STEP 4: EXPERIENCE --- */}
-                        {step === 4 && (
-                            <div className="space-y-8">
-                                <div className="text-center space-y-2">
-                                    <h1 className="text-3xl font-black text-slate-900">Experience Level 📈</h1>
-                                    <p className="text-slate-500 font-medium">How would you describe your expertise?</p>
-                                </div>
-                                <div className="space-y-4">
-                                    {EXPERIENCE_LEVELS.map((exp) => (
-                                        <button
-                                            key={exp.id}
-                                            onClick={() => setFormData({ ...formData, experience: exp.id })}
-                                            className={`w-full p-4 rounded-xl border-2 flex items-center justify-between group transition-all
-                                            ${formData.experience === exp.id ? 'border-green-500 bg-green-50' : 'border-slate-200 hover:border-green-300'}`}
-                                        >
-                                            <div className="text-left">
-                                                <div className={`font-bold text-lg ${formData.experience === exp.id ? 'text-green-700' : 'text-slate-800'}`}>{exp.label}</div>
-                                                <div className="text-slate-400 text-sm">{exp.desc}</div>
-                                            </div>
-                                            {formData.experience === exp.id && <Check className="w-6 h-6 text-green-600" />}
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-
-                        {/* --- STEP 5: AVAILABILITY --- */}
-                        {step === 5 && (
-                            <div className="space-y-8">
-                                <div className="text-center space-y-2">
-                                    <h1 className="text-3xl font-black text-slate-900">Your Availability ⏰</h1>
-                                    <p className="text-slate-500 font-medium">How much time can you commit?</p>
-                                </div>
-                                <div className="space-y-4">
-                                    {AVAILABILITY.map((avail) => (
-                                        <button
-                                            key={avail.id}
-                                            onClick={() => setFormData({ ...formData, availability: avail.id })}
-                                            className={`w-full p-4 rounded-xl border-2 flex items-center justify-between group transition-all
-                                            ${formData.availability === avail.id ? 'border-green-500 bg-green-50' : 'border-slate-200 hover:border-green-300'}`}
-                                        >
-                                            <div className="text-left">
-                                                <div className={`font-bold text-lg ${formData.availability === avail.id ? 'text-green-700' : 'text-slate-800'}`}>{avail.label}</div>
-                                                <div className="text-slate-400 text-sm">{avail.desc}</div>
-                                            </div>
-                                            <Clock className={`w-6 h-6 ${formData.availability === avail.id ? 'text-green-600' : 'text-slate-300'}`} />
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-
-                        {/* --- STEP 6: TOUR OPT-IN --- */}
-                        {step === 6 && (
-                            <div className="space-y-8">
-                                <div className="text-center space-y-2">
-                                    <h1 className="text-3xl font-black text-slate-900">One Last Thing! 🧭</h1>
-                                    <p className="text-slate-500 font-medium">Would you like a quick tour of the app?</p>
-                                </div>
-                                <div className="grid grid-cols-2 gap-6 h-64">
-                                    <button
-                                        onClick={() => setFormData({ ...formData, wantsTour: true })}
-                                        className={`rounded-2xl border-2 flex flex-col items-center justify-center gap-4 transition-all
-                                        ${formData.wantsTour === true ? 'border-green-500 bg-green-50 shadow-lg scale-105' : 'border-slate-200 hover:border-green-300'}`}
-                                    >
-                                        <div className="text-6xl">✨</div>
-                                        <div className="font-black text-xl text-slate-800">Yes, show me around!</div>
-                                    </button>
-                                    <button
-                                        onClick={() => setFormData({ ...formData, wantsTour: false })}
-                                        className={`rounded-2xl border-2 flex flex-col items-center justify-center gap-4 transition-all
-                                        ${formData.wantsTour === false ? 'border-slate-500 bg-slate-100 shadow-lg scale-105' : 'border-slate-200 hover:border-slate-400'}`}
-                                    >
-                                        <div className="text-6xl">🙅</div>
-                                        <div className="font-bold text-xl text-slate-600">No, I'll explore myself</div>
-                                    </button>
-                                </div>
-                            </div>
-                        )}
-                    </div>
-
-                    {/* Navigation Buttons */}
-                    <div className="flex gap-4 pt-8 mt-auto">
-                        {step > 1 && (
-                            <button
-                                onClick={prevStep}
-                                className="flex-1 py-4 bg-white border-2 border-slate-200 text-slate-600 font-bold rounded-xl hover:bg-slate-50 transition-all shadow-sm"
-                            >
-                                Back
-                            </button>
-                        )}
-
-                        {step < STEPS ? (
-                            <button
-                                onClick={nextStep}
-                                // Validation for each step
-                                disabled={
-                                    (step === 1 && !formData.role) ||
-                                    (step === 2 && formData.skills.length === 0) ||
-                                    (step === 3 && formData.goals.length === 0) ||
-                                    (step === 4 && !formData.experience) ||
-                                    (step === 5 && !formData.availability)
-                                }
-                                className="flex-[2] py-4 bg-green-600 text-white font-bold rounded-xl hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-md flex items-center justify-center gap-2"
-                            >
-                                Continue <ArrowRight className="w-5 h-5" />
-                            </button>
-                        ) : (
-                            <button
-                                onClick={handleComplete}
-                                disabled={loading || formData.wantsTour === null}
-                                className="flex-[2] py-4 bg-green-600 text-white font-bold rounded-xl hover:bg-green-700 disabled:opacity-70 transition-all shadow-md flex items-center justify-center gap-2"
-                            >
-                                {loading ? (
-                                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                                ) : (
-                                    "Get Started"
-                                )}
-                            </button>
-                        )}
+        <div className="min-h-screen bg-slate-50 font-sans text-slate-900 flex flex-col">
+            {/* Header */}
+            <div className="w-full bg-white border-b-4 border-slate-900 p-4">
+                <div className="max-w-4xl mx-auto flex justify-between items-center">
+                    <h1 className="text-2xl font-black uppercase tracking-tighter">EarnBuddy Setup</h1>
+                    <div className="text-sm font-bold bg-slate-100 px-3 py-1 border-2 border-slate-900">
+                        Step {step} of {STEPS}
                     </div>
                 </div>
             </div>
 
-            <p className="mt-8 text-xs text-slate-400 font-bold tracking-widest uppercase">EarnBuddy © 2025</p>
+            <div className="flex-1 flex items-center justify-center p-4">
+                <div className="w-full max-w-2xl bg-white border-4 border-slate-900 shadow-[8px_8px_0px_0px_rgba(15,23,42,1)] p-8 md:p-12 relative flex flex-col min-h-[600px]">
+                    {/* Progress Bar */}
+                    <div className="absolute top-0 left-0 h-4 bg-slate-100 w-full border-b-4 border-slate-900">
+                        <div
+                            className="h-full bg-green-500 transition-all duration-300 border-r-4 border-slate-900"
+                            style={{ width: `${(step / STEPS) * 100}%` }}
+                        />
+                    </div>
+
+                    <div className="mt-6 flex-1 flex flex-col">
+                        {/* Header Animation Wrapper */}
+                        <div className="animate-in fade-in slide-in-from-top-4 duration-500 flex-1">
+
+                            {/* --- STEP 1: ROLE --- */}
+                            {step === 1 && (
+                                <div className="space-y-8">
+                                    <div className="text-center space-y-4">
+                                        <h1 className="text-4xl font-black text-slate-900 uppercase tracking-tighter">Who are you?</h1>
+                                        <p className="text-slate-600 font-bold text-lg">Choose your primary role.</p>
+                                    </div>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        {ROLES.map((role) => {
+                                            const Icon = role.icon;
+                                            const isSelected = formData.role === role.id;
+                                            return (
+                                                <button
+                                                    key={role.id}
+                                                    onClick={() => setFormData({ ...formData, role: role.id })}
+                                                    className={`p-6 border-4 text-left transition-all duration-200 flex flex-col gap-3 group
+                                                ${isSelected ? 'border-slate-900 bg-green-400 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] translate-x-[2px] translate-y-[2px]' : 'border-slate-200 hover:border-slate-900 hover:bg-slate-50'}`}
+                                                >
+                                                    <div className={`p-3 border-2 border-slate-900 w-fit ${isSelected ? 'bg-white text-slate-900' : 'bg-slate-100 text-slate-500'}`}>
+                                                        <Icon className="w-6 h-6" />
+                                                    </div>
+                                                    <div>
+                                                        <h3 className={`font-black text-xl uppercase tracking-wide ${isSelected ? 'text-slate-900' : 'text-slate-800'}`}>{role.label}</h3>
+                                                        <p className={`text-sm font-bold ${isSelected ? 'text-slate-800' : 'text-slate-500'}`}>{role.desc}</p>
+                                                    </div>
+                                                </button>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* --- STEP 2: SKILLS --- */}
+                            {step === 2 && (
+                                <div className="space-y-8">
+                                    <div className="text-center space-y-4">
+                                        <h1 className="text-4xl font-black text-slate-900 uppercase tracking-tighter">Your Skills</h1>
+                                        <p className="text-slate-600 font-bold text-lg">What brings you to the table?</p>
+                                    </div>
+                                    <div className="flex flex-wrap justify-center gap-3">
+                                        {SKILLS.map((item) => {
+                                            const isSelected = formData.skills.includes(item);
+                                            return (
+                                                <button
+                                                    key={item}
+                                                    onClick={() => handleMultiSelect('skills', item)}
+                                                    className={`px-6 py-3 font-black text-sm border-2 transition-all uppercase tracking-wide
+                                                ${isSelected ? 'bg-slate-900 border-slate-900 text-white shadow-[4px_4px_0px_0px_rgba(34,197,94,1)]' : 'bg-white border-slate-200 text-slate-600 hover:border-slate-900 hover:text-slate-900'}`}
+                                                >
+                                                    {item}
+                                                </button>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* --- STEP 3: GOALS --- */}
+                            {step === 3 && (
+                                <div className="space-y-8">
+                                    <div className="text-center space-y-4">
+                                        <h1 className="text-4xl font-black text-slate-900 uppercase tracking-tighter">Your Goals</h1>
+                                        <p className="text-slate-600 font-bold text-lg">What do you want to achieve?</p>
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        {GOALS.map((item) => {
+                                            const isSelected = formData.goals.includes(item.id);
+                                            return (
+                                                <button
+                                                    key={item.id}
+                                                    onClick={() => handleMultiSelect('goals', item.id)}
+                                                    className={`p-6 border-4 text-center transition-all duration-200 group
+                                                ${isSelected ? 'border-slate-900 bg-green-400 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]' : 'border-slate-200 hover:border-slate-900'}`}
+                                                >
+                                                    <div className={`font-black text-lg uppercase tracking-wide ${isSelected ? 'text-slate-900' : 'text-slate-700'}`}>{item.label}</div>
+                                                </button>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* --- STEP 4: EXPERIENCE --- */}
+                            {step === 4 && (
+                                <div className="space-y-8">
+                                    <div className="text-center space-y-4">
+                                        <h1 className="text-4xl font-black text-slate-900 uppercase tracking-tighter">Experience Level</h1>
+                                        <p className="text-slate-600 font-bold text-lg">Rate your expertise.</p>
+                                    </div>
+                                    <div className="space-y-4">
+                                        {EXPERIENCE_LEVELS.map((exp) => (
+                                            <button
+                                                key={exp.id}
+                                                onClick={() => setFormData({ ...formData, experience: exp.id })}
+                                                className={`w-full p-4 border-4 flex items-center justify-between group transition-all
+                                            ${formData.experience === exp.id ? 'border-slate-900 bg-purple-100 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]' : 'border-slate-200 hover:border-slate-900'}`}
+                                            >
+                                                <div className="text-left">
+                                                    <div className={`font-black text-xl uppercase tracking-wide ${formData.experience === exp.id ? 'text-slate-900' : 'text-slate-800'}`}>{exp.label}</div>
+                                                    <div className="text-slate-500 font-bold text-sm">{exp.desc}</div>
+                                                </div>
+                                                {formData.experience === exp.id && <Check className="w-8 h-8 text-slate-900" strokeWidth={3} />}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* --- STEP 5: AVAILABILITY --- */}
+                            {step === 5 && (
+                                <div className="space-y-8">
+                                    <div className="text-center space-y-4">
+                                        <h1 className="text-4xl font-black text-slate-900 uppercase tracking-tighter">Availability</h1>
+                                        <p className="text-slate-600 font-bold text-lg">Your time commitment.</p>
+                                    </div>
+                                    <div className="space-y-4">
+                                        {AVAILABILITY.map((avail) => (
+                                            <button
+                                                key={avail.id}
+                                                onClick={() => setFormData({ ...formData, availability: avail.id })}
+                                                className={`w-full p-4 border-4 flex items-center justify-between group transition-all
+                                            ${formData.availability === avail.id ? 'border-slate-900 bg-yellow-100 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]' : 'border-slate-200 hover:border-slate-900'}`}
+                                            >
+                                                <div className="text-left">
+                                                    <div className={`font-black text-xl uppercase tracking-wide ${formData.availability === avail.id ? 'text-slate-900' : 'text-slate-800'}`}>{avail.label}</div>
+                                                    <div className="text-slate-500 font-bold text-sm">{avail.desc}</div>
+                                                </div>
+                                                <Clock className={`w-8 h-8 ${formData.availability === avail.id ? 'text-slate-900' : 'text-slate-300'}`} strokeWidth={3} />
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* --- STEP 6: TOUR OPT-IN --- */}
+                            {step === 6 && (
+                                <div className="space-y-8">
+                                    <div className="text-center space-y-4">
+                                        <h1 className="text-4xl font-black text-slate-900 uppercase tracking-tighter">App Tour</h1>
+                                        <p className="text-slate-600 font-bold text-lg">Take a quick tour?</p>
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-6 h-64">
+                                        <button
+                                            onClick={() => setFormData({ ...formData, wantsTour: true })}
+                                            className={`border-4 flex flex-col items-center justify-center gap-4 transition-all
+                                        ${formData.wantsTour === true ? 'border-slate-900 bg-green-400 shadow-[6px_6px_0px_0px_rgba(15,23,42,1)] translate-x-[2px] translate-y-[2px]' : 'border-slate-200 hover:border-slate-900'}`}
+                                        >
+                                            <div className="font-black text-2xl text-slate-900 uppercase tracking-wide">Yes</div>
+                                            <p className="text-sm font-bold text-slate-700">Show me around</p>
+                                        </button>
+                                        <button
+                                            onClick={() => setFormData({ ...formData, wantsTour: false })}
+                                            className={`border-4 flex flex-col items-center justify-center gap-4 transition-all
+                                        ${formData.wantsTour === false ? 'border-slate-900 bg-slate-200 shadow-[6px_6px_0px_0px_rgba(15,23,42,1)] translate-x-[2px] translate-y-[2px]' : 'border-slate-200 hover:border-slate-900'}`}
+                                        >
+                                            <div className="font-black text-2xl text-slate-900 uppercase tracking-wide">No</div>
+                                            <p className="text-sm font-bold text-slate-500">I'll explore myself</p>
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Navigation Buttons */}
+                        <div className="flex gap-4 pt-8 mt-auto">
+                            {step > 1 && (
+                                <button
+                                    onClick={prevStep}
+                                    className="flex-1 py-4 bg-white border-2 border-slate-900 text-slate-900 font-black uppercase tracking-wide hover:bg-slate-50 transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px]"
+                                >
+                                    Back
+                                </button>
+                            )}
+
+                            {step < STEPS ? (
+                                <button
+                                    onClick={nextStep}
+                                    // Validation for each step
+                                    disabled={
+                                        (step === 1 && !formData.role) ||
+                                        (step === 2 && formData.skills.length === 0) ||
+                                        (step === 3 && formData.goals.length === 0) ||
+                                        (step === 4 && !formData.experience) ||
+                                        (step === 5 && !formData.availability)
+                                    }
+                                    className="flex-[2] py-4 bg-slate-900 text-white font-black uppercase tracking-wide border-2 border-slate-900 hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] flex items-center justify-center gap-2"
+                                >
+                                    Continue <ArrowRight className="w-5 h-5" />
+                                </button>
+                            ) : (
+                                <button
+                                    onClick={handleComplete}
+                                    disabled={loading || formData.wantsTour === null}
+                                    className="flex-[2] py-4 bg-green-500 text-slate-900 font-black uppercase tracking-wide border-2 border-slate-900 hover:bg-green-400 disabled:opacity-70 transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] flex items-center justify-center gap-2"
+                                >
+                                    {loading ? (
+                                        <div className="w-5 h-5 border-2 border-slate-900 border-t-transparent rounded-full animate-spin" />
+                                    ) : (
+                                        "Get Started"
+                                    )}
+                                </button>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     );
 }

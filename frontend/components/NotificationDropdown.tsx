@@ -7,6 +7,7 @@ import { notificationAPI } from '../lib/axios';
 import { Bell } from 'lucide-react';
 import Link from 'next/link';
 import useOnClickOutside from '../hooks/useOnClickOutside';
+import { motion } from 'framer-motion';
 
 interface INotification {
     _id: string;
@@ -94,9 +95,11 @@ const NotificationDropdown = () => {
 
     return (
         <div className="relative" ref={wrapperRef}>
-            <button
+            <motion.button
                 onClick={() => setIsOpen(!isOpen)}
-                className="relative p-2 text-white hover:text-green-100 transition-all hover:scale-110"
+                className="relative p-2 text-white hover:text-green-100 transition-colors"
+                animate={unreadCount > 0 ? { scale: [1, 1.2, 1] } : {}}
+                transition={{ duration: 0.3 }}
             >
                 <Bell className="w-6 h-6 text-white" />
                 {unreadCount > 0 && (
@@ -104,7 +107,7 @@ const NotificationDropdown = () => {
                         {unreadCount > 5 ? '5+' : unreadCount}
                     </span>
                 )}
-            </button>
+            </motion.button>
 
             {isOpen && (
                 <div className="absolute right-0 mt-2 w-80 bg-white border-2 border-slate-900 rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-200">

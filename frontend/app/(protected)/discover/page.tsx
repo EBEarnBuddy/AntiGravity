@@ -89,8 +89,8 @@ export default function DiscoverPage() {
     const quickActions = [
         { title: 'Find Projects', icon: Briefcase, path: '/freelance', color: 'bg-emerald-500', badge: 'Coming Soon' },
         { title: 'Trending Circles', icon: Users, path: '/circles', color: 'bg-blue-500', badge: 'Hot' },
-        { title: 'Browse Startups', icon: Rocket, path: '/startups', color: 'bg-purple-500' },
-        { title: 'Events', icon: Calendar, path: '/events', color: 'bg-orange-500', badge: 'New' },
+        { title: 'Browse Startups', icon: Rocket, path: '/startups', color: 'bg-purple-500', badge: 'Trending' },
+        { title: 'Events', icon: Calendar, path: '/events', color: 'bg-orange-500', badge: 'Coming Soon' },
     ];
 
 

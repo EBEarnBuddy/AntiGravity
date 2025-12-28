@@ -12,7 +12,7 @@ export default function EventsPage() {
                 </div>
 
                 <div className="space-y-4">
-                    <h1 className="text-4xl font-black text-slate-900 uppercase tracking-tight">Events Coming Soon! 📅</h1>
+                    <h1 className="text-4xl font-black text-slate-900 uppercase tracking-tight">Events Coming Soon!</h1>
                     <p className="text-slate-500 font-bold text-lg">We're getting the party started. Check back later for hackathons, meetups, and workshops.</p>
                 </div>
 

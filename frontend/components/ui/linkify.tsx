@@ -12,7 +12,10 @@ interface LinkifyProps {
 export const Linkify: React.FC<LinkifyProps> = ({ children, className = "text-green-600 hover:underline" }) => {
     if (!children) return null;
 
-    const urlRegex = /(https?:\/\/[^\s]+)/g;
+    // URL Parsing Regex: matches http/https OR www.
+    // Group 1: Protocol (optional)
+    // Group 2: Domain + Path
+    const urlRegex = /((?:https?:\/\/|www\.)[^\s]+)/g;
     const parts = children.split(urlRegex);
 
     return (
@@ -22,7 +25,7 @@ export const Linkify: React.FC<LinkifyProps> = ({ children, className = "text-gr
                     return (
                         <a
                             key={index}
-                            href={part}
+                            href={part.startsWith('www.') ? `https://${part}` : part}
                             target="_blank"
                             rel="noopener noreferrer"
                             className={className}
