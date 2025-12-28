@@ -546,7 +546,7 @@ const RoomChatPage: React.FC = () => {
                                                             href={part}
                                                             target="_blank"
                                                             rel="noopener noreferrer"
-                                                            className="text-yellow-300 hover:text-yellow-200 underline mx-1"
+                                                            className="text-yellow-300 hover:text-white underline mx-1"
                                                         >
                                                             {part}
                                                         </a>
@@ -648,7 +648,7 @@ const RoomChatPage: React.FC = () => {
                                                                 </button>
                                                             );
                                                         }
-                                                        return <Linkify key={i}>{part}</Linkify>;
+                                                        return <Linkify key={i} className={isMe ? "text-yellow-300 hover:text-white underline" : "text-purple-600 hover:text-purple-800 underline"}>{part}</Linkify>;
                                                     })}
                                                 </div>
                                             )}
