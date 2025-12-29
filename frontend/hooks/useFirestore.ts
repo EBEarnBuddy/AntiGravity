@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Pod, PodPost, ChatRoom as Room, Startup, Gig, Notification, ChatMessage, UserAnalytics, Application, FirestoreService } from '../lib/firestore'; // Keep types for now
 import { useAuth } from '../contexts/AuthContext';
+import api from '../lib/api';
 
 
 // Custom hooks for Firestore operations
@@ -39,12 +40,24 @@ export const useRooms = () => {
     const fetchRooms = async () => {
       try {
         setLoading(true);
-        const [publicRooms, userRooms] = await Promise.all([
-          FirestoreService.getPublicRooms(),
-          currentUser ? FirestoreService.getRooms(currentUser.uid) : Promise.resolve([])
-        ]);
-        setRooms(publicRooms);
-        setMyRooms(userRooms);
+
+        let pRooms: Room[] = [];
+        let uRooms: Room[] = [];
+
+        try {
+          const pubRes = await api.get('/rooms');
+          pRooms = pubRes.data.map((r: any) => ({ ...r, id: r._id }));
+        } catch (e) { console.error("Error fetching public rooms", e); }
+
+        if (currentUser) {
+          try {
+            const myRes = await api.get('/rooms/me');
+            uRooms = myRes.data.map((r: any) => ({ ...r, id: r._id }));
+          } catch (e) { console.error("Error fetching my rooms", e); }
+        }
+
+        setRooms(pRooms);
+        setMyRooms(uRooms);
       } catch (err: any) {
         setError(err.message || 'Failed to fetch rooms');
       } finally {
@@ -52,23 +65,17 @@ export const useRooms = () => {
       }
     };
     fetchRooms();
-    // Realtime listeners removed for now, or could use onSnapshot if implemented in FirestoreService for rooms list
   }, [currentUser]);
 
   const createRoom = async (roomData: any) => {
     if (!currentUser) return;
     try {
-      const enhancedData = {
-        ...roomData,
-        createdBy: currentUser.uid,
-        members: [currentUser.uid]
-      };
-      await FirestoreService.createRoom(enhancedData);
-      // Optimistic or refetch
-      const userRooms = await FirestoreService.getRooms(currentUser.uid);
-      setMyRooms(userRooms);
-      const publicRooms = await FirestoreService.getPublicRooms();
-      setRooms(publicRooms);
+      await api.post('/rooms', roomData);
+      // Refresh
+      const myRes = await api.get('/rooms/me');
+      setMyRooms(myRes.data.map((r: any) => ({ ...r, id: r._id })));
+      const pubRes = await api.get('/rooms');
+      setRooms(pubRes.data.map((r: any) => ({ ...r, id: r._id })));
     } catch (err: any) {
       setError(err.message || 'Failed to create room');
       throw err;
@@ -78,10 +85,9 @@ export const useRooms = () => {
   const joinRoom = async (roomId: string) => {
     if (!currentUser) return;
     try {
-      await FirestoreService.joinRoom(roomId, currentUser.uid);
-      // Refetch
-      const userRooms = await FirestoreService.getRooms(currentUser.uid);
-      setMyRooms(userRooms);
+      await api.post(`/rooms/${roomId}/join`);
+      const myRes = await api.get('/rooms/me');
+      setMyRooms(myRes.data.map((r: any) => ({ ...r, id: r._id })));
     } catch (err: any) {
       setError(err.message || 'Failed to join room');
     }
@@ -198,7 +204,9 @@ export const useStartups = () => {
   const fetchStartups = async () => {
     try {
       setLoading(true);
-      const data = await FirestoreService.getStartups();
+      // const data = await FirestoreService.getStartups();
+      const response = await api.get('/opportunities?type=startup');
+      const data = response.data.map((item: any) => ({ ...item, id: item._id }));
       setStartups(data);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to fetch startups');
@@ -323,7 +331,15 @@ export const useMyApplications = () => {
       if (!currentUser) return;
       try {
         setLoading(true);
-        const apps = await FirestoreService.getUserApplications(currentUser.uid);
+        // const apps = await FirestoreService.getUserApplications(currentUser.uid);
+        const response = await api.get('/applications/me');
+        const apps = response.data.map((app: any) => ({
+          ...app,
+          id: app._id,
+          // Map backend status to frontend expectations if needed, usually matches
+          // Backend populated opportunity is just an ID or object?
+          // Route says: .populate('opportunity')
+        }));
         setApplications(apps);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to fetch applications');
@@ -332,7 +348,7 @@ export const useMyApplications = () => {
       }
     };
     fetchApplications();
-  }, []);
+  }, [currentUser]);
 
   return { applications, loading, error };
 };
@@ -347,7 +363,9 @@ export const useProjects = () => {
     const fetchProjects = async () => {
       try {
         setLoading(true);
-        const data = await FirestoreService.getProjects();
+        // const data = await FirestoreService.getProjects();
+        const response = await api.get('/opportunities?type=freelance');
+        const data = response.data.map((item: any) => ({ ...item, id: item._id }));
         setProjects(data);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to fetch projects');
@@ -435,16 +453,31 @@ export const useNotifications = () => {
 
   useEffect(() => {
     if (!currentUser) return;
-    const unsubscribe = FirestoreService.subscribeToNotifications(currentUser.uid, (notifs) => {
-      setNotifications(notifs);
-      setLoading(false);
-    });
-    return () => unsubscribe();
+
+    // Polling based since we are using REST API now
+    const fetchNotifications = async () => {
+      try {
+        const response = await api.get('/notifications');
+        const data = response.data.map((item: any) => ({ ...item, id: item._id }));
+        setNotifications(data);
+        setLoading(false);
+      } catch (e) {
+        console.error(e);
+        setError('Failed to fetch notifications');
+      }
+    };
+
+    fetchNotifications();
+    const interval = setInterval(fetchNotifications, 30000); // Poll every 30s
+    return () => clearInterval(interval);
   }, [currentUser]);
 
   const markAsRead = async (id: string) => {
     try {
-      await FirestoreService.markNotificationRead(id);
+      // await FirestoreService.markNotificationRead(id);
+      await api.put(`/notifications/${id}/read`);
+      // Update local state
+      setNotifications(prev => prev.map(n => n.id === id ? { ...n, isRead: true } : n));
     } catch (e) {
       console.error(e);
     }

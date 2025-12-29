@@ -9,6 +9,7 @@ import {
 } from 'firebase/auth';
 import { auth, googleProvider, isFirebaseConfigured } from '../lib/firebase';
 import { UserProfile, FirestoreService } from '../lib/firestore';
+import api from '../lib/api';
 
 
 interface AuthContextType {
@@ -44,44 +45,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (!user) return;
 
     try {
-      // Check if profile exists
-      const existingProfile = await FirestoreService.getUserProfile(user.uid);
-      if (existingProfile) {
-        setUserProfile(existingProfile);
-        return;
-      }
+      // Sync user with backend
+      const response = await api.post('/users/sync', {
+        displayName: additionalData?.displayName || user.displayName,
+        photoURL: user.photoURL,
+        email: user.email
+      });
 
-      // Create new profile
-      const newProfile: Omit<UserProfile, 'id' | 'joinDate'> = {
-        uid: user.uid,
-        email: user.email || '',
-        displayName: additionalData?.displayName || user.displayName || 'User',
-        photoURL: user.photoURL || '',
-        skills: [],
-        interests: [],
-        joinedPods: [],
-        joinedRooms: [],
-        postedStartups: [],
-        postedGigs: [],
-        appliedGigs: [],
-        appliedStartups: [],
-        bookmarkedGigs: [],
-        bookmarkedStartups: [],
-        bookmarks: [],
-        activityLog: [],
-        rating: 0,
-        completedProjects: 0,
-        totalEarnings: '0',
-        onboardingCompleted: false,
-        createdAt: undefined as any, // FirestoreService handles this
-        updatedAt: undefined as any  // FirestoreService handles this
+      const backendUser = response.data;
+      // Map backend user to UserProfile interface
+      const profile: UserProfile = {
+        ...backendUser,
+        id: backendUser._id,
+        uid: backendUser.firebaseUid
       };
 
-      await FirestoreService.createUserProfile(newProfile);
-      const created = await FirestoreService.getUserProfile(user.uid);
-      setUserProfile(created);
+      setUserProfile(profile);
     } catch (error) {
       console.error('Error syncing user profile:', error);
+      // Fallback or retry logic could be added here
     }
   };
 
@@ -89,9 +71,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (!currentUser) return;
 
     try {
-      await FirestoreService.updateUserProfile(currentUser.uid, updates);
+      // await FirestoreService.updateUserProfile(currentUser.uid, updates);
+      const response = await api.put('/users/me', updates);
+      const backendUser = response.data;
       // Optimistic update locally or fetch again
-      setUserProfile(prev => prev ? { ...prev, ...updates } : null);
+      setUserProfile(prev => prev ? { ...prev, ...updates, ...backendUser } : null);
     } catch (error) {
       console.error('Error updating profile:', error);
       throw error;
