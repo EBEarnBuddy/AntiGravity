@@ -71,10 +71,10 @@ export const SignInPage: React.FC<SignInPageProps> = ({
     const [showPassword, setShowPassword] = useState(false);
 
     return (
-        <div className="h-[100dvh] flex flex-col md:flex-row font-sans w-[100dvw] bg-white">
+        <div className="h-[100dvh] flex flex-col md:flex-row font-sans w-[100dvw] bg-white overflow-hidden">
             {/* Left column: sign-in form */}
-            <section className="flex-1 flex flex-col items-center justify-center p-8 z-10 bg-white overflow-y-auto h-full min-h-0">
-                <div className="w-full max-w-md">
+            <section className="flex-1 flex flex-col items-center justify-center p-8 z-10 bg-white overflow-y-auto md:overflow-hidden h-full min-h-0">
+                <div className="w-full max-w-md md:scale-[0.70] md:origin-center">
                     <div className="flex flex-col gap-6">
                         <div className="mb-4 animate-element animate-delay-100 flex items-center gap-2 font-black text-2xl text-slate-900 uppercase tracking-tight">
                             {/* Logo */}
