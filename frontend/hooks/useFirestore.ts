@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from 'react';
-import { Pod, PodPost, ChatRoom as Room, Startup, Gig, Notification, ChatMessage, UserAnalytics, Application, FirestoreService, OnboardingData } from '../lib/firestore';
+import { Pod, PodPost, ChatRoom as Room, Startup, Gig, Notification, ChatMessage, UserAnalytics, Application, FirestoreService } from '../lib/firestore'; // Keep types for now
 import { useAuth } from '../contexts/AuthContext';
 
 
@@ -411,7 +411,7 @@ export const useCommunityPosts = () => {
 };
 
 // Enhanced Pod Posts
-export const useEnhancedPodPosts = (_podId: string) => {
+export const useEnhancedPodPosts = (podId: string) => {
   return { posts: [], loading: false, error: null, createPost: async () => { } };
 };
 
@@ -420,7 +420,7 @@ export const useEnhancedPodPosts = (_podId: string) => {
 export const useNotifications = () => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const { currentUser } = useAuth();
 
   useEffect(() => {
@@ -470,7 +470,7 @@ export const useEvents = (limit?: number) => {
 };
 
 export const useBookmarks = () => {
-  const { userProfile } = useAuth();
+  const { userProfile, updateProfile } = useAuth();
   const [loading, setLoading] = useState(false);
 
   const toggleBookmark = async (opportunityId: string) => {
@@ -498,7 +498,7 @@ export const useBookmarks = () => {
 };
 
 export const useOnboarding = () => {
-  const saveOnboardingResponse = async (data: OnboardingData) => {
+  const saveOnboardingResponse = async (data: any) => {
     try {
       await FirestoreService.saveOnboardingResponse(data);
     } catch (error) {

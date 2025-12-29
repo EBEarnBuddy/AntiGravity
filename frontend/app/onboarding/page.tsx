@@ -128,6 +128,7 @@ export default function OnboardingPage() {
             window.location.href = '/discover';
         } catch (error) {
             console.error("Onboarding error:", error);
+            alert("Setup failed: " + (error as any).message);
         } finally {
             setLoading(false);
         }

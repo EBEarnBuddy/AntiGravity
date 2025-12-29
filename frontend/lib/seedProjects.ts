@@ -1,4 +1,5 @@
-import { FirestoreService, Gig } from './firestore';
+import { FirestoreService, Gig, ProjectRole } from './firestore';
+import { serverTimestamp } from 'firebase/firestore';
 
 // Sample permanent projects to seed the database
 const permanentProjects: Omit<Gig, 'id' | 'createdAt' | 'updatedAt' | 'totalApplicants'>[] = [
