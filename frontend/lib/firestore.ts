@@ -113,6 +113,7 @@ export interface Gig {
   urgency: 'low' | 'medium' | 'high';
   featured: boolean;
   tags: string[];
+  circleId?: string;
 }
 
 export interface ProjectRole {
@@ -188,6 +189,7 @@ export interface Startup {
     displayName: string;
     photoURL?: string;
   };
+  circleId?: string;
 }
 
 export interface StartupRole {
@@ -256,6 +258,8 @@ export interface ChatRoom {
   };
   pendingMembers?: string[];
   memberCount?: number;
+  linkedEntityId?: string;
+  linkedEntityType?: 'gig' | 'startup' | 'community';
 }
 
 export interface ChatMessage {
@@ -1242,16 +1246,49 @@ export class FirestoreService {
   }
 
   // Gigs
-  static async createProject(projectData: Omit<Gig, 'id' | 'createdAt' | 'updatedAt' | 'totalApplicants'>): Promise<string> {
-    const docRef = await addDoc(collection(db, 'gigs'), {
+  static async createProject(projectData: Omit<Gig, 'id' | 'createdAt' | 'updatedAt' | 'totalApplicants'>, userId: string): Promise<string> {
+    const batch = writeBatch(db);
+
+    // 1. Create Project Reference
+    const projectRef = doc(collection(db, 'gigs'));
+
+    // 2. Create Circle Reference
+    const roomRef = doc(collection(db, 'rooms'));
+
+    // 3. Set Circle Data
+    batch.set(roomRef, {
+      name: projectData.title,
+      description: `Discussion circle for ${projectData.title}`,
+      members: [userId],
+      createdBy: userId,
+      createdAt: serverTimestamp(),
+      lastActivity: serverTimestamp(),
+      isPrivate: false,
+      type: 'opportunity',
+      linkedEntityId: projectRef.id,
+      linkedEntityType: 'gig'
+    });
+
+    // 4. Set Project Data with circleId
+    batch.set(projectRef, {
       ...projectData,
+      circleId: roomRef.id,
       totalApplicants: 0,
       createdAt: serverTimestamp(),
-      updatedAt: serverTimestamp()
+      updatedAt: serverTimestamp(),
+      postedBy: userId // Ensure postedBy is set
     });
-    return docRef.id;
-  }
 
+    // 5. Update User's Joined Rooms
+    const userRef = doc(db, 'users', userId);
+    batch.update(userRef, {
+      joinedRooms: arrayUnion(roomRef.id),
+      postedGigs: arrayUnion(projectRef.id)
+    });
+
+    await batch.commit();
+    return projectRef.id;
+  }
   static async getProjects(): Promise<Gig[]> {
     const querySnapshot = await getDocs(
       query(collection(db, 'gigs'), orderBy('createdAt', 'desc'))
@@ -1380,15 +1417,48 @@ export class FirestoreService {
   }
 
   // Startups
-  static async createStartup(startupData: Omit<Startup, 'id' | 'createdAt' | 'updatedAt'>): Promise<string> {
-    const docRef = await addDoc(collection(db, 'startups'), {
-      ...startupData,
-      createdAt: serverTimestamp(),
-      updatedAt: serverTimestamp()
-    });
-    return docRef.id;
-  }
+  static async createStartup(startupData: Omit<Startup, 'id' | 'createdAt' | 'updatedAt'>, userId: string): Promise<string> {
+    const batch = writeBatch(db);
 
+    // 1. Create Startup Reference
+    const startupRef = doc(collection(db, 'startups'));
+
+    // 2. Create Circle Reference
+    const roomRef = doc(collection(db, 'rooms'));
+
+    // 3. Set Circle Data
+    batch.set(roomRef, {
+      name: startupData.name,
+      description: `Discussion circle for ${startupData.name}`,
+      members: [userId],
+      createdBy: userId,
+      createdAt: serverTimestamp(),
+      lastActivity: serverTimestamp(),
+      isPrivate: false,
+      type: 'opportunity',
+      linkedEntityId: startupRef.id,
+      linkedEntityType: 'startup'
+    });
+
+    // 4. Set Startup Data with circleId
+    batch.set(startupRef, {
+      ...startupData,
+      circleId: roomRef.id,
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+      founderId: userId // Ensure founderId is set if not already
+    });
+
+    // 5. Update User's Joined Rooms
+    const userRef = doc(db, 'users', userId);
+    batch.update(userRef, {
+      joinedRooms: arrayUnion(roomRef.id),
+      postedStartups: arrayUnion(startupRef.id)
+    });
+
+    await batch.commit();
+    return startupRef.id;
+  }
   static async getStartups(): Promise<Startup[]> {
     const querySnapshot = await getDocs(
       query(collection(db, 'startups'), orderBy('createdAt', 'desc'))

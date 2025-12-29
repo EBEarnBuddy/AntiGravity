@@ -56,17 +56,22 @@ export const useRooms = () => {
   }, [currentUser]);
 
   const createRoom = async (roomData: any) => {
+    if (!currentUser) return;
     try {
-      await FirestoreService.createRoom(roomData);
+      const enhancedData = {
+        ...roomData,
+        createdBy: currentUser.uid,
+        members: [currentUser.uid]
+      };
+      await FirestoreService.createRoom(enhancedData);
       // Optimistic or refetch
-      if (currentUser) {
-        const userRooms = await FirestoreService.getRooms(currentUser.uid);
-        setMyRooms(userRooms);
-        const publicRooms = await FirestoreService.getPublicRooms();
-        setRooms(publicRooms);
-      }
+      const userRooms = await FirestoreService.getRooms(currentUser.uid);
+      setMyRooms(userRooms);
+      const publicRooms = await FirestoreService.getPublicRooms();
+      setRooms(publicRooms);
     } catch (err: any) {
       setError(err.message || 'Failed to create room');
+      throw err;
     }
   };
 
@@ -187,6 +192,7 @@ export const useStartups = () => {
   const [startups, setStartups] = useState<Startup[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { currentUser } = useAuth();
 
   // Initial fetch
   const fetchStartups = async () => {
@@ -206,8 +212,9 @@ export const useStartups = () => {
   }, []);
 
   const createStartup = async (startupData: any) => {
+    if (!currentUser) return;
     try {
-      await FirestoreService.createStartup({ ...startupData, type: 'startup' });
+      await FirestoreService.createStartup({ ...startupData, type: 'startup' }, currentUser.uid);
       await fetchStartups();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to create startup');
@@ -334,6 +341,7 @@ export const useProjects = () => {
   const [projects, setProjects] = useState<Gig[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { currentUser } = useAuth();
 
   useEffect(() => {
     const fetchProjects = async () => {
@@ -352,12 +360,14 @@ export const useProjects = () => {
   }, []);
 
   const createProject = async (projectData: any) => {
+    if (!currentUser) return;
     try {
-      await FirestoreService.createProject({ ...projectData, type: 'project' });
+      await FirestoreService.createProject({ ...projectData, type: 'project' }, currentUser.uid);
       const data = await FirestoreService.getProjects();
       setProjects(data);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to create project');
+      throw err;
     }
   };
 

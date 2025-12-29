@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { SignInPage, Testimonial } from "@/components/ui/sign-in";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 
 const testimonials: Testimonial[] = [
@@ -22,10 +22,21 @@ const testimonials: Testimonial[] = [
 
 export default function AuthPage() {
     const router = useRouter();
+    const searchParams = useSearchParams();
     const { signInWithEmail, signUpWithEmail, signInWithGoogle, currentUser } = useAuth();
-    const [mode, setMode] = useState<'signin' | 'signup'>('signin');
+
+    const initialMode = searchParams.get('mode') === 'signup' ? 'signup' : 'signin';
+    const [mode, setMode] = useState<'signin' | 'signup'>(initialMode);
+
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+
+    useEffect(() => {
+        const paramMode = searchParams.get('mode');
+        if (paramMode === 'signup' || paramMode === 'signin') {
+            setMode(paramMode);
+        }
+    }, [searchParams]);
 
     useEffect(() => {
         if (currentUser) {

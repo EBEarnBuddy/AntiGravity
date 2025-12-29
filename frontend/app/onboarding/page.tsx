@@ -116,7 +116,8 @@ export default function OnboardingPage() {
                     remote: false, // Default
                     interests: [] // Added to satisfy type definition
                 },
-                hasCompletedOnboarding: true,
+                onboardingCompleted: true,
+                hasCompletedOnboarding: true, // Keep for legacy compatibility check
                 hasCompletedTour: !wantsTour,
                 isNewUser: wantsTour
             });

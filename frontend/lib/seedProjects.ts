@@ -274,7 +274,7 @@ export const seedPermanentProjects = async () => {
       }
 
       try {
-        const projectId = await FirestoreService.createProject(project);
+        const projectId = await FirestoreService.createProject(project, project.postedBy);
         console.log(`✅ Created project: ${project.title} (ID: ${projectId})`);
         createdCount++;
       } catch (error) {

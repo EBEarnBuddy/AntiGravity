@@ -82,11 +82,11 @@ function LanderContent() {
 
                     <div className="flex items-center gap-4">
                         {/* Login - Ghost Button */}
-                        <Link href="/auth" className="hidden md:block bg-transparent text-white px-6 py-2.5 rounded-none border-2 border-white text-lg font-black uppercase tracking-wide hover:bg-white/10 transition-all shadow-none">
+                        <Link href="/auth?mode=signin" className="hidden md:block bg-transparent text-white px-6 py-2.5 rounded-none border-2 border-white text-lg font-black uppercase tracking-wide hover:bg-white/10 transition-all shadow-none">
                             Log In
                         </Link>
                         {/* Get Started - White Fill, Green Text */}
-                        <Link href="/auth" className="bg-white text-green-600 border-2 border-white px-6 py-2.5 rounded-none text-lg font-black uppercase tracking-wide hover:bg-slate-100 transition shadow-none">
+                        <Link href="/auth?mode=signup" className="bg-white text-green-600 border-2 border-white px-6 py-2.5 rounded-none text-lg font-black uppercase tracking-wide hover:bg-slate-100 transition shadow-none">
                             Get Started
                         </Link>
                         <button className="lg:hidden text-white"><Menu className="w-8 h-8" /></button>
@@ -109,7 +109,7 @@ function LanderContent() {
                                 Join India's fastest growing community of student builders. Learn from founders, ship real products, and get hired.
                             </p>
                             <div className="flex items-center gap-4">
-                                <Link href="/auth" className="bg-white text-slate-900 px-8 py-4 rounded-none border-2 border-slate-900 text-xl font-black uppercase tracking-wide shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition flex items-center gap-2">
+                                <Link href="/auth?mode=signup" className="bg-white text-slate-900 px-8 py-4 rounded-none border-2 border-slate-900 text-xl font-black uppercase tracking-wide shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition flex items-center gap-2">
                                     Find a Team
                                 </Link>
                                 <button
