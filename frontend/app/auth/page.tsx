@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import { SignInPage, Testimonial } from "@/components/ui/sign-in";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
@@ -20,7 +20,7 @@ const testimonials: Testimonial[] = [
     }
 ];
 
-export default function AuthPage() {
+function AuthPageContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const { signInWithEmail, signUpWithEmail, signInWithGoogle, currentUser } = useAuth();
@@ -77,7 +77,7 @@ export default function AuthPage() {
 
     const handleGoogleSignIn = async () => {
         setError(null);
-        if (loading) return; // Prevention
+        if (loading) return;
         try {
             setLoading(true);
             await signInWithGoogle();
@@ -85,9 +85,8 @@ export default function AuthPage() {
         } catch (err: any) {
             console.error(err);
             setError(err.message || "Google Sign In failed");
-            setLoading(false); // Only set false on error, success redirects
+            setLoading(false);
         }
-        // Note: We don't finally set loading false on success to prevent button re-enable during redirect
     };
 
     const toggleMode = () => {
@@ -115,4 +114,12 @@ export default function AuthPage() {
             />
         </div>
     );
-};
+}
+
+export default function AuthPage() {
+    return (
+        <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div></div>}>
+            <AuthPageContent />
+        </Suspense>
+    );
+}
