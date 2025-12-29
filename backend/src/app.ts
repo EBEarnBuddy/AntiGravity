@@ -23,7 +23,7 @@ const allowedOrigins = [
     'https://earnbuddy-frontend.vercel.app', // Production domain reported in logs
     'https://earnbuddy.onrender.com'
 
-].filter(Boolean); // Remove empty strings if any
+].filter(Boolean); // Remove empty strings if any (i think there is some problem with render)
 console.log('ℹ️  [CORS] Allowed Origins:', allowedOrigins);
 
 app.use(cors({
