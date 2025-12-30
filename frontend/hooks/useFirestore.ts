@@ -246,43 +246,37 @@ export const useStartups = () => {
 
   const applyToStartup = async (startupId: string, roleId: string, userId: string, applicationData: any) => {
     try {
-      await FirestoreService.applyToStartup(startupId, roleId, userId, applicationData);
+      await api.post('/applications', {
+        opportunityId: startupId,
+        roleId,
+        message: applicationData
+      });
     } catch (err) {
       console.error(err);
       setError(err instanceof Error ? err.message : 'Failed to apply to startup');
+      throw err;
     }
   };
 
   const getApplicants = async (startupId: string): Promise<any[]> => {
-    // This requires fetching from roles.applicants in the startup doc
-    // Currently FirestoreService doesn't have a direct "getApplicants" that returns array
-    // It's embedded in the Startup object. 
-    // Implementation logic: fetch startup, aggregate applicants.
-    const startup = await FirestoreService.getOpportunityById(startupId);
-    if (startup && (startup as Startup).roles) {
-      return (startup as Startup).roles.flatMap(r => r.applicants.map(app => ({
-        ...app,
-        _id: app.userId,
-        id: app.userId,
-        applicantId: app.userId,
-        applicant: {
-          displayName: app.userName,
-          photoURL: app.userAvatar,
-          _id: app.userId
-        },
-        opportunityId: startupId,
-        message: app.coverLetter || '',
-        createdAt: app.appliedAt ? (app.appliedAt as any).toDate?.()?.toISOString() || new Date().toISOString() : new Date().toISOString()
-      })));
+    try {
+      const response = await api.get(`/applications/opportunity/${startupId}`);
+      // Backend returns array of application objects, populated with 'applicant'
+      return response.data;
+    } catch (err) {
+      console.error("Error fetching applicants:", err);
+      throw err;
     }
-    return [];
   };
 
-  const updateApplicationStatus = async (applicationId: string, status: 'accepted' | 'rejected') => {
-    // This requires finding which role/startup the application belongs to.
-    // Might need more arguments (startupId, roleId).
-    // Or refactor usage to pass them.
-    console.error("updateApplicationStatus requires startupId and roleId in Firestore implementation");
+
+  const updateApplicationStatus = async (applicationId: string, status: 'accepted' | 'rejected' | 'interviewing') => {
+    try {
+      await api.patch(`/applications/${applicationId}/status`, { status });
+    } catch (err) {
+      console.error("Error updating application status:", err);
+      throw err;
+    }
   };
 
   const bookmarkStartup = async (startupId: string, userId: string) => {
