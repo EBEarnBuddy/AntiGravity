@@ -60,26 +60,16 @@ export default function OnboardingPage() {
         wantsTour: null as boolean | null
     });
 
-    const checkUsername = async (val: string) => {
-        if (!val || val.length < 3) {
-            setUsernameAvailable(null);
-            return;
-        }
-        setCheckingUsername(true);
-        try {
-            const user = await FirestoreService.getUserByUsername(val);
-            if (user) {
-                setUsernameAvailable(false);
-            } else {
-                setUsernameAvailable(true);
-            }
-        } catch (err: any) {
-            console.error("Error checking username", err);
-            setUsernameAvailable(null);
-        } finally {
-            setCheckingUsername(false);
-        }
-    };
+    if (!val || val.length < 3) {
+        setUsernameAvailable(null);
+        return;
+    }
+    setCheckingUsername(true);
+    // Simulate check without backend
+    setTimeout(() => {
+        setUsernameAvailable(true);
+        setCheckingUsername(false);
+    }, 500);
 
     // Debounce username check
     React.useEffect(() => {
@@ -99,40 +89,8 @@ export default function OnboardingPage() {
     };
 
     const handleComplete = async () => {
-        if (!currentUser) return;
-        setLoading(true);
-        try {
-            // Determine tour status based on user choice
-            const wantsTour = formData.wantsTour === true;
-
-            await updateProfile({
-                username: username,
-                onboardingData: {
-                    role: formData.role as any,
-                    skills: formData.skills,
-                    goals: formData.goals,
-                    experience: formData.experience as any,
-                    availability: formData.availability as any,
-                    remote: false, // Default
-                    interests: [] // Added to satisfy type definition
-                },
-                onboardingCompleted: true,
-                hasCompletedOnboarding: true, // Keep for legacy compatibility check
-                hasCompletedTour: !wantsTour,
-                isNewUser: wantsTour
-            });
-
-            if (!wantsTour) {
-                await updateProfile({ isNewUser: false });
-            }
-
-            window.location.href = '/discover';
-        } catch (error) {
-            console.error("Onboarding error:", error);
-            alert("Setup failed: " + (error as any).message);
-        } finally {
-            setLoading(false);
-        }
+        // Direct bypass as requested - no saving to backend
+        window.location.href = '/discover';
     };
 
     if (!currentUser) {

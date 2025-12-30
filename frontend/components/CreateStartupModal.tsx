@@ -277,7 +277,7 @@ const CreateStartupModal: React.FC<CreateStartupModalProps> = ({ isOpen, onClose
         totalApplicants: initialData?.totalApplicants || 0
       };
 
-      console.log('Submitting Startup Data:', startupData);
+      // console.log('Submitting Startup Data:', startupData);
 
       if (isEditing && initialData && (initialData.id || initialData._id)) {
         await updateStartup(initialData.id || initialData._id, startupData);

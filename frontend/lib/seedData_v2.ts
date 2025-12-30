@@ -20,7 +20,7 @@ const circles = [
 
 export const seedDataV2 = async () => {
     console.log('🌱 Starting Seed V2...');
-    let counts = { circles: 0, startups: 0 };
+    const counts = { circles: 0, startups: 0 };
 
     // 1. Create Circles
     for (const c of circles) {

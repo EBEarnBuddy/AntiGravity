@@ -191,7 +191,7 @@ const CommunityPostModal: React.FC<CommunityPostModalProps> = ({
       existingPosts.unshift(localPost);
       localStorage.setItem('localCommunityPosts', JSON.stringify(existingPosts));
 
-      console.log('Post saved to localStorage successfully');
+      // console.log('Post saved to localStorage successfully');
 
       // Try backend API as well (but don't fail if it doesn't work)
       try {
@@ -207,9 +207,9 @@ const CommunityPostModal: React.FC<CommunityPostModalProps> = ({
           userAvatar: currentUser?.photoURL || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop&crop=face',
           userId: currentUser?.uid || 'anonymous'
         });
-        console.log('Post also saved to backend API');
+        // console.log('Post also saved to backend API');
       } catch (apiError) {
-        console.log('Backend API not available, but post was saved to localStorage');
+        console.warn('Backend API not available, but post was saved to localStorage');
       }
 
       onSuccess();

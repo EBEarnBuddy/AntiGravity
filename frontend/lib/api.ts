@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, { InternalAxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
 import { getAuth } from 'firebase/auth'; // Assuming we still use Firebase Auth for tokens
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1';
@@ -13,7 +13,7 @@ const api = axios.create({
 
 // Request interceptor to add Auth Token
 api.interceptors.request.use(
-    async (config) => {
+    async (config: InternalAxiosRequestConfig) => {
         try {
             const auth = getAuth();
             const user = auth.currentUser;
@@ -27,15 +27,15 @@ api.interceptors.request.use(
         }
         return config;
     },
-    (error) => {
+    (error: AxiosError) => {
         return Promise.reject(error);
     }
 );
 
 // Response interceptor for global error handling
 api.interceptors.response.use(
-    (response) => response,
-    (error) => {
+    (response: AxiosResponse) => response,
+    (error: AxiosError) => {
         if (error.response) {
             // Server responded with a status code outside of 2xx
             console.error('API Error:', error.response.status, error.response.data);

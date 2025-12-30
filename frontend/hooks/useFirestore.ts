@@ -46,7 +46,7 @@ export const useRooms = () => {
 
         try {
           const pubRes = await api.get('/rooms');
-          pRooms = pubRes.data.map((r: any) => ({ ...r, id: r._id }));
+          pRooms = pubRes.data.map((r: { _id: string;[key: string]: unknown }) => ({ ...r, id: r._id }));
         } catch (e) { console.error("Error fetching public rooms", e); }
 
         if (currentUser) {
@@ -58,8 +58,9 @@ export const useRooms = () => {
 
         setRooms(pRooms);
         setMyRooms(uRooms);
-      } catch (err: any) {
-        setError(err.message || 'Failed to fetch rooms');
+      } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : 'Failed to fetch rooms';
+        setError(message);
       } finally {
         setLoading(false);
       }

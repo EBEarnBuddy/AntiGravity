@@ -98,7 +98,7 @@ export const ProductTour: React.FC = () => {
         }
 
         // Final Y assignment
-        let finalY = placement === 'top' ? topY : bottomY;
+        const finalY = placement === 'top' ? topY : bottomY;
 
         setCoords({ x: left, y: finalY, placement: placement as 'top' | 'bottom' });
 
