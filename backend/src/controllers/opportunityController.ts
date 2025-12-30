@@ -301,3 +301,50 @@ export const deleteOpportunity = async (req: AuthRequest, res: Response) => {
     }
 };
 
+// Update Opportunity Details
+export const updateOpportunity = async (req: AuthRequest, res: Response) => {
+    try {
+        const { uid } = req.user!;
+        const { id } = req.params;
+        const payload = req.body;
+
+        const user = await User.findOne({ firebaseUid: uid });
+        if (!user) {
+            res.status(404).json({ error: 'User not found' });
+            return;
+        }
+
+        const opportunity = await Opportunity.findById(id);
+        if (!opportunity) {
+            res.status(404).json({ error: 'Opportunity not found' });
+            return;
+        }
+
+        if (!opportunity.postedBy.equals(user._id)) {
+            res.status(403).json({ error: 'Not authorized' });
+            return;
+        }
+
+        // Update fields
+        // We carefully only allow updating certain fields to prevent overwriting critical ones like `postedBy` or `createdAt`
+        // Mongoose generic update or manually setting fields
+        const allowedUpdates = [
+            'title', 'description', 'requirements', 'location', 'salary',
+            'name', 'industry', 'stage', 'funding', 'equity', 'founderName', 'founderAvatar', 'slug', 'startupStatus',
+            'roles', 'contact', 'additionalInfo', 'website', 'logo', 'teamSize', 'projectType', 'totalBudget',
+            'duration', 'remote', 'benefits', 'urgency', 'featured', 'tags', 'image'
+        ];
+
+        Object.keys(payload).forEach((key) => {
+            if (allowedUpdates.includes(key)) {
+                (opportunity as any)[key] = payload[key];
+            }
+        });
+
+        await opportunity.save();
+        res.json(opportunity);
+    } catch (error) {
+        console.error('Error updating opportunity:', error);
+        res.status(500).json({ error: 'Update failed' });
+    }
+};

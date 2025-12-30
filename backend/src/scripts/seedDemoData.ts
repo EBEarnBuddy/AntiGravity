@@ -302,6 +302,15 @@ async function seedEvents(posterId: mongoose.Types.ObjectId) {
 async function main() {
   try {
     await connect();
+
+    console.log('🧹 Clearing existing data...');
+    await User.deleteMany({});
+    await Opportunity.deleteMany({});
+    await Room.deleteMany({});
+    await RoomMembership.deleteMany({});
+    await Event.deleteMany({});
+    console.log('✨ Database cleared.');
+
     const demoUser = await ensureDemoUser();
 
     console.log('🌱 Seeding Startups...');

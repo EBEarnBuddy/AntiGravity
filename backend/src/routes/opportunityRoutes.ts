@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { createOpportunity, getOpportunities, getOpportunityById, deleteOpportunity, updateOpportunityStatus } from '../controllers/opportunityController.js';
+import { createOpportunity, getOpportunities, getOpportunityById, deleteOpportunity, updateOpportunityStatus, updateOpportunity } from '../controllers/opportunityController.js';
 import { verifyToken } from '../middlewares/auth.js';
 
 const router = Router();
@@ -12,5 +12,6 @@ router.get('/:id', getOpportunityById);
 router.post('/', verifyToken, createOpportunity);
 router.delete('/:id', verifyToken, deleteOpportunity);
 router.patch('/:id/status', verifyToken, updateOpportunityStatus);
+router.put('/:id', verifyToken, updateOpportunity); // Full update
 
 export default router;

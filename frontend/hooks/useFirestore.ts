@@ -223,7 +223,9 @@ export const useStartups = () => {
   const createStartup = async (startupData: any) => {
     if (!currentUser) return;
     try {
-      await FirestoreService.createStartup({ ...startupData, type: 'startup' }, currentUser.uid);
+      // Ensure type is set to startup
+      const payload = { ...startupData, type: 'startup' };
+      await api.post('/opportunities', payload);
       await fetchStartups();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to create startup');
@@ -232,12 +234,14 @@ export const useStartups = () => {
   };
 
   const updateStartup = async (id: string, startupData: any) => {
-    // TODO: Add updateStartup to FirestoreService if not exists, or implement logic
-    // Assume it exists or stub for now as we don't have explicit updateStartup in snippet yet
-    // Using generic update logic if possible or omit if not critical
-    console.warn("updateStartup not fully implemented in FirestoreService yet");
-    // Reload
-    await fetchStartups();
+    if (!currentUser) return;
+    try {
+      await api.put(`/opportunities/${id}`, startupData);
+      await fetchStartups();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to update startup');
+      throw err;
+    }
   };
 
   const applyToStartup = async (startupId: string, roleId: string, userId: string, applicationData: any) => {
