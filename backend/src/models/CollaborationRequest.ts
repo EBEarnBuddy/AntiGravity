@@ -26,7 +26,7 @@ const CollaborationRequestSchema = new Schema<ICollaborationRequest>({
     timestamps: true
 });
 
-// Index for faster queries
+// Index for faster queries (deploy new one)
 CollaborationRequestSchema.index({ toOwner: 1, status: 1 });
 CollaborationRequestSchema.index({ fromOwner: 1, status: 1 });
 
