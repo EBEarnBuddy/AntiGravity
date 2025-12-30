@@ -60,16 +60,18 @@ export default function OnboardingPage() {
         wantsTour: null as boolean | null
     });
 
-    if (!val || val.length < 3) {
-        setUsernameAvailable(null);
-        return;
-    }
-    setCheckingUsername(true);
-    // Simulate check without backend
-    setTimeout(() => {
-        setUsernameAvailable(true);
-        setCheckingUsername(false);
-    }, 500);
+    const checkUsername = (val: string) => {
+        if (!val || val.length < 3) {
+            setUsernameAvailable(null);
+            return;
+        }
+        setCheckingUsername(true);
+        // Simulate check without backend
+        setTimeout(() => {
+            setUsernameAvailable(true);
+            setCheckingUsername(false);
+        }, 500);
+    };
 
     // Debounce username check
     React.useEffect(() => {
