@@ -65,7 +65,7 @@ function AuthPageContent() {
             } else {
                 const displayName = email.split('@')[0];
                 await signUpWithEmail(email, password, displayName);
-                router.push('/onboarding');
+                router.push('/discover');
             }
         } catch (err: any) {
             console.error(err);

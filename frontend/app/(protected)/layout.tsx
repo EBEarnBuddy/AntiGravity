@@ -21,11 +21,9 @@ function ProtectedShell({ children }: { children: React.ReactNode }) {
         if (!loading) {
             if (!currentUser) {
                 router.push('/auth');
-            } else if (userProfile && !userProfile.onboardingCompleted) {
-                router.push('/onboarding');
             }
         }
-    }, [currentUser, userProfile, loading, router]);
+    }, [currentUser, loading, router]);
 
     if (loading) {
         return (
