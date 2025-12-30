@@ -274,7 +274,9 @@ const CreateStartupModal: React.FC<CreateStartupModalProps> = ({ isOpen, onClose
         founderId: currentUser.uid,
         founderName: currentUser.displayName || 'Anonymous',
         founderAvatar: currentUser.photoURL || '',
-        totalApplicants: initialData?.totalApplicants || 0
+        totalApplicants: initialData?.totalApplicants || 0,
+        logo: formData.logo,
+        image: formData.logo // Redundant but safe for systems expecting image field
       };
 
       // console.log('Submitting Startup Data:', startupData);
