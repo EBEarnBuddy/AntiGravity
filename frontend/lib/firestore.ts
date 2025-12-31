@@ -594,31 +594,37 @@ export class FirestoreService {
 
   // Collaborations
   static async createCollaborationRequest(data: Omit<CollaborationRequest, 'id' | 'createdAt' | 'updatedAt' | 'status'>): Promise<string> {
-    const docRef = await addDoc(collection(db, 'collaborationRequests'), {
-      ...data,
-      status: 'pending',
-      createdAt: serverTimestamp(),
-      updatedAt: serverTimestamp()
-    });
-    return docRef.id;
+    const response = await api.post('/collaboration/request', data);
+    return response.data._id; // detailed object returned, but return ID to match signature if possible, or adjust caller.
   }
 
   static async getCollaborationRequests(circleId: string): Promise<CollaborationRequest[]> {
-    // Incoming requests
-    const q = query(
-      collection(db, 'collaborationRequests'),
-      where('toCircleId', '==', circleId),
-      orderBy('createdAt', 'desc')
-    );
-    const snapshot = await getDocs(q);
-    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as CollaborationRequest));
+    // Get all pending requests for the current user
+    const response = await api.get('/collaboration/pending');
+    const allRequests: any[] = response.data;
+
+    // Filter for the specific circle if circleId is provided
+    // Backend populates toCircle, fromCircle. We check toCircle._id
+    return allRequests.filter(req =>
+      (req.toCircle?._id === circleId || req.toCircle === circleId)
+    ).map(req => ({
+      id: req._id,
+      ...req,
+      // Map populated fields to flat structure if needed by component, or update component to handle objects
+      fromCircleName: req.fromCircle?.name || 'Unknown',
+      toCircleName: req.toCircle?.name || 'Unknown',
+      fromCircleId: req.fromCircle?._id || req.fromCircle,
+      toCircleId: req.toCircle?._id || req.toCircle,
+      requestedBy: req.fromOwner?._id || req.fromOwner
+    }));
   }
 
   static async updateCollaborationRequest(requestId: string, status: 'accepted' | 'rejected'): Promise<void> {
-    await updateDoc(doc(db, 'collaborationRequests', requestId), {
-      status,
-      updatedAt: serverTimestamp()
-    });
+    if (status === 'accepted') {
+      await api.post(`/collaboration/${requestId}/accept`);
+    } else {
+      await api.post(`/collaboration/${requestId}/reject`);
+    }
   }
 
   // Pod Posts

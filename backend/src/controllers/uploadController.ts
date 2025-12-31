@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { v2 as cloudinary } from 'cloudinary';
 
 // Configure Cloudinary (it will read from process.env if variables are named correctly, 
-// but explicit config is safer if variables have different names)
+// but explicit config is safer if the variables have different names)
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
     api_key: process.env.CLOUDINARY_API_KEY,

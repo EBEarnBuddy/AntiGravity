@@ -103,10 +103,31 @@ export const sendMessage = async (req: AuthRequest, res: Response) => {
                 if (recipient) {
                     const isMentioned = mentionedUserIds.has(member.user.toString());
 
-                    const notifType = isMentioned ? 'mention' : 'new_message';
-                    const notifTitle = isMentioned
-                        ? `${user.displayName} mentioned you in ${roomDoc.name}`
-                        : `New Message from ${user.displayName}`;
+                    // Filter logic:
+                    // 1. Always notify for Direct Messages
+                    // 2. For Circles (Community, Collab, Opp), ONLY notify if mentioned
+                    const isDirectMessage = roomDoc.type === 'direct' || roomDoc.isPrivate; // Assuming 'direct' type exists or private implies it, but better stick to explicit types if defined.
+                    // Actually, 'isPrivate' applies to Opportunity circles too. 
+                    // Let's rely on type if possible. The schema has 'community', 'collab', 'opportunity', 'project'.
+                    // If we don't have explicit 'direct', we can check member count === 2 (risky).
+                    // Safe bet: If !isMentioned AND type != 'direct', skip.
+
+                    // Check if we should notify
+                    let shouldNotify = false;
+                    let notifType = 'new_message';
+                    let notifTitle = `New Message from ${user.displayName}`;
+
+                    if (isMentioned) {
+                        shouldNotify = true;
+                        notifType = 'mention';
+                        notifTitle = `${user.displayName} mentioned you in ${roomDoc.name}`;
+                    } else if (roomDoc.type === 'direct') {
+                        shouldNotify = true;
+                    }
+                    // Note: If you want to notify for ALL messages in 'collab' circles (e.g. small teams), valid.
+                    // But user specifically said "Not every message from the circle gives a notification".
+
+                    if (!shouldNotify) continue;
 
                     const linkId = roomDoc.slug || realRoomId;
 

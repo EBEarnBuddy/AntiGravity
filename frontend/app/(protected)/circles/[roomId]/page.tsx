@@ -27,6 +27,7 @@ import useOnClickOutside from '@/hooks/useOnClickOutside';
 import { FirestoreService } from '@/lib/firestore';
 import PendingRequestsModal from '@/components/PendingRequestsModal';
 import CollaborationRequestsModal from '@/components/CollaborationRequestsModal';
+import RequestCollaborationModal from '@/components/RequestCollaborationModal';
 import ChatSettingsModal from '@/components/ChatSettingsModal';
 import { formatTimeAgo } from '@/lib/utils';
 import { UserAvatar } from '@/components/ui/UserAvatar';
@@ -66,6 +67,7 @@ const RoomChatPage: React.FC = () => {
     const [newMessage, setNewMessage] = useState('');
     const [showPendingModal, setShowPendingModal] = useState(false);
     const [showCollabModal, setShowCollabModal] = useState(false);
+    const [showRequestCollabModal, setShowRequestCollabModal] = useState(false);
     const [showSettingsModal, setShowSettingsModal] = useState(false);
 
     const [showMenu, setShowMenu] = useState(false);
@@ -517,6 +519,16 @@ const RoomChatPage: React.FC = () => {
                                         Collaboration Requests
                                     </button>
                                 )}
+                                <button
+                                    onClick={() => {
+                                        setShowRequestCollabModal(true);
+                                        setShowMenu(false);
+                                    }}
+                                    className="w-full px-4 py-3 text-left text-sm font-bold text-slate-900 hover:bg-blue-50 hover:text-blue-700 transition flex items-center gap-2"
+                                >
+                                    <Users className="w-4 h-4" />
+                                    Request to Collaborate
+                                </button>
                                 {isAdmin && (
                                     <button
                                         onClick={() => {
@@ -899,23 +911,30 @@ const RoomChatPage: React.FC = () => {
             )}
 
 
-
-            {/* Pending Requests Modal */}
+            {/* Modals */}
             <PendingRequestsModal
                 isOpen={showPendingModal}
                 onClose={() => setShowPendingModal(false)}
                 roomId={activeRoomId}
-                roomName={room?.name || ''}
+                roomName={room?.name || 'Circle'}
             />
 
-            {/* Collaboration Requests Modal */}
             <CollaborationRequestsModal
                 isOpen={showCollabModal}
                 onClose={() => setShowCollabModal(false)}
                 roomId={activeRoomId}
             />
 
-            {/* Chat Settings Modal */}
+            <RequestCollaborationModal
+                isOpen={showRequestCollabModal}
+                onClose={() => setShowRequestCollabModal(false)}
+                targetCircleId={activeRoomId}
+                targetName={room?.name}
+                onSuccess={() => {
+                    // Maybe show a success toast? Modal already alerts.
+                }}
+            />
+
             <ChatSettingsModal
                 isOpen={showSettingsModal}
                 onClose={() => setShowSettingsModal(false)}
