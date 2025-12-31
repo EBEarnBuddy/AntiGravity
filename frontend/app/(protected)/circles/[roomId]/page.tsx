@@ -35,7 +35,7 @@ const RoomChatPage: React.FC = () => {
     const params = useParams();
     const router = useRouter();
     const paramRoomId = params?.roomId as string;
-    const { currentUser } = useAuth();
+    const { currentUser, userProfile } = useAuth();
 
     const { rooms, myRooms } = useRooms();
 
@@ -165,14 +165,26 @@ const RoomChatPage: React.FC = () => {
     // Admin Check: Owner OR (todo: fetch explicit admin role) - For now restricting to Owner/Creator as "Admin" for settings
     const isOwner = React.useMemo(() => {
         if (!currentUser || !room) return false;
+
         const createdBy = (room as any).createdBy;
-        const creatorId = typeof createdBy === 'object' ? createdBy?._id || createdBy?.id : createdBy;
+        // creatorId could be MongoID string, or object with _id
+        const creatorMongoId = typeof createdBy === 'object' ? (createdBy?._id || createdBy?.id) : createdBy;
 
-        // Also check legacy/alternative fields if they exist
-        const altCreatorId = (room as any).createdByUid || (room as any).ownerId;
+        // 1. Check if creator matches MongoID of current user (Best for MongoDB relations)
+        if (userProfile?.id && creatorMongoId === userProfile.id) return true;
 
-        return creatorId === currentUser.uid || altCreatorId === currentUser.uid;
-    }, [currentUser, room]);
+        // 2. Check if creator matches Firebase UID (Legacy/Simple)
+        if (creatorMongoId === currentUser.uid) return true;
+
+        // 3. Check explicit Firebase UID field on room
+        const creatorFirebaseUid = (room as any).createdByUid || (room as any).ownerId;
+        if (creatorFirebaseUid === currentUser.uid) return true;
+
+        // 4. Check if populated createdBy object has a firebaseUid field that matches
+        if (typeof createdBy === 'object' && createdBy?.firebaseUid === currentUser.uid) return true;
+
+        return false;
+    }, [currentUser, userProfile, room]);
 
     const isAdmin = isOwner; // Temporarily equates admin to owner until role fetch is added
 

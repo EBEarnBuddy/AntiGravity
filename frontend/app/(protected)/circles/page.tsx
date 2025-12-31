@@ -365,7 +365,7 @@ const CirclesPage: React.FC = () => {
                                                     ) : isMember ? (
                                                         <>Open Circle <ArrowRight className="w-3 h-3" /></>
                                                     ) : (
-                                                        'Join Circle'
+                                                        'Request to Join'
                                                     )}
                                                 </button>
                                             </div>
