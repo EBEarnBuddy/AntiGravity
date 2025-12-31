@@ -16,7 +16,7 @@ export interface IApplication extends Document {
     applicant: mongoose.Types.ObjectId;
     status: 'pending' | 'accepted' | 'rejected' | 'interviewing';
     message?: string; // Short note / cover letter
-    roleId?: string; // Which specific role inside a startup/project
+    roleId?: string; // Which specific roles inside a startup/project
     details?: IApplicationDetails; // Structured payload parsed from frontend
     createdAt: Date;
     updatedAt: Date;
