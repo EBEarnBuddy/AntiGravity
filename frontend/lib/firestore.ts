@@ -315,6 +315,7 @@ export interface CollaborationRequest {
 }
 
 export interface UserProfile {
+  id?: string; // MongoDB _id (if synced) or Firestore Doc ID
   uid: string;
   username?: string;
   displayName: string;
