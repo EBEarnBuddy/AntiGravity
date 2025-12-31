@@ -80,7 +80,7 @@ export const sendMessage = async (req: AuthRequest, res: Response) => {
                 memberships.forEach(m => mentionedUserIds.add(m.user.toString()));
             } else {
                 // 2. Check for specific @username
-                const mentionRegex = /@(\w+)/g;
+                const mentionRegex = /@([\w.-]+)/g;
                 let match;
                 const potentialUsernames: string[] = [];
                 while ((match = mentionRegex.exec(content)) !== null) {

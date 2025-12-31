@@ -162,8 +162,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setCurrentUser(user);
       if (user) {
         await createUserProfile(user);
+
+        // Connect Socket with Auth Token
+        try {
+          const token = await user.getIdToken();
+          const { socket } = await import('../lib/socket');
+          socket.auth = { token };
+          socket.connect();
+        } catch (e) {
+          console.error("Socket Connection Failed", e);
+        }
+
       } else {
         setUserProfile(null);
+        // Disconnect Socket
+        const { socket } = await import('../lib/socket');
+        socket.disconnect();
       }
       setLoading(false);
     });
