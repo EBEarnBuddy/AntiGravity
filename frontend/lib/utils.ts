@@ -15,3 +15,8 @@ export function formatTimeAgo(dateString: string | number | Date | undefined): s
         return '';
     }
 }
+
+export function getDefaultImage(name: string) {
+    const encodedName = encodeURIComponent(name || 'Unknown');
+    return `https://ui-avatars.com/api/?name=${encodedName}&background=random&color=fff&size=128&bold=true`;
+}
