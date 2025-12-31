@@ -104,13 +104,10 @@ export const sendMessage = async (req: AuthRequest, res: Response) => {
                     const isMentioned = mentionedUserIds.has(member.user.toString());
 
                     // Filter logic:
-                    // 1. Always notify for Direct Messages
-                    // 2. For Circles (Community, Collab, Opp), ONLY notify if mentioned
-                    const isDirectMessage = roomDoc.type === 'direct' || roomDoc.isPrivate; // Assuming 'direct' type exists or private implies it, but better stick to explicit types if defined.
-                    // Actually, 'isPrivate' applies to Opportunity circles too. 
-                    // Let's rely on type if possible. The schema has 'community', 'collab', 'opportunity', 'project'.
-                    // If we don't have explicit 'direct', we can check member count === 2 (risky).
-                    // Safe bet: If !isMentioned AND type != 'direct', skip.
+                    // 1. Always notify for Direct Messages (if type exists, or if private 1:1)
+                    // The Room type definition in Mongoose might restricted.
+                    // We treat 'isPrivate' + 2 members as approximation of DM if 'direct' type is missing.
+                    const isPrivateDM = roomDoc.isPrivate && roomDoc.membersCount === 2;
 
                     // Check if we should notify
                     let shouldNotify = false;
@@ -121,11 +118,10 @@ export const sendMessage = async (req: AuthRequest, res: Response) => {
                         shouldNotify = true;
                         notifType = 'mention';
                         notifTitle = `${user.displayName} mentioned you in ${roomDoc.name}`;
-                    } else if (roomDoc.type === 'direct') {
+                    } else if (isPrivateDM) {
+                        // Always notify for DMs
                         shouldNotify = true;
                     }
-                    // Note: If you want to notify for ALL messages in 'collab' circles (e.g. small teams), valid.
-                    // But user specifically said "Not every message from the circle gives a notification".
 
                     if (!shouldNotify) continue;
 
