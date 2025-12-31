@@ -78,11 +78,7 @@ export const SignInPage: React.FC<SignInPageProps> = ({
                     <div className="flex flex-col gap-6">
                         <div className="mb-4 animate-element animate-delay-100 flex items-center gap-2 font-black text-2xl text-slate-900 uppercase tracking-tight">
                             {/* Logo */}
-                            <div className="bg-green-400 p-1 border-2 border-slate-900 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)]">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M7 17L17 7M17 7H9M17 7V15" stroke="#0f172a" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
-                                </svg>
-                            </div>
+                            <img src="/logofinal.svg" alt="EarnBuddy" className="h-10 w-10 object-contain" />
                             EarnBuddy
                         </div>
 

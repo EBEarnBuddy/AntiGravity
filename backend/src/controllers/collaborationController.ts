@@ -27,9 +27,24 @@ export const sendCollaborationRequest = async (req: AuthRequest, res: Response) 
             return;
         }
 
-        // Verify user owns fromCircle
-        if (fromCircle.createdBy.toString() !== user._id.toString()) {
-            res.status(403).json({ error: 'You can only send collaboration requests from circles you own' });
+        // Verify user owns fromCircle OR is an admin
+        // Check strict ownership first
+        const isCreator = fromCircle.createdBy.toString() === user._id.toString();
+
+        // If not creator, check admin membership
+        let isAdmin = false;
+        if (!isCreator) {
+            const membership = await RoomMembership.findOne({
+                room: fromCircleId,
+                user: user._id,
+                role: 'admin',
+                status: 'accepted'
+            });
+            if (membership) isAdmin = true;
+        }
+
+        if (!isCreator && !isAdmin) {
+            res.status(403).json({ error: 'You must be an Owner or Admin of the circle to send collaboration requests.' });
             return;
         }
 
