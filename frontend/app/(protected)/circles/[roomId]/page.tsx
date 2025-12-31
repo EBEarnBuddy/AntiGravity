@@ -163,7 +163,17 @@ const RoomChatPage: React.FC = () => {
     const isPending = currentUser && room?.pendingMembers?.includes(currentUser.uid);
 
     // Admin Check: Owner OR (todo: fetch explicit admin role) - For now restricting to Owner/Creator as "Admin" for settings
-    const isOwner = currentUser && room && (room.createdBy === currentUser.uid || (room as any).createdBy?._id === currentUser.uid || (room as any).createdByUid === currentUser.uid);
+    const isOwner = React.useMemo(() => {
+        if (!currentUser || !room) return false;
+        const createdBy = (room as any).createdBy;
+        const creatorId = typeof createdBy === 'object' ? createdBy?._id || createdBy?.id : createdBy;
+
+        // Also check legacy/alternative fields if they exist
+        const altCreatorId = (room as any).createdByUid || (room as any).ownerId;
+
+        return creatorId === currentUser.uid || altCreatorId === currentUser.uid;
+    }, [currentUser, room]);
+
     const isAdmin = isOwner; // Temporarily equates admin to owner until role fetch is added
 
     const handleSaveEdit = async () => {

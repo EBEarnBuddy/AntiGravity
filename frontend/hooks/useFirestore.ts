@@ -294,7 +294,7 @@ export const useStartups = () => {
 
   const updateStartupStatus = async (startupId: string, status: string) => {
     try {
-      await FirestoreService.updateStartupStatus(startupId, status);
+      await api.patch(`/opportunities/${startupId}/status`, { status });
       await fetchStartups();
     } catch (e) {
       console.error('Failed to update startup status:', e);

@@ -23,6 +23,7 @@ import { useStartups, useMyApplications, useBookmarks } from '@/hooks/useFiresto
 import { useAuth } from '@/contexts/AuthContext';
 import { FirestoreService } from '@/lib/firestore';
 import { formatTimeAgo } from '@/lib/utils';
+import api from '@/lib/api';
 import StartupApplicationModal from '@/components/StartupApplicationModal';
 import ShareModal from '@/components/ShareModal';
 import CreateStartupModal from '@/components/CreateStartupModal';
@@ -53,7 +54,10 @@ const StartupDetailPage: React.FC = () => {
         const fetchStartup = async () => {
             try {
                 setLoading(true);
-                const data = await FirestoreService.getOpportunityById(startupId);
+                // const data = await FirestoreService.getOpportunityById(startupId);
+                const response = await api.get(`/opportunities/${startupId}`);
+                const data = { ...response.data, id: response.data._id };
+
                 if (!data) throw new Error("Opportunity not found");
                 setStartup(data);
             } catch (err: any) {
@@ -431,8 +435,11 @@ const StartupDetailPage: React.FC = () => {
                 onSuccess={() => {
                     // Refetch startup data to show changes
                     const fetchStartup = async () => {
-                        const data = await FirestoreService.getOpportunityById(startupId);
-                        if (data) setStartup(data);
+                        try {
+                            const response = await api.get(`/opportunities/${startupId}`);
+                            const data = { ...response.data, id: response.data._id };
+                            if (data) setStartup(data);
+                        } catch (e) { console.error(e); }
                     };
                     fetchStartup();
                 }}

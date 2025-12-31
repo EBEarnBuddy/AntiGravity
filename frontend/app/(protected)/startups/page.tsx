@@ -41,8 +41,8 @@ const StartupsPage: React.FC = () => {
     const initialTab = (searchParams.get('tab') as 'discover' | 'posted' | 'applied') || 'discover';
 
     // Add delete/update hooks
-    const { startups, loading: startupsLoading, deleteStartup, updateStartupStatus } = useStartups();
-    const { applications, loading: appsLoading } = useMyApplications();
+    const { startups, loading: startupsLoading, deleteStartup, updateStartupStatus, fetchStartups } = useStartups();
+    const { applications, loading: appsLoading, fetchApplications } = useMyApplications();
     const { toggleBookmark, isBookmarked } = useBookmarks();
     const [searchTerm, setSearchTerm] = useState('');
     const [activeTab, setActiveTabState] = useState<'discover' | 'posted' | 'applied'>(initialTab);
@@ -417,7 +417,7 @@ const StartupsPage: React.FC = () => {
                 onClose={() => setShowCreateModal(false)}
                 onSuccess={() => {
                     setShowCreateModal(false);
-                    // Force refresh or switch tab logic here if needed
+                    fetchStartups();
                     setActiveTab('posted');
                 }}
             />
@@ -429,6 +429,7 @@ const StartupsPage: React.FC = () => {
                 onSuccess={() => {
                     setShowEditModal(false);
                     setSelectedStartup(null);
+                    fetchStartups(); // Refresh list to show edits
                 }}
                 isEditing={true}
                 initialData={selectedStartup}
@@ -458,6 +459,7 @@ const StartupsPage: React.FC = () => {
                 onSuccess={() => {
                     setShowApplicationModal(false);
                     setSelectedStartup(null);
+                    fetchApplications(); // Refresh my applications list
                     setActiveTab('applied');
                 }}
             />
