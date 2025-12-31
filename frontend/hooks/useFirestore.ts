@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { Pod, PodPost, ChatRoom as Room, Startup, Gig, Notification, ChatMessage, UserAnalytics, Application, FirestoreService } from '../lib/firestore'; // Keep types for now
 import { useAuth } from '../contexts/AuthContext';
 import api from '../lib/api';
+import { socket } from '../lib/socket';
 
 
 // Custom hooks for Firestore operations
@@ -35,6 +36,7 @@ export const useRooms = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { currentUser } = useAuth();
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   useEffect(() => {
     const fetchRooms = async () => {
@@ -66,17 +68,39 @@ export const useRooms = () => {
       }
     };
     fetchRooms();
-  }, [currentUser]);
+  }, [currentUser, refreshTrigger]);
+
+  useEffect(() => {
+    // Listen for room updates
+    const handleRefresh = () => {
+      setRefreshTrigger(prev => prev + 1);
+    };
+
+    if (socket) {
+      socket.on('room:created', handleRefresh);
+      socket.on('room:updated', handleRefresh);
+      socket.on('room:deleted', handleRefresh);
+      socket.on('room:member_joined', handleRefresh);
+      socket.on('room:member_left', handleRefresh);
+    }
+
+    return () => {
+      if (socket) {
+        socket.off('room:created', handleRefresh);
+        socket.off('room:updated', handleRefresh);
+        socket.off('room:deleted', handleRefresh);
+        socket.off('room:member_joined', handleRefresh);
+        socket.off('room:member_left', handleRefresh);
+      }
+    };
+  }, []);
 
   const createRoom = async (roomData: any) => {
     if (!currentUser) return;
     try {
       await api.post('/rooms', roomData);
-      // Refresh
-      const myRes = await api.get('/rooms/me');
-      setMyRooms(myRes.data.map((r: any) => ({ ...r, id: r._id })));
-      const pubRes = await api.get('/rooms');
-      setRooms(pubRes.data.map((r: any) => ({ ...r, id: r._id })));
+      // Trigger refresh via state to use the shared logic
+      setRefreshTrigger(prev => prev + 1);
     } catch (err: any) {
       setError(err.message || 'Failed to create room');
       throw err;
@@ -87,8 +111,7 @@ export const useRooms = () => {
     if (!currentUser) return;
     try {
       await api.post(`/rooms/${roomId}/join`);
-      const myRes = await api.get('/rooms/me');
-      setMyRooms(myRes.data.map((r: any) => ({ ...r, id: r._id })));
+      setRefreshTrigger(prev => prev + 1);
     } catch (err: any) {
       setError(err.message || 'Failed to join room');
     }
@@ -200,6 +223,7 @@ export const useStartups = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { currentUser } = useAuth();
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   // Initial fetch
   const fetchStartups = useCallback(async () => {
@@ -216,8 +240,30 @@ export const useStartups = () => {
     }
   }, []);
 
+  // Use Effect to handle initial fetch and refresh trigger (manual or socket)
   useEffect(() => {
     fetchStartups();
+  }, [fetchStartups, refreshTrigger]);
+
+  // Socket Listeners
+  useEffect(() => {
+    const handleRefresh = () => {
+      setRefreshTrigger(prev => prev + 1);
+    };
+
+    if (socket) {
+      socket.on('opportunity:created', handleRefresh);
+      socket.on('opportunity:updated', handleRefresh);
+      socket.on('application:updated', handleRefresh); // Status changes
+    }
+
+    return () => {
+      if (socket) {
+        socket.off('opportunity:created', handleRefresh);
+        socket.off('opportunity:updated', handleRefresh);
+        socket.off('application:updated', handleRefresh);
+      }
+    };
   }, []);
 
   const createStartup = async (startupData: any) => {
@@ -226,7 +272,7 @@ export const useStartups = () => {
       // Ensure type is set to startup
       const payload = { ...startupData, type: 'startup' };
       await api.post('/opportunities', payload);
-      await fetchStartups();
+      setRefreshTrigger(p => p + 1);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to create startup');
       throw err;
@@ -237,7 +283,7 @@ export const useStartups = () => {
     if (!currentUser) return;
     try {
       await api.put(`/opportunities/${id}`, startupData);
-      await fetchStartups();
+      setRefreshTrigger(p => p + 1);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to update startup');
       throw err;
@@ -289,13 +335,13 @@ export const useStartups = () => {
   const deleteStartup = async (startupId: string) => {
     // TODO: implement delete in FirestoreService
     // await FirestoreService.deleteStartup(startupId);
-    await fetchStartups();
+    setRefreshTrigger(p => p + 1);
   };
 
   const updateStartupStatus = async (startupId: string, status: string) => {
     try {
       await api.patch(`/opportunities/${startupId}/status`, { status });
-      await fetchStartups();
+      setRefreshTrigger(p => p + 1);
     } catch (e) {
       console.error('Failed to update startup status:', e);
       setError(e instanceof Error ? e.message : 'Failed to update status');
@@ -356,6 +402,7 @@ export const useProjects = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { currentUser } = useAuth();
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   const fetchProjects = useCallback(async () => {
     try {
@@ -373,14 +420,32 @@ export const useProjects = () => {
 
   useEffect(() => {
     fetchProjects();
-  }, [fetchProjects]);
+  }, [fetchProjects, refreshTrigger]);
+
+  // Socket Listeners
+  useEffect(() => {
+    const handleRefresh = () => {
+      setRefreshTrigger(p => p + 1);
+    };
+
+    if (socket) {
+      socket.on('opportunity:created', handleRefresh);
+      socket.on('opportunity:updated', handleRefresh);
+    }
+
+    return () => {
+      if (socket) {
+        socket.off('opportunity:created', handleRefresh);
+        socket.off('opportunity:updated', handleRefresh);
+      }
+    };
+  }, []);
 
   const createProject = async (projectData: any) => {
     if (!currentUser) return;
     try {
       await FirestoreService.createProject({ ...projectData, type: 'project' }, currentUser.uid);
-      const data = await FirestoreService.getProjects();
-      setProjects(data);
+      setRefreshTrigger(p => p + 1);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to create project');
       throw err;
