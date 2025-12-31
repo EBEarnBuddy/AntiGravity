@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Pod, PodPost, ChatRoom as Room, Startup, Gig, Notification, ChatMessage, UserAnalytics, Application, FirestoreService } from '../lib/firestore'; // Keep types for now
 import { useAuth } from '../contexts/AuthContext';
 import api from '../lib/api';
@@ -202,7 +202,7 @@ export const useStartups = () => {
   const { currentUser } = useAuth();
 
   // Initial fetch
-  const fetchStartups = async () => {
+  const fetchStartups = useCallback(async () => {
     try {
       setLoading(true);
       // const data = await FirestoreService.getStartups();
@@ -214,7 +214,7 @@ export const useStartups = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchStartups();
@@ -315,7 +315,8 @@ export const useStartups = () => {
     getApplicants,
     updateApplicationStatus,
     deleteStartup,
-    updateStartupStatus
+    updateStartupStatus,
+    fetchStartups
   };
 };
 
@@ -325,31 +326,29 @@ export const useMyApplications = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const fetchApplications = useCallback(async () => {
+    if (!currentUser) return;
+    try {
+      setLoading(true);
+      // const apps = await FirestoreService.getUserApplications(currentUser.uid);
+      const response = await api.get('/applications/me');
+      const apps = response.data.map((app: any) => ({
+        ...app,
+        id: app._id,
+      }));
+      setApplications(apps);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to fetch applications');
+    } finally {
+      setLoading(false);
+    }
+  }, [currentUser]);
+
   useEffect(() => {
-    const fetchApplications = async () => {
-      if (!currentUser) return;
-      try {
-        setLoading(true);
-        // const apps = await FirestoreService.getUserApplications(currentUser.uid);
-        const response = await api.get('/applications/me');
-        const apps = response.data.map((app: any) => ({
-          ...app,
-          id: app._id,
-          // Map backend status to frontend expectations if needed, usually matches
-          // Backend populated opportunity is just an ID or object?
-          // Route says: .populate('opportunity')
-        }));
-        setApplications(apps);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to fetch applications');
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchApplications();
   }, [currentUser]);
 
-  return { applications, loading, error };
+  return { applications, loading, error, fetchApplications };
 };
 
 export const useProjects = () => {
@@ -358,23 +357,23 @@ export const useProjects = () => {
   const [error, setError] = useState<string | null>(null);
   const { currentUser } = useAuth();
 
-  useEffect(() => {
-    const fetchProjects = async () => {
-      try {
-        setLoading(true);
-        // const data = await FirestoreService.getProjects();
-        const response = await api.get('/opportunities?type=freelance');
-        const data = response.data.map((item: any) => ({ ...item, id: item._id }));
-        setProjects(data);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to fetch projects');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProjects();
+  const fetchProjects = useCallback(async () => {
+    try {
+      setLoading(true);
+      // const data = await FirestoreService.getProjects();
+      const response = await api.get('/opportunities?type=freelance');
+      const data = response.data.map((item: any) => ({ ...item, id: item._id }));
+      setProjects(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to fetch projects');
+    } finally {
+      setLoading(false);
+    }
   }, []);
+
+  useEffect(() => {
+    fetchProjects();
+  }, [fetchProjects]);
 
   const createProject = async (projectData: any) => {
     if (!currentUser) return;
@@ -399,7 +398,7 @@ export const useProjects = () => {
   const bookmarkProject = async (projectId: string, userId: string) => { await FirestoreService.bookmarkProject(projectId, userId); };
   const unbookmarkProject = async (projectId: string, userId: string) => { await FirestoreService.unbookmarkProject(projectId, userId); };
 
-  return { projects, loading, error, createProject, applyToRole, bookmarkProject, unbookmarkProject };
+  return { projects, loading, error, createProject, applyToRole, bookmarkProject, unbookmarkProject, fetchProjects };
 };
 
 // Analytics Hook
