@@ -154,24 +154,61 @@ export const useRoomMessages = (roomId: string) => {
     const [typingUsers, setTypingUsers] = useState<any[]>([]);
 
     // Realtime Subscription
+    // Realtime Subscription & Initial Fetch
     useEffect(() => {
         if (!roomId || !currentUser) return;
 
-        // 1. Fetch Online Users (Stubbed)
-        FirestoreService.getOnlineMembers(roomId).then(setOnlineUsers).catch(console.error);
+        let mounted = true;
 
-        // 2. Subscribe to messages
+        // 1. Fetch Online Users
+        FirestoreService.getOnlineMembers(roomId).then(data => {
+            if (mounted) setOnlineUsers(data);
+        }).catch(console.error);
+
+        // 2. Fetch Initial Messages via API
         setLoading(true);
-        const unsubscribe = FirestoreService.subscribeToRoomMessages(roomId, (msgs) => {
-            setMessages(msgs);
-            setLoading(false);
-            // Check hasMore usually requires knowing total count or getting older messages. 
-            // Snapshot gives latest 100. Pagination with snapshot is tricky. 
-            // For now we assume if we have 100 messages, there might be more.
-            setHasMore(msgs.length >= 100);
-        });
+        api.get(`/rooms/${roomId}/messages?limit=50`)
+            .then(res => {
+                if (mounted) {
+                    setMessages(res.data.reverse()); // Backend returns newest first usually, UI expects old->new? API returns newest first. 
+                    // Wait, controller messageController.ts line 203: "orderedMessages = messages.reverse();" 
+                    // So API returns OLDEST -> NEWEST.
+                    // So I generally don't need to reverse again if API does it. 
+                    // Let's assume API returns correct order for chat (ASC).
+                    // I'll check my view of controller.
+                    // Controller line 203: messages (DESC) .reverse() -> ASC.
+                    // So API returns ASC.
+                    setMessages(res.data);
+                    setLoading(false);
+                }
+            })
+            .catch(err => {
+                console.error('Failed to load messages:', err);
+                if (mounted) setLoading(false);
+            });
 
-        return () => unsubscribe();
+        // 3. Socket Subscription
+        if (socket) {
+            socket.emit('join_room', roomId);
+
+            const handleNewMessage = (msg: ChatMessage) => {
+                setMessages(prev => {
+                    // Dedup
+                    if (prev.some(m => m._id === msg._id || m.id === msg._id)) return prev;
+                    return [...prev, msg];
+                });
+            };
+
+            socket.on('new_message', handleNewMessage);
+
+            return () => {
+                mounted = false;
+                socket.off('new_message', handleNewMessage);
+                socket.emit('leave_room', roomId);
+            };
+        }
+
+        return () => { mounted = false; };
     }, [roomId, currentUser]);
 
     const loadMore = async () => {

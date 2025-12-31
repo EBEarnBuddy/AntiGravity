@@ -25,6 +25,7 @@ import { FirebaseStorage, ref, uploadBytes, getDownloadURL } from 'firebase/stor
 
 const db = firebaseDb as Firestore;
 const storage = firebaseStorage as FirebaseStorage;
+import api from './api';
 
 // Data Types
 export interface Pod {
@@ -1177,11 +1178,14 @@ export class FirestoreService {
 
   // Messages
   static async sendChatMessage(messageData: Omit<ChatMessage, 'id' | 'timestamp'>): Promise<string> {
-    const docRef = await addDoc(collection(db, 'chatMessages'), {
-      ...messageData,
-      timestamp: serverTimestamp()
-    });
-    return docRef.id;
+    try {
+      const { roomId, content, type } = messageData;
+      const response = await api.post(`/rooms/${roomId}/messages`, { content, type: type || 'text' });
+      return response.data._id;
+    } catch (error) {
+      console.error('Failed to send message via API:', error);
+      throw error;
+    }
   }
 
   static subscribeToRoomMessages(
