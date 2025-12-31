@@ -21,11 +21,15 @@ const RequestCollaborationModal: React.FC<RequestCollaborationModalProps> = ({ i
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    // Filter for circles user owns or is admin of (simplified to all myRooms for now, or maybe only 'private' or 'community' ones where they are leader)
-    // Assuming collaboration can be sent from any circle the user is part of (or maybe just ones they own).
-    // Let's assume 'myRooms' contains rooms user is a member of. Ideally we want rooms user manages.
-    // For now, list all.
-    const eligibleCircles = myRooms || [];
+    // Filter for circles user owns or is admin of
+    const eligibleCircles = myRooms.filter(room => {
+        if (!currentUser) return false;
+        // Check simple ownership fields
+        const isCreator = (room as any).createdBy === currentUser.uid || (room as any).ownerId === currentUser.uid;
+        // Check populated createdBy object
+        const isCreatorObj = typeof (room as any).createdBy === 'object' && (room as any).createdBy?.firebaseUid === currentUser.uid;
+        return isCreator || isCreatorObj;
+    });
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();

@@ -2,7 +2,9 @@
 
 import React, { useEffect, useState, useRef } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { FirestoreService, Notification } from '../lib/firestore';
+import { FirestoreService, Notification } from '../lib/firestore'; // Leaving for Types only if needed, but safer to redefine or import from shared
+import { socket } from '../lib/socket';
+import api from '../lib/api';
 import { Bell } from 'lucide-react';
 import Link from 'next/link';
 import useOnClickOutside from '../hooks/useOnClickOutside';
@@ -22,13 +24,46 @@ const NotificationDropdown = () => {
     useEffect(() => {
         if (!currentUser) return;
 
-        const unsubscribe = FirestoreService.subscribeToNotifications(currentUser.uid, (notifs) => {
-            const unread = notifs.filter(n => !n.isRead);
-            setNotifications(unread);
-            setUnreadCount(unread.length);
-        });
+        // 1. Initial Fetch
+        const fetchNotifications = async () => {
+            try {
+                const res = await api.get('/notifications');
+                const unread = res.data.filter((n: any) => !n.isRead);
+                setNotifications(unread); // Or all? Current UI only shows Unread? 
+                // Controller returns filtering by Recipient. Doesn't filter isRead in query but UI logic says "setNotifications(unread)".
+                // Let's stick to existing behavior: show only unread or all?
+                // Existing: "const unread = notifs.filter(n => !n.isRead);"
+                // View line 81: "notifications.length === 0 ? 'No new notifications'".
+                // So the UI is designed for Unread Only.
+                setNotifications(unread);
+                setUnreadCount(unread.length);
+            } catch (err) {
+                console.error('Failed to fetch notifications', err);
+            }
+        };
 
-        return () => unsubscribe();
+        fetchNotifications();
+
+        // 2. Socket Listeners
+        if (socket) {
+            const handleNotification = (notif: any) => {
+                // Backend emits 'notification' with full object
+                setNotifications(prev => {
+                    // Avoid duplicates
+                    if (prev.some(n => n.id === notif.id || n.id === notif._id)) return prev;
+                    // Add to top
+                    const newNotif = { ...notif, id: notif._id || notif.id }; // Normalize ID
+                    return [newNotif, ...prev];
+                });
+                setUnreadCount(prev => prev + 1);
+            };
+
+            socket.on('notification', handleNotification);
+
+            return () => {
+                socket.off('notification', handleNotification);
+            };
+        }
     }, [currentUser]);
 
     const handleNotificationClick = async (id: string, currentlyRead: boolean) => {
@@ -37,7 +72,12 @@ const NotificationDropdown = () => {
 
         if (!currentlyRead) {
             try {
-                await FirestoreService.markNotificationRead(id);
+                // API Call
+                await api.put(`/notifications/${id}/read`);
+                // Optimistic UI update already happened via setIsOpen(false) technically if we routed away,
+                // But local state 'notifications' should be updated too if we stay or return.
+                setNotifications(prev => prev.filter(n => n.id !== id));
+                setUnreadCount(prev => Math.max(0, prev - 1));
             } catch (err) {
                 console.error('Failed to mark read', err);
             }
@@ -47,10 +87,12 @@ const NotificationDropdown = () => {
     const handleClearAll = async () => {
         // Not implemented in FirestoreService yet for batch
         setNotifications([]);
-        // Could loop over current notifications and mark read
-        notifications.forEach(async (n) => {
-            if (!n.isRead) await FirestoreService.markNotificationRead(n.id);
-        });
+        setUnreadCount(0);
+        try {
+            await api.put('/notifications/read-all');
+        } catch (e) {
+            console.error('Failed to clear all', e);
+        }
     };
 
     return (

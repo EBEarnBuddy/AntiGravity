@@ -127,13 +127,20 @@ export const joinRoom = async (req: AuthRequest, res: Response) => {
             return;
         }
 
-        // Create pending membership request
+        // Create membership
+        const status = room.isPrivate ? 'pending' : 'accepted';
+
         await RoomMembership.create({
             room: roomId,
             user: user._id,
             role: 'member',
-            status: 'pending',
+            status: status,
         });
+
+        // If accepted immediately, increment count
+        if (status === 'accepted') {
+            await Room.findByIdAndUpdate(roomId, { $inc: { membersCount: 1 } });
+        }
 
         // Redis: Invalidate user's room list/metadata caches?
         // Pending requests usually don't show on main list unless accepted.

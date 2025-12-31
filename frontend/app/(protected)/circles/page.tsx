@@ -116,7 +116,7 @@ const CirclesPage: React.FC = () => {
                     notify('Request sent successfully', 'success');
                 } else {
                     await joinRoom(room.id);
-                    notify('Joined circle successfully!', 'success');
+                    notify('Request sent successfully', 'success');
                 }
             } catch (error) {
                 notify('Failed to join circle.', 'error');

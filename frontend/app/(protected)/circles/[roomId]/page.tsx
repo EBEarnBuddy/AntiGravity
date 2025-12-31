@@ -30,6 +30,7 @@ import ChatSettingsModal from '@/components/ChatSettingsModal';
 import { formatTimeAgo } from '@/lib/utils';
 import { UserAvatar } from '@/components/ui/UserAvatar';
 import { Linkify } from '@/components/ui/linkify';
+import { uploadImage } from '@/lib/cloudinary';
 
 const RoomChatPage: React.FC = () => {
     const params = useParams();
@@ -151,11 +152,33 @@ const RoomChatPage: React.FC = () => {
     const insertMention = (username: string) => {
         if (mentionIndex === -1) return;
         const before = newMessage.substring(0, mentionIndex);
+        // Clean username: remove spaces
+        const cleanUsername = username.replace(/\s+/g, '');
         const after = newMessage.substring(mentionIndex + (mentionQuery?.length || 0) + 1);
-        setNewMessage(`${before}@${username.replace(/\s+/g, '')} ${after}`);
+        setNewMessage(`${before}@${cleanUsername} ${after}`);
         setMentionQuery(null);
         setMentionIndex(-1);
+        // Focus back on textarea if needed, though react state update usually handle it. 
+        // We might need a ref to textarea to strictly focus it.
     };
+
+    // File Upload Refs
+    const fileInputRef = useRef<HTMLInputElement>(null);
+
+    const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file || !currentUser) return;
+
+        try {
+            // Optimistic / Loading state could be added here
+            const url = await uploadImage(file, `earnbuddy/circles/${activeRoomId}`);
+            await sendMessage(url, 'image'); // Send as image type
+        } catch (error) {
+            console.error("Failed to upload file", error);
+            alert("Failed to upload image.");
+        }
+    };
+
 
 
     // Check membership status
@@ -789,6 +812,31 @@ const RoomChatPage: React.FC = () => {
 
                         </motion.div>
                     )}
+
+                    {/* Mention Suggestions */}
+                    {mentionCandidates.length > 0 && (
+                        <div className="absolute bottom-full left-4 mb-2 bg-white border-2 border-slate-900 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] z-30 min-w-[200px] overflow-hidden">
+                            <div className="bg-slate-100 px-3 py-1 border-b-2 border-slate-200 text-[10px] font-black uppercase text-slate-500 tracking-wider">
+                                Mention Member
+                            </div>
+                            {mentionCandidates.map((user: any) => (
+                                <button
+                                    key={user.uid}
+                                    onClick={() => insertMention(user.username)}
+                                    className="w-full text-left px-4 py-2 hover:bg-green-50 flex items-center gap-2 transition-colors border-b border-slate-100 last:border-0"
+                                >
+                                    <UserAvatar
+                                        src={user.avatar}
+                                        alt={user.username}
+                                        username={user.username}
+                                        size={24}
+                                        className="bg-white border border-slate-200"
+                                    />
+                                    <span className="font-bold text-sm text-slate-900">{user.username}</span>
+                                </button>
+                            ))}
+                        </div>
+                    )}
                 </AnimatePresence>
                 <form
                     onSubmit={handleSend}
@@ -804,8 +852,16 @@ const RoomChatPage: React.FC = () => {
                     />
                     <div className="flex items-center p-2 justify-between">
                         <div className="flex">
+                            <input
+                                type="file"
+                                ref={fileInputRef}
+                                className="hidden"
+                                accept="image/*" // Restrict to images for now
+                                onChange={handleFileSelect}
+                            />
                             <button
                                 type="button"
+                                onClick={() => fileInputRef.current?.click()}
                                 className="p-2 text-slate-400 hover:text-green-600 hover:bg-green-50 transition duration-200"
                             >
                                 <Paperclip className="w-5 h-5" />

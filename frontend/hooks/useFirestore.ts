@@ -125,18 +125,40 @@ export const useRooms = () => {
     const requestJoin = async (roomId: string) => {
         if (!currentUser) return;
         try {
-            await FirestoreService.requestJoinRoom(roomId, currentUser.uid);
+            // Use Backend API for requests (which now handles Pending vs Accepted based on privacy too)
+            // But usually requestJoin implies explicit "Ask to join" -> Pending.
+            // joinRoom (Public) uses the same endpoint.
+            // Our backend `joinRoom` handles both.
+            await api.post(`/rooms/${roomId}/join`);
+            setRefreshTrigger(prev => prev + 1);
         } catch (err: any) {
             setError(err.message || 'Failed to request join');
         }
     };
 
     const getPendingRequests = async (roomId: string) => {
-        return await FirestoreService.getPendingMemberProfiles(roomId);
+        try {
+            const res = await api.get(`/rooms/${roomId}/pending`);
+            // Backend returns array of RoomMembership populated with user
+            // Mapped to expected format if needed. 
+            // Frontend components expect { id, user: { displayName, photoURL... } }
+            // Backend returns { ...membership, user: { ...userDoc } }
+            return res.data;
+        } catch (err) {
+            console.error('Failed to get pending requests:', err);
+            return [];
+        }
     };
 
     const approveMembership = async (roomId: string, userId: string, status: 'accepted' | 'rejected') => {
-        await FirestoreService.approveMembership(roomId, userId, status);
+        try {
+            await api.post(`/rooms/${roomId}/approve/${userId}`, { status });
+            // Trigger refresh via socket usually, but manual refresh safe
+            setRefreshTrigger(prev => prev + 1);
+        } catch (err) {
+            console.error('Failed to update membership:', err);
+            throw err;
+        }
         // Refetch logic if needed, but components usually handle it
     };
 
@@ -170,14 +192,10 @@ export const useRoomMessages = (roomId: string) => {
         api.get(`/rooms/${roomId}/messages?limit=50`)
             .then(res => {
                 if (mounted) {
-                    setMessages(res.data.reverse()); // Backend returns newest first usually, UI expects old->new? API returns newest first. 
-                    // Wait, controller messageController.ts line 203: "orderedMessages = messages.reverse();" 
-                    // So API returns OLDEST -> NEWEST.
-                    // So I generally don't need to reverse again if API does it. 
-                    // Let's assume API returns correct order for chat (ASC).
-                    // I'll check my view of controller.
-                    // Controller line 203: messages (DESC) .reverse() -> ASC.
-                    // So API returns ASC.
+                    // API returns Oldest -> Newest (ASC).
+                    // We render Top -> Bottom.
+                    // So [Oldest, ..., Newest] is correct for Standard Chat.
+                    // NO REVERSE NEEDED.
                     setMessages(res.data);
                     setLoading(false);
                 }
@@ -199,11 +217,52 @@ export const useRoomMessages = (roomId: string) => {
                 });
             };
 
+            const handleTyping = ({ userId, userName }: any) => {
+                if (userId !== currentUser.uid) {
+                    setTypingUsers(prev => {
+                        if (prev.some(u => u.userId === userId)) return prev;
+                        return [...prev, { userId, userName }];
+                    });
+                }
+            };
+
+            const handleStopTyping = ({ userId }: any) => {
+                setTypingUsers(prev => prev.filter(u => u.userId !== userId));
+            };
+
+            const handleOnline = (user: any) => {
+                setOnlineUsers(prev => {
+                    // Dedup
+                    const exists = prev.some(u => u.userId === user.userId);
+                    if (exists) return prev;
+                    return [...prev, user];
+                });
+            };
+
+            const handleOffline = ({ userId }: any) => {
+                setOnlineUsers(prev => prev.filter(u => u.userId !== userId));
+            };
+
+            const handleRoomUsers = (users: any[]) => {
+                setOnlineUsers(users);
+            };
+
             socket.on('new_message', handleNewMessage);
+            socket.on('typing', handleTyping);
+            socket.on('stop_typing', handleStopTyping);
+            socket.on('member:online', handleOnline);
+            socket.on('member:offline', handleOffline);
+            socket.on('room_users', handleRoomUsers);
+
 
             return () => {
                 mounted = false;
                 socket.off('new_message', handleNewMessage);
+                socket.off('typing', handleTyping);
+                socket.off('stop_typing', handleStopTyping);
+                socket.off('member:online', handleOnline);
+                socket.off('member:offline', handleOffline);
+                socket.off('room_users', handleRoomUsers);
                 socket.emit('leave_room', roomId);
             };
         }

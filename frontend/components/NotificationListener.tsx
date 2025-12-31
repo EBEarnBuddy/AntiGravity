@@ -43,10 +43,10 @@ export const NotificationListener = () => {
             });
         };
 
-        socket.on('notification:created', handleNotification);
+        socket.on('notification:new', handleNotification);
 
         return () => {
-            socket.off('notification:created', handleNotification);
+            socket.off('notification:new', handleNotification);
         };
     }, [currentUser, play]);
 
