@@ -183,6 +183,14 @@ const RoomChatPage: React.FC = () => {
         // 4. Check if populated createdBy object has a firebaseUid field that matches
         if (typeof createdBy === 'object' && createdBy?.firebaseUid === currentUser.uid) return true;
 
+        // 5. Check postedBy (for Opportunity/Startup Circles)
+        const postedBy = (room as any).postedBy;
+        const postedByUid = typeof postedBy === 'object' ? (postedBy?.firebaseUid || postedBy?._id) : postedBy;
+        if (postedByUid === currentUser.uid) return true;
+
+        // 6. Check founderId (for Startups)
+        if ((room as any).founderId === currentUser.uid) return true;
+
         return false;
     }, [currentUser, userProfile, room]);
 

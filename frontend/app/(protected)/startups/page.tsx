@@ -260,7 +260,7 @@ const StartupsPage: React.FC = () => {
                                             <img
                                                 src={startup.logo || startup.image}
                                                 alt={startup.name}
-                                                className="w-full h-full object-cover transition-transform group-hover:scale-105 duration-500"
+                                                className="w-full h-full object-cover transition-transform group-hover:scale-105 duration-500 bg-white"
                                             />
                                         ) : (
                                             <div className="absolute inset-0 opacity-20 bg-[linear-gradient(45deg,#000_25%,transparent_25%,transparent_75%,#000_75%,#000),linear-gradient(45deg,#000_25%,transparent_25%,transparent_75%,#000_75%,#000)] [background-size:24px_24px]"></div>

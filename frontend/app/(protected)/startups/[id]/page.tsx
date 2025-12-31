@@ -41,7 +41,7 @@ const StartupDetailPage: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
-    const { applications } = useMyApplications();
+    const { applications, fetchApplications } = useMyApplications();
     const { toggleBookmark, isBookmarked } = useBookmarks();
 
     const [showApplicationModal, setShowApplicationModal] = useState(false);
@@ -360,12 +360,44 @@ const StartupDetailPage: React.FC = () => {
                                         </div>
 
                                         {!isOwner && startup.status !== 'closed' && (
-                                            <button
-                                                onClick={() => handleApply(role.id)}
-                                                className="px-8 py-3 bg-white border-4 border-slate-900 text-slate-900 font-black uppercase tracking-widest hover:bg-slate-900 hover:text-white transition-all whitespace-nowrap shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]"
-                                            >
-                                                Apply Role
-                                            </button>
+                                            (() => {
+                                                // Check application status for this role
+                                                const app = applications.find(a =>
+                                                    (a.roleId === role.id || (a.roleId && (a.roleId as any)._id === role.id)) &&
+                                                    ((a.opportunityId === startup.id) || ((a.opportunityId as any)._id === startup.id))
+                                                );
+
+                                                if (app?.status === 'accepted') {
+                                                    return (
+                                                        <button
+                                                            onClick={() => router.push(startup.circleId ? `/circles/${startup.circleId}` : '/circles')}
+                                                            className="px-8 py-3 bg-green-500 border-4 border-slate-900 text-white font-black uppercase tracking-widest hover:bg-green-600 transition-all whitespace-nowrap shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px] flex items-center gap-2"
+                                                        >
+                                                            View Circle <ArrowLeft className="w-4 h-4 rotate-180" />
+                                                        </button>
+                                                    );
+                                                }
+
+                                                if (app) {
+                                                    return (
+                                                        <button
+                                                            disabled
+                                                            className="px-8 py-3 bg-slate-200 border-4 border-slate-300 text-slate-400 font-black uppercase tracking-widest cursor-not-allowed whitespace-nowrap flex items-center gap-2"
+                                                        >
+                                                            <CheckCircle className="w-4 h-4" /> Applied
+                                                        </button>
+                                                    );
+                                                }
+
+                                                return (
+                                                    <button
+                                                        onClick={() => handleApply(role.id)}
+                                                        className="px-8 py-3 bg-white border-4 border-slate-900 text-slate-900 font-black uppercase tracking-widest hover:bg-slate-900 hover:text-white transition-all whitespace-nowrap shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]"
+                                                    >
+                                                        Apply Role
+                                                    </button>
+                                                );
+                                            })()
                                         )}
                                     </div>
 
@@ -424,6 +456,7 @@ const StartupDetailPage: React.FC = () => {
                 selectedRole={startup.roles?.find((r: any) => r.id === selectedRole) || null}
                 onSuccess={() => {
                     setShowApplicationModal(false);
+                    fetchApplications(); // Update button state immediately
                     router.refresh(); // Or optimistically update status
                 }}
             />

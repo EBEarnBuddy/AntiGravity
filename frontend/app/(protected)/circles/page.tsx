@@ -111,8 +111,13 @@ const CirclesPage: React.FC = () => {
             router.push(`/circles/${room.id}`);
         } else if (!isPending) {
             try {
-                await joinRoom(room.id);
-                notify('Joined circle successfully!', 'success');
+                if (room.isPrivate) {
+                    await requestJoin(room.id);
+                    notify('Request sent successfully', 'success');
+                } else {
+                    await joinRoom(room.id);
+                    notify('Joined circle successfully!', 'success');
+                }
             } catch (error) {
                 notify('Failed to join circle.', 'error');
             }
@@ -321,7 +326,7 @@ const CirclesPage: React.FC = () => {
                                             <div className="absolute inset-0 opacity-20 bg-[linear-gradient(45deg,#000_25%,transparent_25%,transparent_75%,#000_75%,#000),linear-gradient(45deg,#000_25%,transparent_25%,transparent_75%,#000_75%,#000)] [background-size:24px_24px]"></div>
 
                                             {room.avatar ? (
-                                                <img src={room.avatar} alt={room.name} className="w-full h-full object-cover relative z-10 transition-transform group-hover:scale-105 duration-500" />
+                                                <img src={room.avatar} alt={room.name} className="w-full h-full object-cover relative z-10 transition-transform group-hover:scale-105 duration-500 bg-white" />
                                             ) : (
                                                 <div className="w-full h-full flex items-center justify-center relative z-10">
                                                     <Users className="w-16 h-16 text-slate-400" />

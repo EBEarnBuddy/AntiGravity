@@ -124,7 +124,7 @@ export default function DiscoverPage() {
                                         initial={{ opacity: 0, y: 10, scale: 0.95 }}
                                         animate={{ opacity: 1, y: 0, scale: 1 }}
                                         exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                                        className="absolute right-0 top-full mt-2 w-64 bg-white border-2 border-slate-900 shadow-[6px_6px_0px_0px_rgba(15,23,42,1)] z-50 p-2"
+                                        className="absolute right-0 top-full mt-2 w-72 bg-white border-2 border-slate-900 shadow-[6px_6px_0px_0px_rgba(15,23,42,1)] z-50 p-2"
                                     >
                                         <button
                                             onClick={() => {
@@ -142,7 +142,7 @@ export default function DiscoverPage() {
                                         <div className="relative opacity-60 cursor-not-allowed">
                                             <button
                                                 disabled
-                                                className="w-full text-left px-4 py-3 bg-white text-slate-400 font-black uppercase text-xs tracking-wide border-2 border-transparent flex items-center gap-3 mt-1 cursor-not-allowed"
+                                                className="w-full text-left px-4 py-3 bg-white text-slate-400 font-black uppercase text-xs tracking-wide border-2 border-transparent flex items-center gap-3 mt-1 cursor-not-allowed pr-28"
                                             >
                                                 <div className="w-8 h-8 bg-blue-50 border-2 border-slate-200 flex items-center justify-center text-blue-300">
                                                     <Briefcase className="w-4 h-4" />
@@ -165,7 +165,7 @@ export default function DiscoverPage() {
                                         <div className="relative opacity-60 cursor-not-allowed">
                                             <button
                                                 disabled
-                                                className="w-full text-left px-4 py-3 bg-white text-slate-400 font-black uppercase text-xs tracking-wide border-2 border-transparent flex items-center gap-3 mt-1 cursor-not-allowed"
+                                                className="w-full text-left px-4 py-3 bg-white text-slate-400 font-black uppercase text-xs tracking-wide border-2 border-transparent flex items-center gap-3 mt-1 cursor-not-allowed pr-28"
                                             >
                                                 <div className="w-8 h-8 bg-orange-50 border-2 border-slate-200 flex items-center justify-center text-orange-300">
                                                     <Calendar className="w-4 h-4" />
@@ -321,7 +321,7 @@ export default function DiscoverPage() {
                                                 <div className="flex gap-4">
                                                     <div className="w-12 h-12 bg-white border-2 border-slate-900 shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] overflow-hidden flex-shrink-0">
                                                         {item.logo || item.companyLogo ? (
-                                                            <img src={item.logo || item.companyLogo} alt="" className="w-full h-full object-cover" />
+                                                            <img src={item.logo || item.companyLogo} alt="" className="w-full h-full object-cover bg-white" />
                                                         ) : (
                                                             <div className="w-full h-full flex items-center justify-center text-2xl">⚡</div>
                                                         )}
