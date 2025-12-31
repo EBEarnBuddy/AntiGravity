@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRoomMessages, useRooms } from '@/hooks/useFirestore';
+import { useRoomMembers } from '@/hooks/useMembers';
 import { useAuth } from '@/contexts/AuthContext';
 import {
     Send,
@@ -49,6 +50,19 @@ const RoomChatPage: React.FC = () => {
     const activeRoomId = room?.id || paramRoomId;
 
     const { messages, loading, sendMessage, onlineUsers, typingUsers, notifyTyping, loadMore, hasMore, isLoadingMore, deleteMessage, updateMessage } = useRoomMessages(activeRoomId);
+
+    // Member Fetching for Mentions
+    const { members: roomMembers } = useRoomMembers(activeRoomId);
+    // Create Set of valid usernames for quick lookup (normalized: lowercase, no spaces)
+    const validUsernames = React.useMemo(() => {
+        const set = new Set<string>();
+        roomMembers.forEach(m => {
+            if (m.username) set.add(m.username.toLowerCase());
+            // optionally add display name parts if you want to support "@John Doe" -> "@JohnDoe"
+        });
+        return set;
+    }, [roomMembers]);
+
     const [newMessage, setNewMessage] = useState('');
     const [showPendingModal, setShowPendingModal] = useState(false);
     const [showCollabModal, setShowCollabModal] = useState(false);
@@ -171,7 +185,10 @@ const RoomChatPage: React.FC = () => {
 
         try {
             // Optimistic / Loading state could be added here
+            // Optimistic / Loading state could be added here
+            console.log("Uploading file:", file.name);
             const url = await uploadImage(file, `earnbuddy/circles/${activeRoomId}`);
+            console.log("File uploaded, URL:", url);
             await sendMessage(url, 'image'); // Send as image type
         } catch (error) {
             console.error("Failed to upload file", error);
@@ -687,19 +704,26 @@ const RoomChatPage: React.FC = () => {
                                                     {msg.content.split(/(@[\w.-]+)/g).map((part: string, i: number) => {
                                                         if (part.match(/^@[\w.-]+$/)) {
                                                             const username = part.substring(1);
-                                                            // Handle @all separately
+                                                            // Handle @all
                                                             if (username.toLowerCase() === 'all') {
-                                                                return <span key={i} className="text-purple-600 font-black">{part}</span>;
+                                                                return <span key={i} className="text-purple-600 font-black px-1 rounded bg-purple-100">{part}</span>;
                                                             }
-                                                            return (
-                                                                <button
-                                                                    key={i}
-                                                                    onClick={() => router.push(`/u/${username}`)} // Adjust route as needed
-                                                                    className={`${isMe ? 'text-white underline' : 'text-purple-600'} font-black hover:opacity-80 transition`}
-                                                                >
-                                                                    {part}
-                                                                </button>
-                                                            );
+                                                            // Check if valid member
+                                                            const isValid = validUsernames.has(username.toLowerCase());
+
+                                                            if (isValid) {
+                                                                return (
+                                                                    <button
+                                                                        key={i}
+                                                                        onClick={() => router.push(`/u/${username}`)}
+                                                                        className={`${isMe ? 'text-white underline decoration-wavy' : 'text-purple-600 font-black bg-purple-50 px-1 rounded border border-purple-200'} hover:opacity-80 transition mx-0.5`}
+                                                                    >
+                                                                        {part}
+                                                                    </button>
+                                                                );
+                                                            }
+                                                            // Invalid mention -> Plain text (or slightly styled but inactive)
+                                                            return <span key={i} className={`${isMe ? 'text-white' : 'text-slate-500'} opacity-80`}>{part}</span>;
                                                         }
                                                         return <Linkify key={i} className={isMe ? "text-yellow-300 hover:text-white underline" : "text-purple-600 hover:text-purple-800 underline"}>{part}</Linkify>;
                                                     })}
@@ -779,64 +803,10 @@ const RoomChatPage: React.FC = () => {
                         </motion.div>
                     )}
 
-                    {typingUsers.length > 0 && (
-                        <motion.div
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: 10 }}
-                            className="absolute -top-12 left-6 flex items-end gap-2 z-20 pointer-events-none"
-                        >
-                            {/* Horizontal Stack of Typing Users */}
-                            <div className="flex -space-x-2 mr-2">
-                                {typingUsers.map((u: any, idx: number) => (
-                                    <div key={idx} className="relative z-10 border-2 border-white rounded-full">
-                                        <UserAvatar
-                                            src={u.userAvatar}
-                                            alt={u.userName}
-                                            uid={u.userId}
-                                            username={u.userName?.replace(' ', '').toLowerCase()}
-                                            size={24}
-                                            className="bg-white"
-                                        />
-                                    </div>
-                                ))}
-                            </div>
-
-                            {/* Typing Bubble with Dots */}
-                            <div className="bg-white border-2 border-slate-900 rounded-2xl rounded-bl-none px-3 py-2 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] flex items-center gap-1 min-h-[36px]">
-                                <span className="w-1.5 h-1.5 bg-slate-900 rounded-full animate-bounce [animation-duration:0.6s]"></span>
-                                <span className="w-1.5 h-1.5 bg-slate-900 rounded-full animate-bounce [animation-duration:0.6s] [animation-delay:0.2s]"></span>
-                                <span className="w-1.5 h-1.5 bg-slate-900 rounded-full animate-bounce [animation-duration:0.6s] [animation-delay:0.4s]"></span>
-                            </div>
-
-
-                        </motion.div>
-                    )}
+                    {/* Floating Typing Indicator Removed */}
 
                     {/* Mention Suggestions */}
-                    {mentionCandidates.length > 0 && (
-                        <div className="absolute bottom-full left-4 mb-2 bg-white border-2 border-slate-900 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] z-30 min-w-[200px] overflow-hidden">
-                            <div className="bg-slate-100 px-3 py-1 border-b-2 border-slate-200 text-[10px] font-black uppercase text-slate-500 tracking-wider">
-                                Mention Member
-                            </div>
-                            {mentionCandidates.map((user: any) => (
-                                <button
-                                    key={user.uid}
-                                    onClick={() => insertMention(user.username)}
-                                    className="w-full text-left px-4 py-2 hover:bg-green-50 flex items-center gap-2 transition-colors border-b border-slate-100 last:border-0"
-                                >
-                                    <UserAvatar
-                                        src={user.avatar}
-                                        alt={user.username}
-                                        username={user.username}
-                                        size={24}
-                                        className="bg-white border border-slate-200"
-                                    />
-                                    <span className="font-bold text-sm text-slate-900">{user.username}</span>
-                                </button>
-                            ))}
-                        </div>
-                    )}
+                    {/* Redundant Mention Suggestions Removed */}
                 </AnimatePresence>
                 <form
                     onSubmit={handleSend}

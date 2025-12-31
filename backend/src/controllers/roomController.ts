@@ -680,3 +680,33 @@ export const leaveRoom = async (req: AuthRequest, res: Response) => {
         res.status(500).json({ error: 'Failed to leave room' });
     }
 };
+// Get All Members of a Room
+export const getRoomMembers = async (req: AuthRequest, res: Response) => {
+    try {
+        const { roomId } = req.params;
+
+        // Fetch accepted memberships
+        const memberships = await RoomMembership.find({
+            room: roomId,
+            status: 'accepted'
+        }).populate('user', 'displayName photoURL username firebaseUid role bio');
+
+        // Extract user objects
+        const members = memberships.map(m => {
+            const u = m.user as any;
+            return {
+                _id: u._id,
+                uid: u.firebaseUid,
+                username: u.username || u.displayName.replace(/\s+/g, '').toLowerCase(), // Fallback
+                displayName: u.displayName,
+                photoURL: u.photoURL,
+                role: m.role // admin or member
+            };
+        });
+
+        res.json(members);
+    } catch (error) {
+        console.error('Error fetching room members:', error);
+        res.status(500).json({ error: 'Failed to fetch members' });
+    }
+};

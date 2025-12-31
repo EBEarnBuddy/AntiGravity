@@ -3,44 +3,33 @@
 import { useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { socket } from '@/lib/socket';
-import toast from 'react-hot-toast';
-import useSound from 'use-sound';
-
-// Simple pop sound
-const POP_SOUND_URL = 'https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3';
+import { useNotification } from '@/contexts/NotificationContext';
 
 export const NotificationListener = () => {
     const { currentUser } = useAuth();
-    const [play] = useSound(POP_SOUND_URL, { volume: 0.5 });
+    const { notify } = useNotification();
+
+    // Sound is now handled by NotificationContext
 
     useEffect(() => {
         if (!currentUser || !socket) return;
 
         const handleNotification = (notification: any) => {
             // Verify notification is for this user (if backend broadcasts)
+            // Note: backend emits to specific room `user:{uid}`, so this check might be redundant but safe.
             if (notification.userId && notification.userId !== currentUser.uid) return;
 
             // "Remember, a new message in a circle does not count as a notification"
-            // We assume 'type' field distinguishes messages from other notifications
             if (notification.type === 'message' || notification.type === 'chat') return;
 
-            // "And a person who is not in a circle should not receive the notifications of a circle"
-            // Ideally backend handles this filtering. If we receive it here, we assume backend sent it because we are relevant.
-            // But if it's a "circle_update" broadcast, we might need to check membership.
-            // For now, relying on the 'notifications' collection logic where each doc has a userId.
+            // Map types to brutualist colors/icons supported by context
+            let type: 'info' | 'success' | 'error' = 'info';
+            if (notification.type === 'job_accepted' || notification.type === 'application_accepted' || notification.type === 'success') type = 'success';
+            if (notification.type === 'error' || notification.type === 'rejection') type = 'error';
 
-            // Play sound
-            play();
-
-            // Show Toast
-            toast(notification.message || "New Notification", {
-                icon: '🔔',
-                style: {
-                    borderRadius: '10px',
-                    background: '#333',
-                    color: '#fff',
-                },
-            });
+            // Show Toast (Sound plays automatically)
+            // Use 'body' or 'message' field
+            notify(notification.body || notification.message || "New Notification", type);
         };
 
         socket.on('notification:new', handleNotification);
@@ -48,7 +37,7 @@ export const NotificationListener = () => {
         return () => {
             socket.off('notification:new', handleNotification);
         };
-    }, [currentUser, play]);
+    }, [currentUser, notify]);
 
     return null; // Headless component
 };

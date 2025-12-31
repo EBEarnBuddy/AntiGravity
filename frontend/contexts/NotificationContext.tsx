@@ -35,8 +35,8 @@ const playNotificationSound = () => {
         gain.connect(ctx.destination);
 
         osc.type = 'sine';
-        osc.frequency.setValueAtTime(880, ctx.currentTime); // A5
-        gain.gain.setValueAtTime(0.1, ctx.currentTime);
+        osc.frequency.setValueAtTime(500, ctx.currentTime); // Softer tone
+        gain.gain.setValueAtTime(0.02, ctx.currentTime); // Much lower volume
         gain.gain.exponentialRampToValueAtTime(0.00001, ctx.currentTime + 0.5);
 
         osc.start();
@@ -74,8 +74,8 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
                             animate={{ opacity: 1, x: 0, scale: 1 }}
                             exit={{ opacity: 0, x: 20, scale: 0.9 }}
                             className={`pointer-events-auto min-w-[300px] p-4 border-2 border-slate-900 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] flex items-start gap-3 ${n.type === 'success' ? 'bg-green-100 text-green-900' :
-                                    n.type === 'error' ? 'bg-red-100 text-red-900' :
-                                        'bg-white text-slate-900'
+                                n.type === 'error' ? 'bg-red-100 text-red-900' :
+                                    'bg-white text-slate-900'
                                 }`}
                         >
                             <div className="mt-0.5">
