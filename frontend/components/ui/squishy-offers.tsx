@@ -13,7 +13,7 @@ interface OfferCardProps {
 
 export const SquishyOffers = ({ offers }: { offers: OfferCardProps[] }) => {
     return (
-        <div className="mx-auto flex w-fit flex-wrap justify-center gap-4">
+        <div className="mx-auto flex w-fit flex-wrap justify-center gap-8">
             {offers.map((offer, index) => (
                 <OfferCard key={index} {...offer} />
             ))}
@@ -27,24 +27,24 @@ const OfferCard = ({ label, title, description, features, cta, BGComponent }: Of
             whileHover="hover"
             transition={{ duration: 1, ease: "backInOut" }}
             variants={{ hover: { scale: 1.05 } }}
-            className="relative h-[500px] w-80 shrink-0 overflow-hidden rounded-none border-2 border-slate-900 p-8 bg-slate-900 shadow-[8px_8px_0px_0px_rgba(255,255,255,1)] hover:shadow-[12px_12px_0px_0px_rgba(255,255,255,1)] transition-all"
+            className="relative h-[480px] w-72 shrink-0 overflow-hidden rounded-none border-2 border-slate-900 p-6 bg-slate-900 shadow-[8px_8px_0px_0px_rgba(255,255,255,1)] hover:shadow-[12px_12px_0px_0px_rgba(255,255,255,1)] transition-all"
         >
             <div className="relative z-10 text-white">
-                <span className="mb-3 block w-fit rounded-none bg-white text-slate-900 px-3 py-0.5 text-sm font-black uppercase tracking-widest border-2 border-transparent">
+                <span className="mb-3 block w-fit rounded-none bg-white text-slate-900 px-3 py-0.5 text-xs font-black uppercase tracking-widest border-2 border-transparent">
                     {label}
                 </span>
                 <motion.h3
                     initial={{ scale: 0.85 }}
                     variants={{ hover: { scale: 1 } }}
                     transition={{ duration: 1, ease: "backInOut" }}
-                    className="my-2 block origin-top-left text-4xl font-black leading-[1.2] text-white uppercase"
+                    className="my-2 block origin-top-left text-3xl font-black leading-[1.1] text-white uppercase"
                 >
                     {title}
                 </motion.h3>
-                <p className="text-base text-white/90 mb-4 font-bold">{description}</p>
+                <p className="text-sm text-white/90 mb-4 font-bold leading-tight">{description}</p>
                 <ul className="space-y-2">
                     {features.map((feature, idx) => (
-                        <li key={idx} className="flex items-start gap-2 text-sm text-white/90 font-medium">
+                        <li key={idx} className="flex items-start gap-2 text-xs text-white/90 font-medium">
                             <span className="text-green-400 font-bold">•</span>
                             <span>{feature}</span>
                         </li>
@@ -61,11 +61,12 @@ const OfferCard = ({ label, title, description, features, cta, BGComponent }: Of
 
 const BGComponent1 = () => (
     <motion.svg
-        width="320"
-        height="500"
+        width="100%"
+        height="100%"
         viewBox="0 0 320 500"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
+        preserveAspectRatio="none"
         variants={{ hover: { scale: 1.5 } }}
         transition={{ duration: 1, ease: "backInOut" }}
         className="absolute inset-0 z-0"
@@ -92,11 +93,12 @@ const BGComponent1 = () => (
 
 const BGComponent2 = () => (
     <motion.svg
-        width="320"
-        height="500"
+        width="100%"
+        height="100%"
         viewBox="0 0 320 500"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
+        preserveAspectRatio="none"
         variants={{ hover: { scale: 1.05 } }}
         transition={{ duration: 1, ease: "backInOut" }}
         className="absolute inset-0 z-0"
@@ -126,11 +128,12 @@ const BGComponent2 = () => (
 
 const BGComponent3 = () => (
     <motion.svg
-        width="320"
-        height="500"
+        width="100%"
+        height="100%"
         viewBox="0 0 320 500"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
+        preserveAspectRatio="none"
         variants={{ hover: { scale: 1.25 } }}
         transition={{ duration: 1, ease: "backInOut" }}
         className="absolute inset-0 z-0"

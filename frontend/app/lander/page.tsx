@@ -412,7 +412,16 @@ function LanderContent() {
                                 <li><Link href="#" className="hover:text-white hover:underline transition">For Students</Link></li>
                                 <li><Link href="#" className="hover:text-white hover:underline transition">For Startups</Link></li>
                                 <li><Link href="#" className="hover:text-white hover:underline transition">For Freelancers</Link></li>
-                                <li><Link href="#" className="hover:text-white hover:underline transition">Communities</Link></li>
+                                <li><Link href="#" className="hover:text-white hover:underline transition">For Communities</Link></li>
+                            </ul>
+                        </div>
+
+                        <div>
+                            <h4 className="font-black text-lg mb-6 uppercase tracking-wider text-green-400">Reach Out</h4>
+                            <ul className="space-y-4 text-slate-300 font-bold">
+                                <li><Link href="#" className="hover:text-white hover:underline transition">Partner with Us</Link></li>
+                                <li><Link href="#" className="hover:text-white hover:underline transition">Careers</Link></li>
+                                <li><Link href="/support" className="hover:text-white hover:underline transition">Support</Link></li>
                             </ul>
                         </div>
 
