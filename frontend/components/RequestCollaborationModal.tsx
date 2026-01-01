@@ -21,14 +21,14 @@ const RequestCollaborationModal: React.FC<RequestCollaborationModalProps> = ({ i
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    // Filter for circles user owns or is admin of
+    // Filter: Include rooms where user is Creator OR Admin.
     const eligibleCircles = myRooms.filter(room => {
-        if (!currentUser) return false;
-        // Check simple ownership fields
-        const isCreator = (room as any).createdBy === currentUser.uid || (room as any).ownerId === currentUser.uid;
-        // Check populated createdBy object
-        const isCreatorObj = typeof (room as any).createdBy === 'object' && (room as any).createdBy?.firebaseUid === currentUser.uid;
-        return isCreator || isCreatorObj;
+        const r = room as any;
+        // Check local ownership (legacy/fast)
+        const isOwner = r.createdBy === currentUser?.uid || r.ownerId === currentUser?.uid || (typeof r.createdBy === 'object' && r.createdBy?.firebaseUid === currentUser?.uid);
+        // Check role (new backend field)
+        const isAdmin = r.myRole === 'admin';
+        return isOwner || isAdmin;
     });
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -62,7 +62,9 @@ const RequestCollaborationModal: React.FC<RequestCollaborationModalProps> = ({ i
             alert("Collaboration request sent successfully!");
         } catch (err: any) {
             console.error(err);
-            setError(err.response?.data?.message || err.message || "Failed to send request.");
+            // BACKEND sends { error: '...' }, Axios puts it in err.response.data.error
+            const errMsg = err.response?.data?.error || err.response?.data?.message || err.message || "Failed to send request.";
+            setError(errMsg);
         } finally {
             setIsSubmitting(false);
         }

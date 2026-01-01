@@ -11,9 +11,11 @@ export const sendCollaborationRequest = async (req: AuthRequest, res: Response) 
     try {
         const { uid } = req.user!;
         const { fromCircleId, toCircleId, message } = req.body;
+        console.log(`[CollabDebug] Request from ${uid}: from=${fromCircleId}, to=${toCircleId}`);
 
         const user = await User.findOne({ firebaseUid: uid });
         if (!user) {
+            console.log('[CollabDebug] User not found');
             res.status(404).json({ error: 'User not found' });
             return;
         }
@@ -23,6 +25,7 @@ export const sendCollaborationRequest = async (req: AuthRequest, res: Response) 
         const toCircle = await Room.findById(toCircleId);
 
         if (!fromCircle || !toCircle) {
+            console.log(`[CollabDebug] Circle not found: from=${!!fromCircle}, to=${!!toCircle}`);
             res.status(404).json({ error: 'One or both circles not found' });
             return;
         }
@@ -30,6 +33,7 @@ export const sendCollaborationRequest = async (req: AuthRequest, res: Response) 
         // Verify user owns fromCircle OR is an admin
         // Check strict ownership first
         const isCreator = fromCircle.createdBy.toString() === user._id.toString();
+        console.log(`[CollabDebug] isCreator: ${isCreator} (creator=${fromCircle.createdBy}, user=${user._id})`);
 
         // If not creator, check admin membership
         let isAdmin = false;
@@ -40,16 +44,19 @@ export const sendCollaborationRequest = async (req: AuthRequest, res: Response) 
                 role: 'admin',
                 status: 'accepted'
             });
+            console.log(`[CollabDebug] Admin Check: ${!!membership}`);
             if (membership) isAdmin = true;
         }
 
         if (!isCreator && !isAdmin) {
+            console.log('[CollabDebug] Permission denied');
             res.status(403).json({ error: 'You must be an Owner or Admin of the circle to send collaboration requests.' });
             return;
         }
 
         // Can't collaborate with own circle
         if (fromCircleId === toCircleId) {
+            console.log('[CollabDebug] Same circle error');
             res.status(400).json({ error: 'Cannot collaborate with your own circle' });
             return;
         }
@@ -62,6 +69,7 @@ export const sendCollaborationRequest = async (req: AuthRequest, res: Response) 
         });
 
         if (existingRequest) {
+            console.log('[CollabDebug] Existing pending request');
             res.status(400).json({ error: 'A pending collaboration request already exists' });
             return;
         }

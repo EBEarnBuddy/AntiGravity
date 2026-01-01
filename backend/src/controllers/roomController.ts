@@ -329,10 +329,15 @@ export const getMyRooms = async (req: AuthRequest, res: Response) => {
                 .map(membership => (membership.user as any)?.firebaseUid)
                 .filter(Boolean);
 
+            // Find my membership for this room
+            const myMembership = roomMemberships.find(m => (m.user as any)?.firebaseUid === uid);
+            const myRole = myMembership?.role || 'member';
+
             return {
                 ...room,
                 createdByUid,
                 members: memberUids,
+                myRole,
                 id: room._id
             };
         });
