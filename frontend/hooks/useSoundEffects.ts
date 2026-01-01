@@ -20,6 +20,7 @@ export const useSoundEffects = () => {
         playPop,
         playClick,
         playSend,
-        playSuccess
+        playSuccess,
+        playJoin: playSuccess
     };
 };
