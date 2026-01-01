@@ -14,12 +14,41 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { cn } from '@/lib/utils';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useInView } from 'framer-motion';
 import { PublicNavbar } from "@/components/layout/PublicNavbar";
 import { PublicFooter } from "@/components/layout/PublicFooter";
-import { CreativePricing } from "@/components/ui/creative-pricing";
+// import { CreativePricing } from "@/components/ui/creative-pricing"; // REMOVED
 
-// --- INLINED COMPONENTS ---
+import { useRef } from "react";
+
+// --- ANIMATION COMPONENTS ---
+
+interface RevealProps {
+    children: React.ReactNode;
+    width?: "fit-content" | "100%";
+    delay?: number;
+}
+
+const Reveal = ({ children, width = "fit-content", delay = 0 }: RevealProps) => {
+    const ref = useRef(null);
+    const isInView = useInView(ref, { once: true, margin: "-75px" });
+
+    return (
+        <div ref={ref} style={{ position: "relative", width, overflow: "hidden" }}>
+            <motion.div
+                variants={{
+                    hidden: { opacity: 0, y: 75 },
+                    visible: { opacity: 1, y: 0 },
+                }}
+                initial="hidden"
+                animate={isInView ? "visible" : "hidden"}
+                transition={{ duration: 0.5, delay: delay, ease: "easeOut" }}
+            >
+                {children}
+            </motion.div>
+        </div>
+    );
+};
 
 // 1. LogoMarquee
 interface LogoMarqueeProps {
@@ -580,26 +609,28 @@ function LanderContent() {
                 <div className="container mx-auto px-6 max-w-7xl">
                     <div className="flex flex-col md:flex-row items-center gap-12">
                         <div className="flex-1 space-y-8 pb-32 z-10">
-                            <div className="inline-block bg-white/10 text-white px-4 py-1.5 rounded-none border-2 border-white text-sm font-black uppercase tracking-widest backdrop-blur-sm">
-                                Early Access
-                            </div>
-                            <h1 className="text-6xl md:text-7xl font-black leading-none tracking-tight uppercase">
-                                Launch your career with <br className="hidden md:block" /> real startup experience.
-                            </h1>
-                            <p className="text-2xl text-green-50 max-w-xl leading-relaxed font-bold">
-                                Join India's fastest growing community of student builders. Learn from founders, ship real products, and get hired.
-                            </p>
-                            <div className="flex items-center gap-4">
-                                <Link href="/auth?mode=signup" className="bg-white text-slate-900 px-8 py-4 rounded-none border-2 border-slate-900 text-xl font-black uppercase tracking-wide shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition flex items-center gap-2">
-                                    Find a Team
-                                </Link>
-                                <button
-                                    onClick={() => setIsVideoOpen(true)}
-                                    className="px-6 py-4 rounded-none border-2 border-white text-xl font-black uppercase tracking-wide text-white hover:bg-white/10 transition flex items-center gap-2 shadow-[6px_6px_0px_0px_rgba(255,255,255,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]"
-                                >
-                                    <Play className="w-6 h-6 fill-current" /> Watch Video
-                                </button>
-                            </div>
+                            <Reveal width="100%">
+                                <div className="inline-block bg-white/10 text-white px-4 py-1.5 rounded-none border-2 border-white text-sm font-black uppercase tracking-widest backdrop-blur-sm mb-6">
+                                    Early Access
+                                </div>
+                                <h1 className="text-6xl md:text-7xl font-black leading-none tracking-tight uppercase mb-6">
+                                    Launch your career with <br className="hidden md:block" /> real startup experience.
+                                </h1>
+                                <p className="text-2xl text-green-50 max-w-xl leading-relaxed font-bold mb-8">
+                                    Join India's fastest growing community of student builders. Learn from founders, ship real products, and get hired.
+                                </p>
+                                <div className="flex items-center gap-4">
+                                    <Link href="/auth?mode=signup" className="bg-white text-slate-900 px-8 py-4 rounded-none border-2 border-slate-900 text-xl font-black uppercase tracking-wide shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition flex items-center gap-2">
+                                        Find a Team
+                                    </Link>
+                                    <button
+                                        onClick={() => setIsVideoOpen(true)}
+                                        className="px-6 py-4 rounded-none border-2 border-white text-xl font-black uppercase tracking-wide text-white hover:bg-white/10 transition flex items-center gap-2 shadow-[6px_6px_0px_0px_rgba(255,255,255,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]"
+                                    >
+                                        <Play className="w-6 h-6 fill-current" /> Watch Video
+                                    </button>
+                                </div>
+                            </Reveal>
                         </div>
 
                         {/* Hero Image Mockup */}
@@ -720,71 +751,81 @@ function LanderContent() {
 
                 <div className="container mx-auto px-6 relative z-10 pt-10">
                     <div className="text-center max-w-3xl mx-auto mb-16">
-                        <h2 className="text-4xl md:text-6xl font-black mb-6 uppercase tracking-tighter text-white">
-                            What EarnBuddy Offers
-                        </h2>
-                        <p className="text-lg text-gray-300 font-bold">
-                            Everything you need to build, launch, and grow.
-                        </p>
+                        <Reveal width="100%">
+                            <h2 className="text-4xl md:text-6xl font-black mb-6 uppercase tracking-tighter text-white">
+                                What EarnBuddy Offers
+                            </h2>
+                            <p className="text-lg text-gray-300 font-bold">
+                                Everything you need to build, launch, and grow.
+                            </p>
+                        </Reveal>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                         {/* Startups */}
-                        <SquishyOffers
-                            offers={[
-                                {
-                                    label: "For Founders",
-                                    title: "Startups",
-                                    description: "Post roles, find co-founders, and build your team",
-                                    features: ["Post unlimited roles", "Find co-founders", "Private Circles"],
-                                    cta: "Explore Startups",
-                                    href: "/for-startups",
-                                    BGComponent: BGComponent1
-                                }
-                            ]}
-                        />
+                        <Reveal delay={0.1}>
+                            <SquishyOffers
+                                offers={[
+                                    {
+                                        label: "For Founders",
+                                        title: "Startups",
+                                        description: "Post roles, find co-founders, and build your team",
+                                        features: ["Post unlimited roles", "Find co-founders", "Private Circles"],
+                                        cta: "Explore Startups",
+                                        href: "/for-startups",
+                                        BGComponent: BGComponent1
+                                    }
+                                ]}
+                            />
+                        </Reveal>
                         {/* Circles */}
-                        <SquishyOffers
-                            offers={[
-                                {
-                                    label: "For Communities",
-                                    title: "Circles",
-                                    description: "Build communities, host events, collaborate",
-                                    features: ["Create communities", "Group Chat", "Analytics"],
-                                    cta: "Join Circles",
-                                    href: "/for-communities",
-                                    BGComponent: BGComponent3
-                                }
-                            ]}
-                        />
+                        <Reveal delay={0.2}>
+                            <SquishyOffers
+                                offers={[
+                                    {
+                                        label: "For Communities",
+                                        title: "Circles",
+                                        description: "Build communities, host events, collaborate",
+                                        features: ["Create communities", "Group Chat", "Analytics"],
+                                        cta: "Join Circles",
+                                        href: "/for-communities",
+                                        BGComponent: BGComponent3
+                                    }
+                                ]}
+                            />
+                        </Reveal>
                         {/* Colancing */}
-                        <SquishyOffers
-                            offers={[
-                                {
-                                    label: "For Freelancers",
-                                    title: "Colancing",
-                                    description: "Offer services, find projects, team up for gigs",
-                                    features: ["Post projects", "Secure payments", "Reputation System"],
-                                    cta: "Start Colancing",
-                                    href: "/for-freelancers",
-                                    BGComponent: BGComponent2
-                                }
-                            ]}
-                        />
+                        <Reveal delay={0.3}>
+                            <SquishyOffers
+                                offers={[
+                                    {
+                                        label: "For Freelancers",
+                                        title: "Colancing",
+                                        description: "Offer services, find projects, team up for gigs",
+                                        features: ["Post projects", "Secure payments", "Reputation System"],
+                                        cta: "Start Colancing",
+                                        href: "/for-freelancers",
+                                        BGComponent: BGComponent2
+                                    }
+                                ]}
+                            />
+                        </Reveal>
                         {/* Events */}
-                        <SquishyOffers
-                            offers={[
-                                {
-                                    label: "For Everyone",
-                                    title: "Events",
-                                    description: "Discover hackathons, meetups, and workshops",
-                                    features: ["Host events", "Register attendees", "Networking"],
-                                    cta: "Find Events",
-                                    href: "/events",
-                                    BGComponent: BGComponent1
-                                }
-                            ]}
-                        />
+                        <Reveal delay={0.4}>
+                            <SquishyOffers
+                                offers={[
+                                    {
+                                        label: "For Everyone",
+                                        title: "Events",
+                                        description: "Discover hackathons, meetups, and workshops",
+                                        features: ["Host events", "Register attendees", "Networking"],
+                                        cta: "Find Events",
+                                        href: "/events",
+                                        BGComponent: BGComponent1
+                                    }
+                                ]}
+                            />
+                        </Reveal>
                     </div>
                 </div>
             </section>
@@ -795,13 +836,15 @@ function LanderContent() {
 
                 <div className="container mx-auto px-6 relative z-10">
                     <div className="text-center mb-12">
-                        <div className="inline-block bg-green-100 text-green-800 px-3 py-1 text-xs font-black uppercase border-2 border-slate-900 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] mb-6">Verified Partners</div>
-                        <h2 className="text-3xl md:text-5xl font-black text-slate-900 mb-4 uppercase tracking-tighter">
-                            Partnering with <span className="text-green-600">top institutions</span>
-                        </h2>
-                        <p className="text-lg text-slate-500 max-w-2xl mx-auto font-bold">
-                            Trusted by leading entrepreneurship cells and colleges
-                        </p>
+                        <Reveal width="100%">
+                            <div className="inline-block bg-green-100 text-green-800 px-3 py-1 text-xs font-black uppercase border-2 border-slate-900 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] mb-6">Verified Partners</div>
+                            <h2 className="text-3xl md:text-5xl font-black text-slate-900 mb-4 uppercase tracking-tighter">
+                                Partnering with <span className="text-green-600">top institutions</span>
+                            </h2>
+                            <p className="text-lg text-slate-500 max-w-2xl mx-auto font-bold">
+                                Trusted by leading entrepreneurship cells and colleges
+                            </p>
+                        </Reveal>
                     </div>
 
                     <LogoMarquee
@@ -828,59 +871,27 @@ function LanderContent() {
             <section id="community" className="py-24 bg-white border-t-4 border-slate-900 relative">
                 <div className="w-full">
                     <div className="text-center mb-16 container mx-auto px-6">
-                        <h2 className="text-3xl md:text-5xl font-black text-slate-900 uppercase tracking-tighter bg-white inline-block px-6 py-2 border-4 border-slate-900 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transform -rotate-2">
-                            Stories from our <span className="text-green-600">community</span>
-                        </h2>
+                        <Reveal width="100%">
+                            <h2 className="text-3xl md:text-5xl font-black text-slate-900 uppercase tracking-tighter bg-white inline-block px-6 py-2 border-4 border-slate-900 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transform -rotate-2">
+                                Stories from our <span className="text-green-600">community</span>
+                            </h2>
+                        </Reveal>
                     </div>
                     <StaggerTestimonials />
                 </div>
             </section>
 
-            {/* Pricing Section */}
-            <section id="pricing" className="py-24 bg-green-50/50 border-t-4 border-slate-900">
-                <CreativePricing
-                    tag="Membership"
-                    title="Simple, Transparent Pricing"
-                    description="Join as a builder for free, or power up your startup with our premium tools."
-                    tiers={[
-                        {
-                            name: "Builder",
-                            price: "Free",
-                            description: "For students and freelancers starting out.",
-                            features: ["Create Profile", "Join Circles", "Apply to Projects", "Build Reputation"],
-                            color: "bg-green-400",
-                            icon: <Zap className="w-6 h-6" />,
-                            popular: false
-                        },
-                        {
-                            name: "Startup",
-                            price: "Free",
-                            description: "For founders building their MVP.",
-                            features: ["Post 3 Roles", "Direct Messaging", "Basic Analytics", " Verified Badge"],
-                            bestFor: "Early Stage",
-                            popular: true,
-                            color: "bg-purple-400",
-                            icon: <Zap className="w-6 h-6" />
-                        },
-                        {
-                            name: "Scale",
-                            price: "₹4999",
-                            description: "For growing teams and organizations.",
-                            features: ["Unlimited Roles", "Priority Hiring", "Advanced Analytics", "Dedicated Support"],
-                            color: "bg-blue-400",
-                            icon: <Zap className="w-6 h-6" />
-                        }
-                    ]}
-                />
-            </section>
+
 
             {/* FAQ */}
             <section id="faq" className="bg-white border-t-4 border-slate-900 pt-32 pb-24">
-                <Faq5
-                    badge="FAQ"
-                    heading="Frequently Asked Questions"
-                    description="Everything you need to know about the platform."
-                />
+                <Reveal width="100%">
+                    <Faq5
+                        badge="FAQ"
+                        heading="Frequently Asked Questions"
+                        description="Everything you need to know about the platform."
+                    />
+                </Reveal>
             </section>
 
             <PublicFooter />
