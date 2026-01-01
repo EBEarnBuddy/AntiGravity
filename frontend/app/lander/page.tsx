@@ -17,6 +17,7 @@ import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PublicNavbar } from "@/components/layout/PublicNavbar";
 import { PublicFooter } from "@/components/layout/PublicFooter";
+import { CreativePricing } from "@/components/ui/creative-pricing";
 
 // --- INLINED COMPONENTS ---
 
@@ -391,6 +392,7 @@ interface OfferCardProps {
     description: string;
     features: string[];
     cta: string;
+    href: string;
     BGComponent: React.ComponentType;
 }
 
@@ -404,41 +406,43 @@ const SquishyOffers = ({ offers }: { offers: OfferCardProps[] }) => {
     );
 };
 
-const OfferCard = ({ label, title, description, features, cta, BGComponent }: OfferCardProps) => {
+const OfferCard = ({ label, title, description, features, cta, href, BGComponent }: OfferCardProps) => {
     return (
-        <motion.div
-            whileHover="hover"
-            transition={{ duration: 1, ease: "backInOut" }}
-            variants={{ hover: { scale: 1.05 } }}
-            className="relative h-[480px] w-72 shrink-0 overflow-hidden rounded-none border-2 border-slate-900 p-6 bg-slate-900 shadow-[8px_8px_0px_0px_rgba(255,255,255,1)] hover:shadow-[12px_12px_0px_0px_rgba(255,255,255,1)] transition-all"
-        >
-            <div className="relative z-10 text-white">
-                <span className="mb-3 block w-fit rounded-none bg-white text-slate-900 px-3 py-0.5 text-xs font-black uppercase tracking-widest border-2 border-transparent">
-                    {label}
-                </span>
-                <motion.h3
-                    initial={{ scale: 0.85 }}
-                    variants={{ hover: { scale: 1 } }}
-                    transition={{ duration: 1, ease: "backInOut" }}
-                    className="my-2 block origin-top-left text-3xl font-black leading-[1.1] text-white uppercase"
-                >
-                    {title}
-                </motion.h3>
-                <p className="text-sm text-white/90 mb-4 font-bold leading-tight">{description}</p>
-                <ul className="space-y-2">
-                    {features.map((feature, idx) => (
-                        <li key={idx} className="flex items-start gap-2 text-xs text-white/90 font-medium">
-                            <span className="text-green-400 font-bold">•</span>
-                            <span>{feature}</span>
-                        </li>
-                    ))}
-                </ul>
-            </div>
-            <button className="absolute bottom-4 left-4 right-4 z-20 rounded-none border-2 border-white bg-white py-2 text-center font-mono font-black uppercase text-slate-900 backdrop-blur-sm transition-all duration-200 hover:bg-slate-900 hover:text-white hover:border-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]">
-                {cta}
-            </button>
-            <BGComponent />
-        </motion.div>
+        <Link href={href}>
+            <motion.div
+                whileHover="hover"
+                transition={{ duration: 1, ease: "backInOut" }}
+                variants={{ hover: { scale: 1.05 } }}
+                className="relative h-[480px] w-72 shrink-0 overflow-hidden rounded-none border-2 border-slate-900 p-6 bg-green-900 shadow-[8px_8px_0px_0px_rgba(255,255,255,1)] hover:shadow-[12px_12px_0px_0px_rgba(255,255,255,1)] transition-all cursor-pointer"
+            >
+                <div className="relative z-10 text-white">
+                    <span className="mb-3 block w-fit rounded-none bg-white text-slate-900 px-3 py-0.5 text-xs font-black uppercase tracking-widest border-2 border-transparent">
+                        {label}
+                    </span>
+                    <motion.h3
+                        initial={{ scale: 0.85 }}
+                        variants={{ hover: { scale: 1 } }}
+                        transition={{ duration: 1, ease: "backInOut" }}
+                        className="my-2 block origin-top-left text-3xl font-black leading-[1.1] text-white uppercase"
+                    >
+                        {title}
+                    </motion.h3>
+                    <p className="text-sm text-white/90 mb-4 font-bold leading-tight">{description}</p>
+                    <ul className="space-y-2">
+                        {features.map((feature, idx) => (
+                            <li key={idx} className="flex items-start gap-2 text-xs text-white/90 font-medium">
+                                <span className="text-black font-extrabold stroke-black">•</span>
+                                <span>{feature}</span>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+                <button className="absolute bottom-4 left-4 right-4 z-20 rounded-none border-2 border-white bg-white py-2 text-center font-mono font-black uppercase text-slate-900 backdrop-blur-sm transition-all duration-200 hover:bg-slate-900 hover:text-white hover:border-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]">
+                    {cta}
+                </button>
+                <BGComponent />
+            </motion.div>
+        </Link>
     );
 };
 
@@ -734,6 +738,7 @@ function LanderContent() {
                                     description: "Post roles, find co-founders, and build your team",
                                     features: ["Post unlimited roles", "Find co-founders", "Private Circles"],
                                     cta: "Explore Startups",
+                                    href: "/for-startups",
                                     BGComponent: BGComponent1
                                 }
                             ]}
@@ -747,6 +752,7 @@ function LanderContent() {
                                     description: "Build communities, host events, collaborate",
                                     features: ["Create communities", "Group Chat", "Analytics"],
                                     cta: "Join Circles",
+                                    href: "/for-communities",
                                     BGComponent: BGComponent3
                                 }
                             ]}
@@ -760,6 +766,7 @@ function LanderContent() {
                                     description: "Offer services, find projects, team up for gigs",
                                     features: ["Post projects", "Secure payments", "Reputation System"],
                                     cta: "Start Colancing",
+                                    href: "/for-freelancers",
                                     BGComponent: BGComponent2
                                 }
                             ]}
@@ -773,6 +780,7 @@ function LanderContent() {
                                     description: "Discover hackathons, meetups, and workshops",
                                     features: ["Host events", "Register attendees", "Networking"],
                                     cta: "Find Events",
+                                    href: "/events",
                                     BGComponent: BGComponent1
                                 }
                             ]}
@@ -789,7 +797,7 @@ function LanderContent() {
                     <div className="text-center mb-12">
                         <div className="inline-block bg-green-100 text-green-800 px-3 py-1 text-xs font-black uppercase border-2 border-slate-900 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] mb-6">Verified Partners</div>
                         <h2 className="text-3xl md:text-5xl font-black text-slate-900 mb-4 uppercase tracking-tighter">
-                            Partnering with <span className="text-green-600">India's Top Institutions</span>
+                            Partnering with <span className="text-green-600">top institutions</span>
                         </h2>
                         <p className="text-lg text-slate-500 max-w-2xl mx-auto font-bold">
                             Trusted by leading entrepreneurship cells and colleges
@@ -807,24 +815,63 @@ function LanderContent() {
                             { text: "Start-up India" },
                             { text: "Y Combinator" },
                             { text: "Techstars" },
-                            // Repeats for effect if needed
-                            { image: "/partners/iitbhu/ecell iit bhu.webp", text: "E-Cell IIT BHU" },
+                            { text: "IIT Guwahati" },
+                            { text: "IIM Ahmedabad" },
+                            { text: "IIIT Delhi" },
                         ]}
-                        speed={30}
+                        speed={10}
                     />
                 </div>
             </section>
 
             {/* Community Stories */}
             <section id="community" className="py-24 bg-white border-t-4 border-slate-900 relative">
-                <div className="container mx-auto px-6 max-w-6xl">
-                    <div className="text-center mb-16">
+                <div className="w-full">
+                    <div className="text-center mb-16 container mx-auto px-6">
                         <h2 className="text-3xl md:text-5xl font-black text-slate-900 uppercase tracking-tighter bg-white inline-block px-6 py-2 border-4 border-slate-900 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transform -rotate-2">
                             Stories from our <span className="text-green-600">community</span>
                         </h2>
                     </div>
                     <StaggerTestimonials />
                 </div>
+            </section>
+
+            {/* Pricing Section */}
+            <section id="pricing" className="py-24 bg-green-50/50 border-t-4 border-slate-900">
+                <CreativePricing
+                    tag="Membership"
+                    title="Simple, Transparent Pricing"
+                    description="Join as a builder for free, or power up your startup with our premium tools."
+                    tiers={[
+                        {
+                            name: "Builder",
+                            price: "Free",
+                            description: "For students and freelancers starting out.",
+                            features: ["Create Profile", "Join Circles", "Apply to Projects", "Build Reputation"],
+                            color: "bg-green-400",
+                            icon: <Zap className="w-6 h-6" />,
+                            popular: false
+                        },
+                        {
+                            name: "Startup",
+                            price: "Free",
+                            description: "For founders building their MVP.",
+                            features: ["Post 3 Roles", "Direct Messaging", "Basic Analytics", " Verified Badge"],
+                            bestFor: "Early Stage",
+                            popular: true,
+                            color: "bg-purple-400",
+                            icon: <Zap className="w-6 h-6" />
+                        },
+                        {
+                            name: "Scale",
+                            price: "₹4999",
+                            description: "For growing teams and organizations.",
+                            features: ["Unlimited Roles", "Priority Hiring", "Advanced Analytics", "Dedicated Support"],
+                            color: "bg-blue-400",
+                            icon: <Zap className="w-6 h-6" />
+                        }
+                    ]}
+                />
             </section>
 
             {/* FAQ */}

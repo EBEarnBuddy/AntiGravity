@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import LanderPage from './lander/page';
+import BrutalistLoader from '@/components/ui/BrutalistLoader';
 
 export default function Home() {
   const { currentUser, loading } = useAuth();
@@ -17,7 +18,7 @@ export default function Home() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
+        <BrutalistLoader />
       </div>
     );
   }

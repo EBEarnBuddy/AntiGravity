@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, Suspense } from "react";
 import { SignInPage, Testimonial } from "@/components/ui/sign-in";
+import BrutalistLoader from '@/components/ui/BrutalistLoader';
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -118,7 +119,7 @@ function AuthPageContent() {
 
 export default function AuthPage() {
     return (
-        <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div></div>}>
+        <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><BrutalistLoader /></div>}>
             <AuthPageContent />
         </Suspense>
     );

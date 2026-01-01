@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { FirestoreService } from '@/lib/firestore';
 import { Check, ArrowRight, User, Rocket, Heart, Code, Target, Clock, MapPin } from 'lucide-react';
+import BrutalistLoader from '@/components/ui/BrutalistLoader';
 
 // --- CONFIGURATION ---
 const STEPS = 7;
@@ -98,7 +99,7 @@ export default function OnboardingPage() {
     if (!currentUser) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-slate-50">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
+                <BrutalistLoader />
             </div>
         );
     }

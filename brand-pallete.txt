@@ -1,0 +1,45 @@
+EARNBUDDY BRAND IDENTITY
+================================================================================
+
+DESIGN AESTHETIC: NEO-BRUTALISM
+--------------------------------------------------------------------------------
+Visual Style:  High contrast, hard lines, geometric shapes, raw feeling.
+Core Traits:   2px-4px solid borders, hard shadows (no blur), distinct Z-axis layering.
+Vibe:          "Anti-LinkedIn", pro-builder, bold, energetic, confident.
+Shadows:       `box-shadow: 4px 4px 0px 0px #0f172a` (Hard Offset)
+Borders:       `border: 2px solid #0f172a` (Standard) / `4px` (Heavy)
+
+TYPOGRAPHY
+--------------------------------------------------------------------------------
+Headings:      League Spartan (Variable)
+               Usage: H1-H6, Buttons, UI Labels, Hero Text.
+               Variable: --font-heading
+
+Body:          Inter (Variable)
+               Usage: Paragraphs, Inputs, Metadata.
+               Variable: --font-inter
+
+CORE PALETTE
+--------------------------------------------------------------------------------
+Role            Name            Value      Usage
+--------------------------------------------------------------------------------
+Brand Dark      Slate 900       #0f172a    Borders, Text, Hard Shadows
+Primary         Green 600       #16a34a    Primary Buttons, Active States
+Primary Alt     Green 500       #22c55e    Gradients, Highlights
+Canvas          White           #ffffff    Backgrounds, Cards
+Surface         Slate 100       #f1f5f9    Secondary Backgrounds
+
+FUNCTIONAL COLORS
+--------------------------------------------------------------------------------
+Role            Name            Value      Usage
+--------------------------------------------------------------------------------
+Danger          Red 500         #ef4444    Error messages, Destructive actions
+Accent          Purple 600      #9333ea    Feature highlights, Special cards
+Warning         Orange 600      #ea580c    Alerts, Warnings
+Social          Blue 600        #0077b5    LinkedIn Integration
+
+NOTES
+--------------------------------------------------------------------------------
+* Shadows must match "Brand Dark" (#0f172a) to maintain the illustrative look.
+* Avoid soft gradients or blurred shadows; keep everything crisp.
+* Use "Brand Dark" for all structural borders.

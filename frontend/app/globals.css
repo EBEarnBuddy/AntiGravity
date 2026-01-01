@@ -67,6 +67,12 @@
 }
 
 @layer base {
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 5rem;
+    /* Offset for sticky header */
+  }
+
   body {
     font-family: var(--font-inter);
     font-weight: 200;
@@ -189,24 +195,28 @@
   width: 10px;
   height: 10px;
 }
+
 .custom-scrollbar::-webkit-scrollbar-track {
   background: #f8fafc;
   border-left: 2px solid #0f172a;
 }
+
 .custom-scrollbar::-webkit-scrollbar-thumb {
   background: #0f172a;
   border: 2px solid #0f172a;
   border-right: none;
 }
+
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: #334155;
 }
 
 /* Scrollbar Hide */
 .scrollbar-hide::-webkit-scrollbar {
-    display: none;
+  display: none;
 }
+
 .scrollbar-hide {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }

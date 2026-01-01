@@ -12,7 +12,7 @@ import {
 
 export function PublicFooter() {
     return (
-        <footer className="bg-slate-900 text-white py-24 border-t-4 border-slate-900 relative overflow-hidden">
+        <footer className="bg-green-600 text-white py-24 border-t-4 border-slate-900 relative overflow-hidden">
             <div className="container mx-auto px-6 max-w-6xl relative z-10">
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-20">
                     <div>
@@ -48,27 +48,27 @@ export function PublicFooter() {
                     </div>
 
                     <div>
-                        <h4 className="font-black text-lg mb-6 uppercase tracking-wider text-green-400">Quick Links</h4>
-                        <ul className="space-y-4 text-slate-300 font-bold">
-                            <li><Link href="/students" className="hover:text-white hover:underline transition">For Students</Link></li>
-                            <li><Link href="/startups" className="hover:text-white hover:underline transition">For Startups</Link></li>
-                            <li><Link href="/freelancers" className="hover:text-white hover:underline transition">For Freelancers</Link></li>
-                            <li><Link href="/communities" className="hover:text-white hover:underline transition">For Communities</Link></li>
+                        <h4 className="font-black text-lg mb-6 uppercase tracking-wider text-slate-900">Quick Links</h4>
+                        <ul className="space-y-4 text-white font-bold">
+                            <li><Link href="/students" className="hover:text-slate-900 hover:underline transition">For Students</Link></li>
+                            <li><Link href="/startups" className="hover:text-slate-900 hover:underline transition">For Startups</Link></li>
+                            <li><Link href="/freelancers" className="hover:text-slate-900 hover:underline transition">For Freelancers</Link></li>
+                            <li><Link href="/communities" className="hover:text-slate-900 hover:underline transition">For Communities</Link></li>
                         </ul>
                     </div>
 
                     <div>
-                        <h4 className="font-black text-lg mb-6 uppercase tracking-wider text-green-400">Reach Out</h4>
-                        <ul className="space-y-4 text-slate-300 font-bold">
-                            <li><Link href="/partners" className="hover:text-white hover:underline transition">Partner with Us</Link></li>
-                            <li><Link href="/careers" className="hover:text-white hover:underline transition">Careers</Link></li>
-                            <li><Link href="/support" className="hover:text-white hover:underline transition">Support</Link></li>
+                        <h4 className="font-black text-lg mb-6 uppercase tracking-wider text-slate-900">Reach Out</h4>
+                        <ul className="space-y-4 text-white font-bold">
+                            <li><Link href="/partners" className="hover:text-slate-900 hover:underline transition">Partner with Us</Link></li>
+                            <li><Link href="/careers" className="hover:text-slate-900 hover:underline transition">Careers</Link></li>
+                            <li><Link href="/support" className="hover:text-slate-900 hover:underline transition">Support</Link></li>
                         </ul>
                     </div>
 
                     <div>
-                        <h4 className="font-black text-lg mb-6 uppercase tracking-wider text-green-400">Contact</h4>
-                        <div className="space-y-4 text-slate-300 text-sm font-medium">
+                        <h4 className="font-black text-lg mb-6 uppercase tracking-wider text-slate-900">Contact</h4>
+                        <div className="space-y-4 text-white text-sm font-medium">
                             <p>business@earnbuddy.tech</p>
                             <p>suyash@earnbuddy.tech</p>
                             <p>+91 7390900769</p>
@@ -76,7 +76,7 @@ export function PublicFooter() {
                     </div>
                 </div>
 
-                <div className="border-t-2 border-slate-800 pt-8 flex flex-col md:flex-row justify-between items-center text-xs text-slate-500 font-bold uppercase tracking-widest">
+                <div className="border-t-2 border-green-800 pt-8 flex flex-col md:flex-row justify-between items-center text-xs text-green-100 font-bold uppercase tracking-widest">
                     <p>&copy; 2025 EarnBuddy. All rights reserved.</p>
                     <div className="flex gap-6 mt-4 md:mt-0">
                         <Link href="/privacy" className="hover:text-white transition">Privacy Policy</Link>
