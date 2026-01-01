@@ -1,26 +1,22 @@
 "use client";
 
-import { useEffect, Suspense, useState, useRef } from 'react';
+import { useEffect, Suspense, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import {
-    Menu,
     Play,
     Users,
     Zap,
     Globe,
-    ArrowRight,
-    Mail,
-    Link as LinkIconLucide,
-    Camera,
     ChevronLeft,
     ChevronRight,
     X
 } from "lucide-react";
 import Link from "next/link";
-import Image from "next/image";
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
+import { PublicNavbar } from "@/components/layout/PublicNavbar";
+import { PublicFooter } from "@/components/layout/PublicFooter";
 
 // --- INLINED COMPONENTS ---
 
@@ -206,6 +202,9 @@ const TestimonialCard: React.FC<TestimonialCardProps> = ({
             style={{
                 width: cardSize,
                 height: cardSize,
+                // SCALING FIX: Limit max width/height to avoid cutting off on small screens
+                maxWidth: '90vw',
+                maxHeight: '90vw',
                 transform: `
           translate(-50%, -50%) 
           translateX(${(cardSize / 1.5) * position}px)
@@ -570,41 +569,7 @@ function LanderContent() {
         <div className="min-h-screen bg-background font-sans text-slate-900">
             <VideoModal isOpen={isVideoOpen} onClose={() => setIsVideoOpen(false)} />
 
-            {/* Navbar */}
-            <nav className="fixed top-0 w-full z-50 bg-primary/95 backdrop-blur-md border-b border-green-600">
-                <div className="container mx-auto px-6 h-20 flex items-center justify-between">
-                    <div className="flex items-center gap-2 font-bold text-3xl text-white">
-                        <div className="relative h-10 w-auto aspect-square">
-                            <Image
-                                src="/logo-white.png"
-                                alt="EarnBuddy Logo"
-                                width={100}
-                                height={100}
-                                className="object-contain h-full w-auto"
-                            />
-                        </div>
-                        EarnBuddy
-                    </div>
-
-                    <div className="hidden lg:flex items-center gap-8 text-lg font-medium text-white/90">
-                        <Link href="#how-it-works" className="hover:text-white transition">How It Works</Link>
-                        <Link href="#partners" className="hover:text-white transition">Partners</Link>
-                        <Link href="#pricing" className="hover:text-white transition">Pricing</Link>
-                        <Link href="#community" className="hover:text-white transition">Community</Link>
-                        <Link href="#faq" className="hover:text-white transition">FAQ</Link>
-                    </div>
-
-                    <div className="flex items-center gap-4">
-                        <Link href="/auth?mode=signin" className="hidden md:block bg-transparent text-white px-6 py-2.5 rounded-none border-2 border-white text-lg font-black uppercase tracking-wide hover:bg-white/10 transition-all shadow-none">
-                            Log In
-                        </Link>
-                        <Link href="/auth?mode=signup" className="bg-white text-green-600 border-2 border-white px-6 py-2.5 rounded-none text-lg font-black uppercase tracking-wide hover:bg-slate-100 transition shadow-none">
-                            Get Started
-                        </Link>
-                        <button className="lg:hidden text-white"><Menu className="w-8 h-8" /></button>
-                    </div>
-                </div>
-            </nav>
+            <PublicNavbar />
 
             {/* Hero Section */}
             <header className="bg-primary text-white pt-32 pb-0 overflow-hidden relative">
@@ -833,11 +798,17 @@ function LanderContent() {
 
                     <LogoMarquee
                         items={[
-                            { text: "E-Cell IIT BHU" },
-                            { text: "IIT Mandi" },
-                            { text: "IIT Bhilai" },
-                            { text: "IIT Bhubaneshwar" },
-                            { text: "ESIL" },
+                            { image: "/partners/iitbhu/ecell iit bhu.webp", text: "E-Cell IIT BHU" },
+                            { text: "IIT Mandi E-Cell" },
+                            { text: "IIT Bhilai E-Cell" },
+                            { text: "IIT Bhubaneshwar E-Cell" },
+                            { text: "BITS Pilani" },
+                            { text: "IIIT Hyderabad" },
+                            { text: "Start-up India" },
+                            { text: "Y Combinator" },
+                            { text: "Techstars" },
+                            // Repeats for effect if needed
+                            { image: "/partners/iitbhu/ecell iit bhu.webp", text: "E-Cell IIT BHU" },
                         ]}
                         speed={30}
                     />
@@ -865,77 +836,7 @@ function LanderContent() {
                 />
             </section>
 
-            {/* Footer */}
-            <footer className="bg-slate-900 text-white py-24 border-t-4 border-slate-900 relative overflow-hidden">
-                <div className="container mx-auto px-6 max-w-6xl relative z-10">
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-20">
-                        <div>
-                            <div className="flex items-center gap-2 font-bold text-2xl text-white mb-6">
-                                <div className="relative h-10 w-auto aspect-square">
-                                    <Image
-                                        src="/logo-white.png"
-                                        alt="EarnBuddy Logo"
-                                        width={100}
-                                        height={100}
-                                        className="object-contain h-full w-auto"
-                                    />
-                                </div>
-                                EarnBuddy
-                            </div>
-                            <p className="text-slate-400 leading-relaxed mb-8 max-w-sm font-medium">
-                                Where ambitious builders come together to turn ideas into reality. Build. Collaborate. Earn.
-                            </p>
-                            <div className="flex gap-6">
-                                <Mail className="w-5 h-5 text-white hover:text-green-400 cursor-pointer transition" />
-                                <LinkIconLucide className="w-5 h-5 text-white hover:text-green-400 cursor-pointer transition" />
-                                <Camera className="w-5 h-5 text-white hover:text-green-400 cursor-pointer transition" />
-                            </div>
-                        </div>
-
-                        <div>
-                            <h4 className="font-black text-lg mb-6 uppercase tracking-wider text-green-400">Quick Links</h4>
-                            <ul className="space-y-4 text-slate-300 font-bold">
-                                <li><Link href="#" className="hover:text-white hover:underline transition">For Students</Link></li>
-                                <li><Link href="#" className="hover:text-white hover:underline transition">For Startups</Link></li>
-                                <li><Link href="#" className="hover:text-white hover:underline transition">For Freelancers</Link></li>
-                                <li><Link href="#" className="hover:text-white hover:underline transition">For Communities</Link></li>
-                            </ul>
-                        </div>
-
-                        <div>
-                            <h4 className="font-black text-lg mb-6 uppercase tracking-wider text-green-400">Reach Out</h4>
-                            <ul className="space-y-4 text-slate-300 font-bold">
-                                <li><Link href="#" className="hover:text-white hover:underline transition">Partner with Us</Link></li>
-                                <li><Link href="#" className="hover:text-white hover:underline transition">Careers</Link></li>
-                                <li><Link href="/support" className="hover:text-white hover:underline transition">Support</Link></li>
-                            </ul>
-                        </div>
-
-                        <div>
-                            <h4 className="font-black text-lg mb-6 uppercase tracking-wider text-green-400">Contact</h4>
-                            <div className="space-y-4 text-slate-300 text-sm font-medium">
-                                <p>business@earnbuddy.tech</p>
-                                <p>suyash@earnbuddy.tech</p>
-                                <p>+91 7390900769</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="border-t-2 border-slate-800 pt-8 flex flex-col md:flex-row justify-between items-center text-xs text-slate-500 font-bold uppercase tracking-widest">
-                        <p>&copy; 2025 EarnBuddy. All rights reserved.</p>
-                        <div className="flex gap-6 mt-4 md:mt-0">
-                            <Link href="#" className="hover:text-white transition">Privacy Policy</Link>
-                            <Link href="#" className="hover:text-white transition">Terms of Service</Link>
-                        </div>
-                    </div>
-
-                    <div
-                        onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-                        className="fixed bottom-8 right-8 bg-green-500 text-slate-900 rounded-none border-2 border-slate-900 p-3 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] cursor-pointer hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all duration-300 z-[9999]">
-                        <ArrowRight className="w-6 h-6 -rotate-90" />
-                    </div>
-                </div>
-            </footer>
+            <PublicFooter />
         </div >
     );
 }
