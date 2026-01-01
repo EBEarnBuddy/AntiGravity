@@ -19,7 +19,8 @@ import {
     History,
     MessageSquare,
     ArrowRight,
-    Calendar
+    Calendar,
+    Rocket
 } from "lucide-react";
 import Link from "next/link";
 import { cn } from '@/lib/utils';
@@ -1170,8 +1171,40 @@ function LanderContent() {
             </section>
 
             {/* --- PRICING --- */}
+            {/* --- PRICING --- */}
             <section id="pricing">
-                <CreativePricing />
+                <CreativePricing
+                    tag="Simple Plans"
+                    title="Start for free, upgrade to scale."
+                    description="Whether you're a student building a portfolio or a startup building a team."
+                    tiers={[
+                        {
+                            name: "Builder",
+                            price: 0,
+                            description: "For students and freelancers starting out.",
+                            features: ["Create Profile", "Join Community Circles", "Apply to Opportunities", "Basic Analytics"],
+                            color: "bg-white",
+                            icon: <Users className="w-6 h-6" />
+                        },
+                        {
+                            name: "Startup",
+                            price: 2999,
+                            description: "For founders posting roles and building teams.",
+                            features: ["Post Unlimited Roles", "Access Verified Talent", "Create Private Circles", "Advanced Team Tools"],
+                            popular: true,
+                            color: "bg-green-400",
+                            icon: <Rocket className="w-6 h-6" />
+                        },
+                        {
+                            name: "Organization",
+                            price: "Custom",
+                            description: "For large communities and institutions.",
+                            features: ["Custom Branding", "University Dashboards", "API Access", "Dedicated Support"],
+                            color: "bg-blue-400",
+                            icon: <Globe className="w-6 h-6" />
+                        }
+                    ]}
+                />
             </section>
 
             {/* Partners */}
