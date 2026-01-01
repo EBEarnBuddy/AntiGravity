@@ -19,4 +19,7 @@ const RoomMembershipSchema: Schema = new Schema({
 // Prevent duplicate membership
 RoomMembershipSchema.index({ room: 1, user: 1 }, { unique: true });
 
+// Optimize "My Rooms" query: find({ user: X, status: 'accepted' })
+RoomMembershipSchema.index({ user: 1, status: 1 });
+
 export default mongoose.model<IRoomMembership>('RoomMembership', RoomMembershipSchema);

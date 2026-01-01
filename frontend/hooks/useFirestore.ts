@@ -72,27 +72,65 @@ export const useRooms = () => {
     }, [currentUser, refreshTrigger]);
 
     useEffect(() => {
-        // Listen for room updates
-        const handleRefresh = () => {
-            setRefreshTrigger(prev => prev + 1);
+        if (!socket) return;
+
+        // Specific Handlers to avoid full refetch
+        const handleRoomCreated = (newRoom: Room) => {
+            // Add to public rooms (assuming new rooms are public or check isPrivate)
+            // Ideally payload tells us. For now, we append to top.
+            setRooms(prev => {
+                if (prev.some(r => r.id === newRoom.id)) return prev;
+                return [newRoom, ...prev];
+            });
         };
 
-        if (socket) {
-            socket.on('room:created', handleRefresh);
-            socket.on('room:updated', handleRefresh);
-            socket.on('room:deleted', handleRefresh);
-            socket.on('room:member_joined', handleRefresh);
-            socket.on('room:member_left', handleRefresh);
-        }
+        const handleRoomUpdated = (updatedRoom: Room) => {
+            setRooms(prev => prev.map(r => r.id === updatedRoom.id ? { ...r, ...updatedRoom } : r));
+            setMyRooms(prev => prev.map(r => r.id === updatedRoom.id ? { ...r, ...updatedRoom } : r));
+        };
+
+        const handleMemberJoined = (data: { roomId: string }) => {
+            const { roomId } = data;
+            // Update count locally
+            const updateCount = (list: Room[]) => list.map(r => {
+                if (r.id === roomId) {
+                    return { ...r, memberCount: (r.memberCount || 0) + 1 };
+                }
+                return r;
+            });
+            setRooms(prev => updateCount(prev));
+            setMyRooms(prev => updateCount(prev));
+        };
+
+        const handleMemberLeft = (data: { roomId: string }) => {
+            const { roomId } = data;
+            const updateCount = (list: Room[]) => list.map(r => {
+                if (r.id === roomId) {
+                    return { ...r, memberCount: Math.max((r.memberCount || 1) - 1, 0) };
+                }
+                return r;
+            });
+            setRooms(prev => updateCount(prev));
+            setMyRooms(prev => updateCount(prev));
+        };
+
+        const handleRoomDeleted = ({ roomId }: { roomId: string }) => {
+            setRooms(prev => prev.filter(r => r.id !== roomId));
+            setMyRooms(prev => prev.filter(r => r.id !== roomId));
+        };
+
+        socket.on('room:created', handleRoomCreated);
+        socket.on('room:updated', handleRoomUpdated);
+        socket.on('room:deleted', handleRoomDeleted);
+        socket.on('room:member_joined', handleMemberJoined);
+        socket.on('room:member_left', handleMemberLeft);
 
         return () => {
-            if (socket) {
-                socket.off('room:created', handleRefresh);
-                socket.off('room:updated', handleRefresh);
-                socket.off('room:deleted', handleRefresh);
-                socket.off('room:member_joined', handleRefresh);
-                socket.off('room:member_left', handleRefresh);
-            }
+            socket.off('room:created', handleRoomCreated);
+            socket.off('room:updated', handleRoomUpdated);
+            socket.off('room:deleted', handleRoomDeleted);
+            socket.off('room:member_joined', handleMemberJoined);
+            socket.off('room:member_left', handleMemberLeft);
         };
     }, []);
 
@@ -271,11 +309,34 @@ export const useRoomMessages = (roomId: string) => {
     }, [roomId, currentUser]);
 
     const loadMore = async () => {
-        // Pagination with Firestore and snapshot needs complexity (startAfter).
-        // For now, we stub loadMore or just don't load older than 100.
-        // Or we can fetch using getRoomMessages with offset/cursor if needed.
-        console.warn('Load more not fully implemented in Firestore refactor yet');
-        setIsLoadingMore(false);
+        if (!hasMore || isLoadingMore || messages.length === 0) return;
+
+        setIsLoadingMore(true);
+        // Oldest message is at index 0 because we strictly store [Oldest ... Newest]
+        const oldestMessageId = messages[0]._id || messages[0].id; // Handle both due to loose types
+
+        try {
+            const res = await api.get(`/rooms/${roomId}/messages?limit=30&before=${oldestMessageId}`);
+            const olderMessages = res.data;
+
+            if (olderMessages.length < 30) {
+                setHasMore(false);
+            }
+
+            if (olderMessages.length > 0) {
+                setMessages(prev => {
+                    // Prepend logic
+                    // Dedup against existing (just in case)
+                    const existingIds = new Set(prev.map(m => m._id));
+                    const uniqueOlder = olderMessages.filter((m: any) => !existingIds.has(m._id));
+                    return [...uniqueOlder, ...prev];
+                });
+            }
+        } catch (err) {
+            console.error('Failed to load older messages:', err);
+        } finally {
+            setIsLoadingMore(false);
+        }
     };
 
     const sendMessage = async (content: string, type: 'text' | 'image' | 'file' = 'text') => {
@@ -627,6 +688,7 @@ export const useNotifications = () => {
 
         // Polling based since we are using REST API now
         const fetchNotifications = async () => {
+            // ... existing polling logic
             try {
                 const response = await api.get('/notifications');
                 const data = response.data.map((item: any) => ({ ...item, id: item._id }));
@@ -640,7 +702,26 @@ export const useNotifications = () => {
 
         fetchNotifications();
         const interval = setInterval(fetchNotifications, 30000); // Poll every 30s
-        return () => clearInterval(interval);
+
+        // Realtime Listener
+        const handleNewNotification = (notif: any) => {
+            // notif might be raw from socket, ensure shape matches
+            const newNotif = { ...notif, id: notif._id || notif.id, isRead: false };
+            setNotifications(prev => {
+                // Deduplicate
+                if (prev.some(n => n.id === newNotif.id)) return prev;
+                return [newNotif, ...prev];
+            });
+        };
+
+        if (socket) {
+            socket.on('notification:new', handleNewNotification);
+        }
+
+        return () => {
+            clearInterval(interval);
+            if (socket) socket.off('notification:new', handleNewNotification);
+        };
     }, [currentUser]);
 
     const markAsRead = async (id: string) => {

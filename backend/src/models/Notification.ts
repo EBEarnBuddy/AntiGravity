@@ -24,4 +24,7 @@ const NotificationSchema: Schema = new Schema({
     isHidden: { type: Boolean, default: false }, // Soft delete for "Clear All"
 }, { timestamps: true });
 
+// Optimize "Unread Count" query
+NotificationSchema.index({ recipient: 1, isRead: 1 });
+
 export default mongoose.model<INotification>('Notification', NotificationSchema);

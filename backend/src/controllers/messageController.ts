@@ -190,12 +190,9 @@ export const getMessages = async (req: AuthRequest, res: Response) => {
             return;
         }
 
-        // Cache Logic (Use realRoomId)
+        // Cache Logic (Only for first page)
         const cacheKey = `messages:${realRoomId}`;
-        /* 
-           Ideally, we might want to cache by query params too if 'limit' changes often, 
-           but usually the "latest chunk" is standard. 
-        */
+
         if (!before) {
             const cachedMessages = await RedisService.get<any[]>(cacheKey);
             if (cachedMessages) {
@@ -207,7 +204,13 @@ export const getMessages = async (req: AuthRequest, res: Response) => {
         // Build Query
         const query: any = { room: realRoomId };
         if (before) {
-            query.createdAt = { $lt: new Date(before) };
+            if (mongoose.isValidObjectId(before)) {
+                query._id = { $lt: before };
+            } else {
+                // Fallback if 'before' is timestamp (legacy support)
+                // But strictly we prefer ID for cursor stability
+                query.createdAt = { $lt: new Date(before) };
+            }
         }
 
         const messages = await Message.find(query)
