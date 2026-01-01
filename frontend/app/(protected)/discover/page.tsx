@@ -96,87 +96,99 @@ export default function DiscoverPage() {
     return (
         <div className="min-h-screen bg-slate-50 pb-20">
             {/* Header Section */}
-            <div className="bg-white border-b border-slate-100 sticky top-0 z-30">
+            <div className="bg-white border-b border-slate-100 z-30">
                 <div className="container mx-auto px-4 py-6">
-                    <div className="flex flex-row justify-between items-center gap-4">
-                        <div id="tour-dashboard-welcome" className="flex-1 min-w-0">
+                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                        <div id="tour-dashboard-welcome" className="flex-1 min-w-0 w-full md:w-auto">
                             <h1 className="text-2xl font-black text-slate-900 tracking-tight uppercase">
                                 Welcome back, {userProfile?.displayName?.split(' ')[0] || 'Builder'}
                             </h1>
                             <p className="text-slate-500 font-bold text-xs uppercase tracking-wide">Here's what's happening in your network.</p>
                         </div>
 
-                        {/* Search Bar - Removed as per clean up */}
-                        {/* Create Button & Dropdown */}
-                        <div className="relative">
-                            <motion.button
-                                whileHover={{ scale: 1.05 }}
-                                whileTap={{ scale: 0.95 }}
-                                onClick={() => setShowCreateDropdown(!showCreateDropdown)}
-                                className="h-10 w-10 md:h-12 md:w-12 bg-green-500 border-2 border-slate-900 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] hover:shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center text-white"
-                            >
-                                <Plus className="w-6 h-6 md:w-7 md:h-7 stroke-[3]" />
-                            </motion.button>
+                        {/* Mobile Header Optimization: Search + Create */}
+                        <div className="flex items-center gap-3 w-full md:w-auto">
+                            {/* Search Bar - Restored for Mobile/Desktop balance as per request */}
+                            <div className="relative flex-1 md:w-64">
+                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                                <input
+                                    type="text"
+                                    placeholder="Search..."
+                                    className="w-full bg-slate-50 border-2 border-slate-200 pl-10 pr-4 py-2 text-sm font-bold text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-slate-900 transition-colors rounded-none"
+                                />
+                            </div>
 
-                            <AnimatePresence>
-                                {showCreateDropdown && (
-                                    <motion.div
-                                        initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                                        exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                                        className="absolute right-0 top-full mt-2 w-72 bg-white border-2 border-slate-900 shadow-[6px_6px_0px_0px_rgba(15,23,42,1)] z-50 p-2"
-                                    >
-                                        <button
-                                            onClick={() => {
-                                                setShowCreateModal(true);
-                                                setShowCreateDropdown(false);
-                                            }}
-                                            className="w-full text-left px-4 py-3 bg-white hover:bg-green-50 text-slate-900 hover:text-green-700 font-black uppercase text-xs tracking-wide border-2 border-transparent hover:border-slate-900 transition-all flex items-center gap-3"
+                            {/* Create Button & Dropdown */}
+                            <div className="relative">
+                                <motion.button
+                                    whileHover={{ scale: 1.05 }}
+                                    whileTap={{ scale: 0.95 }}
+                                    onClick={() => setShowCreateDropdown(!showCreateDropdown)}
+                                    className="h-10 w-10 md:h-12 md:w-12 bg-green-500 border-2 border-slate-900 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] hover:shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all flex items-center justify-center text-white shrink-0"
+                                >
+                                    <Plus className="w-6 h-6 md:w-7 md:h-7 stroke-[3]" />
+                                </motion.button>
+                                {/* ... Dropdown content (kept same logic, just spacing adjusted above) ... */}
+                                <AnimatePresence>
+                                    {showCreateDropdown && (
+                                        <motion.div
+                                            initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                                            exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                                            className="absolute right-0 top-full mt-2 w-72 bg-white border-2 border-slate-900 shadow-[6px_6px_0px_0px_rgba(15,23,42,1)] z-50 p-2"
                                         >
-                                            <div className="w-8 h-8 bg-green-100 border-2 border-slate-900 flex items-center justify-center text-green-700">
-                                                <Rocket className="w-4 h-4" />
-                                            </div>
-                                            Post Startup Role
-                                        </button>
-
-                                        <div className="relative opacity-60 cursor-not-allowed">
                                             <button
-                                                disabled
-                                                className="w-full text-left px-4 py-3 bg-white text-slate-400 font-black uppercase text-xs tracking-wide border-2 border-transparent flex items-center gap-3 mt-1 cursor-not-allowed pr-28"
+                                                onClick={() => {
+                                                    setShowCreateModal(true);
+                                                    setShowCreateDropdown(false);
+                                                }}
+                                                className="w-full text-left px-4 py-3 bg-white hover:bg-green-50 text-slate-900 hover:text-green-700 font-black uppercase text-xs tracking-wide border-2 border-transparent hover:border-slate-900 transition-all flex items-center gap-3"
                                             >
-                                                <div className="w-8 h-8 bg-blue-50 border-2 border-slate-200 flex items-center justify-center text-blue-300">
-                                                    <Briefcase className="w-4 h-4" />
+                                                <div className="w-8 h-8 bg-green-100 border-2 border-slate-900 flex items-center justify-center text-green-700">
+                                                    <Rocket className="w-4 h-4" />
                                                 </div>
-                                                Post Project
+                                                Post Startup Role
                                             </button>
-                                            <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-black uppercase bg-slate-900 text-white px-2 py-0.5">Coming Soon</span>
-                                        </div>
 
-                                        <button
-                                            onClick={() => { setShowCircleModal(true); setShowCreateDropdown(false); }}
-                                            className="w-full text-left px-4 py-3 bg-white hover:bg-purple-50 text-slate-900 hover:text-purple-700 font-black uppercase text-xs tracking-wide border-2 border-transparent hover:border-slate-900 transition-all flex items-center gap-3 mt-1"
-                                        >
-                                            <div className="w-8 h-8 bg-purple-100 border-2 border-slate-900 flex items-center justify-center text-purple-700">
-                                                <Users className="w-4 h-4" />
+                                            <div className="relative opacity-60 cursor-not-allowed">
+                                                <button
+                                                    disabled
+                                                    className="w-full text-left px-4 py-3 bg-white text-slate-400 font-black uppercase text-xs tracking-wide border-2 border-transparent flex items-center gap-3 mt-1 cursor-not-allowed pr-28"
+                                                >
+                                                    <div className="w-8 h-8 bg-blue-50 border-2 border-slate-200 flex items-center justify-center text-blue-300">
+                                                        <Briefcase className="w-4 h-4" />
+                                                    </div>
+                                                    Post Project
+                                                </button>
+                                                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-black uppercase bg-slate-900 text-white px-2 py-0.5">Coming Soon</span>
                                             </div>
-                                            Create Circle
-                                        </button>
 
-                                        <div className="relative opacity-60 cursor-not-allowed">
                                             <button
-                                                disabled
-                                                className="w-full text-left px-4 py-3 bg-white text-slate-400 font-black uppercase text-xs tracking-wide border-2 border-transparent flex items-center gap-3 mt-1 cursor-not-allowed pr-28"
+                                                onClick={() => { setShowCircleModal(true); setShowCreateDropdown(false); }}
+                                                className="w-full text-left px-4 py-3 bg-white hover:bg-purple-50 text-slate-900 hover:text-purple-700 font-black uppercase text-xs tracking-wide border-2 border-transparent hover:border-slate-900 transition-all flex items-center gap-3 mt-1"
                                             >
-                                                <div className="w-8 h-8 bg-orange-50 border-2 border-slate-200 flex items-center justify-center text-orange-300">
-                                                    <Calendar className="w-4 h-4" />
+                                                <div className="w-8 h-8 bg-purple-100 border-2 border-slate-900 flex items-center justify-center text-purple-700">
+                                                    <Users className="w-4 h-4" />
                                                 </div>
-                                                Host Event
+                                                Create Circle
                                             </button>
-                                            <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-black uppercase bg-slate-900 text-white px-2 py-0.5">Coming Soon</span>
-                                        </div>
-                                    </motion.div>
-                                )}
-                            </AnimatePresence>
+
+                                            <div className="relative opacity-60 cursor-not-allowed">
+                                                <button
+                                                    disabled
+                                                    className="w-full text-left px-4 py-3 bg-white text-slate-400 font-black uppercase text-xs tracking-wide border-2 border-transparent flex items-center gap-3 mt-1 cursor-not-allowed pr-28"
+                                                >
+                                                    <div className="w-8 h-8 bg-orange-50 border-2 border-slate-200 flex items-center justify-center text-orange-300">
+                                                        <Calendar className="w-4 h-4" />
+                                                    </div>
+                                                    Host Event
+                                                </button>
+                                                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-black uppercase bg-slate-900 text-white px-2 py-0.5">Coming Soon</span>
+                                            </div>
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -190,13 +202,13 @@ export default function DiscoverPage() {
                     <div className="lg:col-span-12 space-y-10">
 
                         {/* Quick Actions */}
-                        <section className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <section className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
                             {/* ... quick actions map ... */}
                             {quickActions.map((action, idx) => (
                                 <motion.div
                                     key={idx}
                                     whileHover={{ y: -2, x: -2 }}
-                                    className="bg-white p-4 border-2 border-slate-900 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] hover:shadow-[6px_6px_0px_0px_rgba(15,23,42,1)] transition-all cursor-pointer group relative overflow-hidden"
+                                    className="bg-white p-4 border-2 border-slate-900 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] hover:shadow-[6px_6px_0px_0px_rgba(15,23,42,1)] transition-all cursor-pointer group relative overflow-hidden min-h-[120px] flex flex-col justify-between"
                                     onClick={() => action.path.startsWith('#') ? {} : router.push(action.path)}
                                 >
                                     {action.badge && (
@@ -207,7 +219,7 @@ export default function DiscoverPage() {
                                     <div className={`${action.color} w-10 h-10 border-2 border-slate-900 flex items-center justify-center mb-3 text-white shadow-sm group-hover:scale-110 transition-transform`}>
                                         <action.icon className="w-5 h-5" />
                                     </div>
-                                    <h3 className="font-black text-slate-900 uppercase tracking-tight text-sm">{action.title}</h3>
+                                    <h3 className="font-black text-slate-900 uppercase tracking-tight text-sm pr-6 leading-tight">{action.title}</h3>
                                 </motion.div>
                             ))}
                         </section>
@@ -308,50 +320,61 @@ export default function DiscoverPage() {
                                 {(projectsLoading || startupsLoading) ? (
                                     [1, 2, 3].map(i => <Skeleton key={i} className="h-32 w-full rounded-none" />)
                                 ) : (
-                                    feedItems.map((item: any) => (
-                                        <motion.div
-                                            key={item.id}
-                                            initial={{ opacity: 0, y: 10 }}
-                                            whileInView={{ opacity: 1, y: 0 }}
-                                            viewport={{ once: true }}
-                                            className="bg-white p-6 border-2 border-slate-900 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] hover:shadow-[6px_6px_0px_0px_rgba(15,23,42,1)] hover:-translate-y-1 transition-all cursor-pointer group"
-                                            onClick={() => router.push(item.type === 'startup' ? `/startups` : `/freelance`)}
-                                        >
-                                            <div className="flex justify-between items-start gap-4">
-                                                <div className="flex gap-4">
-                                                    <div className="w-12 h-12 bg-white border-2 border-slate-900 shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] overflow-hidden flex-shrink-0">
-                                                        {item.logo || item.companyLogo ? (
-                                                            <img src={item.logo || item.companyLogo} alt="" className="w-full h-full object-cover bg-white" />
-                                                        ) : (
-                                                            <div className="w-full h-full flex items-center justify-center text-2xl">⚡</div>
-                                                        )}
-                                                    </div>
-                                                    <div>
-                                                        <h3 className="text-lg font-black uppercase text-slate-900 group-hover:text-green-600 transition-colors">
-                                                            {item.name || item.title}
-                                                        </h3>
-                                                        <p className="text-slate-600 text-sm line-clamp-1 mb-2 font-medium">{item.description}</p>
-                                                        <div className="flex flex-wrap gap-2 text-xs font-black uppercase tracking-wide">
-                                                            <span className="px-2 py-1 bg-white border-2 border-slate-900 text-slate-900">
-                                                                {item.industry || item.category || 'Tech'}
-                                                            </span>
-                                                            {item.location && (
-                                                                <span className="px-2 py-1 bg-white border-2 border-slate-900 text-slate-900">
-                                                                    {item.location}
-                                                                </span>
+                                    <>
+                                        {feedItems.slice(0, 5).map((item: any) => (
+                                            <motion.div
+                                                key={item.id}
+                                                initial={{ opacity: 0, y: 10 }}
+                                                whileInView={{ opacity: 1, y: 0 }}
+                                                viewport={{ once: true }}
+                                                className="bg-white p-6 border-2 border-slate-900 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] hover:shadow-[6px_6px_0px_0px_rgba(15,23,42,1)] hover:-translate-y-1 transition-all cursor-pointer group"
+                                                onClick={() => router.push(item.type === 'startup' ? `/startups` : `/freelance`)}
+                                            >
+                                                <div className="flex justify-between items-start gap-4">
+                                                    <div className="flex gap-4">
+                                                        <div className="w-12 h-12 bg-white border-2 border-slate-900 shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] overflow-hidden flex-shrink-0">
+                                                            {item.logo || item.companyLogo ? (
+                                                                <img src={item.logo || item.companyLogo} alt="" className="w-full h-full object-cover bg-white" />
+                                                            ) : (
+                                                                <div className="w-full h-full flex items-center justify-center text-2xl">⚡</div>
                                                             )}
-                                                            <span className="px-2 py-1 bg-green-600 text-white border-2 border-slate-900">
-                                                                {item.salary || item.funding || 'Funded'}
-                                                            </span>
+                                                        </div>
+                                                        <div>
+                                                            <h3 className="text-base font-black uppercase text-slate-900 group-hover:text-green-600 transition-colors">
+                                                                {item.name || item.title}
+                                                            </h3>
+                                                            <p className="text-slate-600 text-sm line-clamp-1 mb-2 font-medium">{item.description}</p>
+                                                            <div className="flex flex-wrap gap-2 text-xs font-black uppercase tracking-wide">
+                                                                <span className="px-2 py-1 bg-white border-2 border-slate-900 text-slate-900">
+                                                                    {item.industry || item.category || 'Tech'}
+                                                                </span>
+                                                                {item.location && (
+                                                                    <span className="px-2 py-1 bg-white border-2 border-slate-900 text-slate-900">
+                                                                        {item.location}
+                                                                    </span>
+                                                                )}
+                                                                <span className="px-2 py-1 bg-green-600 text-white border-2 border-slate-900">
+                                                                    {item.salary || item.funding || 'Funded'}
+                                                                </span>
+                                                            </div>
                                                         </div>
                                                     </div>
+                                                    <div className="text-xs font-black uppercase text-slate-400 whitespace-nowrap">
+                                                        {item.createdAt ? formatDate(item.createdAt) : 'Recently'}
+                                                    </div>
                                                 </div>
-                                                <div className="text-xs font-black uppercase text-slate-400 whitespace-nowrap">
-                                                    {item.createdAt ? formatDate(item.createdAt) : 'Recently'}
-                                                </div>
-                                            </div>
-                                        </motion.div>
-                                    ))
+                                            </motion.div>
+                                        ))}
+
+                                        <div className="flex justify-center mt-8">
+                                            <button
+                                                onClick={() => router.push('/startups')}
+                                                className="bg-white text-slate-900 px-8 py-3 border-2 border-slate-900 font-black uppercase tracking-wide shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] transition-all"
+                                            >
+                                                View More Opportunities
+                                            </button>
+                                        </div>
+                                    </>
                                 )}
                             </div>
                         </section>

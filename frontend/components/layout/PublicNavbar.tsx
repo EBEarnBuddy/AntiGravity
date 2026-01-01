@@ -60,13 +60,13 @@ export function PublicNavbar() {
                         className="fixed inset-0 z-40 bg-slate-900 pt-24 px-6 lg:hidden"
                     >
                         <div className="flex flex-col gap-6 text-2xl font-black text-white uppercase tracking-wide">
-                            <Link href="/lander#how-it-works" onClick={toggleMenu} className="hover:text-green-400">How It Works</Link>
-                            <Link href="/partners" onClick={toggleMenu} className="hover:text-green-400">Partners</Link>
-                            <Link href="/pricing" onClick={toggleMenu} className="hover:text-green-400">Pricing</Link>
-                            <Link href="/communities" onClick={toggleMenu} className="hover:text-green-400">Community</Link>
-                            <Link href="/lander#faq" onClick={toggleMenu} className="hover:text-green-400">FAQ</Link>
+                            <Link href="/lander#how-it-works" onClick={toggleMenu} className="hover:text-green-400 text-center">How It Works</Link>
+                            <Link href="/partners" onClick={toggleMenu} className="hover:text-green-400 text-center">Partners</Link>
+                            <Link href="/pricing" onClick={toggleMenu} className="hover:text-green-400 text-center">Pricing</Link>
+                            <Link href="/communities" onClick={toggleMenu} className="hover:text-green-400 text-center">Community</Link>
+                            <Link href="/lander#faq" onClick={toggleMenu} className="hover:text-green-400 text-center">FAQ</Link>
                             <hr className="border-slate-800 my-2" />
-                            <Link href="/auth?mode=signin" onClick={toggleMenu} className="text-green-400">Log In</Link>
+                            <Link href="/auth?mode=signin" onClick={toggleMenu} className="text-green-400 text-center">Log In</Link>
                             <Link href="/auth?mode=signup" onClick={toggleMenu} className="bg-white text-slate-900 p-4 text-center border-4 border-green-500">Get Started</Link>
                         </div>
                     </motion.div>

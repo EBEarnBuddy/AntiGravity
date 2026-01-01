@@ -599,7 +599,7 @@ function LanderContent() {
     }, [searchParams, logout, currentUser, router]);
 
     return (
-        <div className="min-h-screen bg-background font-sans text-slate-900">
+        <div className="min-h-screen bg-background font-sans text-slate-900 overflow-x-hidden">
             <VideoModal isOpen={isVideoOpen} onClose={() => setIsVideoOpen(false)} />
 
             <PublicNavbar />
@@ -634,7 +634,7 @@ function LanderContent() {
                         </div>
 
                         {/* Hero Image Mockup */}
-                        <div className="flex-1 relative translate-x-4 md:translate-x-0 translate-y-10 md:translate-y-20">
+                        <div className="flex-1 relative translate-x-4 md:translate-x-0 translate-y-10 md:translate-y-20 hidden md:block">
                             <div className="relative z-10">
                                 <div className="bg-white rounded-none shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] overflow-hidden border-4 border-slate-900">
                                     <div className="bg-gray-100 h-8 flex items-center px-4 gap-2 border-b border-gray-200">
@@ -739,7 +739,7 @@ function LanderContent() {
 
                 {/* Wave separator */}
                 <div className="absolute bottom-0 left-0 w-full overflow-hidden leading-none rotate-180">
-                    <svg className="relative block w-[calc(100%+1.3px)] h-[60px]" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none">
+                    <svg className="relative block w-[calc(100%+1.3px)] h-[30px]" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none">
                         <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z" fill="#000000"></path>
                     </svg>
                 </div>
