@@ -33,12 +33,16 @@ import { formatTimeAgo } from '@/lib/utils';
 import { UserAvatar } from '@/components/ui/UserAvatar';
 import { Linkify } from '@/components/ui/linkify';
 import { uploadImage } from '@/lib/cloudinary';
+import { useSoundEffects } from '@/hooks/useSoundEffects';
+import { BrutalistSkeleton } from '@/components/ui/BrutalistSkeleton';
+import { EmptyState } from '@/components/ui/EmptyState';
 
 const RoomChatPage: React.FC = () => {
     const params = useParams();
     const router = useRouter();
     const paramRoomId = params?.roomId as string;
     const { currentUser, userProfile } = useAuth();
+    const { playSend, playClick } = useSoundEffects();
 
     const { rooms, myRooms } = useRooms();
 
@@ -261,6 +265,7 @@ const RoomChatPage: React.FC = () => {
 
         setNewMessage(''); // Clear immediately for UX
         // Hook handles clearing typing state on sendMessage trigger
+        playSend();
 
 
         try {
@@ -384,9 +389,11 @@ const RoomChatPage: React.FC = () => {
 
     if (!room && !loading) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-slate-50">
-                <div className="flex flex-col items-center gap-4">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
+            <div className="min-h-screen flex items-center justify-center bg-slate-50 p-8">
+                <div className="w-full max-w-sm space-y-4">
+                    <BrutalistSkeleton height="h-32" />
+                    <BrutalistSkeleton height="h-8" width="w-2/3" />
+                    <BrutalistSkeleton height="h-4" />
                 </div>
             </div>
         );
@@ -576,11 +583,8 @@ const RoomChatPage: React.FC = () => {
                     className="flex-1 px-6 py-6 space-y-4 overflow-y-auto w-full custom-scrollbar"
                 >
                     {messages.length === 0 && !loading && (
-                        <div className="flex flex-col items-center justify-center flex-1 text-slate-400 space-y-4">
-                            <div className="w-16 h-16 bg-slate-100 rounded-2xl flex items-center justify-center">
-                                <Users className="w-8 h-8 text-slate-300" />
-                            </div>
-                            <p className="font-bold">No messages yet. Start the conversation!</p>
+                        <div className="flex-1 flex items-center justify-center my-8">
+                            <EmptyState title="No messages yet" description="Be the first to break the silence!" type="general" />
                         </div>
                     )}
 

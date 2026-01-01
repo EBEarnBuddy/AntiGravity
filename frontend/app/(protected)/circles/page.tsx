@@ -22,12 +22,16 @@ import BrutalistLoader from '@/components/ui/BrutalistLoader';
 import { Linkify } from '@/components/ui/linkify';
 import ShareModal from '@/components/ui/ShareModal';
 import { useNotification } from '@/contexts/NotificationContext';
+import { useSoundEffects } from '@/hooks/useSoundEffects';
+import { EmptyState } from '@/components/ui/EmptyState';
+import { Loader2 } from 'lucide-react';
 
 const CirclesPage: React.FC = () => {
     const { currentUser } = useAuth();
     const router = useRouter();
     const { rooms, myRooms, loading, joinRoom, requestJoin } = useRooms();
     const { notify } = useNotification();
+    const { playClick, playSuccess, playJoin } = useSoundEffects();
     const [searchTerm, setSearchTerm] = useState('');
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [activeTab, setActiveTab] = useState<'explore' | 'my-circles'>('explore');
@@ -113,10 +117,12 @@ const CirclesPage: React.FC = () => {
             try {
                 if (room.isPrivate) {
                     await requestJoin(room.id);
+                    playJoin();
                     notify('Request sent successfully', 'success');
                 } else {
                     await joinRoom(room.id);
-                    notify('Request sent successfully', 'success');
+                    playSuccess();
+                    notify('Joined successfully!', 'success');
                 }
             } catch (error) {
                 notify('Failed to join circle.', 'error');
@@ -242,10 +248,12 @@ const CirclesPage: React.FC = () => {
                                 <BrutalistLoader />
                             </div>
                         ) : filteredRooms.length === 0 ? (
-                            <div className="col-span-full text-center py-16 border-4 border-dashed border-slate-300">
-                                <h3 className="text-lg font-black text-slate-300 uppercase">
-                                    {activeTab === 'explore' ? "No communities found." : "You haven't joined any circles yet."}
-                                </h3>
+                            <div className="col-span-full">
+                                <EmptyState
+                                    title={activeTab === 'explore' ? "No communities found" : "You haven't joined any circles"}
+                                    description={activeTab === 'explore' ? "Try searching for something else or create your own!" : "Explore the community to find your tribe."}
+                                    type="search"
+                                />
                             </div>
                         ) : (
                             filteredRooms.map((room: any, index: number) => {
@@ -361,16 +369,19 @@ const CirclesPage: React.FC = () => {
                                                             : 'bg-white text-slate-900 hover:bg-green-50'
                                                         }`}
                                                 >
+                                                    {/* Join Button with Micro-interaction */}
                                                     {(activeCircleType as string) === 'collab' || (activeCircleType as string) === 'opportunity' ? (
                                                         'View Circle'
                                                     ) : activeTab === 'my-circles' ? (
                                                         <>Open Circle <ArrowRight className="w-3 h-3" /></>
                                                     ) : isPending ? (
-                                                        'Requested'
+                                                        <motion.span initial={{ scale: 0.8 }} animate={{ scale: 1 }} className="flex items-center gap-2">
+                                                            <Loader2 className="w-3 h-3 animate-spin" /> Requested
+                                                        </motion.span>
                                                     ) : isMember ? (
                                                         <>Open Circle <ArrowRight className="w-3 h-3" /></>
                                                     ) : (
-                                                        'Request to Join'
+                                                        <motion.span whileTap={{ scale: 0.9 }}>Request to Join</motion.span>
                                                     )}
                                                 </button>
                                             </div>

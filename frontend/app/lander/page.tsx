@@ -325,35 +325,32 @@ function LanderContent() {
 
             {/* Verified Partners Section */}
             <section id="partners" className="py-24 bg-white relative overflow-hidden">
-                {/* Subtle background pattern */}
-                <div className="absolute inset-0 z-0 opacity-20"
-                    style={{ backgroundImage: 'radial-gradient(#10b981 1px, transparent 1px)', backgroundSize: '24px 24px' }}>
-                </div>
+                {/* Subtle Texture */}
+                <div className="absolute inset-0 z-0 opacity-10 bg-[linear-gradient(45deg,#000_25%,transparent_25%,transparent_75%,#000_75%,#000),linear-gradient(45deg,#000_25%,transparent_25%,transparent_75%,#000_75%,#000)] [background-size:24px_24px]"></div>
 
                 <div className="container mx-auto px-6 relative z-10">
-                    <div className="text-center mb-12">
-                        <div className="uppercase tracking-widest text-primary font-bold text-xs mb-2">Verified Partners</div>
-                        <h2 className="text-3xl md:text-5xl font-bold text-slate-900 mb-4">
-                            Partnering with <span className="text-primary">India's Top Institutions</span>
+                    <div className="text-centerQX mb-12">
+                        <div className="inline-block bg-green-100 text-green-800 px-3 py-1 text-xs font-black uppercase border-2 border-slate-900 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] mb-6">Verified Partners</div>
+                        <h2 className="text-3xl md:text-5xl font-black text-slate-900 mb-4 uppercase tracking-tighter">
+                            Partnering with <span className="text-green-600">India's Top Institutions</span>
                         </h2>
-                        <p className="text-lg text-slate-500 max-w-2xl mx-auto">
+                        <p className="text-lg text-slate-500 max-w-2xl mx-auto font-bold">
                             Trusted by leading entrepreneurship cells and colleges
                         </p>
                     </div>
 
                     {/* Circular Gallery with Logos */}
-                    <div className="h-[500px] w-full">
+                    <div className="h-[400px] w-full border-4 border-slate-900 bg-slate-50 relative shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
                         <CircularGallery
                             items={[
-                                { image: "/partners/esil.png", text: "ESIL" },
-                                { image: "/partners/iit-bhu.png", text: "IIT BHU" },
-                                { image: "/partners/iit-mandi.png", text: "IIT Mandi" },
-                                { image: "/partners/iit-bhilai.png", text: "IIT Bhilai" },
-                                { image: "/partners/bli.png", text: "BLI" },
-                                { image: "/partners/iit-bhubaneshwar.png", text: "IIT BS" }
+                                { image: "/partners/iitbhu/ecell iit bhu.webp", text: "E-Cell IIT BHU" },
+                                { image: "/partners/iitbhu/ecell iit bhu.webp", text: "IIT Mandi" },
+                                { image: "/partners/iitbhu/ecell iit bhu.webp", text: "IIT Bhilai" },
+                                { image: "/partners/iitbhu/ecell iit bhu.webp", text: "IIT Bhubaneshwar" },
+                                { image: "/partners/iitbhu/ecell iit bhu.webp", text: "ESIL" },
                             ]}
-                            bend={1}
-                            borderRadius={0.05} // sharper corners for logos
+                            bend={0} // Flat
+                            borderRadius={0} // Sharp
                             scrollEase={0.05}
                             scrollSpeed={2}
                         />
@@ -361,110 +358,33 @@ function LanderContent() {
                 </div>
             </section>
 
-            {/* Explaining Our Ecosystem Section - Simplified */}
-            <EcosystemExplainer />
-
-            {/* Plans & Pricing Section */}
-            <section id="pricing" className="py-24 bg-black relative overflow-hidden">
-                <div className="container mx-auto px-6 max-w-6xl mb-16">
-                    <div className="text-center">
-                        <h2 className="text-3xl md:text-5xl font-bold text-white mb-4">
-                            Plans & <span className="text-primary">Pricing</span>
-                        </h2>
-                    </div>
-                </div>
-                {/* Removed Green Rectangle Background Effect via prop if available, or just relied on black bg */}
-                <CreativePricing
-                    tag=""
-                    title=""
-                    description=""
-                    tiers={[
-                        {
-                            name: "Free",
-                            icon: <Zap className="w-6 h-6 text-primary" />,
-                            price: "Free",
-                            description: "For exploring and getting started",
-                            color: "green",
-                            features: [
-                                "Unlimited applications",
-                                "View all opportunities",
-                                "Join Community Circles",
-                                "Real-time chat"
-                            ],
-                            limits: [
-                                "1 Startup post",
-                                "Cannot create Circles"
-                            ],
-                            bestFor: "Individuals exploring EarnBuddy."
-                        },
-                        {
-                            name: "Creator",
-                            icon: <Star className="w-6 h-6 text-amber-500" />,
-                            price: 29,
-                            description: "For founders & freelancers",
-                            color: "amber",
-                            popular: true,
-                            features: [
-                                "5 active Startup posts",
-                                "Create 1 Community Circle",
-                                "Host small events",
-                                "Basic insights"
-                            ],
-                            bestFor: "Solo founders and early creators."
-                        },
-                        {
-                            name: "Builder",
-                            icon: <Briefcase className="w-6 h-6 text-blue-500" />,
-                            price: 79,
-                            description: "For serious builders & teams",
-                            color: "blue",
-                            features: [
-                                "Unlimited posts",
-                                "Priority recommendations",
-                                "Create 5 Circles",
-                                "Team analytics"
-                            ],
-                            bestFor: "Growing startups and agencies."
-                        },
-                        {
-                            name: "Organization",
-                            icon: <Globe className="w-6 h-6 text-purple-500" />,
-                            price: 199,
-                            description: "For large teams & incubators",
-                            color: "purple",
-                            features: [
-                                "Unlimited everything",
-                                "Branded pages",
-                                "Organization analytics",
-                                "Private Circles"
-                            ],
-                            bestFor: "Accelerators and enterprises."
-                        }
-                    ]}
-                />
-            </section>
-
             {/* Stories from our Community */}
-            <section id="community" className="py-24 bg-black border-t border-white/10">
+            <section id="community" className="py-24 bg-yellow-400 border-t-4 border-slate-900 relative">
                 <div className="container mx-auto px-6 max-w-6xl">
-                    <h2 className="text-3xl md:text-5xl font-bold mb-16 text-center text-white">
-                        Stories from our <span className="text-primary">community</span>
+                    <h2 className="text-3xl md:text-5xl font-black mb-16 text-center text-slate-900 uppercase tracking-tighter bg-white inline-block px-6 py-2 border-4 border-slate-900 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] mx-auto transform -rotate-2">
+                        Stories from our <span className="text-green-600">community</span>
                     </h2>
-                    <StaggerTestimonials />
+                    <div className="bg-white border-4 border-slate-900 shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] p-8">
+                        <StaggerTestimonials />
+                    </div>
                 </div>
             </section>
 
             {/* FAQ Section */}
-            <section id="faq">
-                <Faq5 />
+            <section id="faq" className="bg-white py-24 border-t-4 border-slate-900">
+                <div className="container mx-auto px-6 max-w-4xl">
+                    <h2 className="text-4xl font-black text-slate-900 mb-12 text-center uppercase tracking-tighter">
+                        Frequently Asked <span className="underline decoration-wavy decoration-green-500">Questions</span>
+                    </h2>
+                    <div className="border-4 border-slate-900 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+                        <Faq5 />
+                    </div>
+                </div>
             </section>
 
-            {/* White Separator */}
-            <div className="border-t-4 border-white"></div>
-
             {/* Footer */}
-            <footer className="bg-primary text-white py-24">
-                <div className="container mx-auto px-6 max-w-6xl">
+            <footer className="bg-slate-900 text-white py-24 border-t-4 border-slate-900 relative overflow-hidden">
+                <div className="container mx-auto px-6 max-w-6xl relative z-10">
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-20 mb-20">
                         <div>
                             <div className="flex items-center gap-2 font-bold text-2xl text-white mb-6">
@@ -480,29 +400,29 @@ function LanderContent() {
                                 </div>
                                 EarnBuddy
                             </div>
-                            <p className="text-green-50 leading-relaxed mb-8 max-w-sm">
+                            <p className="text-slate-400 leading-relaxed mb-8 max-w-sm font-medium">
                                 Where ambitious builders come together to turn ideas into reality. Build. Collaborate. Earn.
                             </p>
                             <div className="flex gap-6">
-                                <Mail className="w-5 h-5 text-green-100 hover:text-white cursor-pointer transition" />
-                                <LinkIconLucide className="w-5 h-5 text-green-100 hover:text-white cursor-pointer transition" />
-                                <Camera className="w-5 h-5 text-green-100 hover:text-white cursor-pointer transition" />
+                                <Mail className="w-5 h-5 text-white hover:text-green-400 cursor-pointer transition" />
+                                <LinkIconLucide className="w-5 h-5 text-white hover:text-green-400 cursor-pointer transition" />
+                                <Camera className="w-5 h-5 text-white hover:text-green-400 cursor-pointer transition" />
                             </div>
                         </div>
 
                         <div>
-                            <h4 className="font-bold text-lg mb-6">Quick Links</h4>
-                            <ul className="space-y-4 text-green-50">
-                                <li><Link href="#" className="hover:text-white transition">For Students</Link></li>
-                                <li><Link href="#" className="hover:text-white transition">For Startups</Link></li>
-                                <li><Link href="#" className="hover:text-white transition">For Freelancers</Link></li>
-                                <li><Link href="#" className="hover:text-white transition">Communities</Link></li>
+                            <h4 className="font-black text-lg mb-6 uppercase tracking-wider text-green-400">Quick Links</h4>
+                            <ul className="space-y-4 text-slate-300 font-bold">
+                                <li><Link href="#" className="hover:text-white hover:underline transition">For Students</Link></li>
+                                <li><Link href="#" className="hover:text-white hover:underline transition">For Startups</Link></li>
+                                <li><Link href="#" className="hover:text-white hover:underline transition">For Freelancers</Link></li>
+                                <li><Link href="#" className="hover:text-white hover:underline transition">Communities</Link></li>
                             </ul>
                         </div>
 
                         <div>
-                            <h4 className="font-bold text-lg mb-6">Contact</h4>
-                            <div className="space-y-4 text-green-50 text-sm">
+                            <h4 className="font-black text-lg mb-6 uppercase tracking-wider text-green-400">Contact</h4>
+                            <div className="space-y-4 text-slate-300 text-sm font-medium">
                                 <p>business@earnbuddy.tech</p>
                                 <p>suyash@earnbuddy.tech</p>
                                 <p>+91 7390900769</p>
@@ -510,22 +430,22 @@ function LanderContent() {
                         </div>
                     </div>
 
-                    <div className="border-t border-green-500/30 pt-8 flex flex-col md:flex-row justify-between items-center text-xs text-green-100">
+                    <div className="border-t-2 border-slate-800 pt-8 flex flex-col md:flex-row justify-between items-center text-xs text-slate-500 font-bold uppercase tracking-widest">
                         <p>&copy; 2025 EarnBuddy. All rights reserved.</p>
                         <div className="flex gap-6 mt-4 md:mt-0">
-                            <Link href="#" className="hover:text-white">Privacy Policy</Link>
-                            <Link href="#" className="hover:text-white">Terms of Service</Link>
+                            <Link href="#" className="hover:text-white transition">Privacy Policy</Link>
+                            <Link href="#" className="hover:text-white transition">Terms of Service</Link>
                         </div>
                     </div>
 
                     {/* Scroll to Top - White Accent */}
                     <div
                         onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-                        className="fixed bottom-8 right-8 bg-white text-slate-900 rounded-none border-2 border-slate-900 p-3 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] cursor-pointer hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all duration-300 z-[9999]">
+                        className="fixed bottom-8 right-8 bg-green-500 text-slate-900 rounded-none border-2 border-slate-900 p-3 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] cursor-pointer hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all duration-300 z-[9999]">
                         <ArrowRight className="w-6 h-6 -rotate-90" />
                     </div>
                 </div>
-            </footer >
+            </footer>
         </div >
     );
 }
