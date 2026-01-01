@@ -28,6 +28,7 @@ import { CreativePricing, type PricingTier } from "@/components/ui/creative-pric
 import { SquishyOffers, BGComponent1, BGComponent2, BGComponent3 } from "@/components/ui/squishy-offers";
 import { CircularGallery, type GalleryItem } from "@/components/ui/circular-gallery";
 import { VideoModal } from "@/components/ui/video-modal";
+import { LogoMarquee } from "@/components/ui/logo-marquee";
 
 function LanderContent() {
     const router = useRouter();
@@ -238,6 +239,7 @@ function LanderContent() {
             </header>
 
 
+
             {/* What EarnBuddy Offers - Black Background with Squishy Cards */}
             <section id="how-it-works" className="py-24 bg-black text-white relative overflow-hidden">
                 {/* Subtle Texture */}
@@ -246,7 +248,7 @@ function LanderContent() {
                 <div className="container mx-auto px-6 relative z-10 pt-10">
                     <div className="text-center max-w-3xl mx-auto mb-16">
                         <h2 className="text-4xl md:text-6xl font-black mb-6 uppercase tracking-tighter text-white">
-                            What Everybody Offers
+                            What EarnBuddy Offers
                         </h2>
                         <p className="text-lg text-gray-300 font-bold">
                             Everything you need to build, launch, and grow.
@@ -283,11 +285,7 @@ function LanderContent() {
                                 ]}
                             />
                         </div>
-                        <div className="group relative opacity-90">
-                            {/* Overlay for Coming Soon */}
-                            <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-sm rounded-xl">
-                                <span className="text-xl font-black text-white uppercase tracking-widest border-2 border-white px-4 py-2 bg-black">Coming Soon</span>
-                            </div>
+                        <div className="group relative">
                             <SquishyOffers
                                 offers={[
                                     {
@@ -295,17 +293,13 @@ function LanderContent() {
                                         title: "Colancing",
                                         description: "Offer services, find projects, team up for gigs",
                                         features: ["Post projects", "Secure payments", "Reputation System"],
-                                        cta: "Coming Soon", // Changed CTA
+                                        cta: "Start Colancing",
                                         BGComponent: BGComponent2
                                     }
                                 ]}
                             />
                         </div>
-                        <div className="group relative opacity-90">
-                            {/* Overlay for Coming Soon */}
-                            <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-sm rounded-xl">
-                                <span className="text-xl font-black text-white uppercase tracking-widest border-2 border-white px-4 py-2 bg-black">Coming Soon</span>
-                            </div>
+                        <div className="group relative">
                             <SquishyOffers
                                 offers={[
                                     {
@@ -313,8 +307,8 @@ function LanderContent() {
                                         title: "Events",
                                         description: "Discover hackathons, meetups, and workshops",
                                         features: ["Host events", "Register attendees", "Networking"],
-                                        cta: "Coming Soon",
-                                        BGComponent: BGComponent1 // Reusing BG1 for visual consistency
+                                        cta: "Find Events",
+                                        BGComponent: BGComponent1
                                     }
                                 ]}
                             />
@@ -329,7 +323,7 @@ function LanderContent() {
                 <div className="absolute inset-0 z-0 opacity-10 bg-[linear-gradient(45deg,#000_25%,transparent_25%,transparent_75%,#000_75%,#000),linear-gradient(45deg,#000_25%,transparent_25%,transparent_75%,#000_75%,#000)] [background-size:24px_24px]"></div>
 
                 <div className="container mx-auto px-6 relative z-10">
-                    <div className="text-centerQX mb-12">
+                    <div className="text-center mb-12">
                         <div className="inline-block bg-green-100 text-green-800 px-3 py-1 text-xs font-black uppercase border-2 border-slate-900 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] mb-6">Verified Partners</div>
                         <h2 className="text-3xl md:text-5xl font-black text-slate-900 mb-4 uppercase tracking-tighter">
                             Partnering with <span className="text-green-600">India's Top Institutions</span>
@@ -339,27 +333,25 @@ function LanderContent() {
                         </p>
                     </div>
 
-                    {/* Circular Gallery with Logos */}
-                    <div className="h-[400px] w-full border-4 border-slate-900 bg-slate-50 relative shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
-                        <CircularGallery
-                            items={[
-                                { image: "/partners/iitbhu/ecell iit bhu.webp", text: "E-Cell IIT BHU" },
-                                { image: "/partners/iitbhu/ecell iit bhu.webp", text: "IIT Mandi" },
-                                { image: "/partners/iitbhu/ecell iit bhu.webp", text: "IIT Bhilai" },
-                                { image: "/partners/iitbhu/ecell iit bhu.webp", text: "IIT Bhubaneshwar" },
-                                { image: "/partners/iitbhu/ecell iit bhu.webp", text: "ESIL" },
-                            ]}
-                            bend={0} // Flat
-                            borderRadius={0} // Sharp
-                            scrollEase={0.05}
-                            scrollSpeed={2}
-                        />
-                    </div>
+                    {/* Logo Marquee */}
+                    <LogoMarquee
+                        items={[
+                            { text: "E-Cell IIT BHU" },
+                            { text: "IIT Mandi" },
+                            { text: "IIT Bhilai" },
+                            { text: "IIT Bhubaneshwar" },
+                            { text: "ESIL" },
+                            // Repeats for effect if needed, but marquee handles it
+                            { text: "E-Cell IIT BHU" },
+                            { text: "IIT Mandi" },
+                        ]}
+                        speed={30}
+                    />
                 </div>
             </section>
 
             {/* Stories from our Community */}
-            <section id="community" className="py-24 bg-yellow-400 border-t-4 border-slate-900 relative">
+            <section id="community" className="py-24 bg-white border-t-4 border-slate-900 relative">
                 <div className="container mx-auto px-6 max-w-6xl">
                     <h2 className="text-3xl md:text-5xl font-black mb-16 text-center text-slate-900 uppercase tracking-tighter bg-white inline-block px-6 py-2 border-4 border-slate-900 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] mx-auto transform -rotate-2">
                         Stories from our <span className="text-green-600">community</span>
@@ -369,7 +361,7 @@ function LanderContent() {
             </section>
 
             {/* FAQ Section */}
-            <section id="faq" className="bg-white border-t-4 border-slate-900">
+            <section id="faq" className="bg-white border-t-4 border-slate-900 pt-32 pb-24">
                 <div className="container mx-auto px-6 max-w-4xl">
                     <h2 className="text-4xl font-black text-slate-900 mb-12 text-center uppercase tracking-tighter">
                         Frequently Asked <span className="underline decoration-wavy decoration-green-500">Questions</span>
@@ -381,7 +373,7 @@ function LanderContent() {
             {/* Footer */}
             <footer className="bg-slate-900 text-white py-24 border-t-4 border-slate-900 relative overflow-hidden">
                 <div className="container mx-auto px-6 max-w-6xl relative z-10">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-20 mb-20">
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-20">
                         <div>
                             <div className="flex items-center gap-2 font-bold text-2xl text-white mb-6">
                                 {/* Logo Image - White Version */}
