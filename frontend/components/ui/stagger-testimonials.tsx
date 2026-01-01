@@ -148,50 +148,39 @@ const TestimonialCard: React.FC<TestimonialCardProps> = ({
         <div
             onClick={() => handleMove(position)}
             className={cn(
-                "absolute left-1/2 top-1/2 cursor-pointer border-2 p-8 transition-all duration-500 ease-in-out",
+                "absolute left-1/2 top-1/2 cursor-pointer border-4 border-slate-900 p-8 transition-all duration-500 ease-in-out",
                 isCenter
-                    ? "z-10 bg-primary text-primary-foreground border-primary"
-                    : "z-0 bg-card text-card-foreground border-border hover:border-primary/50"
+                    ? "z-10 bg-green-400 text-slate-900 shadow-[12px_12px_0px_0px_rgba(0,0,0,1)]"
+                    : "z-0 bg-white text-slate-500 hover:bg-slate-50 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]"
             )}
             style={{
                 width: cardSize,
                 height: cardSize,
-                clipPath: `polygon(50px 0%, calc(100% - 50px) 0%, 100% 50px, 100% 100%, calc(100% - 50px) 100%, 50px 100%, 0 100%, 0 0)`,
                 transform: `
           translate(-50%, -50%) 
           translateX(${(cardSize / 1.5) * position}px)
           translateY(${isCenter ? -65 : position % 2 ? 15 : -15}px)
           rotate(${isCenter ? 0 : position % 2 ? 2.5 : -2.5}deg)
         `,
-                boxShadow: isCenter ? "0px 8px 0px 4px hsl(var(--border))" : "0px 0px 0px 0px transparent"
             }}
         >
-            <span
-                className="absolute block origin-top-right rotate-45 bg-border"
-                style={{
-                    right: -2,
-                    top: 48,
-                    width: SQRT_5000,
-                    height: 2
-                }}
-            />
+            <div className="absolute top-4 right-4 text-4xl font-black opacity-20 select-none">
+                "
+            </div>
             <img
                 src={testimonial.imgSrc}
                 alt={`${testimonial.by.split(',')[0]}`}
-                className="mb-4 h-14 w-12 bg-muted object-cover object-top"
-                style={{
-                    boxShadow: "3px 3px 0px hsl(var(--background))"
-                }}
+                className="mb-6 h-16 w-16 border-2 border-slate-900 object-cover shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
             />
             <h3 className={cn(
-                "text-base sm:text-xl font-medium",
-                isCenter ? "text-primary-foreground" : "text-foreground"
+                "text-lg sm:text-xl font-black uppercase leading-tight mb-4",
+                isCenter ? "text-slate-900" : "text-slate-700"
             )}>
                 "{testimonial.testimonial}"
             </h3>
             <p className={cn(
-                "absolute bottom-8 left-8 right-8 mt-2 text-sm italic",
-                isCenter ? "text-primary-foreground/80" : "text-muted-foreground"
+                "absolute bottom-8 left-8 right-8 mt-2 text-sm font-bold border-t-2 border-slate-900/10 pt-4",
+                isCenter ? "text-slate-800" : "text-slate-500"
             )}>
                 - {testimonial.by}
             </p>

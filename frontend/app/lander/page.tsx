@@ -364,21 +364,17 @@ function LanderContent() {
                     <h2 className="text-3xl md:text-5xl font-black mb-16 text-center text-slate-900 uppercase tracking-tighter bg-white inline-block px-6 py-2 border-4 border-slate-900 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] mx-auto transform -rotate-2">
                         Stories from our <span className="text-green-600">community</span>
                     </h2>
-                    <div className="bg-white border-4 border-slate-900 shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] p-8">
-                        <StaggerTestimonials />
-                    </div>
+                    <StaggerTestimonials />
                 </div>
             </section>
 
             {/* FAQ Section */}
-            <section id="faq" className="bg-white py-24 border-t-4 border-slate-900">
+            <section id="faq" className="bg-white border-t-4 border-slate-900">
                 <div className="container mx-auto px-6 max-w-4xl">
                     <h2 className="text-4xl font-black text-slate-900 mb-12 text-center uppercase tracking-tighter">
                         Frequently Asked <span className="underline decoration-wavy decoration-green-500">Questions</span>
                     </h2>
-                    <div className="border-4 border-slate-900 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
-                        <Faq5 />
-                    </div>
+                    <Faq5 />
                 </div>
             </section>
 
