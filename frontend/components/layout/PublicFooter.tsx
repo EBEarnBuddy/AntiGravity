@@ -28,7 +28,7 @@ export function PublicFooter() {
                             </div>
                             EarnBuddy
                         </div>
-                        <p className="text-slate-400 leading-relaxed mb-8 max-w-sm font-medium">
+                        <p className="text-white leading-relaxed mb-8 max-w-sm font-medium">
                             Where ambitious builders come together to turn ideas into reality. Build. Collaborate. Earn.
                         </p>
                         <div className="flex gap-6">
@@ -50,25 +50,25 @@ export function PublicFooter() {
                     <div>
                         <h4 className="font-black text-lg mb-6 uppercase tracking-wider text-slate-900">Quick Links</h4>
                         <ul className="space-y-4 text-white font-bold">
-                            <li><Link href="/students" className="hover:text-slate-900 hover:underline transition">For Students</Link></li>
-                            <li><Link href="/startups" className="hover:text-slate-900 hover:underline transition">For Startups</Link></li>
-                            <li><Link href="/freelancers" className="hover:text-slate-900 hover:underline transition">For Freelancers</Link></li>
-                            <li><Link href="/communities" className="hover:text-slate-900 hover:underline transition">For Communities</Link></li>
+                            <li><Link href="/lander#how-it-works" className="hover:text-slate-900 transition">For Students</Link></li>
+                            <li><Link href="/lander#startups" className="hover:text-slate-900 transition">For Startups</Link></li>
+                            <li><Link href="/lander#freelancers" className="hover:text-slate-900 transition">For Freelancers</Link></li>
+                            <li><Link href="/lander#communities" className="hover:text-slate-900 transition">For Communities</Link></li>
                         </ul>
                     </div>
 
                     <div>
                         <h4 className="font-black text-lg mb-6 uppercase tracking-wider text-slate-900">Reach Out</h4>
                         <ul className="space-y-4 text-white font-bold">
-                            <li><Link href="/partners" className="hover:text-slate-900 hover:underline transition">Partner with Us</Link></li>
-                            <li><Link href="/careers" className="hover:text-slate-900 hover:underline transition">Careers</Link></li>
-                            <li><Link href="/support" className="hover:text-slate-900 hover:underline transition">Support</Link></li>
+                            <li><Link href="/partners" className="hover:text-slate-900 transition">Partner with Us</Link></li>
+                            <li><Link href="/careers" className="hover:text-slate-900 transition">Careers</Link></li>
+                            <li><Link href="/support" className="hover:text-slate-900 transition">Support</Link></li>
                         </ul>
                     </div>
 
                     <div>
                         <h4 className="font-black text-lg mb-6 uppercase tracking-wider text-slate-900">Contact</h4>
-                        <div className="space-y-4 text-white text-sm font-medium">
+                        <div className="space-y-4 text-white text-sm font-bold">
                             <p>business@earnbuddy.tech</p>
                             <p>suyash@earnbuddy.tech</p>
                             <p>+91 7390900769</p>
