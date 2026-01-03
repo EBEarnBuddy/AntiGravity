@@ -115,17 +115,12 @@ const CirclesPage: React.FC = () => {
             router.push(`/circles/${room.id}`);
         } else if (!isPending) {
             try {
-                if (room.isPrivate) {
-                    await requestJoin(room.id);
-                    playJoin();
-                    notify('Request sent successfully', 'success');
-                } else {
-                    await joinRoom(room.id);
-                    playSuccess();
-                    notify('Joined successfully!', 'success');
-                }
+                // Modified: All circles now use Request-Approval flow
+                await requestJoin(room.id);
+                playJoin();
+                notify('Request sent successfully', 'success');
             } catch (error) {
-                notify('Failed to join circle.', 'error');
+                notify('Failed to send request.', 'error');
             }
         }
     };
