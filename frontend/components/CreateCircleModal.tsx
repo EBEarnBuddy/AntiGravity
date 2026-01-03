@@ -75,7 +75,7 @@ const CreateCircleModal: React.FC<CreateCircleModalProps> = ({ isOpen, onClose, 
                     onClick={onClose}
                 >
                     <motion.div
-                        className="flex flex-col bg-white border-4 border-slate-900 shadow-[8px_8px_0px_0px_rgba(15,23,42,1)] w-full max-w-lg overflow-hidden"
+                        className="flex flex-col bg-white border-4 border-slate-900 shadow-[8px_8px_0px_0px_rgba(15,23,42,1)] w-full max-w-lg overflow-hidden max-h-[90vh]"
                         initial={{ scale: 0.9, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
                         exit={{ scale: 0.9, opacity: 0 }}
@@ -93,7 +93,7 @@ const CreateCircleModal: React.FC<CreateCircleModalProps> = ({ isOpen, onClose, 
                         </div>
 
                         {/* Content */}
-                        <div className="p-6 space-y-6 overflow-y-auto max-h-[60vh] custom-scrollbar">
+                        <div className="p-6 space-y-6 overflow-y-auto custom-scrollbar flex-1">
                             {/* Avatar Upload */}
                             <div>
                                 <label className="block text-sm font-black text-slate-900 uppercase mb-2">Circle Avatar</label>

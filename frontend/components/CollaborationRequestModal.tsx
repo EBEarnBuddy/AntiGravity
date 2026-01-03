@@ -100,7 +100,7 @@ const CollaborationRequestModal: React.FC<CollaborationRequestModalProps> = ({
                         animate={{ scale: 1, opacity: 1, y: 0 }}
                         exit={{ scale: 0.95, opacity: 0, y: 20 }}
                         onClick={(e) => e.stopPropagation()}
-                        className="relative w-full max-w-md bg-white border-4 border-slate-900 rounded-none shadow-[8px_8px_0px_0px_rgba(15,23,42,1)] flex flex-col overflow-hidden"
+                        className="relative w-full max-w-md bg-white border-4 border-slate-900 rounded-none shadow-[8px_8px_0px_0px_rgba(15,23,42,1)] flex flex-col overflow-hidden max-h-[90vh]"
                     >
                         {/* Header */}
                         <div className="flex items-center justify-between p-6 border-b-4 border-slate-900 bg-green-400">
@@ -119,7 +119,7 @@ const CollaborationRequestModal: React.FC<CollaborationRequestModalProps> = ({
                         </div>
 
                         {/* Content */}
-                        <div className="p-6 bg-white space-y-6">
+                        <div className="p-6 bg-white space-y-6 overflow-y-auto">
                             {/* Error Message */}
                             {error && (
                                 <div className="p-4 bg-red-100 border-2 border-slate-900 text-red-900 font-bold text-sm flex items-center gap-2">

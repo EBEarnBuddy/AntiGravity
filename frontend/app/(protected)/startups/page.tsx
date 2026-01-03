@@ -129,7 +129,7 @@ const StartupsPage: React.FC = () => {
 
     const getAppStatus = (startupId: string) => {
         const app = applications.find(a => {
-            const oppId = a.opportunityId && typeof a.opportunityId === 'object' ? (a.opportunityId as any)._id : a.opportunityId;
+            const oppId = a.opportunityId && typeof a.opportunityId === 'object' ? (a.opportunityId as any)?._id : a.opportunityId;
             return oppId === startupId;
         });
         return app?.status;
@@ -240,11 +240,12 @@ const StartupsPage: React.FC = () => {
                         {(activeTab === 'applied' ? applications : displayItems).map((item, index) => {
                             // Unified item handling based on tab
                             const isAppTab = activeTab === 'applied';
-                            const startup = isAppTab ? (item as any).opportunity : item;
-                            const status = isAppTab ? (item as any).status : getAppStatus(startup.id || startup._id);
-                            const isOwner = startup.postedBy?.firebaseUid === currentUser?.uid || startup.founderId === currentUser?.uid;
+                            const startup = isAppTab ? (item as any)?.opportunity : item;
 
                             if (!startup) return null; // Safety check
+
+                            const status = isAppTab ? (item as any)?.status : getAppStatus(startup.id || startup._id);
+                            const isOwner = startup.postedBy?.firebaseUid === currentUser?.uid || (startup as any).founderId === currentUser?.uid;
 
                             return (
                                 <motion.div

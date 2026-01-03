@@ -320,7 +320,7 @@ const CreateStartupModal: React.FC<CreateStartupModalProps> = ({ isOpen, onClose
           onClick={onClose}
         >
           <motion.div
-            className="flex flex-col bg-white border-4 border-slate-900 w-full max-w-2xl max-h-[85vh] shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] overflow-hidden"
+            className="flex flex-col bg-white border-4 border-slate-900 w-full max-w-2xl max-h-[90vh] shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] overflow-hidden"
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.9, opacity: 0 }}
