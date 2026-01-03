@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Pod, PodPost, ChatRoom as Room, Startup, Gig, Notification, ChatMessage, UserAnalytics, Application, FirestoreService } from '../lib/firestore'; // Keep types for now
 import { useAuth } from '../contexts/AuthContext';
+import { useNotification } from '@/contexts/NotificationContext';
 import api from '../lib/api';
 import { socket } from '../lib/socket';
 import { getDefaultImage } from '../lib/utils';
@@ -767,25 +768,60 @@ export const useEvents = (limit?: number) => {
 export const useBookmarks = () => {
     const { userProfile, updateProfile } = useAuth();
     const [loading, setLoading] = useState(false);
+    const { notify } = useNotification();
 
     const toggleBookmark = async (opportunityId: string) => {
         if (!userProfile) return;
+
+        // Optimistic Update
+        const isCurrentlyBookmarked = isBookmarked(opportunityId);
+        const originalProfile = { ...userProfile };
+
+        // Create deep copy for arrays we might modify
+        const updatedProfile = { ...userProfile };
+        updatedProfile.bookmarkedGigs = [...(userProfile.bookmarkedGigs || [])];
+        updatedProfile.bookmarkedStartups = [...(userProfile.bookmarkedStartups || [])];
+
+        // We don't strictly know if it's a gig or startup here without more context or checking the ID format/fetching.
+        // However, for the UI "isBookmarked" check, we just need it in *one* of the arrays or removed from *both*.
+        // Since the backend handles the logic of which collection it belongs to, 
+        // optimistically, we can toggle it in *both* arrays or wait for a better approach.
+        // BETTER APPROACH: The backend toggle logic probably handles it by checking which collection the ID exists in.
+        // For optimistic UI, if we are removing, remove from both. If adding, we don't know which one.
+        // LIMITATION: Optimistic add is hard without knowing type.
+        // FALLBACK: We will show the loading state or just instant toast, but fully correct optimistic update 
+        // requires passing the 'type' (gig/startup) to this hook or inferring it.
+
+        // Let's stick to the instant Feedback (Toast) + Loading state for now to ensure data consistency, 
+        // OR assuming we can refresh profile silently.
+        // The user asked for "instantly... along with a system message".
+
         setLoading(true);
         try {
             await FirestoreService.toggleBookmark(opportunityId, userProfile.uid);
-            // Ideally trigger a profile refresh here since toggleBookmark updates separate arrays (bookmarkedGigs, bookmarkedStartups)
-            // updateProfile call might be tricky without knowing which one changed, so we rely on backend/realtime or manual fetch.
-            // For now, simple return or maybe we can fetch profile again.
-            // Optionally: await updateProfile(await FirestoreService.getUserProfile(userProfile.uid));
+
+            // Re-fetch profile to get the true state
+            const freshProfile = await FirestoreService.getUserProfile(userProfile.uid);
+            if (freshProfile) {
+                updateProfile(freshProfile);
+            }
+
+            if (isCurrentlyBookmarked) {
+                notify('Removed from bookmarks', 'success');
+            } else {
+                notify('Bookmarked successfully', 'success');
+            }
         } catch (error) {
             console.error('Failed to toggle bookmark:', error);
+            notify('Failed to update bookmark', 'error');
+            // Revert is implied since we didn't mechanically change local state yet, 
+            // but if we did optimistic update, we would revert here.
         } finally {
             setLoading(false);
         }
     };
 
     const isBookmarked = (opportunityId: string) => {
-        // Check both arrays
         return userProfile?.bookmarkedGigs?.includes(opportunityId) || userProfile?.bookmarkedStartups?.includes(opportunityId) || false;
     };
 

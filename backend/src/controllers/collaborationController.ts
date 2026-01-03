@@ -171,7 +171,7 @@ export const acceptCollaborationRequest = async (req: AuthRequest, res: Response
 
         const collabCircle = await Room.create({
             name: `${fromCircle.name} × ${toCircle.name}`,
-            description: `Collaboration between ${fromCircle.name} and ${toCircle.name}`,
+            description: request.message || `Collaboration between ${fromCircle.name} and ${toCircle.name}`,
             createdBy: request.fromOwner,
             type: 'collab',
             collaborators: [request.fromOwner, request.toOwner],

@@ -420,6 +420,7 @@ const StartupsPage: React.FC = () => {
                     setShowCreateModal(false);
                     fetchStartups();
                     setActiveTab('posted');
+                    notify('Opportunity created successfully', 'success');
                 }}
             />
 

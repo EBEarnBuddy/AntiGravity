@@ -859,352 +859,111 @@ function LanderContent() {
                     </div>
                 </div>
 
-                {/* From Role to Team */}
-                <div className="py-20 bg-white border-b-4 border-slate-900">
-                    <div className="container mx-auto px-6 max-w-5xl">
-                        <div className="grid md:grid-cols-2 gap-12 items-center">
-                            <div>
-                                <Reveal>
-                                    <h2 className="text-4xl font-black uppercase tracking-tight mb-8">From Role to Team</h2>
-                                    <ol className="space-y-6 border-l-4 border-slate-200 ml-2">
-                                        {[
-                                            "Post a role or idea",
-                                            "A dedicated workspace is created",
-                                            "Applicants join the same context",
-                                            "The team forms where the work happens"
-                                        ].map((step, i) => (
-                                            <li key={i} className="pl-6 relative">
-                                                <div className="absolute -left-[10px] top-1.5 w-4 h-4 rounded-full bg-blue-600 border-2 border-white ring-2 ring-slate-900"></div>
-                                                <p className="text-lg font-bold text-slate-900">{step}</p>
-                                            </li>
-                                        ))}
-                                    </ol>
-                                    <p className="mt-8 text-xl font-black text-slate-400 uppercase">
-                                        No handoffs. <br /> No context loss.
-                                    </p>
-                                </Reveal>
-                            </div>
-                            <Reveal delay={0.2}>
-                                <div className="bg-slate-50 p-8 border-4 border-slate-900 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] flex flex-col items-center justify-center text-center">
-                                    <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-4">
-                                        <Zap className="w-8 h-8 text-blue-600" />
-                                    </div>
-                                    <h3 className="text-xl font-black uppercase mb-2">Execution Infrastructure</h3>
-                                    <p className="text-slate-600">Not just a hiring site.</p>
-                                </div>
-                            </Reveal>
-                        </div>
-                    </div>
-                </div>
 
-                {/* Why Founders Use EB */}
-                <div className="py-20 bg-slate-50 border-b-4 border-slate-900">
-                    <div className="container mx-auto px-6 max-w-5xl">
-                        <Reveal width="100%">
-                            <h2 className="text-4xl font-black uppercase tracking-tight mb-12 text-center">Why Founders Use EarnBuddy</h2>
-                        </Reveal>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                            {[
-                                { icon: Target, title: "Faster Alignment" },
-                                { icon: Layers, title: "Persistent Collaboration" },
-                                { icon: Zap, title: "Fewer Tools" },
-                                { icon: History, title: "Clear Project History" },
-                            ].map((item, i) => (
-                                <Reveal delay={i * 0.1} key={i}>
-                                    <div className="bg-white p-6 border-2 border-slate-900 h-full">
-                                        <item.icon className="w-8 h-8 text-blue-600 mb-4" />
-                                        <h3 className="font-black text-lg uppercase leading-tight">{item.title}</h3>
-                                    </div>
-                                </Reveal>
-                            ))}
-                        </div>
-                    </div>
-                </div>
-
-                {/* Long Term Value */}
-                <div className="py-20 bg-slate-900 text-white text-center border-b-4 border-slate-900">
-                    <div className="container mx-auto px-6 max-w-3xl">
-                        <Reveal width="100%">
-                            <h2 className="text-3xl font-black uppercase tracking-tight mb-8">Long-term Value</h2>
-                            <p className="text-xl font-medium text-slate-300 mb-8 max-w-xl mx-auto">
-                                Some collaborations end. <br />
-                                Some turn into companies.
-                            </p>
-                            <p className="text-xl font-bold bg-white text-slate-900 inline-block px-4 py-1 transform -rotate-1 mb-12 border-2 border-blue-500">
-                                EarnBuddy supports both — without forcing either.
-                            </p>
-                            <div className="text-4xl font-black uppercase mb-8">
-                                Build with people, not profiles.
-                            </div>
-                        </Reveal>
-                    </div>
-                </div>
-            </section>
-
-            {/* --- FOR FREELANCERS --- */}
-            <section id="freelancers">
-                {/* Hero */}
-                <div className="bg-yellow-400 text-slate-900 pt-24 pb-24 relative overflow-hidden border-b-4 border-slate-900">
-                    <div className="container mx-auto px-6 relative z-10 text-center">
-                        <Reveal width="100%">
-                            <h2 className="text-5xl md:text-7xl font-black uppercase tracking-tighter mb-6 leading-none">
-                                Freelancing, <br /> without the noise.
-                            </h2>
-                            <p className="text-xl md:text-2xl text-slate-800 max-w-2xl mx-auto font-bold mb-10 leading-relaxed">
-                                Find real work, talk directly to clients, and build a visible track record over time.
-                            </p>
-                            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                                <Link href="/auth?mode=signup" className="bg-slate-900 text-white px-8 py-4 rounded-none border-2 border-slate-900 text-xl font-black uppercase tracking-wide hover:bg-white hover:text-slate-900 transition-all shadow-[6px_6px_0px_0px_rgba(255,255,255,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]">
-                                    Browse Opportunities
-                                </Link>
-                                <Link href="/auth?mode=signup" className="px-8 py-4 rounded-none border-2 border-slate-900 text-xl font-black uppercase tracking-wide hover:bg-slate-900 hover:text-white transition-all">
-                                    Create Profile
-                                </Link>
-                            </div>
-                        </Reveal>
-                    </div>
-                </div>
-
-                {/* What's Different */}
-                <div className="py-20 bg-white border-b-4 border-slate-900">
-                    <div className="container mx-auto px-6 max-w-5xl">
-                        <div className="grid md:grid-cols-2 gap-12 items-center">
-                            <div>
-                                <Reveal>
-                                    <h2 className="text-4xl font-black uppercase tracking-tight mb-8">What's different here</h2>
-                                    <ul className="space-y-6">
-                                        {[
-                                            "No proposal spam",
-                                            "No disappearing clients",
-                                            "No work lost in DMs"
-                                        ].map((item, i) => (
-                                            <li key={i} className="flex items-center gap-3 text-lg font-bold">
-                                                <div className="bg-red-500 text-white p-1 border-2 border-slate-900">
-                                                    <Check className="w-4 h-4" />
-                                                </div>
-                                                {item}
-                                            </li>
-                                        ))}
-                                    </ul>
-                                </Reveal>
-                            </div>
-                            <Reveal delay={0.2}>
-                                <div className="bg-slate-100 p-8 border-4 border-slate-900 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
-                                    <h3 className="text-2xl font-black uppercase mb-4">The EarnBuddy Workspace</h3>
-                                    <p className="font-medium text-slate-600 mb-6">Each opportunity creates a shared workspace where:</p>
-                                    <div className="space-y-4">
-                                        <div className="bg-white p-4 border-2 border-slate-900 flex items-center gap-3">
-                                            <Users className="w-5 h-5 text-blue-600" />
-                                            <span className="font-bold">Communication is real-time</span>
-                                        </div>
-                                        <div className="bg-white p-4 border-2 border-slate-900 flex items-center gap-3">
-                                            <Shield className="w-5 h-5 text-green-600" />
-                                            <span className="font-bold">Scope is visible</span>
-                                        </div>
-                                        <div className="bg-white p-4 border-2 border-slate-900 flex items-center gap-3">
-                                            <Clock className="w-5 h-5 text-purple-600" />
-                                            <span className="font-bold">Outcomes are recorded</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </Reveal>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Trust & Continuity */}
-                <div className="py-20 bg-slate-900 text-white border-b-4 border-slate-900">
-                    <div className="container mx-auto px-6 max-w-4xl text-center">
-                        <Reveal width="100%">
-                            <h2 className="text-4xl font-black uppercase tracking-tight mb-6">Trust & Continuity</h2>
-                            <p className="text-2xl font-bold mb-8 text-slate-300">
-                                Your work doesn’t reset every time you finish a gig. It adds up.
-                            </p>
-                            <p className="text-lg text-slate-400 max-w-2xl mx-auto mb-12">
-                                Verified profiles, clear project states, and public completion history help serious freelancers stand out — quietly.
-                            </p>
-
-                            <div className="bg-slate-800 p-8 border-2 border-slate-700 max-w-2xl mx-auto transform rotate-1 hover:rotate-0 transition-transform duration-300">
-                                <p className="text-xl font-bold italic mb-4">
-                                    "If freelancing is part of your long-term plan, this is where it compounds."
+                {/* --- FOR FREELANCERS --- */}
+                <section id="freelancers">
+                    {/* Hero */}
+                    <div className="bg-yellow-400 text-slate-900 pt-24 pb-24 relative overflow-hidden border-b-4 border-slate-900">
+                        <div className="container mx-auto px-6 relative z-10 text-center">
+                            <Reveal width="100%">
+                                <h2 className="text-5xl md:text-7xl font-black uppercase tracking-tighter mb-6 leading-none">
+                                    Freelancing, <br /> without the noise.
+                                </h2>
+                                <p className="text-xl md:text-2xl text-slate-800 max-w-2xl mx-auto font-bold mb-10 leading-relaxed">
+                                    Find real work, talk directly to clients, and build a visible track record over time.
                                 </p>
-                                <div className="flex justify-center gap-4">
-                                    <Link href="/auth?mode=signup" className="inline-flex items-center gap-2 text-green-400 font-black uppercase tracking-wide hover:underline">
-                                        Start Building Your Reputation <ArrowRight className="w-5 h-5" />
+                                <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                                    <Link href="/auth?mode=signup" className="bg-slate-900 text-white px-8 py-4 rounded-none border-2 border-slate-900 text-xl font-black uppercase tracking-wide hover:bg-white hover:text-slate-900 transition-all shadow-[6px_6px_0px_0px_rgba(255,255,255,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]">
+                                        Browse Opportunities
+                                    </Link>
+                                    <Link href="/auth?mode=signup" className="px-8 py-4 rounded-none border-2 border-slate-900 text-xl font-black uppercase tracking-wide hover:bg-slate-900 hover:text-white transition-all">
+                                        Create Profile
                                     </Link>
                                 </div>
-                            </div>
-                        </Reveal>
-                    </div>
-                </div>
-            </section>
-
-            {/* --- FOR COMMUNITIES --- */}
-            <section id="communities">
-                {/* Hero */}
-                <div className="bg-red-500 text-white pt-24 pb-24 relative overflow-hidden border-b-4 border-slate-900">
-                    <div className="container mx-auto px-6 relative z-10 text-center">
-                        <Reveal width="100%">
-                            <h2 className="text-5xl md:text-7xl font-black uppercase tracking-tighter mb-6 leading-none">
-                                A better home for <br /> serious communities.
-                            </h2>
-                            <p className="text-xl md:text-2xl text-red-50 max-w-2xl mx-auto font-bold mb-10 leading-relaxed">
-                                EarnBuddy helps communities talk, collaborate, and build things together — without friction.
-                            </p>
-                            <Link href="/auth?mode=signup" className="inline-block bg-white text-slate-900 px-8 py-4 rounded-none border-2 border-slate-900 text-xl font-black uppercase tracking-wide hover:bg-slate-900 hover:text-white transition-all shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]">
-                                Create a Community Circle
-                            </Link>
-                        </Reveal>
-                    </div>
-                </div>
-
-                {/* Community Circles */}
-                <div className="py-20 bg-white border-b-4 border-slate-900">
-                    <div className="container mx-auto px-6 max-w-5xl">
-                        <div className="flex flex-col md:flex-row gap-12 items-center">
-                            <div className="flex-1">
-                                <Reveal>
-                                    <h2 className="text-4xl font-black uppercase tracking-tight mb-6">Community Circles</h2>
-                                    <p className="text-xl text-slate-600 font-medium mb-8">It’s designed for groups that want to last. Each circle is a persistent space with:</p>
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                        {[
-                                            { icon: MessageSquare, text: "Live Discussion" },
-                                            { icon: Shield, text: "Clear Roles" },
-                                            { icon: Clock, text: "Shared History" },
-                                            { icon: Layers, text: "Structured Collaboration" }
-                                        ].map((item, i) => (
-                                            <div key={i} className="flex items-center gap-3 p-4 border-2 border-slate-900 bg-slate-50">
-                                                <item.icon className="w-5 h-5 text-red-500" />
-                                                <span className="font-bold text-slate-900 uppercase text-sm">{item.text}</span>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </Reveal>
-                            </div>
-                            <div className="flex-1 w-full">
-                                <Reveal delay={0.2}>
-                                    <div className="aspect-video bg-slate-900 border-4 border-slate-900 shadow-[8px_8px_0px_0px_rgba(0,0,0,0.2)] relative p-6 flex items-center justify-center">
-                                        <div className="text-center text-white space-y-2">
-                                            <div className="w-16 h-16 bg-red-500 rounded-full mx-auto flex items-center justify-center border-2 border-white mb-4">
-                                                <Users className="w-8 h-8" />
-                                            </div>
-                                            <h3 className="font-black text-xl uppercase">Design Builders</h3>
-                                            <p className="text-sm text-slate-400">1.2k Members • 45 Projects</p>
-                                        </div>
-                                    </div>
-                                </Reveal>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                {/* For Organizers */}
-                <div className="py-20 bg-slate-50 border-b-4 border-slate-900">
-                    <div className="container mx-auto px-6 max-w-4xl text-center">
-                        <Reveal width="100%">
-                            <h2 className="text-4xl font-black uppercase tracking-tight mb-12">For Organizers</h2>
-                            <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-6 mb-12">
-                                {["Admin Controls", "Announcements", "Moderation Tools", "Cross-collab"].map((feat, i) => (
-                                    <div key={i} className="bg-white p-6 border-2 border-slate-900 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-                                        <p className="font-black text-sm uppercase">{feat}</p>
-                                    </div>
-                                ))}
-                            </div>
-                            <p className="text-2xl font-bold max-w-2xl mx-auto text-slate-800">
-                                "You set the tone. The platform stays out of the way."
-                            </p>
-                        </Reveal>
-                    </div>
-                </div>
-            </section>
-
-            {/* --- FOR EVENTS (NEW) --- */}
-            <section id="events">
-                {/* Hero */}
-                <div className="bg-purple-600 text-white pt-24 pb-24 relative overflow-hidden border-b-4 border-slate-900">
-                    <div className="container mx-auto px-6 relative z-10 text-center">
-                        <Reveal width="100%">
-                            <h2 className="text-5xl md:text-7xl font-black uppercase tracking-tighter mb-6 leading-none">
-                                Host global events. <br /> Build local connection.
-                            </h2>
-                            <p className="text-xl md:text-2xl text-purple-100 max-w-2xl mx-auto font-bold mb-10 leading-relaxed">
-                                From hackathons to meetups, EarnBuddy is the place to gather the builders.
-                            </p>
-                            <Link href="/auth?mode=signup" className="inline-block bg-white text-slate-900 px-8 py-4 rounded-none border-2 border-slate-900 text-xl font-black uppercase tracking-wide hover:bg-slate-900 hover:text-white transition-all shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]">
-                                Host an Event
-                            </Link>
-                        </Reveal>
-                    </div>
-                </div>
-
-                {/* Event Features */}
-                <div className="py-20 bg-white border-b-4 border-slate-900">
-                    <div className="container mx-auto px-6 max-w-5xl">
-                        <Reveal width="100%">
-                            <h2 className="text-4xl font-black uppercase tracking-tight mb-12 text-center">Everything needed to host</h2>
-                        </Reveal>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                            <Reveal delay={0.1}>
-                                <div className="bg-purple-50 p-8 border-4 border-slate-900 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] text-center h-full">
-                                    <Calendar className="w-12 h-12 text-purple-600 mx-auto mb-6" />
-                                    <h3 className="text-xl font-black uppercase mb-3">Scheduling</h3>
-                                    <p className="text-slate-600 font-medium">Manage timelines, multiple tracks, and sessions effortlessly.</p>
-                                </div>
-                            </Reveal>
-                            <Reveal delay={0.2}>
-                                <div className="bg-purple-50 p-8 border-4 border-slate-900 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] text-center h-full">
-                                    <Users className="w-12 h-12 text-purple-600 mx-auto mb-6" />
-                                    <h3 className="text-xl font-black uppercase mb-3">Registration</h3>
-                                    <p className="text-slate-600 font-medium">Built-in ticketing, RSVPs, and attendee management.</p>
-                                </div>
-                            </Reveal>
-                            <Reveal delay={0.3}>
-                                <div className="bg-purple-50 p-8 border-4 border-slate-900 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] text-center h-full">
-                                    <MessageSquare className="w-12 h-12 text-purple-600 mx-auto mb-6" />
-                                    <h3 className="text-xl font-black uppercase mb-3">Networking</h3>
-                                    <p className="text-slate-600 font-medium"> dedicated channels for attendees to connect before and after.</p>
-                                </div>
                             </Reveal>
                         </div>
                     </div>
-                </div>
-            </section>
 
-            {/* --- PRICING --- */}
-            {/* --- PRICING --- */}
-            <section id="pricing">
-                <CreativePricing
-                    tag="Simple Plans"
-                    title="Start for free, upgrade to scale."
-                    description="Whether you're a student building a portfolio or a startup building a team."
-                    tiers={[
-                        {
-                            name: "Builder",
-                            price: 0,
-                            description: "For students and freelancers starting out.",
-                            features: ["Create Profile", "Join Community Circles", "Apply to Opportunities", "Basic Analytics"],
-                            color: "bg-white",
-                            icon: <Users className="w-6 h-6" />
-                        },
-                        {
-                            name: "Startup",
-                            price: 2999,
-                            description: "For founders posting roles and building teams.",
-                            features: ["Post Unlimited Roles", "Access Verified Talent", "Create Private Circles", "Advanced Team Tools"],
-                            popular: true,
-                            color: "bg-green-400",
-                            icon: <Rocket className="w-6 h-6" />
-                        },
-                        {
-                            name: "Organization",
-                            price: "Custom",
-                            description: "For large communities and institutions.",
-                            features: ["Custom Branding", "University Dashboards", "API Access", "Dedicated Support"],
-                            color: "bg-blue-400",
-                            icon: <Globe className="w-6 h-6" />
-                        }
-                    ]}
-                />
+                </section>
+
+                {/* --- FOR COMMUNITIES --- */}
+                <section id="communities">
+                    {/* Hero */}
+                    <div className="bg-red-500 text-white pt-24 pb-24 relative overflow-hidden border-b-4 border-slate-900">
+                        <div className="container mx-auto px-6 relative z-10 text-center">
+                            <Reveal width="100%">
+                                <h2 className="text-5xl md:text-7xl font-black uppercase tracking-tighter mb-6 leading-none">
+                                    A better home for <br /> serious communities.
+                                </h2>
+                                <p className="text-xl md:text-2xl text-red-50 max-w-2xl mx-auto font-bold mb-10 leading-relaxed">
+                                    EarnBuddy helps communities talk, collaborate, and build things together — without friction.
+                                </p>
+                                <Link href="/auth?mode=signup" className="inline-block bg-white text-slate-900 px-8 py-4 rounded-none border-2 border-slate-900 text-xl font-black uppercase tracking-wide hover:bg-slate-900 hover:text-white transition-all shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]">
+                                    Create a Community Circle
+                                </Link>
+                            </Reveal>
+                        </div>
+                    </div>
+
+                </section>
+
+                {/* --- FOR EVENTS (NEW) --- */}
+                <section id="events">
+                    {/* Hero */}
+                    <div className="bg-purple-600 text-white pt-24 pb-24 relative overflow-hidden border-b-4 border-slate-900">
+                        <div className="container mx-auto px-6 relative z-10 text-center">
+                            <Reveal width="100%">
+                                <h2 className="text-5xl md:text-7xl font-black uppercase tracking-tighter mb-6 leading-none">
+                                    Host global events. <br /> Build local connection.
+                                </h2>
+                                <p className="text-xl md:text-2xl text-purple-100 max-w-2xl mx-auto font-bold mb-10 leading-relaxed">
+                                    From hackathons to meetups, EarnBuddy is the place to gather the builders.
+                                </p>
+                                <Link href="/auth?mode=signup" className="inline-block bg-white text-slate-900 px-8 py-4 rounded-none border-2 border-slate-900 text-xl font-black uppercase tracking-wide hover:bg-slate-900 hover:text-white transition-all shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]">
+                                    Host an Event
+                                </Link>
+                            </Reveal>
+                        </div>
+                    </div>
+
+                </section>
+
+                {/* --- PRICING --- */}
+                <section id="pricing">
+                    <CreativePricing
+                        tag="Simple Plans"
+                        title="Start for free, upgrade to scale."
+                        description="Whether you're a student building a portfolio or a startup building a team."
+                        tiers={[
+                            {
+                                name: "Builder",
+                                price: 0,
+                                description: "For students and freelancers starting out.",
+                                features: ["Create Profile", "Join Community Circles", "Apply to Opportunities", "Basic Analytics"],
+                                color: "bg-white",
+                                icon: <Users className="w-6 h-6" />
+                            },
+                            {
+                                name: "Startup",
+                                price: 2999,
+                                description: "For founders posting roles and building teams.",
+                                features: ["Post Unlimited Roles", "Access Verified Talent", "Create Private Circles", "Advanced Team Tools"],
+                                popular: true,
+                                color: "bg-green-400",
+                                icon: <Rocket className="w-6 h-6" />
+                            },
+                            {
+                                name: "Organization",
+                                price: "Custom",
+                                description: "For large communities and institutions.",
+                                features: ["Custom Branding", "University Dashboards", "API Access", "Dedicated Support"],
+                                color: "bg-blue-400",
+                                icon: <Globe className="w-6 h-6" />
+                            }
+                        ]}
+                    />
+                </section>
+
             </section>
 
             {/* Partners */}
@@ -1244,6 +1003,8 @@ function LanderContent() {
                 </div>
             </section>
 
+
+
             {/* Community Stories */}
             <section id="community" className="py-24 bg-white border-t-4 border-slate-900 relative">
                 <div className="w-full">
@@ -1260,8 +1021,10 @@ function LanderContent() {
 
 
 
+
+
             {/* FAQ */}
-            <section id="faq" className="bg-white border-t-4 border-slate-900 pt-32 pb-24">
+            < section id="faq" className="bg-white border-t-4 border-slate-900 pt-32 pb-24" >
                 <Reveal width="100%">
                     <Faq5
                         badge="FAQ"
@@ -1269,7 +1032,9 @@ function LanderContent() {
                         description="Everything you need to know about the platform."
                     />
                 </Reveal>
-            </section>
+            </section >
+
+
 
             <PublicFooter />
         </div >
