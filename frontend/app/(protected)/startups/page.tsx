@@ -31,11 +31,13 @@ import CollaborationRequestModal from '@/components/CollaborationRequestModal';
 import BrutalistLoader from '@/components/ui/BrutalistLoader';
 import ShareModal from '@/components/ShareModal';
 import useOnClickOutside from '@/hooks/useOnClickOutside';
+import { useNotification } from '@/contexts/NotificationContext';
 
 const StartupsPage: React.FC = () => {
     const { currentUser } = useAuth();
     const router = useRouter();
     const searchParams = useSearchParams();
+    const { notify } = useNotification();
 
     // Initialize tab from URL or default to 'discover'
     const initialTab = (searchParams.get('tab') as 'discover' | 'posted' | 'applied') || 'discover';
