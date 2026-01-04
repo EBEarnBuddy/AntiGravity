@@ -96,7 +96,7 @@ function AuthPageContent() {
     };
 
     return (
-        <div className="bg-background text-foreground relative h-screen w-screen overflow-hidden flex flex-col">
+        <div className="bg-background text-foreground relative min-h-screen w-full overflow-y-auto flex flex-col">
             {error && (
                 <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-50 bg-red-100 border-4 border-slate-900 text-slate-900 px-6 py-4 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] max-w-sm w-full text-center animate-in fade-in slide-in-from-top-2">
                     <span className="block sm:inline font-black uppercase text-red-600">{error}</span>

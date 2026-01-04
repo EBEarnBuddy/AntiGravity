@@ -25,7 +25,7 @@ import { useNotification } from '@/contexts/NotificationContext';
 import { useSoundEffects } from '@/hooks/useSoundEffects';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { Loader2 } from 'lucide-react';
-
+import { CircleCardSkeleton } from '@/components/skeletons/CircleCardSkeleton';
 const CirclesPage: React.FC = () => {
     const { currentUser } = useAuth();
     const router = useRouter();
@@ -239,9 +239,10 @@ const CirclesPage: React.FC = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     <AnimatePresence mode="wait">
                         {loading ? (
-                            <div className="col-span-full flex justify-center py-12">
-                                <BrutalistLoader />
-                            </div>
+                            // Skeleton Grid
+                            Array.from({ length: 6 }).map((_, i) => (
+                                <CircleCardSkeleton key={i} />
+                            ))
                         ) : filteredRooms.length === 0 ? (
                             <div className="col-span-full">
                                 <EmptyState
@@ -325,14 +326,17 @@ const CirclesPage: React.FC = () => {
                                         )}
 
                                         {/* Avatar/Icon Area */}
-                                        <div className="aspect-[4/3] bg-slate-100 relative border-b-4 border-slate-900 overflow-hidden">
+                                        <div className="aspect-[4/3] bg-slate-100 relative border-b-4 border-slate-900 overflow-hidden group-hover:bg-slate-50 transition-colors">
+                                            {/* Fallback Pattern Background */}
                                             <div className="absolute inset-0 opacity-20 bg-[linear-gradient(45deg,#000_25%,transparent_25%,transparent_75%,#000_75%,#000),linear-gradient(45deg,#000_25%,transparent_25%,transparent_75%,#000_75%,#000)] [background-size:24px_24px]"></div>
 
                                             {room.avatar ? (
                                                 <img src={room.avatar} alt={room.name} className="w-full h-full object-cover relative z-10 transition-transform group-hover:scale-105 duration-500 bg-white" />
                                             ) : (
-                                                <div className="w-full h-full flex items-center justify-center relative z-10">
-                                                    <Users className="w-16 h-16 text-slate-400" />
+                                                <div className="w-full h-full flex items-center justify-center relative z-10 bg-white/50 backdrop-blur-sm">
+                                                    <span className="text-4xl font-black text-slate-300 uppercase select-none group-hover:text-slate-900 transition-colors duration-300 scale-125 transform">
+                                                        {room.name?.substring(0, 2) || 'EB'}
+                                                    </span>
                                                 </div>
                                             )}
                                         </div>

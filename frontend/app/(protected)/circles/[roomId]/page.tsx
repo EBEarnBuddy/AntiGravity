@@ -79,6 +79,7 @@ const RoomChatPage: React.FC = () => {
 
     // Editing State
     const [editingMessage, setEditingMessage] = useState<{ id: string, content: string } | null>(null);
+    const [imagePreview, setImagePreview] = useState<string | null>(null);
 
     // ... (Scroll refs/effects - keep existing)
 
@@ -189,17 +190,12 @@ const RoomChatPage: React.FC = () => {
         const file = e.target.files?.[0];
         if (!file || !currentUser) return;
 
-        try {
-            // Optimistic / Loading state could be added here
-            // Optimistic / Loading state could be added here
-            console.log("Uploading file:", file.name);
-            const url = await uploadImage(file, `earnbuddy/circles/${activeRoomId}`);
-            console.log("File uploaded, URL:", url);
-            await sendMessage(url, 'image'); // Send as image type
-        } catch (error) {
-            console.error("Failed to upload file", error);
-            alert("Failed to upload image.");
-        }
+        // Create preview
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            setImagePreview(reader.result as string);
+        };
+        reader.readAsDataURL(file);
     };
 
 
@@ -787,6 +783,76 @@ const RoomChatPage: React.FC = () => {
                 </AnimatePresence>
             </div>
 
+            {/* Image Preview */}
+            <AnimatePresence>
+                {imagePreview && (
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 20 }}
+                        className="absolute bottom-full left-4 mb-4 z-40"
+                    >
+                        <div className="bg-white border-2 border-slate-900 p-2 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] rounded-xl relative">
+                            <button
+                                onClick={() => {
+                                    setImagePreview(null);
+                                    if (fileInputRef.current) fileInputRef.current.value = '';
+                                }}
+                                className="absolute -top-2 -right-2 bg-red-500 text-white border-2 border-slate-900 rounded-full p-1 hover:bg-red-600 transition z-10"
+                            >
+                                <X className="w-4 h-4" />
+                            </button>
+                            <img src={imagePreview} alt="Preview" className="h-32 w-auto rounded-lg border border-slate-200" />
+                            <div className="mt-2 flex justify-end">
+                                <button
+                                    onClick={async () => {
+                                        if (fileInputRef.current?.files?.[0]) {
+                                            try {
+                                                const file = fileInputRef.current.files[0];
+                                                const url = await uploadImage(file, `earnbuddy/circles/${activeRoomId}`);
+                                                await sendMessage(url, 'image');
+                                                setImagePreview(null);
+                                                if (fileInputRef.current) fileInputRef.current.value = '';
+                                            } catch (error) {
+                                                console.error("Failed to upload", error);
+                                                alert("Upload failed");
+                                            }
+                                        }
+                                    }}
+                                    className="px-3 py-1 bg-green-600 text-white text-xs font-bold rounded-lg hover:bg-green-700 transition flex items-center gap-1"
+                                >
+                                    <Send className="w-3 h-3" />
+                                    Send
+                                </button>
+                            </div>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
+            {/* Typing Indicator */}
+            <AnimatePresence>
+                {typingUsers.length > 0 && (
+                    <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 10 }}
+                        className="absolute bottom-full left-6 mb-2 z-20"
+                    >
+                        <div className="bg-slate-900 text-white text-[10px] font-bold px-3 py-1 rounded-t-lg flex items-center gap-2">
+                            <div className="flex gap-1">
+                                <span className="w-1 h-1 bg-white rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
+                                <span className="w-1 h-1 bg-white rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
+                                <span className="w-1 h-1 bg-white rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
+                            </div>
+                            {typingUsers.length === 1
+                                ? `${typingUsers[0]} is typing...`
+                                : `${typingUsers.length} people are typing...`}
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
             {/* Input Area - Comicy Style */}
             <div className="bg-slate-50 p-4 shrink-0 border-t-2 border-slate-900 w-full relative">
                 <AnimatePresence>
@@ -798,75 +864,68 @@ const RoomChatPage: React.FC = () => {
                             className="absolute bottom-full left-4 mb-2 bg-white border-2 border-slate-900 rounded-xl shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] z-30 min-w-[200px] overflow-hidden"
                         >
                             <div className="bg-slate-100 px-3 py-2 text-[10px] uppercase font-black text-slate-500 border-b-2 border-slate-900">
-                                Mention Someone
+                                Maintainers & Members
                             </div>
-                            {mentionCandidates.map((c, idx) => (
+                            {mentionCandidates.map((candidate, i) => (
                                 <button
-                                    key={c.uid || idx}
-                                    onClick={() => insertMention(c.username)}
-                                    className="w-full text-left px-4 py-3 hover:bg-purple-50 hover:text-purple-700 transition flex items-center gap-3 border-b border-slate-100 last:border-0"
+                                    key={candidate.uid}
+                                    onClick={() => insertMention(candidate.username)}
+                                    className={`w-full text-left px-4 py-3 flex items-center gap-3 hover:bg-purple-50 transition border-b border-slate-100 last:border-0 ${i === 0 ? 'bg-purple-50' : ''}`}
                                 >
-                                    <UserAvatar
-                                        src={c.avatar}
-                                        alt={c.username}
-                                        uid={c.uid}
-                                        size={24}
-                                        className="bg-purple-100"
-                                    />
-                                    <span className="font-bold text-sm w-full truncate">{c.username}</span>
+                                    <UserAvatar src={candidate.avatar} uid={candidate.uid} alt={candidate.username} size={24} />
+                                    <span className="font-bold text-slate-900 text-sm">@{candidate.username}</span>
                                 </button>
                             ))}
                         </motion.div>
                     )}
-
-                    {/* Floating Typing Indicator Removed */}
-
-                    {/* Mention Suggestions */}
-                    {/* Redundant Mention Suggestions Removed */}
                 </AnimatePresence>
+
+                {/* Context Menu Mockup - Actual rendering logic for context menu */}
+                {/* Moved to root level for better z-index handling */}
+
                 <form
                     onSubmit={handleSend}
-                    className="w-full mx-auto relative border-2 border-slate-900 bg-white shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] focus-within:shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] focus-within:translate-x-[2px] focus-within:translate-y-[2px] transition-all"
+                    className="flex items-end gap-2 max-w-5xl mx-auto"
                 >
-                    <textarea
-                        value={newMessage}
-                        onChange={handleInputParams}
-                        onKeyDown={handleKeyPress}
-                        placeholder="Type your message..."
-                        className="w-full min-h-12 max-h-32 resize-none bg-white px-4 py-3 text-sm font-medium focus:outline-none placeholder:text-slate-400"
-                        rows={1}
+                    <input
+                        type="file"
+                        ref={fileInputRef}
+                        onChange={handleFileSelect}
+                        className="hidden"
+                        accept="image/*"
                     />
-                    <div className="flex items-center p-2 justify-between">
-                        <div className="flex">
-                            <input
-                                type="file"
-                                ref={fileInputRef}
-                                className="hidden"
-                                accept="image/*" // Restrict to images for now
-                                onChange={handleFileSelect}
-                            />
-                            <button
-                                type="button"
-                                onClick={() => fileInputRef.current?.click()}
-                                className="p-2 text-slate-400 hover:text-green-600 hover:bg-green-50 transition duration-200"
-                            >
-                                <Paperclip className="w-5 h-5" />
-                            </button>
-                        </div>
-                        <button
-                            type="submit"
-                            disabled={!newMessage.trim()}
-                            onClick={() => {
-                                // Force scroll to bottom on send
-                                setIsNearBottom(true);
-                                setTimeout(() => scrollToBottom("smooth"), 100);
-                            }}
-                            className="px-4 py-2 bg-slate-900 text-white border-2 border-slate-900 hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed transition transform active:scale-95 font-bold uppercase text-xs flex items-center gap-2"
-                        >
-                            <Send className="w-4 h-4" />
-                            Send
-                        </button>
+                    <button
+                        type="button"
+                        onClick={() => fileInputRef.current?.click()}
+                        className="p-3 bg-white border-2 border-slate-900 rounded-xl shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] transition-all flex-shrink-0"
+                    >
+                        <Paperclip className="w-5 h-5 text-slate-900" />
+                    </button>
+
+                    <div className="flex-1 relative">
+                        <textarea
+                            value={newMessage}
+                            onChange={handleInputParams}
+                            onKeyDown={handleKeyPress}
+                            placeholder="Type a message... (@ to mention)"
+                            className="w-full px-4 py-3 bg-white border-2 border-slate-900 rounded-xl shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] focus:outline-none focus:translate-x-[2px] focus:translate-y-[2px] focus:shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] transition-all resize-none min-h-[50px] max-h-[120px] font-bold text-slate-900 placeholder:text-slate-400"
+                            rows={1}
+                        />
                     </div>
+
+                    <button
+                        type="submit"
+                        disabled={!newMessage.trim()}
+                        onClick={() => {
+                            // Force scroll to bottom on send
+                            setIsNearBottom(true);
+                            setTimeout(() => scrollToBottom("smooth"), 100);
+                        }}
+                        className="px-4 py-2 bg-slate-900 text-white border-2 border-slate-900 hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed transition transform active:scale-95 font-bold uppercase text-xs flex items-center gap-2 rounded-xl shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] hover:shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] hover:translate-x-[2px] hover:translate-y-[2px]"
+                    >
+                        <Send className="w-4 h-4" />
+                        Send
+                    </button>
                 </form>
             </div>
 
@@ -900,12 +959,12 @@ const RoomChatPage: React.FC = () => {
                             </button>
                             <button
                                 onClick={() => {
-                                    if (window.confirm('Delete this message?')) {
+                                    if (confirm("Delete this message?")) {
                                         deleteMessage(contextMenu.message.id || contextMenu.message._id);
                                     }
                                     setContextMenu(null);
                                 }}
-                                className="w-full text-left px-4 py-2 text-xs font-black uppercase hover:bg-red-50 text-red-600 flex items-center gap-2"
+                                className="w-full text-left px-4 py-2 text-xs font-black uppercase hover:bg-red-50 text-red-600 flex items-center gap-2 border-t border-slate-100 mt-1"
                             >
                                 <Trash className="w-3 h-3" /> Delete
                             </button>
@@ -913,7 +972,6 @@ const RoomChatPage: React.FC = () => {
                     )}
                 </div>
             )}
-
 
             {/* Modals */}
             <PendingRequestsModal
@@ -952,7 +1010,8 @@ const RoomChatPage: React.FC = () => {
                 }}
                 onDelete={() => router.push('/circles')}
             />
-        </div >
+
+        </div>
     );
 };
 

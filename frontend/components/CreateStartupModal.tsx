@@ -114,6 +114,7 @@ const CreateStartupModal: React.FC<CreateStartupModalProps> = ({ isOpen, onClose
     location: 'remote' as 'remote' | 'hybrid' | 'onsite'
   });
   const [newRoleRequirement, setNewRoleRequirement] = useState('');
+  const [showLocationSuggestions, setShowLocationSuggestions] = useState(false);
 
   // ... (Constants industries, stages remain same)
   const industries = [
@@ -246,7 +247,7 @@ const CreateStartupModal: React.FC<CreateStartupModalProps> = ({ isOpen, onClose
       case 2:
         return !!(formData.location && formData.funding && formData.equity);
       case 3:
-        return formData.roles.length > 0 && !!formData.contact.email;
+        return formData.roles.length > 0 && !!formData.contact.email && formData.contact.email.includes('@');
       default:
         return true;
     }
@@ -489,26 +490,60 @@ const CreateStartupModal: React.FC<CreateStartupModalProps> = ({ isOpen, onClose
                       <label className="block text-sm font-bold text-slate-700 mb-2">
                         Location *
                       </label>
-                      <input
-                        type="text"
-                        value={formData.location}
-                        onChange={(e) => handleInputChange('location', e.target.value)}
-                        className="w-full px-4 py-3 border-2 border-slate-900 bg-white text-slate-900 focus:outline-none focus:bg-slate-50 transition-all font-bold placeholder:text-slate-400 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] focus:shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] focus:translate-x-[2px] focus:translate-y-[2px]"
-                        placeholder="City, Country"
-                      />
+                      <div className="relative">
+                        <input
+                          type="text"
+                          value={formData.location}
+                          onChange={(e) => {
+                            handleInputChange('location', e.target.value);
+                            setShowLocationSuggestions(true);
+                          }}
+                          onFocus={() => setShowLocationSuggestions(true)}
+                          onBlur={() => setTimeout(() => setShowLocationSuggestions(false), 200)}
+                          className="w-full px-4 py-3 border-2 border-slate-900 bg-white text-slate-900 focus:outline-none focus:bg-slate-50 transition-all font-bold placeholder:text-slate-400 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] focus:shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] focus:translate-x-[2px] focus:translate-y-[2px]"
+                          placeholder="Search city..."
+                        />
+                        {showLocationSuggestions && formData.location.length > 0 && (
+                          <div className="absolute top-full left-0 right-0 bg-white border-2 border-slate-900 border-t-0 max-h-40 overflow-y-auto z-10 shadow-lg">
+                            {['San Francisco, CA', 'New York, NY', 'London, UK', 'Berlin, DE', 'Bengaluru, India', 'Remote'].filter(l => l.toLowerCase().includes(formData.location.toLowerCase())).map((loc) => (
+                              <button
+                                key={loc}
+                                type="button"
+                                onClick={() => {
+                                  handleInputChange('location', loc);
+                                  setShowLocationSuggestions(false);
+                                }}
+                                className="w-full text-left px-4 py-2 hover:bg-slate-100 font-bold text-sm"
+                              >
+                                {loc}
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </div>
                     </div>
 
                     <div>
                       <label className="block text-sm font-bold text-slate-700 mb-2">
                         Funding Status *
                       </label>
-                      <input
-                        type="text"
-                        value={formData.funding}
-                        onChange={(e) => handleInputChange('funding', e.target.value)}
-                        className="w-full px-4 py-3 border-2 border-slate-900 bg-white text-slate-900 focus:outline-none focus:bg-slate-50 transition-all font-bold placeholder:text-slate-400 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] focus:shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] focus:translate-x-[2px] focus:translate-y-[2px]"
-                        placeholder="e.g., $500K raised, Seeking $250K, etc."
-                      />
+                      <div className="flex">
+                        <select
+                          className="px-3 py-3 border-2 border-r-0 border-slate-900 bg-slate-100 font-bold focus:outline-none"
+                        >
+                          <option>$</option>
+                          <option>€</option>
+                          <option>£</option>
+                          <option>₹</option>
+                        </select>
+                        <input
+                          type="text"
+                          value={formData.funding}
+                          onChange={(e) => handleInputChange('funding', e.target.value)}
+                          className="w-full px-4 py-3 border-2 border-slate-900 bg-white text-slate-900 focus:outline-none focus:bg-slate-50 transition-all font-bold placeholder:text-slate-400 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] focus:shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] focus:translate-x-[2px] focus:translate-y-[2px]"
+                          placeholder="e.g., 500K raised"
+                        />
+                      </div>
                     </div>
 
                     <div>
@@ -593,13 +628,23 @@ const CreateStartupModal: React.FC<CreateStartupModalProps> = ({ isOpen, onClose
                           <label className="block text-sm font-bold text-slate-700 mb-2">
                             Salary (optional)
                           </label>
-                          <input
-                            type="text"
-                            value={newRole.salary}
-                            onChange={(e) => setNewRole(prev => ({ ...prev, salary: e.target.value }))}
-                            className="w-full px-4 py-3 border-2 border-slate-900 bg-white text-slate-900 focus:outline-none focus:bg-slate-50 transition-all font-bold shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] focus:shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] focus:translate-x-[2px] focus:translate-y-[2px]"
-                            placeholder="e.g., $80K-120K"
-                          />
+                          <div className="flex">
+                            <select
+                              className="px-3 py-3 border-2 border-r-0 border-slate-900 bg-slate-100 font-bold focus:outline-none"
+                            >
+                              <option>$</option>
+                              <option>€</option>
+                              <option>£</option>
+                              <option>₹</option>
+                            </select>
+                            <input
+                              type="text"
+                              value={newRole.salary}
+                              onChange={(e) => setNewRole(prev => ({ ...prev, salary: e.target.value }))}
+                              className="w-full px-4 py-3 border-2 border-slate-900 bg-white text-slate-900 focus:outline-none focus:bg-slate-50 transition-all font-bold shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] focus:shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] focus:translate-x-[2px] focus:translate-y-[2px]"
+                              placeholder="e.g., 80K-120K"
+                            />
+                          </div>
                         </div>
                       </div>
 
@@ -829,10 +874,10 @@ const CreateStartupModal: React.FC<CreateStartupModalProps> = ({ isOpen, onClose
                 </motion.button>
               )}
             </div>
-          </motion.div>
-        </motion.div>
+          </motion.div >
+        </motion.div >
       )}
-    </AnimatePresence>
+    </AnimatePresence >
   );
 };
 

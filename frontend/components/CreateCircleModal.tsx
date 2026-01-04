@@ -40,8 +40,10 @@ const CreateCircleModal: React.FC<CreateCircleModalProps> = ({ isOpen, onClose, 
         }
     }, [isOpen, initialType]);
 
+    const isFormValid = formData.name.length >= 3 && formData.description.length >= 10;
+
     const handleSubmit = async () => {
-        if (!formData.name || !formData.description) return;
+        if (!isFormValid) return;
         if (!currentUser) return;
 
         try {
@@ -63,6 +65,7 @@ const CreateCircleModal: React.FC<CreateCircleModalProps> = ({ isOpen, onClose, 
             setIsSubmitting(false);
         }
     };
+
 
     return (
         <AnimatePresence>
@@ -220,8 +223,8 @@ const CreateCircleModal: React.FC<CreateCircleModalProps> = ({ isOpen, onClose, 
                             </button>
                             <button
                                 onClick={handleSubmit}
-                                disabled={isSubmitting || !formData.name || !formData.description}
-                                className={`px-6 py-3 font-black uppercase tracking-wide border-2 border-slate-900 text-white transition-all shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] ${isSubmitting || !formData.name || !formData.description
+                                disabled={isSubmitting || !isFormValid}
+                                className={`px-6 py-3 font-black uppercase tracking-wide border-2 border-slate-900 text-white transition-all shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px] ${isSubmitting || !isFormValid
                                     ? 'bg-slate-400 cursor-not-allowed border-slate-400 shadow-none'
                                     : 'bg-green-600 hover:bg-green-700'
                                     }`}

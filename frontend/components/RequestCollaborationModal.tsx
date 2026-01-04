@@ -23,6 +23,8 @@ const RequestCollaborationModal: React.FC<RequestCollaborationModalProps> = ({ i
 
     // Filter: Include rooms where user is Creator OR Admin.
     const eligibleCircles = myRooms.filter(room => {
+        if (room.id === targetCircleId) return false; // Prevent self-collaboration
+
         const r = room as any;
         // Check local ownership (legacy/fast)
         const isOwner = r.createdBy === currentUser?.uid || r.ownerId === currentUser?.uid || (typeof r.createdBy === 'object' && r.createdBy?.firebaseUid === currentUser?.uid);
