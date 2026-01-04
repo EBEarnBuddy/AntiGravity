@@ -594,13 +594,13 @@ export class FirestoreService {
 
   // Collaborations
   static async createCollaborationRequest(data: Omit<CollaborationRequest, 'id' | 'createdAt' | 'updatedAt' | 'status'>): Promise<string> {
-    const response = await api.post('/collaboration/request', data);
+    const response = await api.post('/collaborations/request', data);
     return response.data._id; // detailed object returned, but return ID to match signature if possible, or adjust caller.
   }
 
   static async getCollaborationRequests(circleId: string): Promise<CollaborationRequest[]> {
     // Get all pending requests for the current user
-    const response = await api.get('/collaboration/pending');
+    const response = await api.get('/collaborations/pending');
     const allRequests: any[] = response.data;
 
     // Filter for the specific circle if circleId is provided
@@ -621,9 +621,9 @@ export class FirestoreService {
 
   static async updateCollaborationRequest(requestId: string, status: 'accepted' | 'rejected'): Promise<void> {
     if (status === 'accepted') {
-      await api.post(`/collaboration/${requestId}/accept`);
+      await api.post(`/collaborations/${requestId}/accept`);
     } else {
-      await api.post(`/collaboration/${requestId}/reject`);
+      await api.post(`/collaborations/${requestId}/reject`);
     }
   }
 

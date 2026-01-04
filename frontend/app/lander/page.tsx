@@ -586,6 +586,150 @@ const BGComponent3 = () => (
 );
 
 
+// 6. LanderSlideshow
+interface SlideData {
+    id: string;
+    bgColor: string;
+    patternColor: string;
+    title: React.ReactNode;
+    description: string;
+    ctas: { text: string; href: string; primary?: boolean }[];
+}
+
+const slides: SlideData[] = [
+    {
+        id: "startups",
+        bgColor: "bg-blue-600",
+        patternColor: "text-blue-500",
+        title: <>Find people. <br /> Build together. <br className="md:hidden" /> Keep moving.</>,
+        description: "EarnBuddy helps startups form teams and work inside shared spaces — from first conversation to execution.",
+        ctas: [{ text: "Post an Opportunity", href: "/auth?mode=signup", primary: true }]
+    },
+    {
+        id: "freelancers",
+        bgColor: "bg-yellow-400",
+        patternColor: "text-yellow-500",
+        title: <>Freelancing, <br /> without the noise.</>,
+        description: "Find real work, talk directly to clients, and build a visible track record over time.",
+        ctas: [
+            { text: "Browse Opportunities", href: "/auth?mode=signup", primary: true },
+            { text: "Create Profile", href: "/auth?mode=signup", primary: false }
+        ]
+    },
+    {
+        id: "communities",
+        bgColor: "bg-red-500",
+        patternColor: "text-red-600",
+        title: <>A better home for <br /> serious communities.</>,
+        description: "EarnBuddy helps communities talk, collaborate, and build things together — without friction.",
+        ctas: [{ text: "Create a Community Circle", href: "/auth?mode=signup", primary: true }]
+    },
+    {
+        id: "events",
+        bgColor: "bg-purple-600",
+        patternColor: "text-purple-500",
+        title: <>Host global events. <br /> Build local connection.</>,
+        description: "From hackathons to meetups, EarnBuddy is the place to gather the builders.",
+        ctas: [{ text: "Host an Event", href: "/auth?mode=signup", primary: true }]
+    }
+];
+
+const LanderSlideshow = () => {
+    const [current, setCurrent] = useState(0);
+
+    useEffect(() => {
+        const timer = setInterval(() => {
+            setCurrent((prev) => (prev + 1) % slides.length);
+        }, 4000);
+        return () => clearInterval(timer);
+    }, []);
+
+    const handleDotClick = (index: number) => {
+        setCurrent(index);
+    };
+
+    return (
+        <section className="relative h-[650px] overflow-hidden border-b-4 border-slate-900 border-t-4 bg-slate-900">
+            <AnimatePresence mode="wait">
+                <motion.div
+                    key={current}
+                    initial={{ opacity: 0, x: 100 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -100 }}
+                    transition={{ duration: 0.5, ease: "easeInOut" }}
+                    className={cn(
+                        "absolute inset-0 flex items-center justify-center text-center",
+                        slides[current].bgColor
+                    )}
+                >
+                    {/* Background Pattern */}
+                    <div className={cn("absolute inset-0 opacity-20 pointer-events-none", slides[current].patternColor)}>
+                        <svg className="w-full h-full" width="100%" height="100%">
+                            <defs>
+                                <pattern id={`pattern-${current}`} x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
+                                    <circle cx="2" cy="2" r="2" fill="currentColor" />
+                                </pattern>
+                            </defs>
+                            <rect width="100%" height="100%" fill={`url(#pattern-${current})`} />
+                        </svg>
+                    </div>
+
+                    <div className="container mx-auto px-6 relative z-10">
+                        <Reveal width="100%">
+                            <h2 className={cn(
+                                "text-5xl md:text-7xl font-black uppercase tracking-tighter mb-6 leading-none",
+                                slides[current].id === "freelancers" ? "text-slate-900" : "text-white"
+                            )}>
+                                {slides[current].title}
+                            </h2>
+                            <p className={cn(
+                                "text-xl md:text-2xl max-w-2xl mx-auto font-bold mb-10 leading-relaxed",
+                                slides[current].id === "freelancers" ? "text-slate-800" : "text-white/90"
+                            )}>
+                                {slides[current].description}
+                            </p>
+                            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                                {slides[current].ctas.map((cta, idx) => (
+                                    <Link
+                                        key={idx}
+                                        href={cta.href}
+                                        className={cn(
+                                            "px-8 py-4 rounded-none border-2 border-slate-900 text-xl font-black uppercase tracking-wide transition-all",
+                                            cta.primary
+                                                ? slides[current].id === "freelancers"
+                                                    ? "bg-slate-900 text-white hover:bg-white hover:text-slate-900 shadow-[6px_6px_0px_0px_rgba(255,255,255,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]"
+                                                    : "bg-white text-slate-900 hover:bg-slate-900 hover:text-white shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]"
+                                                : "bg-transparent text-slate-900 hover:bg-slate-900 hover:text-white border-slate-900"
+                                        )}
+                                    >
+                                        {cta.text}
+                                    </Link>
+                                ))}
+                            </div>
+                        </Reveal>
+                    </div>
+                </motion.div>
+            </AnimatePresence>
+
+            {/* Navigation Dots */}
+            <div className="absolute bottom-12 left-0 right-0 z-20 flex justify-center gap-4">
+                {slides.map((_, idx) => (
+                    <button
+                        key={idx}
+                        onClick={() => handleDotClick(idx)}
+                        className={cn(
+                            "w-4 h-4 rounded-none border-2 border-slate-900 transition-all shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]",
+                            current === idx ? "bg-white scale-110" : "bg-slate-900/50 hover:bg-white"
+                        )}
+                        aria-label={`Go to slide ${idx + 1}`}
+                    />
+                ))}
+            </div>
+        </section>
+    );
+};
+
+
 // --- MAIN PAGE COMPONENT ---
 
 function LanderContent() {
@@ -840,130 +984,43 @@ function LanderContent() {
                 </div>
             </section>
 
-            {/* --- FOR STARTUPS --- */}
-            <section id="startups">
-                {/* Hero */}
-                <div className="bg-blue-600 text-white pt-24 pb-24 relative overflow-hidden border-b-4 border-slate-900 border-t-4">
-                    <div className="container mx-auto px-6 relative z-10 text-center">
-                        <Reveal width="100%">
-                            <h2 className="text-5xl md:text-7xl font-black uppercase tracking-tighter mb-6 leading-none">
-                                Find people. <br /> Build together. <br className="md:hidden" /> Keep moving.
-                            </h2>
-                            <p className="text-xl md:text-2xl text-blue-100 max-w-2xl mx-auto font-bold mb-10 leading-relaxed">
-                                EarnBuddy helps startups form teams and work inside shared spaces — from first conversation to execution.
-                            </p>
-                            <Link href="/auth?mode=signup" className="inline-block bg-white text-slate-900 px-8 py-4 rounded-none border-2 border-slate-900 text-xl font-black uppercase tracking-wide hover:bg-slate-900 hover:text-white transition-all shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]">
-                                Post an Opportunity
-                            </Link>
-                        </Reveal>
-                    </div>
-                </div>
+            {/* --- SLIDESHOW SECTION --- */}
+            <LanderSlideshow />
 
-
-                {/* --- FOR FREELANCERS --- */}
-                <section id="freelancers">
-                    {/* Hero */}
-                    <div className="bg-yellow-400 text-slate-900 pt-24 pb-24 relative overflow-hidden border-b-4 border-slate-900">
-                        <div className="container mx-auto px-6 relative z-10 text-center">
-                            <Reveal width="100%">
-                                <h2 className="text-5xl md:text-7xl font-black uppercase tracking-tighter mb-6 leading-none">
-                                    Freelancing, <br /> without the noise.
-                                </h2>
-                                <p className="text-xl md:text-2xl text-slate-800 max-w-2xl mx-auto font-bold mb-10 leading-relaxed">
-                                    Find real work, talk directly to clients, and build a visible track record over time.
-                                </p>
-                                <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                                    <Link href="/auth?mode=signup" className="bg-slate-900 text-white px-8 py-4 rounded-none border-2 border-slate-900 text-xl font-black uppercase tracking-wide hover:bg-white hover:text-slate-900 transition-all shadow-[6px_6px_0px_0px_rgba(255,255,255,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]">
-                                        Browse Opportunities
-                                    </Link>
-                                    <Link href="/auth?mode=signup" className="px-8 py-4 rounded-none border-2 border-slate-900 text-xl font-black uppercase tracking-wide hover:bg-slate-900 hover:text-white transition-all">
-                                        Create Profile
-                                    </Link>
-                                </div>
-                            </Reveal>
-                        </div>
-                    </div>
-
-                </section>
-
-                {/* --- FOR COMMUNITIES --- */}
-                <section id="communities">
-                    {/* Hero */}
-                    <div className="bg-red-500 text-white pt-24 pb-24 relative overflow-hidden border-b-4 border-slate-900">
-                        <div className="container mx-auto px-6 relative z-10 text-center">
-                            <Reveal width="100%">
-                                <h2 className="text-5xl md:text-7xl font-black uppercase tracking-tighter mb-6 leading-none">
-                                    A better home for <br /> serious communities.
-                                </h2>
-                                <p className="text-xl md:text-2xl text-red-50 max-w-2xl mx-auto font-bold mb-10 leading-relaxed">
-                                    EarnBuddy helps communities talk, collaborate, and build things together — without friction.
-                                </p>
-                                <Link href="/auth?mode=signup" className="inline-block bg-white text-slate-900 px-8 py-4 rounded-none border-2 border-slate-900 text-xl font-black uppercase tracking-wide hover:bg-slate-900 hover:text-white transition-all shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]">
-                                    Create a Community Circle
-                                </Link>
-                            </Reveal>
-                        </div>
-                    </div>
-
-                </section>
-
-                {/* --- FOR EVENTS (NEW) --- */}
-                <section id="events">
-                    {/* Hero */}
-                    <div className="bg-purple-600 text-white pt-24 pb-24 relative overflow-hidden border-b-4 border-slate-900">
-                        <div className="container mx-auto px-6 relative z-10 text-center">
-                            <Reveal width="100%">
-                                <h2 className="text-5xl md:text-7xl font-black uppercase tracking-tighter mb-6 leading-none">
-                                    Host global events. <br /> Build local connection.
-                                </h2>
-                                <p className="text-xl md:text-2xl text-purple-100 max-w-2xl mx-auto font-bold mb-10 leading-relaxed">
-                                    From hackathons to meetups, EarnBuddy is the place to gather the builders.
-                                </p>
-                                <Link href="/auth?mode=signup" className="inline-block bg-white text-slate-900 px-8 py-4 rounded-none border-2 border-slate-900 text-xl font-black uppercase tracking-wide hover:bg-slate-900 hover:text-white transition-all shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]">
-                                    Host an Event
-                                </Link>
-                            </Reveal>
-                        </div>
-                    </div>
-
-                </section>
-
-                {/* --- PRICING --- */}
-                <section id="pricing">
-                    <CreativePricing
-                        tag="Simple Plans"
-                        title="Start for free, upgrade to scale."
-                        description="Whether you're a student building a portfolio or a startup building a team."
-                        tiers={[
-                            {
-                                name: "Builder",
-                                price: 0,
-                                description: "For students and freelancers starting out.",
-                                features: ["Create Profile", "Join Community Circles", "Apply to Opportunities", "Basic Analytics"],
-                                color: "bg-white",
-                                icon: <Users className="w-6 h-6" />
-                            },
-                            {
-                                name: "Startup",
-                                price: 2999,
-                                description: "For founders posting roles and building teams.",
-                                features: ["Post Unlimited Roles", "Access Verified Talent", "Create Private Circles", "Advanced Team Tools"],
-                                popular: true,
-                                color: "bg-green-400",
-                                icon: <Rocket className="w-6 h-6" />
-                            },
-                            {
-                                name: "Organization",
-                                price: "Custom",
-                                description: "For large communities and institutions.",
-                                features: ["Custom Branding", "University Dashboards", "API Access", "Dedicated Support"],
-                                color: "bg-blue-400",
-                                icon: <Globe className="w-6 h-6" />
-                            }
-                        ]}
-                    />
-                </section>
-
+            {/* --- PRICING --- */}
+            <section id="pricing">
+                <CreativePricing
+                    tag="Simple Plans"
+                    title="Start for free, upgrade to scale."
+                    description="Whether you're a student building a portfolio or a startup building a team."
+                    tiers={[
+                        {
+                            name: "Builder",
+                            price: 0,
+                            description: "For students and freelancers starting out.",
+                            features: ["Create Profile", "Join Community Circles", "Apply to Opportunities", "Basic Analytics"],
+                            color: "bg-white",
+                            icon: <Users className="w-6 h-6" />
+                        },
+                        {
+                            name: "Startup",
+                            price: 2999,
+                            description: "For founders posting roles and building teams.",
+                            features: ["Post Unlimited Roles", "Access Verified Talent", "Create Private Circles", "Advanced Team Tools"],
+                            popular: true,
+                            color: "bg-green-400",
+                            icon: <Rocket className="w-6 h-6" />
+                        },
+                        {
+                            name: "Organization",
+                            price: "Custom",
+                            description: "For large communities and institutions.",
+                            features: ["Custom Branding", "University Dashboards", "API Access", "Dedicated Support"],
+                            color: "bg-blue-400",
+                            icon: <Globe className="w-6 h-6" />
+                        }
+                    ]}
+                />
             </section>
 
             {/* Partners */}
@@ -986,24 +1043,18 @@ function LanderContent() {
                     <LogoMarquee
                         items={[
                             { image: "/partners/iitbhu/ecell iit bhu.webp", text: "E-Cell IIT BHU" },
-                            { text: "IIT Mandi E-Cell" },
-                            { text: "IIT Bhilai E-Cell" },
+                            { image: "/partners/iitbhilai/iitbhilai.jpeg", text: "IIT Bhilai" },
+                            { image: "/partners/iitmandi/iitmandi.png", text: "IIT Mandi" },
                             { text: "IIT Bhubaneshwar E-Cell" },
                             { text: "BITS Pilani" },
                             { text: "IIIT Hyderabad" },
                             { text: "Start-up India" },
                             { text: "Y Combinator" },
-                            { text: "Techstars" },
-                            { text: "IIT Guwahati" },
-                            { text: "IIM Ahmedabad" },
-                            { text: "IIIT Delhi" },
                         ]}
                         speed={10}
                     />
                 </div>
             </section>
-
-
 
             {/* Community Stories */}
             <section id="community" className="py-24 bg-white border-t-4 border-slate-900 relative">
@@ -1019,12 +1070,8 @@ function LanderContent() {
                 </div>
             </section>
 
-
-
-
-
             {/* FAQ */}
-            < section id="faq" className="bg-white border-t-4 border-slate-900 pt-32 pb-24" >
+            <section id="faq" className="bg-white border-t-4 border-slate-900 pt-32 pb-24">
                 <Reveal width="100%">
                     <Faq5
                         badge="FAQ"
@@ -1032,13 +1079,12 @@ function LanderContent() {
                         description="Everything you need to know about the platform."
                     />
                 </Reveal>
-            </section >
-
-
+            </section>
 
             <PublicFooter />
-        </div >
+        </div>
     );
+
 }
 
 export default function Lander() {

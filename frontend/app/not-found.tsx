@@ -23,11 +23,11 @@ export default function NotFound() {
                     </p>
 
                     <Link
-                        href="/dashboard"
+                        href="/discover"
                         className="inline-flex items-center gap-2 px-8 py-4 bg-slate-900 text-white font-black uppercase tracking-widest border-2 border-transparent hover:bg-white hover:text-slate-900 hover:border-slate-900 transition-all shadow-[6px_6px_0px_0px_rgba(22,163,74,1)] hover:shadow-[4px_4px_0px_0px_rgba(22,163,74,1)] hover:translate-x-[2px] hover:translate-y-[2px]"
                     >
                         <Home className="w-5 h-5 stroke-[3]" />
-                        Return to Base
+                        Return Home
                     </Link>
                 </div>
             </div>
