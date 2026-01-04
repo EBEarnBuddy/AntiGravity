@@ -12,14 +12,20 @@ import { motion } from 'framer-motion';
 
 
 
-const NotificationDropdown = () => {
+interface NotificationDropdownProps {
+    isOpen: boolean;
+    onToggle: () => void;
+}
+
+const NotificationDropdown = ({ isOpen, onToggle }: NotificationDropdownProps) => {
     const { currentUser } = useAuth();
     const [notifications, setNotifications] = useState<Notification[]>([]);
     const [unreadCount, setUnreadCount] = useState(0);
-    const [isOpen, setIsOpen] = useState(false);
 
     const wrapperRef = useRef<HTMLDivElement>(null);
-    useOnClickOutside(wrapperRef, () => setIsOpen(false));
+    useOnClickOutside(wrapperRef, () => {
+        if (isOpen) onToggle();
+    });
 
     useEffect(() => {
         if (!currentUser) return;
@@ -67,15 +73,12 @@ const NotificationDropdown = () => {
     }, [currentUser]);
 
     const handleNotificationClick = async (id: string, currentlyRead: boolean) => {
-        if (!id) return; // Should remove from list optimistically?
-        setIsOpen(false);
+        if (!id) return;
+        if (isOpen) onToggle(); // Close on click
 
         if (!currentlyRead) {
             try {
-                // API Call
                 await api.put(`/notifications/${id}/read`);
-                // Optimistic UI update already happened via setIsOpen(false) technically if we routed away,
-                // But local state 'notifications' should be updated too if we stay or return.
                 setNotifications(prev => prev.filter(n => n.id !== id));
                 setUnreadCount(prev => Math.max(0, prev - 1));
             } catch (err) {
@@ -85,7 +88,6 @@ const NotificationDropdown = () => {
     };
 
     const handleClearAll = async () => {
-        // Not implemented in FirestoreService yet for batch
         setNotifications([]);
         setUnreadCount(0);
         try {
@@ -98,7 +100,7 @@ const NotificationDropdown = () => {
     return (
         <div className="relative" ref={wrapperRef}>
             <motion.button
-                onClick={() => setIsOpen(!isOpen)}
+                onClick={onToggle}
                 className="relative p-2 text-white hover:text-green-100 transition-colors"
                 animate={unreadCount > 0 ? { scale: [1, 1.2, 1] } : {}}
                 transition={{ duration: 0.3 }}
@@ -112,14 +114,14 @@ const NotificationDropdown = () => {
             </motion.button>
 
             {isOpen && (
-                <div className="absolute right-0 mt-2 w-80 bg-white border-2 border-slate-900 rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-                    <div className="p-3 border-b-2 border-slate-900 bg-slate-50 flex justify-between items-center bg-slate-100">
+                <div className="fixed inset-x-0 top-16 md:absolute md:top-full md:right-0 md:left-auto md:w-80 bg-white border-b-2 md:border-2 border-slate-900 shadow-[0_4px_0_0_rgba(0,0,0,1)] md:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+                    <div className="p-3 border-b-2 border-slate-900 bg-slate-100 flex justify-between items-center">
                         <h3 className="font-black text-slate-900 uppercase tracking-wide text-xs">Notifications</h3>
                         <div className="flex gap-3">
                             <button onClick={handleClearAll} className="text-[10px] font-bold text-red-600 hover:text-red-800 uppercase tracking-wide">Clear All</button>
                         </div>
                     </div>
-                    <div className="max-h-96 overflow-y-auto">
+                    <div className="max-h-[60vh] md:max-h-96 overflow-y-auto">
                         {notifications.length === 0 ? (
                             <div className="p-4 text-center text-slate-500 text-sm font-bold">No new notifications</div>
                         ) : (

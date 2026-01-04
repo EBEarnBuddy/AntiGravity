@@ -213,30 +213,46 @@ async function seedProjects(posterId: mongoose.Types.ObjectId, founderUid: strin
   }
 }
 
-async function seedCircles(posterId: mongoose.Types.ObjectId) {
+async function ensureSystemUser() {
+  let user = await User.findOne({ email: 'system@earnbuddy.io' });
+  if (!user) {
+    user = await User.create({
+      firebaseUid: 'system-admin-uid',
+      email: 'system@earnbuddy.io',
+      displayName: 'EarnBuddy System',
+      photoURL: 'https://ui-avatars.com/api/?name=EB&background=0f172a&color=fff',
+      role: 'admin'
+    });
+  }
+  return user;
+}
+
+async function seedCircles(demoUserId: mongoose.Types.ObjectId, systemUserId: mongoose.Types.ObjectId) {
   const categories = [
-    { name: 'Web Dev Wizards', icon: '💻', desc: 'Discuss latest frameworks and tools.' },
-    { name: 'UI/UX Designers', icon: '🎨', desc: 'Feedback, critiques, and design talk.' },
-    { name: 'Indie Hackers', icon: '🚀', desc: 'Building profitable side projects.' },
-    { name: 'AI Researchers', icon: '🤖', desc: 'Discussing LLMs, agents, and more.' },
-    { name: 'Content Creators', icon: '✍️', desc: 'Writing, video, and audience building.' },
-    { name: 'Product Management', icon: '📅', desc: 'Roadmaps, strategy, and user talks.' },
-    { name: 'Crypto & Web3', icon: '⛓️', desc: 'DeFi, NFTs, and DAOs.' },
-    { name: 'Mobile Devs', icon: '📱', desc: 'iOS, Android, React Native, Flutter.' },
+    { name: 'Web Dev Wizards', icon: '💻', desc: 'Discuss latest frameworks and tools.', owner: 'demo' },
+    { name: 'UI/UX Designers', icon: '🎨', desc: 'Feedback, critiques, and design talk.', owner: 'system' },
+    { name: 'Indie Hackers', icon: '🚀', desc: 'Building profitable side projects.', owner: 'demo' },
+    { name: 'AI Researchers', icon: '🤖', desc: 'Discussing LLMs, agents, and more.', owner: 'system' },
+    { name: 'Content Creators', icon: '✍️', desc: 'Writing, video, and audience building.', owner: 'system' },
+    { name: 'Product Management', icon: '📅', desc: 'Roadmaps, strategy, and user talks.', owner: 'system' },
+    { name: 'Crypto & Web3', icon: '⛓️', desc: 'DeFi, NFTs, and DAOs.', owner: 'demo' },
+    { name: 'Mobile Devs', icon: '📱', desc: 'iOS, Android, React Native, Flutter.', owner: 'system' },
     // New Demo Circles for Verification
-    { name: 'General Lounge', icon: '☕', desc: 'Chill hangout for everyone.' },
-    { name: 'Startup Ideas', icon: '💡', desc: 'Validate your crazy ideas here.' },
-    { name: 'EarnBuddy Feedback', icon: '📢', desc: 'Help us improve the platform!' },
+    { name: 'General Lounge', icon: '☕', desc: 'Chill hangout for everyone.', owner: 'demo' },
+    { name: 'Startup Ideas', icon: '💡', desc: 'Validate your crazy ideas here.', owner: 'system' },
+    { name: 'EarnBuddy Feedback', icon: '📢', desc: 'Help us improve the platform!', owner: 'system' },
   ];
 
   for (const cat of categories) {
     const exists = await Room.findOne({ name: cat.name });
     if (exists) continue;
 
+    const ownerId = cat.owner === 'demo' ? demoUserId : systemUserId;
+
     const room = await Room.create({
       name: cat.name,
       description: cat.desc,
-      createdBy: posterId,
+      createdBy: ownerId,
       icon: cat.icon,
       isPrivate: false,
       membersCount: Math.floor(Math.random() * 50) + 5,
@@ -244,7 +260,7 @@ async function seedCircles(posterId: mongoose.Types.ObjectId) {
 
     await RoomMembership.create({
       room: room._id,
-      user: posterId,
+      user: ownerId,
       role: 'admin',
     });
   }
@@ -312,6 +328,7 @@ async function main() {
     console.log('✨ Database cleared.');
 
     const demoUser = await ensureDemoUser();
+    const systemUser = await ensureSystemUser();
 
     console.log('🌱 Seeding Startups...');
     await seedStartups(demoUser._id, demoUser.firebaseUid);
@@ -320,7 +337,7 @@ async function main() {
     await seedProjects(demoUser._id, demoUser.firebaseUid);
 
     console.log('🌱 Seeding Circles...');
-    await seedCircles(demoUser._id);
+    await seedCircles(demoUser._id, systemUser._id);
 
     console.log('🌱 Seeding Events...');
     await seedEvents(demoUser._id);

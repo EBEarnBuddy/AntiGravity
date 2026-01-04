@@ -892,7 +892,7 @@ function LanderContent() {
                 </div>
 
                 {/* Wave separator */}
-                <div className="absolute bottom-0 left-0 w-full overflow-hidden leading-none rotate-180">
+                <div className="absolute bottom-[-1px] left-0 w-full overflow-hidden leading-none rotate-180">
                     <svg className="relative block w-[calc(100%+1.3px)] h-[30px]" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none">
                         <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z" fill="#000000"></path>
                     </svg>
@@ -915,7 +915,7 @@ function LanderContent() {
                         </Reveal>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
                         {/* Startups */}
                         <Reveal delay={0.1}>
                             <SquishyOffers
@@ -1044,14 +1044,9 @@ function LanderContent() {
                         items={[
                             { image: "/partners/iitbhu/ecell iit bhu.webp", text: "E-Cell IIT BHU" },
                             { image: "/partners/iitbhilai/iitbhilai.jpeg", text: "IIT Bhilai" },
-                            { image: "/partners/iitmandi/iitmandi.png", text: "IIT Mandi" },
-                            { text: "IIT Bhubaneshwar E-Cell" },
-                            { text: "BITS Pilani" },
-                            { text: "IIIT Hyderabad" },
-                            { text: "Start-up India" },
-                            { text: "Y Combinator" },
+                            { image: "/partners/iitmandi/iitmandi.png", text: "IIT Mandi" }
                         ]}
-                        speed={10}
+                        speed={20}
                     />
                 </div>
             </section>
