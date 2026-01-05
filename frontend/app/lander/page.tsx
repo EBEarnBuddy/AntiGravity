@@ -27,7 +27,7 @@ import { cn } from '@/lib/utils';
 import { motion, AnimatePresence, useInView } from 'framer-motion';
 import { PublicNavbar } from "@/components/layout/PublicNavbar";
 import { PublicFooter } from "@/components/layout/PublicFooter";
-import { CreativePricing } from "@/components/ui/creative-pricing";
+
 
 import { useRef } from "react";
 
@@ -163,199 +163,7 @@ function VideoModal({ isOpen, onClose }: VideoModalProps) {
     );
 }
 
-// 3. StaggerTestimonials
-const testimonials = [
-    {
-        tempId: 0,
-        testimonial: "My favorite solution in the market. We work 5x faster with EarnBuddy.",
-        by: "Alex, CEO at TechCorp",
-        imgSrc: "https://i.pravatar.cc/150?img=1"
-    },
-    {
-        tempId: 1,
-        testimonial: "I'm confident my data is safe with EarnBuddy. I can't say that about other providers.",
-        by: "Dan, CTO at SecureNet",
-        imgSrc: "https://i.pravatar.cc/150?img=2"
-    },
-    {
-        tempId: 2,
-        testimonial: "I know it's cliche, but we were lost before we found EarnBuddy. Can't thank you guys enough!",
-        by: "Stephanie, COO at InnovateCo",
-        imgSrc: "https://i.pravatar.cc/150?img=3"
-    },
-    {
-        tempId: 3,
-        testimonial: "EarnBuddy's products make planning for the future seamless. Can't recommend them enough!",
-        by: "Marie, CFO at FuturePlanning",
-        imgSrc: "https://i.pravatar.cc/150?img=4"
-    },
-    {
-        tempId: 4,
-        testimonial: "If I could give 11 stars, I'd give 12.",
-        by: "Andre, Head of Design at CreativeSolutions",
-        imgSrc: "https://i.pravatar.cc/150?img=5"
-    },
-    {
-        tempId: 5,
-        testimonial: "SO SO SO HAPPY WE FOUND YOU GUYS!!!! I'd bet you've saved me 100 hours so far.",
-        by: "Jeremy, Product Manager at TimeWise",
-        imgSrc: "https://i.pravatar.cc/150?img=6"
-    },
-    {
-        tempId: 6,
-        testimonial: "Took some convincing, but now that we're on EarnBuddy, we're never going back.",
-        by: "Pam, Marketing Director at BrandBuilders",
-        imgSrc: "https://i.pravatar.cc/150?img=7"
-    },
-    {
-        tempId: 7,
-        testimonial: "I would be lost without EarnBuddy's in-depth analytics. The ROI is EASILY 100X for us.",
-        by: "Daniel, Data Scientist at AnalyticsPro",
-        imgSrc: "https://i.pravatar.cc/150?img=8"
-    }
-];
 
-interface TestimonialCardProps {
-    position: number;
-    testimonial: typeof testimonials[0];
-    handleMove: (steps: number) => void;
-    cardSize: number;
-}
-
-const TestimonialCard: React.FC<TestimonialCardProps> = ({
-    position,
-    testimonial,
-    handleMove,
-    cardSize
-}) => {
-    const isCenter = position === 0;
-
-    return (
-        <div
-            onClick={() => handleMove(position)}
-            className={cn(
-                "absolute left-1/2 top-1/2 cursor-pointer border-4 border-slate-900 p-8 transition-all duration-500 ease-in-out",
-                isCenter
-                    ? "z-10 bg-green-400 text-slate-900 shadow-[12px_12px_0px_0px_rgba(0,0,0,1)]"
-                    : "z-0 bg-white text-slate-500 hover:bg-slate-50 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]"
-            )}
-            style={{
-                width: cardSize,
-                height: cardSize,
-                // SCALING FIX: Limit max width/height to avoid cutting off on small screens
-                maxWidth: '90vw',
-                maxHeight: '90vw',
-                transform: `
-          translate(-50%, -50%) 
-          translateX(${(cardSize / 1.5) * position}px)
-          translateY(${isCenter ? -65 : position % 2 ? 15 : -15}px)
-          rotate(${isCenter ? 0 : position % 2 ? 2.5 : -2.5}deg)
-        `,
-            }}
-        >
-            <div className="absolute top-4 right-4 text-4xl font-black opacity-20 select-none">
-                "
-            </div>
-            <img
-                src={testimonial.imgSrc}
-                alt={`${testimonial.by.split(',')[0]}`}
-                className="mb-6 h-16 w-16 border-2 border-slate-900 object-cover shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
-            />
-            <h3 className={cn(
-                "text-lg sm:text-xl font-black uppercase leading-tight mb-4",
-                isCenter ? "text-slate-900" : "text-slate-700"
-            )}>
-                "{testimonial.testimonial}"
-            </h3>
-            <p className={cn(
-                "absolute bottom-8 left-8 right-8 mt-2 text-sm font-bold border-t-2 border-slate-900/10 pt-4",
-                isCenter ? "text-slate-800" : "text-slate-500"
-            )}>
-                - {testimonial.by}
-            </p>
-        </div>
-    );
-};
-
-const StaggerTestimonials: React.FC = () => {
-    const [cardSize, setCardSize] = useState(365);
-    const [testimonialsList, setTestimonialsList] = useState(testimonials);
-
-    const handleMove = (steps: number) => {
-        const newList = [...testimonialsList];
-        if (steps > 0) {
-            for (let i = steps; i > 0; i--) {
-                const item = newList.shift();
-                if (!item) return;
-                newList.push({ ...item, tempId: Math.random() });
-            }
-        } else {
-            for (let i = steps; i < 0; i++) {
-                const item = newList.pop();
-                if (!item) return;
-                newList.unshift({ ...item, tempId: Math.random() });
-            }
-        }
-        setTestimonialsList(newList);
-    };
-
-    useEffect(() => {
-        const updateSize = () => {
-            const { matches } = window.matchMedia("(min-width: 640px)");
-            setCardSize(matches ? 365 : 290);
-        };
-
-        updateSize();
-        window.addEventListener("resize", updateSize);
-        return () => window.removeEventListener("resize", updateSize);
-    }, []);
-
-    return (
-        <div
-            className="relative w-full overflow-hidden"
-            style={{ height: 600 }}
-        >
-            {testimonialsList.map((testimonial, index) => {
-                const position = testimonialsList.length % 2
-                    ? index - (testimonialsList.length + 1) / 2
-                    : index - testimonialsList.length / 2;
-                return (
-                    <TestimonialCard
-                        key={testimonial.tempId}
-                        testimonial={testimonial}
-                        handleMove={handleMove}
-                        position={position}
-                        cardSize={cardSize}
-                    />
-                );
-            })}
-            <div className="absolute bottom-4 left-1/2 flex -translate-x-1/2 gap-2">
-                <button
-                    onClick={() => handleMove(-1)}
-                    className={cn(
-                        "flex h-14 w-14 items-center justify-center text-2xl transition-colors rounded-none",
-                        "bg-white border-2 border-slate-900 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none hover:bg-white hover:text-slate-900",
-                        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                    )}
-                    aria-label="Previous testimonial"
-                >
-                    <ChevronLeft className="w-8 h-8" />
-                </button>
-                <button
-                    onClick={() => handleMove(1)}
-                    className={cn(
-                        "flex h-14 w-14 items-center justify-center text-2xl transition-colors rounded-none",
-                        "bg-white border-2 border-slate-900 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none hover:bg-white hover:text-slate-900",
-                        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                    )}
-                    aria-label="Next testimonial"
-                >
-                    <ChevronRight className="w-8 h-8" />
-                </button>
-            </div>
-        </div>
-    );
-};
 
 // 4. Faq5
 interface FaqItem {
@@ -759,7 +567,7 @@ function LanderContent() {
             <PublicNavbar />
 
             {/* Hero Section */}
-            <header className="bg-primary text-white pt-32 pb-0 overflow-hidden relative">
+            <header className="bg-primary text-white pt-24 pb-0 overflow-hidden relative">
                 <div className="container mx-auto px-6 max-w-7xl">
                     <div className="flex flex-col md:flex-row items-center gap-12">
                         <div className="flex-1 space-y-8 pb-32 z-10">
@@ -926,7 +734,7 @@ function LanderContent() {
                                         description: "Post roles, find co-founders, and build your team",
                                         features: ["Post unlimited roles", "Find co-founders", "Private Circles"],
                                         cta: "Learn More",
-                                        href: "#startups",
+                                        href: "/for-startups",
                                         BGComponent: BGComponent1
                                     }
                                 ]}
@@ -942,7 +750,7 @@ function LanderContent() {
                                         description: "Offer services, find projects, team up for gigs",
                                         features: ["Post projects", "Secure payments", "Reputation System"],
                                         cta: "Learn More",
-                                        href: "#freelancers",
+                                        href: "/for-freelancers",
                                         BGComponent: BGComponent2
                                     }
                                 ]}
@@ -958,7 +766,7 @@ function LanderContent() {
                                         description: "Build communities, host events, collaborate",
                                         features: ["Create communities", "Group Chat", "Analytics"],
                                         cta: "Learn More",
-                                        href: "#communities",
+                                        href: "/for-communities",
                                         BGComponent: BGComponent3
                                     }
                                 ]}
@@ -974,7 +782,7 @@ function LanderContent() {
                                         description: "Discover hackathons, meetups, and workshops",
                                         features: ["Host events", "Register attendees", "Networking"],
                                         cta: "Learn More",
-                                        href: "#events",
+                                        href: "/events",
                                         BGComponent: BGComponent1
                                     }
                                 ]}
@@ -982,45 +790,6 @@ function LanderContent() {
                         </Reveal>
                     </div>
                 </div>
-            </section>
-
-            {/* --- SLIDESHOW SECTION --- */}
-            <LanderSlideshow />
-
-            {/* --- PRICING --- */}
-            <section id="pricing">
-                <CreativePricing
-                    tag="Simple Plans"
-                    title="Start for free, upgrade to scale."
-                    description="Whether you're a student building a portfolio or a startup building a team."
-                    tiers={[
-                        {
-                            name: "Builder",
-                            price: 0,
-                            description: "For students and freelancers starting out.",
-                            features: ["Create Profile", "Join Community Circles", "Apply to Opportunities", "Basic Analytics"],
-                            color: "bg-white",
-                            icon: <Users className="w-6 h-6" />
-                        },
-                        {
-                            name: "Startup",
-                            price: 2999,
-                            description: "For founders posting roles and building teams.",
-                            features: ["Post Unlimited Roles", "Access Verified Talent", "Create Private Circles", "Advanced Team Tools"],
-                            popular: true,
-                            color: "bg-green-400",
-                            icon: <Rocket className="w-6 h-6" />
-                        },
-                        {
-                            name: "Organization",
-                            price: "Custom",
-                            description: "For large communities and institutions.",
-                            features: ["Custom Branding", "University Dashboards", "API Access", "Dedicated Support"],
-                            color: "bg-blue-400",
-                            icon: <Globe className="w-6 h-6" />
-                        }
-                    ]}
-                />
             </section>
 
             {/* Partners */}
@@ -1046,24 +815,13 @@ function LanderContent() {
                             { image: "/partners/iitbhilai/iitbhilai.jpeg", text: "IIT Bhilai" },
                             { image: "/partners/iitmandi/iitmandi.png", text: "IIT Mandi" }
                         ]}
-                        speed={20}
+                        speed={10}
                     />
                 </div>
             </section>
 
-            {/* Community Stories */}
-            <section id="community" className="py-24 bg-white border-t-4 border-slate-900 relative">
-                <div className="w-full">
-                    <div className="text-center mb-16 container mx-auto px-6">
-                        <Reveal width="100%">
-                            <h2 className="text-3xl md:text-5xl font-black text-slate-900 uppercase tracking-tighter bg-white inline-block px-8 py-4 border-4 border-slate-900 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] transform -rotate-2">
-                                Stories from our <span className="text-green-600">community</span>
-                            </h2>
-                        </Reveal>
-                    </div>
-                    <StaggerTestimonials />
-                </div>
-            </section>
+            {/* --- SLIDESHOW SECTION --- */}
+            <LanderSlideshow />
 
             {/* FAQ */}
             <section id="faq" className="bg-white border-t-4 border-slate-900 pt-32 pb-24">

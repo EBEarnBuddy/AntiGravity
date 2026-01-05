@@ -31,8 +31,7 @@ export function PublicNavbar() {
                     <div className="hidden lg:flex items-center gap-8 text-lg font-medium text-white/90">
                         <Link href="/lander#how-it-works" className="hover:text-white transition">How It Works</Link>
                         <Link href="/partners" className="hover:text-white transition">Partners</Link>
-                        <Link href="/pricing" className="hover:text-white transition">Pricing</Link>
-                        <Link href="/communities" className="hover:text-white transition">Community</Link>
+                        <Link href="/for-communities" className="hover:text-white transition">Community</Link>
                         <Link href="/lander#faq" className="hover:text-white transition">FAQ</Link>
                     </div>
 
@@ -62,8 +61,7 @@ export function PublicNavbar() {
                         <div className="flex flex-col gap-6 text-2xl font-black text-white uppercase tracking-wide">
                             <Link href="/lander#how-it-works" onClick={toggleMenu} className="hover:text-green-400 text-center">How It Works</Link>
                             <Link href="/partners" onClick={toggleMenu} className="hover:text-green-400 text-center">Partners</Link>
-                            <Link href="/pricing" onClick={toggleMenu} className="hover:text-green-400 text-center">Pricing</Link>
-                            <Link href="/communities" onClick={toggleMenu} className="hover:text-green-400 text-center">Community</Link>
+                            <Link href="/for-communities" onClick={toggleMenu} className="hover:text-green-400 text-center">Community</Link>
                             <Link href="/lander#faq" onClick={toggleMenu} className="hover:text-green-400 text-center">FAQ</Link>
                             <hr className="border-slate-800 my-2" />
                             <Link href="/auth?mode=signin" onClick={toggleMenu} className="text-green-400 text-center">Log In</Link>
