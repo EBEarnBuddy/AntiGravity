@@ -605,7 +605,7 @@ function LanderContent() {
                                             <div className="w-2.5 h-2.5 rounded-full bg-yellow-400"></div>
                                             <div className="w-2.5 h-2.5 rounded-full bg-green-400"></div>
                                         </div>
-                                        <div className="bg-white text-[10px] text-gray-400 px-2 py-0.5 rounded flex-1 text-center mx-4 font-mono">earnbuddy.tech</div>
+                                        <div className="bg-white text-[10px] text-gray-400 px-2 py-0.5 rounded flex-1 text-center mx-4 font-mono">earnbuddy.io</div>
                                     </div>
                                     {/* Content Simulation - Realistic Dashboard Mockup */}
                                     <div className="bg-slate-50 relative aspect-[16/10] overflow-hidden group">
@@ -809,6 +809,51 @@ function LanderContent() {
                         </Reveal>
                     </div>
 
+
+                    <div className="mt-16 mb-16">
+                        <Reveal width="100%">
+                            <h3 className="text-2xl md:text-3xl font-black text-slate-900 text-center mb-12 uppercase tracking-tight">What our institutional partners say</h3>
+                        </Reveal>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            {[
+                                {
+                                    name: "Gourav Pandey",
+                                    role: "Startup Assistance Head, E-Cell IIT BHU",
+                                    quote: "Earnbuddy is the kind of platform every startup ecosystem needs today. It connects ambitious campus talent with budding startups, making collaboration easier and more impactful. Platforms like these create a self-sufficient ecosystem where both sides support and grow with each other, raising the overall entrepreneurial culture. Having been closely connected with student founders myself, I know how valuable this support truly is — and Earnbuddy is driven to prove its impact",
+                                    initials: "GP"
+                                },
+                                {
+                                    name: "Oppilan Iniyan",
+                                    role: "Startup Assistance Head, E-Cell IIT BHU",
+                                    quote: "EarnBuddy has been instrumental in strengthening the founder-developer ecosystem for student entrepreneurs at IIT BHU. By connecting builders, founders, and innovators on one platform, it has made collaboration easier and more impactful. As someone closely working with student founders, I've seen how EarnBuddy accelerates their journey from ideas to execution.",
+                                    initials: "OI"
+                                }
+                            ].map((partner, idx) => (
+                                <motion.div
+                                    key={idx}
+                                    initial={{ opacity: 0, y: 20 }}
+                                    whileInView={{ opacity: 1, y: 0 }}
+                                    viewport={{ once: true }}
+                                    transition={{ delay: idx * 0.1 }}
+                                    className="bg-white border-2 border-slate-900 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] p-6 md:p-8 flex flex-col h-full"
+                                >
+                                    <div className="flex items-center gap-4 mb-6">
+                                        <div className="w-12 h-12 bg-slate-100 border-2 border-slate-900 rounded-full flex items-center justify-center text-slate-900 font-black relative overflow-hidden shrink-0">
+                                            {partner.initials}
+                                        </div>
+                                        <div>
+                                            <h4 className="font-black text-slate-900 text-lg leading-none">{partner.name}</h4>
+                                            <p className="text-xs font-bold text-slate-500 uppercase mt-1">{partner.role}</p>
+                                        </div>
+                                    </div>
+                                    <p className="text-slate-700 font-medium leading-relaxed text-sm md:text-base italic">
+                                        "{partner.quote}"
+                                    </p>
+                                </motion.div>
+                            ))}
+                        </div>
+                    </div>
                 </div>
 
                 <div className="w-full">
@@ -824,10 +869,73 @@ function LanderContent() {
             </section >
 
             {/* --- SLIDESHOW SECTION --- */}
-            < LanderSlideshow />
+            <LanderSlideshow />
+
+            {/* Testimonials */}
+            <section id="community" className="py-24 bg-white border-t-4 border-slate-900 relative">
+                <div className="container mx-auto px-6">
+                    <div className="text-center mb-16">
+                        <Reveal width="100%">
+                            <div className="inline-block bg-pink-100 text-pink-800 px-3 py-1 text-xs font-black uppercase border-2 border-slate-900 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] mb-6">Community Stories</div>
+                            <h2 className="text-3xl md:text-5xl font-black text-slate-900 mb-6 uppercase tracking-tighter">
+                                What Builders <span className="text-pink-600">Are Saying</span>
+                            </h2>
+                        </Reveal>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+                        {[
+                            {
+                                quote: "As a freelancer and hackathon enthusiast, I'm genuinely wish to transform my solo project struggles into powerful teamwork.",
+                                author: "Mrinal",
+                                role: "Student and Freelancer"
+                            },
+                            {
+                                quote: "As a freelancer and hackathon enthusiast, I'm genuinely wish to transform my solo project struggles into powerful teamwork.",
+                                author: "Elivs Osano",
+                                role: "Freelancer and Founder, UpShift Ecommerce"
+                            },
+                            {
+                                quote: "EarnBuddy solved a problem I faced, and I'm genuinely excited to be a part of the journey as we build it together.",
+                                author: "Aditi Bansal",
+                                role: "Student and Full-Stack Developer"
+                            },
+                            {
+                                quote: "As a founder, I'm excited by EarnBuddy's vision for building the right team and would love early access.",
+                                author: "Jay Agarwal",
+                                role: "Founder, Ganges"
+                            }
+                        ].map((item, idx) => (
+                            <motion.div
+                                key={idx}
+                                initial={{ opacity: 0, y: 20 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ delay: idx * 0.1 }}
+                                className="bg-white border-4 border-slate-900 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-8 flex flex-col justify-between hover:-translate-y-1 hover:shadow-[10px_10px_0px_0px_rgba(0,0,0,1)] transition-all"
+                            >
+                                <div className="mb-6">
+                                    <div className="flex gap-1 mb-4">
+                                        {[1, 2, 3, 4, 5].map(star => (
+                                            <svg key={star} className="w-5 h-5 text-yellow-400 fill-current" viewBox="0 0 20 20">
+                                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                            </svg>
+                                        ))}
+                                    </div>
+                                    <p className="text-xl font-bold text-slate-900 leading-relaxed">"{item.quote}"</p>
+                                </div>
+                                <div className="border-t-2 border-slate-100 pt-4 mt-auto">
+                                    <h4 className="font-black text-slate-900 uppercase">{item.author}</h4>
+                                    <p className="text-sm font-bold text-slate-500 uppercase">{item.role}</p>
+                                </div>
+                            </motion.div>
+                        ))}
+                    </div>
+                </div>
+            </section>
 
             {/* FAQ */}
-            < section id="faq" className="bg-white border-t-4 border-slate-900 pt-32 pb-24" >
+            <section id="faq" className="bg-white border-t-4 border-slate-900 pt-32 pb-24">
                 <Reveal width="100%">
                     <Faq5
                         badge="FAQ"

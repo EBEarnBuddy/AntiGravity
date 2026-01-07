@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import {
@@ -54,6 +54,20 @@ export default function DiscoverPage() {
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [showCircleModal, setShowCircleModal] = useState(false);
     const [showCreateDropdown, setShowCreateDropdown] = useState(false);
+    const createDropdownRef = useRef<HTMLDivElement>(null);
+
+    // Close dropdown when clicking outside
+    useEffect(() => {
+        function handleClickOutside(event: MouseEvent) {
+            if (createDropdownRef.current && !createDropdownRef.current.contains(event.target as Node)) {
+                setShowCreateDropdown(false);
+            }
+        }
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, [createDropdownRef]);
 
     // Fetch My Applications
     useEffect(() => {
@@ -111,7 +125,7 @@ export default function DiscoverPage() {
 
 
                             {/* Create Button & Dropdown */}
-                            <div className="relative">
+                            <div className="relative" ref={createDropdownRef}>
                                 <motion.button
                                     whileHover={{ scale: 1.05 }}
                                     whileTap={{ scale: 0.95 }}
