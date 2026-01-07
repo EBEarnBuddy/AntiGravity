@@ -74,7 +74,7 @@ function LogoMarquee({ items, speed = 20 }: LogoMarqueeProps) {
         <div className="w-full relative overflow-hidden bg-slate-50 border-4 border-slate-900 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] py-8">
             <div className="flex gap-16 whitespace-nowrap overflow-hidden">
                 <motion.div
-                    className="flex gap-16 min-w-full items-center"
+                    className="flex gap-16 min-w-full items-center pr-16"
                     animate={{
                         x: ["0%", "-50%"] // Move half the width (since we double the content)
                     }}
@@ -809,6 +809,9 @@ function LanderContent() {
                         </Reveal>
                     </div>
 
+                </div>
+
+                <div className="w-full">
                     <LogoMarquee
                         items={[
                             { image: "/partners/iitbhu/ecell iit bhu.webp", text: "E-Cell IIT BHU" },
@@ -818,13 +821,13 @@ function LanderContent() {
                         speed={10}
                     />
                 </div>
-            </section>
+            </section >
 
             {/* --- SLIDESHOW SECTION --- */}
-            <LanderSlideshow />
+            < LanderSlideshow />
 
             {/* FAQ */}
-            <section id="faq" className="bg-white border-t-4 border-slate-900 pt-32 pb-24">
+            < section id="faq" className="bg-white border-t-4 border-slate-900 pt-32 pb-24" >
                 <Reveal width="100%">
                     <Faq5
                         badge="FAQ"
@@ -832,10 +835,10 @@ function LanderContent() {
                         description="Everything you need to know about the platform."
                     />
                 </Reveal>
-            </section>
+            </section >
 
             <PublicFooter />
-        </div>
+        </div >
     );
 
 }
