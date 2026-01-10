@@ -92,8 +92,28 @@ export default function OnboardingPage() {
     };
 
     const handleComplete = async () => {
-        // Direct bypass as requested - no saving to backend
-        window.location.href = '/discover';
+        setLoading(true);
+        try {
+            await updateProfile({
+                ...formData,
+                displayName: username || currentUser?.displayName, // Use chosen username as display name fallback or keep google name? Actually username is likely unique handle.
+                username: username,
+                onboardingCompleted: true, // Legacy field support
+                hasCompletedOnboarding: true,
+                hasCompletedTour: !formData.wantsTour, // If wants tour (true), completed is false. If doesn't want (false), completed is true.
+                isNewUser: false
+            });
+
+            // Small delay for data propagation
+            setTimeout(() => {
+                window.location.href = '/discover';
+            }, 500);
+
+        } catch (error) {
+            console.error("Failed to save onboarding data:", error);
+            setLoading(false);
+            alert("Failed to save profile. Please try again.");
+        }
     };
 
     if (!currentUser) {
