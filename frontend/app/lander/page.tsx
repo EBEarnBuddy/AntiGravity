@@ -540,6 +540,129 @@ const LanderSlideshow = () => {
 
 // --- MAIN PAGE COMPONENT ---
 
+const testimonials = [
+    {
+        tempId: 0,
+        testimonial: "As a freelancer and hackathon enthusiast, I genuinely wish to transform my solo project struggles into powerful teamwork.",
+        by: "Mrinal",
+        role: "Student and Freelancer",
+        imgSrc: "/testimonies/mrinal.png"
+    },
+    {
+        tempId: 1,
+        testimonial: "As a freelancer and hackathon enthusiast, I genuinely wish to transform my solo project struggles into powerful teamwork.",
+        by: "Elivs Osano",
+        role: "Freelancer and Founder, UpShift Ecommerce",
+        imgSrc: "/testimonies/elvis.jpg"
+    },
+    {
+        tempId: 2,
+        testimonial: "EarnBuddy solved a problem I faced, and I'm genuinely excited to be a part of the journey as we build it together.",
+        by: "Aditi Bansal",
+        role: "Student and Full-Stack Developer",
+        imgSrc: "/testimonies/aditi.jpg"
+    },
+    {
+        tempId: 3,
+        testimonial: "As a founder, I'm excited by EarnBuddy's vision for building the right team and would love early access.",
+        by: "Jay Agarwal",
+        role: "Founder, Ganges",
+        imgSrc: "/testimonies/Jay.png"
+    }
+];
+
+const StaggerTestimonials = () => {
+    const [active, setActive] = useState(0);
+
+    const handleNext = () => {
+        setActive((prev) => (prev + 1) % testimonials.length);
+    };
+
+    const handlePrev = () => {
+        setActive((prev) => (prev - 1 + testimonials.length) % testimonials.length);
+    };
+
+    const isActive = (index: number) => {
+        return index === active;
+    };
+
+    return (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div>
+                <div className="relative h-[400px] w-full">
+                    <AnimatePresence mode="popLayout">
+                        {testimonials.map((t, idx) => {
+                            if (idx === active) {
+                                return (
+                                    <motion.div
+                                        key={t.tempId}
+                                        initial={{ scale: 0.9, opacity: 0, rotate: -5 }}
+                                        animate={{ scale: 1, opacity: 1, rotate: 0, zIndex: 10 }}
+                                        exit={{ scale: 0.9, opacity: 0, rotate: 5, zIndex: 0 }}
+                                        transition={{ duration: 0.4, ease: "easeInOut" }}
+                                        className="absolute inset-0 z-10"
+                                    >
+                                        <div className="bg-white border-4 border-slate-900 shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] p-8 h-full flex flex-col justify-between relative">
+                                            <div className="absolute top-4 right-4 text-6xl font-black text-slate-100 z-0">"</div>
+                                            <div className="relative z-10">
+                                                <div className="flex gap-1 mb-6">
+                                                    {[1, 2, 3, 4, 5].map(star => (
+                                                        <svg key={star} className="w-5 h-5 text-yellow-400 fill-current" viewBox="0 0 20 20">
+                                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                                        </svg>
+                                                    ))}
+                                                </div>
+                                                <p className="text-xl md:text-2xl font-bold text-slate-900 leading-relaxed mb-6">
+                                                    "{t.testimonial}"
+                                                </p>
+                                            </div>
+                                            <div className="flex items-center gap-4 pt-6 border-t-2 border-slate-100">
+                                                <div className="w-12 h-12 bg-slate-200 border-2 border-slate-900 rounded-full overflow-hidden shrink-0">
+                                                    <img src={t.imgSrc} alt={t.by} className="w-full h-full object-cover" />
+                                                </div>
+                                                <div>
+                                                    <h4 className="font-black text-slate-900 uppercase text-lg leading-none">{t.by}</h4>
+                                                    <p className="text-xs font-bold text-slate-500 uppercase mt-1">{t.role}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </motion.div>
+                                );
+                            }
+                            return null;
+                        })}
+                    </AnimatePresence>
+                </div>
+            </div>
+
+            <div className="flex flex-col gap-6">
+                <div className="flex gap-4">
+                    <button
+                        onClick={handlePrev}
+                        className="w-14 h-14 bg-white border-4 border-slate-900 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all group"
+                    >
+                        <ChevronLeft className="w-8 h-8 text-slate-900 group-hover:scale-110 transition-transform" strokeWidth={3} />
+                    </button>
+                    <button
+                        onClick={handleNext}
+                        className="w-14 h-14 bg-green-500 border-4 border-slate-900 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-[4px] active:translate-y-[4px] active:shadow-none transition-all group"
+                    >
+                        <ChevronRight className="w-8 h-8 text-white group-hover:scale-110 transition-transform" strokeWidth={3} />
+                    </button>
+                </div>
+                <div>
+                    <p className="text-lg font-bold text-slate-500 max-w-sm">
+                        Join hundreds of builders who are finding their team on EarnBuddy.
+                    </p>
+                    <div className="flex items-center gap-2 mt-4 text-sm font-black uppercase tracking-wide text-slate-900">
+                        <span className="text-green-600 animate-pulse">●</span> {active + 1} / {testimonials.length} Stories
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
 function LanderContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -810,6 +933,16 @@ function LanderContent() {
                     </div>
 
 
+                    <div className="w-full">
+                        <LogoMarquee
+                            items={[
+                                { image: "/partners/iitbhu/ecell iit bhu.webp", text: "E-Cell IIT BHU" },
+                                { image: "/partners/iitbhilai/iitbhilai.jpeg", text: "E-Cell IIT Bhilai" },
+                                { image: "/partners/iitmandi/iitmandi.png", text: "E-Cell IIT Mandi" }
+                            ]}
+                            speed={10}
+                        />
+                    </div>
                     <div className="mt-16 mb-16">
                         <Reveal width="100%">
                             <h3 className="text-2xl md:text-3xl font-black text-slate-900 text-center mb-12 uppercase tracking-tight">What our institutional partners say</h3>
@@ -856,16 +989,6 @@ function LanderContent() {
                     </div>
                 </div>
 
-                <div className="w-full">
-                    <LogoMarquee
-                        items={[
-                            { image: "/partners/iitbhu/ecell iit bhu.webp", text: "E-Cell IIT BHU" },
-                            { image: "/partners/iitbhilai/iitbhilai.jpeg", text: "IIT Bhilai" },
-                            { image: "/partners/iitmandi/iitmandi.png", text: "IIT Mandi" }
-                        ]}
-                        speed={10}
-                    />
-                </div>
             </section >
 
             {/* --- SLIDESHOW SECTION --- */}
@@ -883,53 +1006,10 @@ function LanderContent() {
                         </Reveal>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-                        {[
-                            {
-                                quote: "As a freelancer and hackathon enthusiast, I'm genuinely wish to transform my solo project struggles into powerful teamwork.",
-                                author: "Mrinal",
-                                role: "Student and Freelancer"
-                            },
-                            {
-                                quote: "As a freelancer and hackathon enthusiast, I'm genuinely wish to transform my solo project struggles into powerful teamwork.",
-                                author: "Elivs Osano",
-                                role: "Freelancer and Founder, UpShift Ecommerce"
-                            },
-                            {
-                                quote: "EarnBuddy solved a problem I faced, and I'm genuinely excited to be a part of the journey as we build it together.",
-                                author: "Aditi Bansal",
-                                role: "Student and Full-Stack Developer"
-                            },
-                            {
-                                quote: "As a founder, I'm excited by EarnBuddy's vision for building the right team and would love early access.",
-                                author: "Jay Agarwal",
-                                role: "Founder, Ganges"
-                            }
-                        ].map((item, idx) => (
-                            <motion.div
-                                key={idx}
-                                initial={{ opacity: 0, y: 20 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ once: true }}
-                                transition={{ delay: idx * 0.1 }}
-                                className="bg-white border-4 border-slate-900 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-8 flex flex-col justify-between hover:-translate-y-1 hover:shadow-[10px_10px_0px_0px_rgba(0,0,0,1)] transition-all"
-                            >
-                                <div className="mb-6">
-                                    <div className="flex gap-1 mb-4">
-                                        {[1, 2, 3, 4, 5].map(star => (
-                                            <svg key={star} className="w-5 h-5 text-yellow-400 fill-current" viewBox="0 0 20 20">
-                                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                            </svg>
-                                        ))}
-                                    </div>
-                                    <p className="text-xl font-bold text-slate-900 leading-relaxed">"{item.quote}"</p>
-                                </div>
-                                <div className="border-t-2 border-slate-100 pt-4 mt-auto">
-                                    <h4 className="font-black text-slate-900 uppercase">{item.author}</h4>
-                                    <p className="text-sm font-bold text-slate-500 uppercase">{item.role}</p>
-                                </div>
-                            </motion.div>
-                        ))}
+                    <div className="max-w-4xl mx-auto">
+                        <div className="relative">
+                            <StaggerTestimonials />
+                        </div>
                     </div>
                 </div>
             </section>
